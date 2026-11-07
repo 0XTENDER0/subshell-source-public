@@ -106,6 +106,7 @@ import io.github.brealorg.subshell.ui.communityPostFeedQueryKey
 import io.github.brealorg.subshell.ui.pagingFooterKey
 import io.github.brealorg.subshell.ui.rememberFeedScrollState
 import io.github.brealorg.subshell.ui.PostLayout
+import io.github.brealorg.subshell.ui.feedEdgeToEdge
 import io.github.brealorg.subshell.ui.feedItemSpacing
 import io.github.brealorg.subshell.ui.feedPostItemKeys
 import io.github.brealorg.subshell.ui.feedPostItems
@@ -1110,7 +1111,7 @@ fun CommunityScreen(
                 // ISSUE205_PASSIVE_SCROLL_POSITION_INDICATOR_V1
                 scrollPositionIndicator = state.scrollPositionIndicator,
                 contentPadding = PaddingValues(top = 4.dp, bottom = 96.dp),
-                verticalArrangement = Arrangement.spacedBy(feedItemSpacing(postLayout, 9.dp)),
+                verticalArrangement = Arrangement.spacedBy(feedItemSpacing(postLayout, 9.dp, feedEdgeToEdge(state, postLayout))),
                 isRefreshing = if (authenticatedRedditFeed) {
                     activeRedditFeedState.refreshing
                 } else {
@@ -1593,7 +1594,8 @@ fun CommunityScreen(
                             posts = visiblePosts,
                             layout = postLayout,
                             columns = gridColumns.count,
-                            horizontalPadding = ScreenMargin,
+                            // POSTSTYLE_EDGE_TO_EDGE_V1 (fork)
+                            horizontalPadding = if (feedEdgeToEdge(state, postLayout)) 0.dp else ScreenMargin,
                         ) { post, itemModifier ->
                             PostCard(
                                 post = post,

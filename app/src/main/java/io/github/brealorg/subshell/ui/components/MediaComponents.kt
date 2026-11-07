@@ -36,6 +36,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -110,6 +111,7 @@ import io.github.brealorg.subshell.media.splitAssetVideoMedia
 import io.github.brealorg.subshell.media.adaptiveAssetVideoMedia
 import io.github.brealorg.subshell.media.localRawVideoMedia
 import io.github.brealorg.subshell.ui.MediaCaptionMode
+import io.github.brealorg.subshell.ui.PostCardStyle
 import io.github.brealorg.subshell.ui.RedditExternalPollHandoffStore
 import io.github.brealorg.subshell.ui.noticeFailure
 import io.github.brealorg.subshell.ui.resolveRedditTarget
@@ -1515,6 +1517,11 @@ internal fun GalleryMedia(
         AbsoluteAlignment.TopRight
     }
 
+    // POSTSTYLE_EDGE_TO_EDGE_V1 (fork): the pictures take the whole width and height of the
+    // carousel; the badge and the fullscreen button sit closer to the corners.
+    val edgeToEdgeGallery = state.postCardStyle == PostCardStyle.EDGE_TO_EDGE
+    val galleryEdgeInset = if (edgeToEdgeGallery) 10.dp else 32.dp
+    val galleryTileShape = if (edgeToEdgeGallery) RectangleShape else MaterialTheme.shapes.medium
     Column(Modifier.fillMaxWidth()) {
         Box(
             Modifier
@@ -1525,13 +1532,17 @@ internal fun GalleryMedia(
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(
-                    start = 32.dp,
-                    top = 10.dp,
-                    end = 32.dp,
-                    bottom = 10.dp,
-                ),
-                pageSpacing = 8.dp,
+                contentPadding = if (edgeToEdgeGallery) {
+                    PaddingValues(0.dp)
+                } else {
+                    PaddingValues(
+                        start = 32.dp,
+                        top = 10.dp,
+                        end = 32.dp,
+                        bottom = 10.dp,
+                    )
+                },
+                pageSpacing = if (edgeToEdgeGallery) 3.dp else 8.dp,
                 // ISSUE121_GALLERY_PAGE_KEY_UNIQUE_V1: a gallery may list one
                 // media_id twice; a repeated pager key crashed the feed.
                 key = { index -> galleryPageKey(post.gallery[index].id, index) },
@@ -1542,7 +1553,7 @@ internal fun GalleryMedia(
                     playing = state.activeAnimatedMediaId == post.id && index == activeIndex,
                     modifier = Modifier
                         .fillMaxSize()
-                        .clip(MaterialTheme.shapes.medium)
+                        .clip(galleryTileShape)
                         .combinedClickable(
                             onClick = { state.openMedia(post, index) },
                             onLongClick = { onLongPress(item) },
@@ -1553,7 +1564,7 @@ internal fun GalleryMedia(
                 "${(activeIndex + 1).coerceAtMost(post.gallery.size)} / ${post.gallery.size}",
                 Modifier
                     .align(galleryCounterAlignment)
-                    .padding(horizontal = 32.dp, vertical = 10.dp),
+                    .padding(horizontal = galleryEdgeInset, vertical = 10.dp),
             )
             // M3225_MEDIA_BUTTONS_ARE_FILLED_TONAL_ICON_BUTTONS_V1: same scrim colours,
             // M3 icon button states.
@@ -1561,7 +1572,7 @@ internal fun GalleryMedia(
                 onClick = { state.openMedia(post, activeIndex) },
                 modifier = Modifier
                     .align(galleryFullscreenAlignment)
-                    .padding(horizontal = 32.dp, vertical = 10.dp),
+                    .padding(horizontal = galleryEdgeInset, vertical = 10.dp),
                 colors = IconButtonDefaults.filledTonalIconButtonColors(
                     containerColor = Color.Black.copy(alpha = 0.66f),
                     contentColor = Color.White,

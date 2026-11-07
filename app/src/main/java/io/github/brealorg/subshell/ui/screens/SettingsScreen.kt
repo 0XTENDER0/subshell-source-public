@@ -750,6 +750,18 @@ fun SettingsScreen(
             },
             onDismiss = { choiceDialogKey = null },
         )
+        // POSTSTYLE_EDGE_TO_EDGE_V1
+        "post-card-style" -> SettingsSingleChoiceDialog(
+            title = "Post style",
+            options = io.github.brealorg.subshell.ui.PostCardStyle.entries,
+            selected = state.postCardStyle,
+            label = { it.label },
+            onSelect = { style ->
+                state.updatePostCardStyle(style)
+                choiceDialogKey = null
+            },
+            onDismiss = { choiceDialogKey = null },
+        )
         "list-thumbnail-side" -> SettingsSingleChoiceDialog(
             title = "Thumbnail",
             options = io.github.brealorg.subshell.ui.ListThumbnailSide.entries,
@@ -825,6 +837,18 @@ fun SettingsScreen(
             label = { it.label },
             onSelect = { mode ->
                 state.updateFullscreenCaptionMode(mode)
+                choiceDialogKey = null
+            },
+            onDismiss = { choiceDialogKey = null },
+        )
+        // COMMENTSTYLE_COMPACT_V1
+        "comment-layout-style" -> SettingsSingleChoiceDialog(
+            title = "Comment style",
+            options = io.github.brealorg.subshell.ui.CommentLayoutStyle.entries,
+            selected = state.commentLayoutStyle,
+            label = { it.label },
+            onSelect = { style ->
+                state.updateCommentLayoutStyle(style)
                 choiceDialogKey = null
             },
             onDismiss = { choiceDialogKey = null },
@@ -1595,6 +1619,16 @@ fun SettingsScreen(
                         description = "Large cards, compact cards, a list or a grid",
                         value = state.postLayout.label,
                         onClick = { choiceDialogKey = "post-layout" },
+                    )
+                }
+                // POSTSTYLE_EDGE_TO_EDGE_V1: only Large posts are drawn as cards.
+                if (searchResult.isItemVisible("post-card-style")) item("post-card-style") {
+                    ValueSettingRow(
+                        icon = Symbols.ViewAgenda,
+                        title = "Post style",
+                        description = "Cards, or edge to edge with no card and no side margin (Large layout)",
+                        value = state.postCardStyle.label,
+                        onClick = { choiceDialogKey = "post-card-style" },
                     )
                 }
                 if (
@@ -2804,6 +2838,16 @@ fun SettingsScreen(
                         } else {
                             settingsSectionTitle(destination, "Comments")
                         },
+                    )
+                }
+                // COMMENTSTYLE_COMPACT_V1
+                if (searchResult.isItemVisible("comment-layout-style")) item("comment-layout-style") {
+                    ValueSettingRow(
+                        icon = Symbols.Forum,
+                        title = "Comment style",
+                        description = "Standard, or compact: no cards, no side margin, more comments per screen",
+                        value = state.commentLayoutStyle.label,
+                        onClick = { choiceDialogKey = "comment-layout-style" },
                     )
                 }
                 if (

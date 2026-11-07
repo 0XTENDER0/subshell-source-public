@@ -49,7 +49,10 @@ import io.github.brealorg.subshell.model.Post
 import io.github.brealorg.subshell.model.PostKind
 import io.github.brealorg.subshell.ui.FeedPostEntryTarget
 import io.github.brealorg.subshell.ui.PostLayout
+import io.github.brealorg.subshell.ui.feedEdgeToEdge
 import io.github.brealorg.subshell.ui.feedItemSpacing
+import io.github.brealorg.subshell.ui.feedRowItem
+import io.github.brealorg.subshell.ui.withoutSidesWhen
 import io.github.brealorg.subshell.ui.feedPostItemKeys
 import io.github.brealorg.subshell.ui.feedPostItems
 import io.github.brealorg.subshell.ui.rememberFeedGridColumns
@@ -514,6 +517,8 @@ fun HomeScreen(
     }
     // ISSUE234_FEED_POST_LAYOUTS_V1
     val postLayout = state.postLayout
+    // POSTSTYLE_EDGE_TO_EDGE_V1 (fork)
+    val edgeToEdgePosts = feedEdgeToEdge(state, postLayout)
     val gridColumns = rememberFeedGridColumns()
     val feedItemKeys = remember(
         state.feedPreviewState,
@@ -682,9 +687,9 @@ fun HomeScreen(
             state = listState,
             // ISSUE205_PASSIVE_SCROLL_POSITION_INDICATOR_V1
             scrollPositionIndicator = state.scrollPositionIndicator,
-            contentPadding = contentPadding,
+            contentPadding = contentPadding.withoutSidesWhen(edgeToEdgePosts),
             indicatorTopPadding = contentPadding.calculateTopPadding(),
-            verticalArrangement = Arrangement.spacedBy(feedItemSpacing(postLayout, 9.dp)),
+            verticalArrangement = Arrangement.spacedBy(feedItemSpacing(postLayout, 9.dp, edgeToEdgePosts)),
             isRefreshing = if (
                 authenticatedRedditFeed &&
                 !authenticatedLandingPending &&
@@ -736,7 +741,7 @@ fun HomeScreen(
             },
         ) {
             if (state.feedPreviewState == FeedPreviewState.OFFLINE) {
-                item(key = "offline-banner") {
+                feedRowItem("offline-banner", edgeToEdgePosts) {
                     StatusBanner(
                         icon = { Icon(Symbols.CloudOff, contentDescription = null) },
                         title = if (authenticated) {
@@ -758,7 +763,7 @@ fun HomeScreen(
                 showLiveReadError &&
                 visiblePosts.isEmpty()
             ) {
-                item(key = "reddit-read-error") {
+                feedRowItem("reddit-read-error", edgeToEdgePosts) {
                     // LOWUI8_EMPTY_HOME_RETRY_RESUMES_THE_APPEND_V1 (OCB-216): as the
                     // tray does, a failed load-more is retried as a load-more, not
                     // as a reload from the top.
@@ -803,7 +808,7 @@ fun HomeScreen(
 
             when (state.feedPreviewState) {
                 FeedPreviewState.LOADING -> items(4, key = { "skeleton-$it" }) { SkeletonPost() }
-                FeedPreviewState.ERROR -> item(key = "error") {
+                FeedPreviewState.ERROR -> feedRowItem("error", edgeToEdgePosts) {
                     EmptyState(
                         title = "Could not load the feed",
                         description = "A deterministic error state for retry and spacing checks.",
@@ -815,12 +820,12 @@ fun HomeScreen(
                         },
                     )
                 }
-                FeedPreviewState.EMPTY -> item(key = "empty-preview") {
+                FeedPreviewState.EMPTY -> feedRowItem("empty-preview", edgeToEdgePosts) {
                     EmptyState("This feed is empty", "Join a community or choose another feed.")
                 }
                 else -> {
                     if (filteredSummaryVisible) {
-                        item(key = "filtered-summary") {
+                        feedRowItem("filtered-summary", edgeToEdgePosts) {
                             FilteredPostsSummaryRow(
                                 filteredCount = filteredCount,
                                 revealed = filteredRevealed,
@@ -829,7 +834,7 @@ fun HomeScreen(
                         }
                     }
                     if (visiblePosts.isEmpty()) {
-                        item(key = "empty-results") {
+                        feedRowItem("empty-results", edgeToEdgePosts) {
                             EmptyState(
                                 if (authenticatedLandingPending) {
                                     "Preparing your feed"
@@ -946,7 +951,7 @@ fun HomeScreen(
             }
 
             if (pagingFooterKey != null) {
-                item(key = pagingFooterKey) {
+                feedRowItem(pagingFooterKey, edgeToEdgePosts) {
                     RepositoryPagingFooter(
                         snapshot = pagingSnapshot,
                         onRetry = { state.retryPostPaging(pagingKey) },
@@ -954,7 +959,7 @@ fun HomeScreen(
                 }
             }
             if (showLivePagingStatus) {
-                item(key = "reddit-paging") {
+                feedRowItem("reddit-paging", edgeToEdgePosts) {
                     RedditPagingControl(
                         state = activeRedditFeedState,
                         hasPosts = visiblePosts.isNotEmpty(),

@@ -762,6 +762,8 @@ class SubshellState(
     initialInteractionSideConfigured: Boolean = initialCommentActionPlacement != null,
     initialCommentTimeFormat: CommentTimeFormat = CommentTimeFormat.RELATIVE,
     initialCommentCollapseMode: CommentCollapseMode = CommentCollapseMode.HEADER,
+    initialPostCardStyle: PostCardStyle = PostCardStyle.CARD,
+    initialCommentLayoutStyle: CommentLayoutStyle = CommentLayoutStyle.STANDARD,
     initialCommentHierarchyStyle: CommentHierarchyStyle = CommentHierarchyStyle.GUIDE_LINES,
     initialCommentThreadColours: CommentThreadColours = CommentThreadColours.OFF,
     initialSwipeActionsEnabled: Boolean = false,
@@ -1084,6 +1086,8 @@ class SubshellState(
         initialInteractionSideConfigured = initialInteractionSideConfigured,
         initialCommentTimeFormat = initialCommentTimeFormat,
         initialCommentCollapseMode = initialCommentCollapseMode,
+        initialPostCardStyle = initialPostCardStyle,
+        initialCommentLayoutStyle = initialCommentLayoutStyle,
         initialCommentHierarchyStyle = initialCommentHierarchyStyle,
         initialCommentThreadColours = initialCommentThreadColours,
         initialSwipeActionsEnabled = initialSwipeActionsEnabled,
@@ -1221,6 +1225,8 @@ class SubshellState(
     var commentCollapseMode by settings::commentCollapseMode
         private set
     var commentHierarchyStyle by settings::commentHierarchyStyle
+    var postCardStyle by settings::postCardStyle
+    var commentLayoutStyle by settings::commentLayoutStyle
     var commentThreadColours by settings::commentThreadColours
         private set
 
@@ -1230,7 +1236,11 @@ class SubshellState(
      * came without any connector).
      */
     val effectiveCommentThreadColours: CommentThreadColours
-        get() = if (commentHierarchyStyle == CommentHierarchyStyle.GUIDE_LINES) {
+        get() = if (
+            commentHierarchyStyle == CommentHierarchyStyle.GUIDE_LINES &&
+            // COMMENTSTYLE_COMPACT_V1: Compact has no cards and draws its own lines.
+            commentLayoutStyle != CommentLayoutStyle.COMPACT
+        ) {
             commentThreadColours
         } else {
             CommentThreadColours.OFF
@@ -5858,6 +5868,14 @@ class SubshellState(
         settings.updateCommentHierarchyStyle(style)
     }
 
+    fun updatePostCardStyle(style: PostCardStyle) {
+        settings.updatePostCardStyle(style)
+    }
+
+    fun updateCommentLayoutStyle(style: CommentLayoutStyle) {
+        settings.updateCommentLayoutStyle(style)
+    }
+
     fun updateCommentThreadColours(colours: CommentThreadColours) {
         settings.updateCommentThreadColours(colours)
     }
@@ -6288,6 +6306,8 @@ class SubshellState(
         commentTimeFormat = commentTimeFormat,
         commentCollapseMode = commentCollapseMode,
         commentHierarchyStyle = commentHierarchyStyle,
+        postCardStyle = postCardStyle,
+        commentLayoutStyle = commentLayoutStyle,
         commentThreadColours = commentThreadColours,
         swipeActionsEnabled = swipeActionsEnabled,
         postSwipeLeftAction = postSwipeLeftAction,
@@ -6379,6 +6399,8 @@ class SubshellState(
         commentActionOnboardingVisible = false
         commentTimeFormat = settings.commentTimeFormat
         commentHierarchyStyle = settings.commentHierarchyStyle
+        postCardStyle = settings.postCardStyle
+        commentLayoutStyle = settings.commentLayoutStyle
         commentThreadColours = settings.commentThreadColours
         // ISSUE71_RESTORE_APPLIES_COMMENT_COLLAPSE_MODE_V1: the only setting a
         // restore wrote to disk but left stale in the live state.

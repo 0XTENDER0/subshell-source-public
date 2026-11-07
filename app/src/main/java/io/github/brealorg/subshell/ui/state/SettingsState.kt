@@ -63,6 +63,8 @@ internal class SettingsState(
     initialInteractionSideConfigured: Boolean,
     initialCommentTimeFormat: CommentTimeFormat,
     initialCommentCollapseMode: CommentCollapseMode,
+    initialPostCardStyle: io.github.brealorg.subshell.ui.PostCardStyle,
+    initialCommentLayoutStyle: io.github.brealorg.subshell.ui.CommentLayoutStyle,
     initialCommentHierarchyStyle: CommentHierarchyStyle,
     initialCommentThreadColours: CommentThreadColours,
     initialSwipeActionsEnabled: Boolean,
@@ -156,6 +158,8 @@ internal class SettingsState(
     var commentCollapseMode by mutableStateOf(initialCommentCollapseMode)
         internal set
     var commentHierarchyStyle by mutableStateOf(initialCommentHierarchyStyle)
+    var postCardStyle by mutableStateOf(initialPostCardStyle)
+    var commentLayoutStyle by mutableStateOf(initialCommentLayoutStyle)
     var commentThreadColours by mutableStateOf(initialCommentThreadColours)
         internal set
     var swipeActionsEnabled by mutableStateOf(initialSwipeActionsEnabled)
@@ -318,6 +322,16 @@ internal class SettingsState(
     fun updateCommentCollapseMode(mode: CommentCollapseMode) {
         commentCollapseMode = mode
         persistPreference(SubshellSettings.COMMENT_COLLAPSE_MODE, mode.name)
+    }
+
+    fun updatePostCardStyle(style: io.github.brealorg.subshell.ui.PostCardStyle) {
+        postCardStyle = style
+        persistPreference(SubshellSettings.POST_CARD_STYLE, style.name)
+    }
+
+    fun updateCommentLayoutStyle(style: io.github.brealorg.subshell.ui.CommentLayoutStyle) {
+        commentLayoutStyle = style
+        persistPreference(SubshellSettings.COMMENT_LAYOUT_STYLE, style.name)
     }
 
     fun updateCommentHierarchyStyle(style: CommentHierarchyStyle) {

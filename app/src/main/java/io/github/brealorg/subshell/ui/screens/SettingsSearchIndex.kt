@@ -31,6 +31,8 @@ internal val settingsSearchEntries: List<SettingsSearchEntry> = listOf(
 
     // ISSUE234_FEED_POST_LAYOUTS_V1: the Thumbnail row shows only with List, so its words lead here.
     setting("post-layout", "Feed", "post layout large compact list grid density cards size small dense columns view thumbnail left right"),
+    // POSTSTYLE_EDGE_TO_EDGE_V1
+    setting("post-card-style", "Feed", "post style card cards edge to edge full width fullscreen no margin padding transparent background flat large"),
     setting("unread-marker", "Feed", "show unread marker post age dot read unread"),
     setting("show-nsfw-posts", "Feed", "show NSFW posts 18+ sensitive content"),
     setting("content-filters", "Feed", "content filters words communities domains users flair filter hide"),
@@ -117,6 +119,8 @@ internal val settingsSearchEntries: List<SettingsSearchEntry> = listOf(
     setting("post-swipe-right", "Navigation", "post swipe right upvote downvote save hide none gesture"),
     setting("comment-swipe-left", "Navigation", "comment swipe left upvote downvote none gesture"),
     setting("comment-swipe-right", "Navigation", "comment swipe right upvote downvote none gesture"),
+    // COMMENTSTYLE_COMPACT_V1
+    setting("comment-layout-style", "Comments", "comment style compact standard dense boost density margin padding transparent background cards more comments"),
     setting("comment-hierarchy-style", "Comments", "comment hierarchy guide lines parent connectors replies thread"),
     setting("comment-thread-colours", "Comments", "thread colours colors colour color lines guide depth warm cold accent card top level parent comments"),
     setting("highlight-new-comments", "Comments", "highlight new comments replies"),

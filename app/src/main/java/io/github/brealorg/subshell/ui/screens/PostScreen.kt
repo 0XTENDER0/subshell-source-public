@@ -15,6 +15,9 @@ import androidx.compose.ui.semantics.semantics
 import io.github.brealorg.subshell.data.error.FailureDetails
 import io.github.brealorg.subshell.data.error.LocalFailureKind
 import io.github.brealorg.subshell.ui.ScreenMargin
+import io.github.brealorg.subshell.ui.CommentLayoutStyle
+import io.github.brealorg.subshell.ui.PostCardStyle
+import io.github.brealorg.subshell.ui.feedRowItem
 import io.github.brealorg.subshell.ui.components.RouteTopBar
 import io.github.brealorg.subshell.ui.components.rememberRouteTopBarScrollBehavior
 import io.github.brealorg.subshell.ui.error.LocalViewportErrorHostState
@@ -2745,6 +2748,12 @@ fun PostScreen(
         modifier = modifier.fillMaxSize(),
     ) {
         RouteTopBar(title = "Post", scrollBehavior = routeTopBarScroll, onBack = onBack)
+        // POSTSTYLE_EDGE_TO_EDGE_V1 / COMMENTSTYLE_COMPACT_V1 (fork): either style takes the list's
+        // side margin away; the rows that still want it put it back themselves.
+        val compactComments = state.commentLayoutStyle == CommentLayoutStyle.COMPACT
+        val edgeToEdgePost = state.postCardStyle == PostCardStyle.EDGE_TO_EDGE
+        val fullWidthList = compactComments || edgeToEdgePost
+        val listSideMargin = if (fullWidthList) ScreenMargin else 0.dp
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
@@ -2784,9 +2793,9 @@ fun PostScreen(
                     null
                 },
                 contentPadding = PaddingValues(
-                    start = ScreenMargin,
+                    start = if (fullWidthList) 0.dp else ScreenMargin,
                     top = 4.dp,
-                    end = ScreenMargin,
+                    end = if (fullWidthList) 0.dp else ScreenMargin,
                     bottom = when {
                         !addCommentVisible -> 32.dp
                         activeCommentComposerVisible -> 224.dp
@@ -2798,7 +2807,7 @@ fun PostScreen(
             // viewport projection count it (Back and "Post" are in RouteTopBar).
             item("post-navigation") {}
 
-                item("post-card") {
+                feedRowItem("post-card", fullWidthList && !edgeToEdgePost) {
                     PostCard(
                         post = post,
                         state = state,
@@ -2858,7 +2867,7 @@ fun PostScreen(
                         modifier = Modifier.fillMaxWidth(),
                         color = MaterialTheme.colorScheme.background,
                     ) {
-                        Column {
+                        Column(Modifier.padding(horizontal = listSideMargin)) {
                             if (threadFindOpen) {
                                 ThreadFindBar(
                                     query = threadFindQuery,
@@ -2966,7 +2975,7 @@ fun PostScreen(
                     }
                 }
                 if (liveStatusVisible && !pinnedCommentFailure) {
-                    item("live-comment-status") {
+                    feedRowItem("live-comment-status", fullWidthList) {
                         LiveCommentStatus(
                             matches = liveStateMatches,
                             state = redditCommentsState,
@@ -2990,6 +2999,7 @@ fun PostScreen(
                     key = CommentViewportRow::key,
                     contentType = CommentViewportRow::kind,
                 ) { row ->
+                    Column(Modifier.padding(horizontal = if (fullWidthList && !compactComments) ScreenMargin else 0.dp)) {
                     when (row.kind) {
                         CommentViewportRowKind.COMMENT -> {
                             // ISSUE16_COMMENT_SWIPE_ACTION_SURFACE_V1
@@ -2999,7 +3009,7 @@ fun PostScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 // ISSUE285_THREAD_COLOURS_V1: the surface rounds every row's corners, which cut a
                                 // notch out of a thread's card at each row; with the card the rows are square.
-                                shape = if (commentThreadChrome(state.effectiveCommentThreadColours).squareRows) {
+                                shape = if (compactComments || commentThreadChrome(state.effectiveCommentThreadColours).squareRows) {
                                     androidx.compose.ui.graphics.RectangleShape
                                 } else {
                                     MaterialTheme.shapes.small
@@ -3115,7 +3125,16 @@ fun PostScreen(
                         )
                     }
                     if (showDivider) {
-                        if (commentThreadChrome(state.effectiveCommentThreadColours).rowDividers) {
+                        if (compactComments) {
+                            // COMMENTSTYLE_COMPACT_V1: a line only where a thread ends.
+                            if (row.kind == CommentViewportRowKind.COMMENT &&
+                                branchRailVisualByCommentId[row.comment.id]?.endsThread != false
+                            ) {
+                                HorizontalDivider(
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                                )
+                            }
+                        } else if (commentThreadChrome(state.effectiveCommentThreadColours).rowDividers) {
                             HorizontalDivider(
                                 modifier = Modifier.padding(start = 12.dp),
                                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.32f),
@@ -3126,6 +3145,7 @@ fun PostScreen(
                             // ISSUE285_THREAD_COLOURS_V1: no strokes inside a thread's card; a gap between cards.
                             Spacer(Modifier.height(THREAD_CARD_GAP_DP.dp))
                         }
+                    }
                     }
                 }
                 if (focusedAnchorOwned) {
@@ -3407,6 +3427,11 @@ private fun CommentRow(
     collapsed: Boolean = comment.id in state.collapsedCommentIds,
 ) {
     val focused = comment.id == focusedCommentId
+    // COMMENTSTYLE_COMPACT_V1 (fork): tight rows, straight depth lines, no card, and the action
+    // row only after a tap on the comment.
+    val compact = state.commentLayoutStyle == CommentLayoutStyle.COMPACT
+    var compactActionsShown by rememberSaveable(comment.id) { mutableStateOf(false) }
+    val compactLevel = comment.depth.coerceIn(0, COMPACT_COMMENT_MAX_LEVELS)
     val isNew = comment.id in newCommentIds
     val newReplies = newDescendantCount(comment, newCommentIds)
     val focusedPulse = remember(comment.id) { Animatable(0f) }
@@ -3516,6 +3541,21 @@ private fun CommentRow(
                 },
             )
             .drawBehind {
+                if (compact) {
+                    // One straight line per level, the whole height of the row, so a line runs
+                    // unbroken from a parent down through all of its replies.
+                    for (level in 1..compactLevel) {
+                        val x = (COMPACT_COMMENT_LINE_BASE_DP + (level - 1) * COMPACT_COMMENT_INDENT_DP).dp.toPx()
+                        drawLine(
+                            color = THREAD_DEPTH_COLOURS[(level - 1) % THREAD_DEPTH_COLOURS.size]
+                                .withMinContrast(railBackground, 2f),
+                            start = Offset(x, 0f),
+                            end = Offset(x, size.height),
+                            strokeWidth = 1.5.dp.toPx(),
+                        )
+                    }
+                    return@drawBehind
+                }
                 if (threadColours != CommentThreadColours.OFF) {
                     val inset = THREAD_CARD_INSET_DP.dp.toPx()
                     val radius = THREAD_CARD_RADIUS_DP.dp.toPx()
@@ -3736,8 +3776,20 @@ private fun CommentRow(
                     }
                 }
             }
+            .then(
+                if (compact) {
+                    Modifier.padding(
+                        start = (COMPACT_COMMENT_LINE_BASE_DP + compactLevel * COMPACT_COMMENT_INDENT_DP + 6).dp,
+                        top = 4.dp,
+                        end = 8.dp,
+                        bottom = 3.dp,
+                    )
+                } else {
+                    Modifier
+                },
+            )
             .padding(
-                start = when (state.commentHierarchyStyle) {
+                start = if (compact) 0.dp else when (state.commentHierarchyStyle) {
                     CommentHierarchyStyle.GUIDE_LINES ->
                         threadVisual?.let { visual ->
                             commentBranchRailGutterDp(
@@ -3751,7 +3803,13 @@ private fun CommentRow(
                         parentConnectorVisual?.gutterDp?.dp ?: 0.dp
                 },
             )
-            .padding(start = 12.dp, top = 10.dp, end = 2.dp, bottom = 6.dp),
+            .then(
+                if (compact) {
+                    Modifier
+                } else {
+                    Modifier.padding(start = 12.dp, top = 10.dp, end = 2.dp, bottom = 6.dp)
+                },
+            ),
     ) {
         Column(
             modifier = Modifier
@@ -3790,13 +3848,13 @@ private fun CommentRow(
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.small)
                     .then(
-                        if (state.commentCollapseMode == CommentCollapseMode.HEADER) {
+                        if (compact || state.commentCollapseMode == CommentCollapseMode.HEADER) {
                             Modifier.clickable { onToggleComment(comment.id) }
                         } else {
                             Modifier
                         },
                     )
-                    .padding(vertical = 3.dp),
+                    .padding(vertical = if (compact) 0.dp else 3.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 // ISSUE22_COMMENT_AUTHOR_AVATARS_SETTING_V1
@@ -3809,7 +3867,7 @@ private fun CommentRow(
                     // target, the name beside it.
                     modifier = Modifier
                         .clearAndSetSemantics {}
-                        .size(25.dp)
+                        .size(if (compact) 20.dp else 25.dp)
                         .clip(CircleShape)
                         .clickable(onClick = onAuthorClick),
                 )
@@ -3879,7 +3937,7 @@ private fun CommentRow(
             }
             Spacer(Modifier.width(5.dp))
             Text(
-                text = if (state.voteControlMode == VoteControlMode.COMPACT) {
+                text = if (compact || state.voteControlMode == VoteControlMode.COMPACT) {
                     "${compactNumber(displayedUpvotes)} · $displayedTime"
                 } else {
                     displayedTime
@@ -3893,7 +3951,9 @@ private fun CommentRow(
                 Text(comment.award, color = MaterialTheme.colorScheme.tertiary)
             }
             // A11Y01A11_COMMENT_THREAD_TARGET_V1
-            IconButton(
+            // COMMENTSTYLE_COMPACT_V1: the whole header collapses a compact comment; the 48 dp
+            // button is what made one-line comments so tall.
+            if (!compact) IconButton(
                 onClick = { onToggleComment(comment.id) },
                 modifier = Modifier.size(48.dp),
             ) {
@@ -3905,6 +3965,7 @@ private fun CommentRow(
             }
         }
         if (
+            !compact &&
             commentViewportShowsReplyContext(comment.depth) &&
             !threadVisual?.parentAuthor.isNullOrBlank()
         ) {
@@ -3937,13 +3998,16 @@ private fun CommentRow(
                         modifier = Modifier
                             .fillMaxWidth()
                             .then(
-                                if (state.commentCollapseMode == CommentCollapseMode.COMMENT) {
+                                if (compact) {
+                                    // A tap shows or hides the actions; the header collapses.
+                                    Modifier.clickable { compactActionsShown = !compactActionsShown }
+                                } else if (state.commentCollapseMode == CommentCollapseMode.COMMENT) {
                                     Modifier.clickable { onToggleComment(comment.id) }
                                 } else {
                                     Modifier
                                 },
                             )
-                            .padding(top = 6.dp, end = 6.dp)
+                            .padding(top = if (compact) 2.dp else 6.dp, end = if (compact) 0.dp else 6.dp)
                             // ISSUE226_REMOVED_COMMENT_STANDS_OUT_V1: still readable, but quieter.
                             .alpha(if (comment.removedByModerator) 0.7f else 1f),
                         onMediaClick = { media ->
@@ -3986,7 +4050,7 @@ private fun CommentRow(
                     )
                 }
                 comment.codeSample?.let { CodeBlock(it) }
-                CommentActionRow(
+                if (!compact || compactActionsShown) CommentActionRow(
                     placement = state.commentActionPlacement,
                     score = displayedUpvotes,
                     vote = vote,
@@ -4570,6 +4634,10 @@ internal fun commentRowAvatarUri(state: SubshellState, author: String): String? 
     if (state.showCommentAvatars) state.avatarUriForAuthor(author) else null
 
 // ISSUE285_THREAD_COLOURS_V1: the card behind a top-level comment's thread and its lines.
+// COMMENTSTYLE_COMPACT_V1: a line every 12 dp, up to 10 levels; deeper replies stay at level 10.
+internal const val COMPACT_COMMENT_INDENT_DP = 12
+internal const val COMPACT_COMMENT_LINE_BASE_DP = 4
+internal const val COMPACT_COMMENT_MAX_LEVELS = 10
 internal const val THREAD_CARD_INSET_DP = 6
 internal const val THREAD_CARD_RADIUS_DP = 14
 internal const val THREAD_CARD_EDGE_DP = 4

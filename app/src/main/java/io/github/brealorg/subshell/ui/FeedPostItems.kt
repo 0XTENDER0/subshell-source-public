@@ -2,6 +2,7 @@ package io.github.brealorg.subshell.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,9 +40,38 @@ internal fun feedGridColumnsFor(widthDp: Float): Int =
 internal fun PostLayout.forFeed(gridAllowed: Boolean): PostLayout =
     if (this == PostLayout.GRID && !gridAllowed) PostLayout.LIST else this
 
+/**
+ * POSTSTYLE_EDGE_TO_EDGE_V1 (fork): true when Large posts are drawn without a card or side margin.
+ * Only the Large layout has cards, so only it has an edge-to-edge form.
+ */
+internal fun feedEdgeToEdge(state: SubshellState, layout: PostLayout): Boolean =
+    layout == PostLayout.LARGE && state.postCardStyle == PostCardStyle.EDGE_TO_EDGE
+
+/**
+ * The feed list's padding without its sides, for a feed whose posts run edge to edge. The rows
+ * that are not posts (banners, empty states, footers) get the sides back through [feedRowItem].
+ */
+internal fun PaddingValues.withoutSidesWhen(edgeToEdge: Boolean): PaddingValues =
+    if (edgeToEdge) {
+        PaddingValues(top = calculateTopPadding(), bottom = calculateBottomPadding())
+    } else {
+        this
+    }
+
+/** A feed row that is not a post; it keeps the screen margin even when the posts have none. */
+internal fun LazyListScope.feedRowItem(
+    key: Any,
+    edgeToEdge: Boolean,
+    content: @Composable () -> Unit,
+) {
+    item(key = key) {
+        Box(if (edgeToEdge) Modifier.padding(horizontal = ScreenMargin) else Modifier) { content() }
+    }
+}
+
 /** The gap between feed items; Large keeps each screen's own spacing. */
-internal fun feedItemSpacing(layout: PostLayout, largeSpacing: Dp): Dp = when (layout) {
-    PostLayout.LARGE -> largeSpacing
+internal fun feedItemSpacing(layout: PostLayout, largeSpacing: Dp, edgeToEdge: Boolean = false): Dp = when (layout) {
+    PostLayout.LARGE -> if (edgeToEdge) 0.dp else largeSpacing
     PostLayout.COMPACT, PostLayout.GRID -> 8.dp
     PostLayout.LIST -> 2.dp
 }

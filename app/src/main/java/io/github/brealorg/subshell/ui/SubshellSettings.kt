@@ -50,6 +50,25 @@ enum class PostLayout(val label: String) {
     GRID("Grid"),
 }
 
+/**
+ * POSTSTYLE_EDGE_TO_EDGE_V1 (fork): how a Large post is drawn. Card is how posts always looked.
+ * Edge to edge drops the card (no background, no side margin) and gives the media the full width.
+ */
+enum class PostCardStyle(val label: String) {
+    CARD("Card"),
+    EDGE_TO_EDGE("Edge to edge"),
+}
+
+/**
+ * COMMENTSTYLE_COMPACT_V1 (fork): Standard is how comments always looked. Compact packs more
+ * comments on a screen: no side margin, no card, no action row (tap a comment's header or use
+ * its menu), one straight guide line per level.
+ */
+enum class CommentLayoutStyle(val label: String) {
+    STANDARD("Standard"),
+    COMPACT("Compact"),
+}
+
 enum class ListThumbnailSide(val label: String) {
     RIGHT("Right"),
     LEFT("Left"),
@@ -214,6 +233,8 @@ data class SubshellSettings(
     val pinnedPostsPresentation: PinnedPostsPresentation = PinnedPostsPresentation.CARDS,
     // ISSUE234_FEED_POST_LAYOUTS_V1: backed up (owner); older backups leave them unchanged.
     val postLayout: PostLayout = PostLayout.LARGE,
+    val postCardStyle: PostCardStyle = PostCardStyle.CARD,
+    val commentLayoutStyle: CommentLayoutStyle = CommentLayoutStyle.STANDARD,
     val listThumbnailSide: ListThumbnailSide = ListThumbnailSide.RIGHT,
     // SETTINGSREVIEW01_MUTED_COMMUNITY_VIEW_IS_BACKED_UP_V1 (owner 2026-10-17): a
     // reading preference, so it travels with the other settings; an older backup
@@ -302,6 +323,8 @@ data class SubshellSettings(
         RANDOM_NSFW_COMMUNITY_PLACEMENT to randomNsfwCommunityPlacement.name,
         PINNED_POSTS_PRESENTATION to pinnedPostsPresentation.name,
         POST_LAYOUT to postLayout.name,
+        POST_CARD_STYLE to postCardStyle.name,
+        COMMENT_LAYOUT_STYLE to commentLayoutStyle.name,
         LIST_THUMBNAIL_SIDE to listThumbnailSide.name,
         MUTED_COMMUNITY_DIRECT_VIEW_MODE to mutedCommunityDirectViewMode.name,
         COMMUNITY_DISCOVERY_LAYOUT to communityDiscoveryLayout.name,
@@ -394,6 +417,8 @@ data class SubshellSettings(
         const val RANDOM_NSFW_COMMUNITY_PLACEMENT = "random_nsfw_community_placement"
         const val PINNED_POSTS_PRESENTATION = "pinned_posts_presentation"
         const val POST_LAYOUT = "post_layout"
+        const val POST_CARD_STYLE = "post_card_style"
+        const val COMMENT_LAYOUT_STYLE = "comment_layout_style"
         const val LIST_THUMBNAIL_SIDE = "list_thumbnail_side"
         const val MUTED_COMMUNITY_DIRECT_VIEW_MODE = MUTED_COMMUNITY_DIRECT_VIEW_MODE_KEY
         const val COMMUNITY_DISCOVERY_LAYOUT = "community_discovery_layout"
@@ -495,6 +520,8 @@ data class SubshellSettings(
             RANDOM_NSFW_COMMUNITY_PLACEMENT,
             PINNED_POSTS_PRESENTATION,
             POST_LAYOUT,
+            POST_CARD_STYLE,
+            COMMENT_LAYOUT_STYLE,
             LIST_THUMBNAIL_SIDE,
             MUTED_COMMUNITY_DIRECT_VIEW_MODE,
             COMMUNITY_DISCOVERY_LAYOUT,
@@ -744,6 +771,16 @@ data class SubshellSettings(
                     POST_LAYOUT,
                     compatibleValues,
                     PostLayout.entries,
+                ),
+                postCardStyle = enumValue(
+                    POST_CARD_STYLE,
+                    compatibleValues,
+                    PostCardStyle.entries,
+                ),
+                commentLayoutStyle = enumValue(
+                    COMMENT_LAYOUT_STYLE,
+                    compatibleValues,
+                    CommentLayoutStyle.entries,
                 ),
                 listThumbnailSide = enumValue(
                     LIST_THUMBNAIL_SIDE,

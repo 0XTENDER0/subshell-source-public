@@ -91,6 +91,7 @@ import io.github.brealorg.subshell.model.PostKind
 import io.github.brealorg.subshell.ui.FeedSort
 import io.github.brealorg.subshell.ui.ProfileActivityEvidence
 import io.github.brealorg.subshell.ui.PostLayout
+import io.github.brealorg.subshell.ui.feedEdgeToEdge
 import io.github.brealorg.subshell.ui.SubshellState
 import io.github.brealorg.subshell.ui.MainDestination
 import io.github.brealorg.subshell.ui.SecondaryDestination
@@ -1065,6 +1066,8 @@ fun PostCard(
     // SAFETY01A32_IMMEDIATE_HIDE_UNHIDE_LIST_PROJECTION_V1
     if (suppressWhenHiddenStateDiffers && postHidden != knownHidden) return
     val read = post.id in state.readPostIds
+    // POSTSTYLE_EDGE_TO_EDGE_V1 (fork): no card, no side margin, media at full width.
+    val edgeToEdgePost = feedEdgeToEdge(state, layout)
     val ownPostActions = ownContentActions(
         activeUsername = state.activeAccountUsername,
         author = post.author,
@@ -1325,6 +1328,7 @@ fun PostCard(
     // ISSUE16_POST_SWIPE_ACTION_SURFACE_V1
     SwipeActionSurface(
         modifier = modifier.fillMaxWidth(),
+        shape = if (edgeToEdgePost) RectangleShape else MaterialTheme.shapes.medium,
         // ISSUE234_FEED_POST_LAYOUTS_V1: a half-width grid tile has no room to swipe.
         enabled = state.swipeActionsEnabled && swipeActionsEnabled && layout != PostLayout.GRID,
         reduceMotion = state.motionReduced,
@@ -1393,13 +1397,25 @@ fun PostCard(
                 beforeNavigation()
                 onOpen()
             },
-        shape = MaterialTheme.shapes.medium,
+        shape = if (edgeToEdgePost) RectangleShape else MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            // The page's own colour rather than Transparent: a swipe's action colour is drawn
+            // behind the post and must not show through it.
+            containerColor = if (edgeToEdgePost) {
+                MaterialTheme.colorScheme.background
+            } else {
+                MaterialTheme.colorScheme.surfaceContainerLow
+            },
         ),
     ) {
         Column {
-            Column(Modifier.padding(start = 14.dp, top = 12.dp, end = 10.dp, bottom = 8.dp)) {
+            Column(
+                if (edgeToEdgePost) {
+                    Modifier.padding(start = 12.dp, top = 8.dp, end = 4.dp, bottom = 6.dp)
+                } else {
+                    Modifier.padding(start = 14.dp, top = 12.dp, end = 10.dp, bottom = 8.dp)
+                },
+            ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Row(
                         modifier = Modifier.weight(1f),
@@ -1596,6 +1612,10 @@ fun PostCard(
                 onShare = { sharePostLink(context, post, notices) },
                 saveActionsEnabled = state.postSaveControlEnabled(post),
             )
+            if (edgeToEdgePost) {
+                // Without a card the posts need a line between them.
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            }
         }
     }
     }

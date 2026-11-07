@@ -591,6 +591,16 @@ fun rememberSubshellState(
                 CommentCollapseMode.entries,
                 DefaultSubshellSettings.commentCollapseMode,
             ),
+            initialPostCardStyle = enumValue(
+                SubshellSettings.POST_CARD_STYLE,
+                PostCardStyle.entries,
+                DefaultSubshellSettings.postCardStyle,
+            ),
+            initialCommentLayoutStyle = enumValue(
+                SubshellSettings.COMMENT_LAYOUT_STYLE,
+                CommentLayoutStyle.entries,
+                DefaultSubshellSettings.commentLayoutStyle,
+            ),
             initialCommentHierarchyStyle = enumValue(
                 SubshellSettings.COMMENT_HIERARCHY_STYLE,
                 CommentHierarchyStyle.entries,
