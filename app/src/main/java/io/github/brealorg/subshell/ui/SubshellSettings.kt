@@ -235,6 +235,24 @@ data class SubshellSettings(
     val postLayout: PostLayout = PostLayout.LARGE,
     val postCardStyle: PostCardStyle = PostCardStyle.CARD,
     val commentLayoutStyle: CommentLayoutStyle = CommentLayoutStyle.STANDARD,
+    // SWIPEBACK_V1 (fork): swipe left to right on an open post to go back.
+    val swipeBackEnabled: Boolean = false,
+    // SWIPEDOWN_MEDIA_V1 (fork): swipe down in a full screen picture or video to close it.
+    val swipeDownCloseMedia: Boolean = false,
+    // DOUBLETAP_FULLSCREEN_V1 (fork): double-tap a video to open it full screen.
+    val doubleTapVideoFullscreen: Boolean = false,
+    // VIDEO_DOWNLOAD_BUTTON_V1 (fork): a visible Download button on videos instead of only the options menu.
+    val videoDownloadButton: Boolean = false,
+    // VIDEO_CONTROLS_BAR_V1 (fork): sound and full screen sit beside the seek bar, not in the top corner.
+    val videoControlsInTimeline: Boolean = false,
+    // FEEDSORT_REMEMBER_V1 (fork): the feed sort survives closing the app.
+    val rememberFeedSort: Boolean = true,
+    // COMPACT_VOTES_V1 (fork): compact comments show their vote buttons without a tap.
+    val compactCommentVoteButtons: Boolean = false,
+    // SEARCHBAR_HEADER_V1 (fork): the top bar is a search bar with the sort beside the menu; post layout and account move into the side menu.
+    val searchBarHeader: Boolean = false,
+    // CREATE_FAB_V1 (fork): the floating Create / Message button.
+    val showCreateButton: Boolean = true,
     val listThumbnailSide: ListThumbnailSide = ListThumbnailSide.RIGHT,
     // SETTINGSREVIEW01_MUTED_COMMUNITY_VIEW_IS_BACKED_UP_V1 (owner 2026-10-17): a
     // reading preference, so it travels with the other settings; an older backup
@@ -325,6 +343,15 @@ data class SubshellSettings(
         POST_LAYOUT to postLayout.name,
         POST_CARD_STYLE to postCardStyle.name,
         COMMENT_LAYOUT_STYLE to commentLayoutStyle.name,
+        SWIPE_BACK_ENABLED to swipeBackEnabled.toString(),
+        SWIPE_DOWN_CLOSE_MEDIA to swipeDownCloseMedia.toString(),
+        DOUBLE_TAP_VIDEO_FULLSCREEN to doubleTapVideoFullscreen.toString(),
+        VIDEO_DOWNLOAD_BUTTON to videoDownloadButton.toString(),
+        VIDEO_CONTROLS_IN_TIMELINE to videoControlsInTimeline.toString(),
+        REMEMBER_FEED_SORT to rememberFeedSort.toString(),
+        COMPACT_COMMENT_VOTE_BUTTONS to compactCommentVoteButtons.toString(),
+        SEARCH_BAR_HEADER to searchBarHeader.toString(),
+        SHOW_CREATE_BUTTON to showCreateButton.toString(),
         LIST_THUMBNAIL_SIDE to listThumbnailSide.name,
         MUTED_COMMUNITY_DIRECT_VIEW_MODE to mutedCommunityDirectViewMode.name,
         COMMUNITY_DISCOVERY_LAYOUT to communityDiscoveryLayout.name,
@@ -419,6 +446,15 @@ data class SubshellSettings(
         const val POST_LAYOUT = "post_layout"
         const val POST_CARD_STYLE = "post_card_style"
         const val COMMENT_LAYOUT_STYLE = "comment_layout_style"
+        const val SWIPE_BACK_ENABLED = "swipe_back_enabled"
+        const val SWIPE_DOWN_CLOSE_MEDIA = "swipe_down_close_media"
+        const val DOUBLE_TAP_VIDEO_FULLSCREEN = "double_tap_video_fullscreen"
+        const val VIDEO_DOWNLOAD_BUTTON = "video_download_button"
+        const val VIDEO_CONTROLS_IN_TIMELINE = "video_controls_in_timeline"
+        const val REMEMBER_FEED_SORT = "remember_feed_sort"
+        const val COMPACT_COMMENT_VOTE_BUTTONS = "compact_comment_vote_buttons"
+        const val SEARCH_BAR_HEADER = "search_bar_header"
+        const val SHOW_CREATE_BUTTON = "show_create_button"
         const val LIST_THUMBNAIL_SIDE = "list_thumbnail_side"
         const val MUTED_COMMUNITY_DIRECT_VIEW_MODE = MUTED_COMMUNITY_DIRECT_VIEW_MODE_KEY
         const val COMMUNITY_DISCOVERY_LAYOUT = "community_discovery_layout"
@@ -522,6 +558,15 @@ data class SubshellSettings(
             POST_LAYOUT,
             POST_CARD_STYLE,
             COMMENT_LAYOUT_STYLE,
+            SWIPE_BACK_ENABLED,
+            SWIPE_DOWN_CLOSE_MEDIA,
+            DOUBLE_TAP_VIDEO_FULLSCREEN,
+            VIDEO_DOWNLOAD_BUTTON,
+            VIDEO_CONTROLS_IN_TIMELINE,
+            REMEMBER_FEED_SORT,
+            COMPACT_COMMENT_VOTE_BUTTONS,
+            SEARCH_BAR_HEADER,
+            SHOW_CREATE_BUTTON,
             LIST_THUMBNAIL_SIDE,
             MUTED_COMMUNITY_DIRECT_VIEW_MODE,
             COMMUNITY_DISCOVERY_LAYOUT,
@@ -782,6 +827,15 @@ data class SubshellSettings(
                     compatibleValues,
                     CommentLayoutStyle.entries,
                 ),
+                swipeBackEnabled = booleanValue(SWIPE_BACK_ENABLED, compatibleValues),
+                swipeDownCloseMedia = booleanValue(SWIPE_DOWN_CLOSE_MEDIA, compatibleValues),
+                doubleTapVideoFullscreen = booleanValue(DOUBLE_TAP_VIDEO_FULLSCREEN, compatibleValues),
+                videoDownloadButton = booleanValue(VIDEO_DOWNLOAD_BUTTON, compatibleValues),
+                videoControlsInTimeline = booleanValue(VIDEO_CONTROLS_IN_TIMELINE, compatibleValues),
+                rememberFeedSort = booleanValue(REMEMBER_FEED_SORT, compatibleValues),
+                compactCommentVoteButtons = booleanValue(COMPACT_COMMENT_VOTE_BUTTONS, compatibleValues),
+                searchBarHeader = booleanValue(SEARCH_BAR_HEADER, compatibleValues),
+                showCreateButton = booleanValue(SHOW_CREATE_BUTTON, compatibleValues),
                 listThumbnailSide = enumValue(
                     LIST_THUMBNAIL_SIDE,
                     compatibleValues,

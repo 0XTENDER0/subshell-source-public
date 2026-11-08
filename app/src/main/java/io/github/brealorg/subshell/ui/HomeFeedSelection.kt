@@ -11,6 +11,9 @@ internal fun availableFeedSorts(source: FeedSource): List<FeedSort> = when (sour
     -> FeedSort.entries
 }
 
+/** FEEDSORT_REMEMBER_V1 (fork): the sort last chosen in the feed; not part of a settings backup. */
+internal const val LAST_FEED_SORT_PREFERENCE_KEY = "last_feed_sort"
+
 internal fun normalizedFeedSort(
     source: FeedSource,
     sort: FeedSort,

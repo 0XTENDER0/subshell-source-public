@@ -32,6 +32,7 @@ internal val settingsSearchEntries: List<SettingsSearchEntry> = listOf(
     // ISSUE234_FEED_POST_LAYOUTS_V1: the Thumbnail row shows only with List, so its words lead here.
     setting("post-layout", "Feed", "post layout large compact list grid density cards size small dense columns view thumbnail left right"),
     // POSTSTYLE_EDGE_TO_EDGE_V1
+    setting("remember-feed-sort", "Feed", "remember feed sort best hot new top keep restart reopen default"),
     setting("post-card-style", "Feed", "post style card cards edge to edge full width fullscreen no margin padding transparent background flat large"),
     setting("unread-marker", "Feed", "show unread marker post age dot read unread"),
     setting("show-nsfw-posts", "Feed", "show NSFW posts 18+ sensitive content"),
@@ -56,6 +57,8 @@ internal val settingsSearchEntries: List<SettingsSearchEntry> = listOf(
     setting("code-font", "Appearance", "code font monospace JetBrains Mono Iosevka Recursive balanced narrow compact casual"),
 
     setting("top-bar-behavior", "Home & feeds", "top bar always show visible hide on scroll"),
+    setting("search-bar-header", "Home & feeds", "search bar header top bar wide sort menu post layout account drawer"),
+    setting("show-create-button", "Home & feeds", "floating create button fab remove hide new post message"),
     setting("bottom-navigation-behavior", "Home & feeds", "bottom navigation bar always show visible hide on scroll"),
 
     setting("interaction-side", "Navigation", "interaction side left right controls floating actions media composer"),
@@ -64,6 +67,7 @@ internal val settingsSearchEntries: List<SettingsSearchEntry> = listOf(
     setting("drawer-communities", "Navigation", "communities in drawer simple dropdown full list joined communities"),
     setting("drawer-recent-communities", "Navigation", "recent communities in drawer favorites history"),
     setting("back-twice-to-exit", "Navigation", "press back twice exit confirm leave close app quit"),
+    setting("swipe-back", "Navigation", "swipe right go back gesture post open previous screen"),
     setting("launcher-shortcuts", "Navigation", "launcher shortcuts home screen pin favorite communities app icon long press"),
     setting("reddit-favorite-sync", "Navigation", "sync favorites with reddit favourite communities star reddit account"),
     setting("share-into-subshell", "Navigation", "share into subshell share menu share sheet post link text images send"),
@@ -92,6 +96,10 @@ internal val settingsSearchEntries: List<SettingsSearchEntry> = listOf(
     setting("video-audio-default", "Media & links", "audio language track default device language dub"),
     setting("video-speed-controls", "Media & links", "playback speed faster slower 2x 1.5x 0.5x"),
     setting("video-double-tap-seek", "Media & links", "double tap skip seek forward back 10 seconds"),
+    setting("swipe-down-close-media", "Media & links", "swipe down close dismiss fullscreen picture image viewer"),
+    setting("double-tap-video-fullscreen", "Media & links", "double tap video fullscreen enlarge open"),
+    setting("video-download-button", "Media & links", "download button video save visible menu"),
+    setting("video-controls-in-timeline", "Media & links", "sound mute fullscreen buttons seekbar bottom bar top corner controls placement"),
     setting("video-hold-double-speed", "Media & links", "hold press 2x double speed faster"),
     setting("video-pinch-to-zoom", "Media & links", "pinch zoom video magnify enlarge closer look"),
     setting("video-rotate-fullscreen", "Media & links", "rotate landscape orientation wide video full screen turn"),
@@ -121,6 +129,7 @@ internal val settingsSearchEntries: List<SettingsSearchEntry> = listOf(
     setting("comment-swipe-right", "Navigation", "comment swipe right upvote downvote none gesture"),
     // COMMENTSTYLE_COMPACT_V1
     setting("comment-layout-style", "Comments", "comment style compact standard dense boost density margin padding transparent background cards more comments"),
+    setting("compact-comment-vote-buttons", "Comments", "compact comments vote buttons upvote downvote arrows always visible without tap"),
     setting("comment-hierarchy-style", "Comments", "comment hierarchy guide lines parent connectors replies thread"),
     setting("comment-thread-colours", "Comments", "thread colours colors colour color lines guide depth warm cold accent card top level parent comments"),
     setting("highlight-new-comments", "Comments", "highlight new comments replies"),

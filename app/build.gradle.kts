@@ -1042,7 +1042,11 @@ dependencies {
     implementation(libs.androidx.profileinstaller)
     // PERF01_LEAKCANARY_IN_DEBUG_ONLY_V1: reports leaked activities and
     // composables in lane builds; never part of a release.
-    debugImplementation(libs.leakcanary.android)
+    // NO_LEAKCANARY_V1 (fork): LeakCanary adds its own "Leaks" launcher icon, a second app
+    // entry beside Subshell. Off by default; build with -Psubshell.leakcanary=true to get it back.
+    if (providers.gradleProperty("subshell.leakcanary").orNull == "true") {
+        debugImplementation(libs.leakcanary.android)
+    }
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.compose.animation)

@@ -601,6 +601,21 @@ fun rememberSubshellState(
                 CommentLayoutStyle.entries,
                 DefaultSubshellSettings.commentLayoutStyle,
             ),
+            initialSwipeBackEnabled = preferences.getBoolean(SubshellSettings.SWIPE_BACK_ENABLED, DefaultSubshellSettings.swipeBackEnabled),
+            initialSwipeDownCloseMedia = preferences.getBoolean(SubshellSettings.SWIPE_DOWN_CLOSE_MEDIA, DefaultSubshellSettings.swipeDownCloseMedia),
+            initialDoubleTapVideoFullscreen = preferences.getBoolean(SubshellSettings.DOUBLE_TAP_VIDEO_FULLSCREEN, DefaultSubshellSettings.doubleTapVideoFullscreen),
+            initialVideoDownloadButton = preferences.getBoolean(SubshellSettings.VIDEO_DOWNLOAD_BUTTON, DefaultSubshellSettings.videoDownloadButton),
+            initialVideoControlsInTimeline = preferences.getBoolean(SubshellSettings.VIDEO_CONTROLS_IN_TIMELINE, DefaultSubshellSettings.videoControlsInTimeline),
+            initialRememberFeedSort = preferences.getBoolean(SubshellSettings.REMEMBER_FEED_SORT, DefaultSubshellSettings.rememberFeedSort),
+            initialCompactCommentVoteButtons = preferences.getBoolean(SubshellSettings.COMPACT_COMMENT_VOTE_BUTTONS, DefaultSubshellSettings.compactCommentVoteButtons),
+            initialSearchBarHeader = preferences.getBoolean(SubshellSettings.SEARCH_BAR_HEADER, DefaultSubshellSettings.searchBarHeader),
+            initialShowCreateButton = preferences.getBoolean(SubshellSettings.SHOW_CREATE_BUTTON, DefaultSubshellSettings.showCreateButton),
+            // FEEDSORT_REMEMBER_V1 (fork): the sort last chosen, used only with the setting on.
+            initialFeedSort = if (preferences.getBoolean(SubshellSettings.REMEMBER_FEED_SORT, DefaultSubshellSettings.rememberFeedSort)) {
+                enumValue(LAST_FEED_SORT_PREFERENCE_KEY, FeedSort.entries, FeedSort.BEST)
+            } else {
+                FeedSort.BEST
+            },
             initialCommentHierarchyStyle = enumValue(
                 SubshellSettings.COMMENT_HIERARCHY_STYLE,
                 CommentHierarchyStyle.entries,

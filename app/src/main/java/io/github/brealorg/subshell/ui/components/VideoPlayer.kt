@@ -63,7 +63,10 @@ import androidx.compose.ui.Modifier
 import io.github.brealorg.subshell.media.remoteMediaDiagnosticScope
 import io.github.brealorg.subshell.ui.error.LocalViewportErrorHostState
 import io.github.brealorg.subshell.ui.mediaDownloadFolder
+import io.github.brealorg.subshell.ui.PostMediaActionTarget
+import io.github.brealorg.subshell.ui.downloadPostMedia
 import io.github.brealorg.subshell.ui.mediaActionScope
+import io.github.brealorg.subshell.ui.sharePostMedia
 import io.github.brealorg.subshell.ui.InteractionSide
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.platform.LocalDensity
@@ -292,6 +295,56 @@ private fun FullscreenQuickControls(
     }
 }
 
+/** VIDEO_CONTROLS_BAR_V1 (fork): sound, download and full screen beside the inline seek bar. */
+@Composable
+private fun InlineVideoBarButtons(
+    showMute: Boolean,
+    muted: Boolean,
+    showDownload: Boolean,
+    downloadBusy: Boolean,
+    showFullscreen: Boolean,
+    onToggleMute: () -> Unit,
+    onDownload: () -> Unit,
+    onFullscreen: () -> Unit,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        if (showMute) {
+            IconButton(onClick = onToggleMute, modifier = Modifier.size(40.dp)) {
+                Icon(
+                    if (muted) Symbols.VolumeOff else Symbols.VolumeUp,
+                    contentDescription = if (muted) "Turn sound on" else "Mute video",
+                    tint = Color.White,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
+        }
+        if (showDownload) {
+            IconButton(onClick = onDownload, modifier = Modifier.size(40.dp)) {
+                if (downloadBusy) {
+                    CircularProgressIndicator(Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
+                } else {
+                    Icon(
+                        Symbols.Download,
+                        contentDescription = "Download video",
+                        tint = Color.White,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+            }
+        }
+        if (showFullscreen) {
+            IconButton(onClick = onFullscreen, modifier = Modifier.size(40.dp)) {
+                Icon(
+                    Symbols.Fullscreen,
+                    contentDescription = "Full screen",
+                    tint = Color.White,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
+        }
+    }
+}
+
 /** The round 48 dp button the video chrome uses for its actions. */
 @Composable
 private fun VideoChromeIconButton(
@@ -326,6 +379,7 @@ private fun VideoTopActionCluster(
     onPlaybackOptions: () -> Unit,
     onToggleMute: () -> Unit,
     onToggleFullscreen: () -> Unit,
+    showFullscreenButton: Boolean = true,
 ) {
     val playbackOptionsAction: @Composable () -> Unit = {
         if (showPlaybackOptions) {
@@ -348,7 +402,7 @@ private fun VideoTopActionCluster(
     val fullscreenAction: @Composable () -> Unit = {
         // VIDEO06_ONE_WAY_OUT_OF_FULL_SCREEN_V1: full screen keeps only its back
         // arrow; a second "Exit full screen" button beside it was a duplicate.
-        if (!fullscreen) {
+        if (!fullscreen && showFullscreenButton) {
             FullscreenControlButton(
                 fullscreen = fullscreen,
                 atStart = atStart,
@@ -553,6 +607,37 @@ fun LocalVideoPlayer(
     var controlsInteraction by remember(post.id) { mutableIntStateOf(0) }
     var mediaSharing by remember(post.id) { mutableStateOf(false) }
     var mediaDownload by remember(post.id) { mutableStateOf<String?>(null) }
+    // VIDEO_DOWNLOAD_BUTTON_V1 (fork): with the setting on, the inline player gets the same
+    // share/download actions the full screen one has, so Download can be a visible button.
+    val videoActionContext = androidx.compose.ui.platform.LocalContext.current
+    val resolvedMediaActions: VideoMediaActions? = mediaActions ?: if (state.videoDownloadButton) {
+        val target = PostMediaActionTarget(post = post, galleryItem = null)
+        VideoMediaActions(
+            share = { sharePostMedia(videoActionContext, target) },
+            download = { downloadPostMedia(videoActionContext, target) },
+        )
+    } else {
+        null
+    }
+    val startVideoDownload: () -> Unit = {
+        val actions = resolvedMediaActions
+        if (actions != null && !mediaSharing && mediaDownload == null) {
+            mediaDownload = VIDEO_DOWNLOAD_SAVING
+            mediaActionScope.launch {
+                val destination = actions.download()
+                if (destination != null) {
+                    mediaDownload = "Saved to ${mediaDownloadFolder(destination)}"
+                    delay(MEDIA_DOWNLOAD_SAVED_VISIBLE_MS)
+                } else {
+                    errorHost?.reportMediaActionFailure(
+                        title = "Could not download",
+                        message = "This media could not be saved",
+                    )
+                }
+                mediaDownload = null
+            }
+        }
+    }
     var playbackModal by remember(post.id) { mutableStateOf<PlaybackModal?>(null) }
     var isScrubbing by remember(post.id) { mutableStateOf(false) }
     var scrubPositionMs by remember(post.id) { mutableLongStateOf(0L) }
@@ -1046,9 +1131,15 @@ fun LocalVideoPlayer(
                     )
                 }
             }
-            .pointerInput(longPress != null) {
+            .pointerInput(longPress != null, fullscreen, state.doubleTapVideoFullscreen) {
                 detectTapGestures(
                     onTap = { toggleControls() },
+                    // DOUBLETAP_FULLSCREEN_V1 (fork): inline players only.
+                    onDoubleTap = if (!fullscreen && state.doubleTapVideoFullscreen) {
+                        { _ -> state.openMedia(post) }
+                    } else {
+                        null
+                    },
                     onLongPress = longPress?.let { action -> { _ -> action() } },
                 )
             }
@@ -1366,7 +1457,9 @@ fun LocalVideoPlayer(
                         inPostDetail = inPostDetail,
                     ),
                     // VIDEO06_SILENT_VIDEO_LOOPS_WITHOUT_A_MUTE_BUTTON_V1
-                    showMute = coordinator.silentMediaId != post.id,
+                    // VIDEO_CONTROLS_BAR_V1 (fork): sound and full screen move to the seek bar row.
+                    showMute = coordinator.silentMediaId != post.id && !state.videoControlsInTimeline,
+                    showFullscreenButton = !state.videoControlsInTimeline,
                     muted = muted,
                     atStart = actionsAtRowStart,
                     onPlaybackOptions = {
@@ -1442,6 +1535,25 @@ fun LocalVideoPlayer(
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.labelMedium,
                         )
+                    }
+                    if (state.videoDownloadButton && resolvedMediaActions != null) {
+                        // VIDEO_DOWNLOAD_BUTTON_V1 (fork)
+                        IconButton(
+                            onClick = {
+                                controlsInteraction += 1
+                                startVideoDownload()
+                            },
+                        ) {
+                            if (mediaDownload == VIDEO_DOWNLOAD_SAVING) {
+                                CircularProgressIndicator(Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
+                            } else {
+                                Icon(
+                                    Symbols.Download,
+                                    contentDescription = "Download video",
+                                    tint = Color.White,
+                                )
+                            }
+                        }
                     }
                     IconButton(
                         onClick = {
@@ -1571,6 +1683,42 @@ fun LocalVideoPlayer(
                         Spacer(Modifier.weight(1f))
                         if (quickAtRowStart) timeText() else quickControls()
                     }
+                } else if (durationMs != null && (state.videoControlsInTimeline || (state.videoDownloadButton && resolvedMediaActions != null))) {
+                    // VIDEO_CONTROLS_BAR_V1 / VIDEO_DOWNLOAD_BUTTON_V1 (fork): the buttons sit in
+                    // the seek bar area like any other video player.
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "${formatVideoPlaybackTime(displayedPositionMs)} / ${formatVideoPlaybackTime(durationMs)}",
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                        Spacer(Modifier.weight(1f))
+                        InlineVideoBarButtons(
+                            showMute = state.videoControlsInTimeline && coordinator.silentMediaId != post.id,
+                            muted = muted,
+                            showDownload = state.videoDownloadButton && resolvedMediaActions != null,
+                            downloadBusy = mediaDownload == VIDEO_DOWNLOAD_SAVING,
+                            showFullscreen = state.videoControlsInTimeline,
+                            onToggleMute = {
+                                controlsVisible = true
+                                controlsInteraction += 1
+                                state.toggleVideoMuted()
+                            },
+                            onDownload = {
+                                controlsVisible = true
+                                controlsInteraction += 1
+                                startVideoDownload()
+                            },
+                            onFullscreen = {
+                                controlsVisible = true
+                                controlsInteraction += 1
+                                state.openMedia(post)
+                            },
+                        )
+                    }
                 } else if (durationMs != null) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -1588,6 +1736,23 @@ fun LocalVideoPlayer(
                         )
                     }
                 }
+            }
+        }
+
+        // VIDEO_DOWNLOAD_BUTTON_V1 (fork): the visible button's result, since it has no menu row.
+        val downloadNotice = mediaDownload
+        if (state.videoDownloadButton && downloadNotice != null && downloadNotice != VIDEO_DOWNLOAD_SAVING) {
+            Surface(
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 72.dp),
+                shape = MaterialTheme.shapes.medium,
+                color = Color.Black.copy(alpha = 0.72f),
+            ) {
+                Text(
+                    text = downloadNotice,
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                )
             }
         }
 
@@ -1695,7 +1860,7 @@ fun LocalVideoPlayer(
                         speedSummary = videoSpeedLabel(coordinator.playbackSpeed)
                             .takeIf { state.videoSpeedControls },
                         onSpeed = { playbackModal = PlaybackModal.SPEED },
-                        mediaActionRows = if (mediaActions != null) {
+                        mediaActionRows = if (resolvedMediaActions != null) {
                             {
                                 PlaybackActionRow(
                                     title = "Share",
@@ -1705,7 +1870,7 @@ fun LocalVideoPlayer(
                                     onClick = {
                                         mediaSharing = true
                                         mediaActionScope.launch {
-                                            val shared = mediaActions.share()
+                                            val shared = resolvedMediaActions.share()
                                             mediaSharing = false
                                             if (!shared) {
                                                 errorHost?.reportMediaActionFailure(
@@ -1724,7 +1889,7 @@ fun LocalVideoPlayer(
                                     onClick = {
                                         mediaDownload = VIDEO_DOWNLOAD_SAVING
                                         mediaActionScope.launch {
-                                            val destination = mediaActions.download()
+                                            val destination = resolvedMediaActions.download()
                                             if (destination != null) {
                                                 mediaDownload = "Saved to ${mediaDownloadFolder(destination)}"
                                                 delay(MEDIA_DOWNLOAD_SAVED_VISIBLE_MS)

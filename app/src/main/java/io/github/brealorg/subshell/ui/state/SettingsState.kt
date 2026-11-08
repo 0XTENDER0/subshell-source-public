@@ -65,6 +65,15 @@ internal class SettingsState(
     initialCommentCollapseMode: CommentCollapseMode,
     initialPostCardStyle: io.github.brealorg.subshell.ui.PostCardStyle,
     initialCommentLayoutStyle: io.github.brealorg.subshell.ui.CommentLayoutStyle,
+    initialSwipeBackEnabled: Boolean,
+    initialSwipeDownCloseMedia: Boolean,
+    initialDoubleTapVideoFullscreen: Boolean,
+    initialVideoDownloadButton: Boolean,
+    initialVideoControlsInTimeline: Boolean,
+    initialRememberFeedSort: Boolean,
+    initialCompactCommentVoteButtons: Boolean,
+    initialSearchBarHeader: Boolean,
+    initialShowCreateButton: Boolean,
     initialCommentHierarchyStyle: CommentHierarchyStyle,
     initialCommentThreadColours: CommentThreadColours,
     initialSwipeActionsEnabled: Boolean,
@@ -160,6 +169,15 @@ internal class SettingsState(
     var commentHierarchyStyle by mutableStateOf(initialCommentHierarchyStyle)
     var postCardStyle by mutableStateOf(initialPostCardStyle)
     var commentLayoutStyle by mutableStateOf(initialCommentLayoutStyle)
+    var swipeBackEnabled by mutableStateOf(initialSwipeBackEnabled)
+    var swipeDownCloseMedia by mutableStateOf(initialSwipeDownCloseMedia)
+    var doubleTapVideoFullscreen by mutableStateOf(initialDoubleTapVideoFullscreen)
+    var videoDownloadButton by mutableStateOf(initialVideoDownloadButton)
+    var videoControlsInTimeline by mutableStateOf(initialVideoControlsInTimeline)
+    var rememberFeedSort by mutableStateOf(initialRememberFeedSort)
+    var compactCommentVoteButtons by mutableStateOf(initialCompactCommentVoteButtons)
+    var searchBarHeader by mutableStateOf(initialSearchBarHeader)
+    var showCreateButton by mutableStateOf(initialShowCreateButton)
     var commentThreadColours by mutableStateOf(initialCommentThreadColours)
         internal set
     var swipeActionsEnabled by mutableStateOf(initialSwipeActionsEnabled)
@@ -332,6 +350,51 @@ internal class SettingsState(
     fun updateCommentLayoutStyle(style: io.github.brealorg.subshell.ui.CommentLayoutStyle) {
         commentLayoutStyle = style
         persistPreference(SubshellSettings.COMMENT_LAYOUT_STYLE, style.name)
+    }
+
+    fun updateSwipeBackEnabled(enabled: Boolean) {
+        swipeBackEnabled = enabled
+        persistPreference(SubshellSettings.SWIPE_BACK_ENABLED, enabled.toString())
+    }
+
+    fun updateSwipeDownCloseMedia(enabled: Boolean) {
+        swipeDownCloseMedia = enabled
+        persistPreference(SubshellSettings.SWIPE_DOWN_CLOSE_MEDIA, enabled.toString())
+    }
+
+    fun updateDoubleTapVideoFullscreen(enabled: Boolean) {
+        doubleTapVideoFullscreen = enabled
+        persistPreference(SubshellSettings.DOUBLE_TAP_VIDEO_FULLSCREEN, enabled.toString())
+    }
+
+    fun updateVideoDownloadButton(enabled: Boolean) {
+        videoDownloadButton = enabled
+        persistPreference(SubshellSettings.VIDEO_DOWNLOAD_BUTTON, enabled.toString())
+    }
+
+    fun updateVideoControlsInTimeline(enabled: Boolean) {
+        videoControlsInTimeline = enabled
+        persistPreference(SubshellSettings.VIDEO_CONTROLS_IN_TIMELINE, enabled.toString())
+    }
+
+    fun updateRememberFeedSort(enabled: Boolean) {
+        rememberFeedSort = enabled
+        persistPreference(SubshellSettings.REMEMBER_FEED_SORT, enabled.toString())
+    }
+
+    fun updateCompactCommentVoteButtons(enabled: Boolean) {
+        compactCommentVoteButtons = enabled
+        persistPreference(SubshellSettings.COMPACT_COMMENT_VOTE_BUTTONS, enabled.toString())
+    }
+
+    fun updateSearchBarHeader(enabled: Boolean) {
+        searchBarHeader = enabled
+        persistPreference(SubshellSettings.SEARCH_BAR_HEADER, enabled.toString())
+    }
+
+    fun updateShowCreateButton(enabled: Boolean) {
+        showCreateButton = enabled
+        persistPreference(SubshellSettings.SHOW_CREATE_BUTTON, enabled.toString())
     }
 
     fun updateCommentHierarchyStyle(style: CommentHierarchyStyle) {

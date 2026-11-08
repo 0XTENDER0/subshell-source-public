@@ -500,6 +500,54 @@ private fun LocalAssetStill(asset: io.github.brealorg.subshell.model.MediaAsset,
 internal const val POST_THUMBNAIL_TEST_TAG = "post-thumbnail"
 private val MediaViewerKinds = setOf(PostKind.IMAGE, PostKind.VIDEO, PostKind.GIF, PostKind.GALLERY)
 internal val PostLayoutMenuWidth = 200.dp
+
+/**
+ * SEARCHBAR_HEADER_V1 (fork): the post layout choices as a menu anchored to any row (the side
+ * menu's "Post layout"), the same choices the header button offers.
+ */
+@Composable
+internal fun PostLayoutDropdown(state: SubshellState, expanded: Boolean, onDismiss: () -> Unit) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismiss,
+        modifier = Modifier.width(PostLayoutMenuWidth),
+    ) {
+        PostLayout.entries.forEach { layout ->
+            DropdownMenuItem(
+                text = { Text(layout.label) },
+                modifier = Modifier.semantics { selected = layout == state.postLayout },
+                leadingIcon = { Icon(postLayoutIcon(layout), contentDescription = null) },
+                trailingIcon = if (layout == state.postLayout) {
+                    { Icon(Symbols.Check, contentDescription = null) }
+                } else {
+                    null
+                },
+                onClick = {
+                    state.updatePostLayout(layout)
+                    if (layout != PostLayout.LIST) onDismiss()
+                },
+            )
+        }
+        if (state.postLayout == PostLayout.LIST) {
+            HorizontalDivider()
+            ListThumbnailSide.entries.forEach { side ->
+                DropdownMenuItem(
+                    text = { Text("Thumbnail ${side.label.lowercase()}") },
+                    modifier = Modifier.semantics { selected = side == state.listThumbnailSide },
+                    trailingIcon = if (side == state.listThumbnailSide) {
+                        { Icon(Symbols.Check, contentDescription = null) }
+                    } else {
+                        null
+                    },
+                    onClick = {
+                        state.updateListThumbnailSide(side)
+                        onDismiss()
+                    },
+                )
+            }
+        }
+    }
+}
 private val CompactMediaHeight = 160.dp
 private val ListThumbnailSize = 72.dp
 

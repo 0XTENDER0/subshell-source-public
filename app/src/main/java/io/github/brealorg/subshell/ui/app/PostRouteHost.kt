@@ -55,6 +55,7 @@ import io.github.brealorg.subshell.ui.MainDestination
 import io.github.brealorg.subshell.ui.SubshellRoute
 import io.github.brealorg.subshell.ui.SubshellState
 import io.github.brealorg.subshell.ui.app.ExpandedContextSurface
+import io.github.brealorg.subshell.ui.components.swipeRightToGoBack
 import io.github.brealorg.subshell.ui.app.ExpandedListDetailSurface
 import io.github.brealorg.subshell.ui.screens.CommunityScreen
 import io.github.brealorg.subshell.ui.screens.HomeScreen
@@ -710,7 +711,13 @@ internal fun PostRouteHost(
                     expanded = expandedWindowLayout,
                     maxWidth = ExpandedContextReadingMaxWidth,
                 ) { contextModifier ->
-                    postDetail(contextModifier)
+                    // SWIPEBACK_V1 (fork): phone-style context surface only.
+                    postDetail(
+                        contextModifier.swipeRightToGoBack(
+                            enabled = state.swipeBackEnabled && !expandedWindowLayout,
+                            onBack = state::closePost,
+                        ),
+                    )
                 }
             }
         }

@@ -764,6 +764,17 @@ class SubshellState(
     initialCommentCollapseMode: CommentCollapseMode = CommentCollapseMode.HEADER,
     initialPostCardStyle: PostCardStyle = PostCardStyle.CARD,
     initialCommentLayoutStyle: CommentLayoutStyle = CommentLayoutStyle.STANDARD,
+    initialSwipeBackEnabled: Boolean = false,
+    initialSwipeDownCloseMedia: Boolean = false,
+    initialDoubleTapVideoFullscreen: Boolean = false,
+    initialVideoDownloadButton: Boolean = false,
+    initialVideoControlsInTimeline: Boolean = false,
+    initialRememberFeedSort: Boolean = true,
+    initialCompactCommentVoteButtons: Boolean = false,
+    initialSearchBarHeader: Boolean = false,
+    initialShowCreateButton: Boolean = true,
+    // FEEDSORT_REMEMBER_V1 (fork): the sort the feed starts with.
+    initialFeedSort: FeedSort = FeedSort.BEST,
     initialCommentHierarchyStyle: CommentHierarchyStyle = CommentHierarchyStyle.GUIDE_LINES,
     initialCommentThreadColours: CommentThreadColours = CommentThreadColours.OFF,
     initialSwipeActionsEnabled: Boolean = false,
@@ -1034,7 +1045,7 @@ class SubshellState(
     var focusedCommentId by mutableStateOf(initialFocusedCommentId)
     var postVisitId by mutableIntStateOf(initialPostVisitId.coerceAtLeast(0))
         private set
-    var feedSort by mutableStateOf(FeedSort.BEST)
+    var feedSort by mutableStateOf(initialFeedSort)
     var feedSource by mutableStateOf(FeedSource.HOME)
     var hideReadPosts by mutableStateOf(false)
         private set
@@ -1088,6 +1099,15 @@ class SubshellState(
         initialCommentCollapseMode = initialCommentCollapseMode,
         initialPostCardStyle = initialPostCardStyle,
         initialCommentLayoutStyle = initialCommentLayoutStyle,
+        initialSwipeBackEnabled = initialSwipeBackEnabled,
+        initialSwipeDownCloseMedia = initialSwipeDownCloseMedia,
+        initialDoubleTapVideoFullscreen = initialDoubleTapVideoFullscreen,
+        initialVideoDownloadButton = initialVideoDownloadButton,
+        initialVideoControlsInTimeline = initialVideoControlsInTimeline,
+        initialRememberFeedSort = initialRememberFeedSort,
+        initialCompactCommentVoteButtons = initialCompactCommentVoteButtons,
+        initialSearchBarHeader = initialSearchBarHeader,
+        initialShowCreateButton = initialShowCreateButton,
         initialCommentHierarchyStyle = initialCommentHierarchyStyle,
         initialCommentThreadColours = initialCommentThreadColours,
         initialSwipeActionsEnabled = initialSwipeActionsEnabled,
@@ -1227,6 +1247,15 @@ class SubshellState(
     var commentHierarchyStyle by settings::commentHierarchyStyle
     var postCardStyle by settings::postCardStyle
     var commentLayoutStyle by settings::commentLayoutStyle
+    var swipeBackEnabled by settings::swipeBackEnabled
+    var swipeDownCloseMedia by settings::swipeDownCloseMedia
+    var doubleTapVideoFullscreen by settings::doubleTapVideoFullscreen
+    var videoDownloadButton by settings::videoDownloadButton
+    var videoControlsInTimeline by settings::videoControlsInTimeline
+    var rememberFeedSort by settings::rememberFeedSort
+    var compactCommentVoteButtons by settings::compactCommentVoteButtons
+    var searchBarHeader by settings::searchBarHeader
+    var showCreateButton by settings::showCreateButton
     var commentThreadColours by settings::commentThreadColours
         private set
 
@@ -1480,13 +1509,13 @@ class SubshellState(
                 SubshellRouteStack.forDestination(
                     destination = MainDestination.HOME,
                     source = FeedSource.HOME,
-                    sort = FeedSort.BEST,
+                    sort = initialFeedSort,
                 )
             } else {
                 SubshellRouteStack.restored(
                     destination = initialDestination,
                     source = FeedSource.HOME,
-                    sort = FeedSort.BEST,
+                    sort = initialFeedSort,
                     selectedCommunity = selectedSubreddit,
                     communitySort = initialCommunitySort,
                     postRoute = selectedPost?.let { post ->
@@ -2712,7 +2741,11 @@ class SubshellState(
             "Authenticated account landing must use Home or Popular"
         }
         feedSource = source
-        feedSort = if (source == FeedSource.HOME) {
+        // FEEDSORT_REMEMBER_V1 (fork): the landing used to put Best (Hot for Popular) back at
+        // every start; with the setting on the sort the reader chose stays.
+        feedSort = if (rememberFeedSort) {
+            normalizedFeedSort(source, feedSort)
+        } else if (source == FeedSource.HOME) {
             FeedSort.BEST
         } else {
             FeedSort.HOT
@@ -2728,6 +2761,8 @@ class SubshellState(
 
     fun updateFeedSort(sort: FeedSort) {
         feedSort = normalizedFeedSort(feedSource, sort)
+        // FEEDSORT_REMEMBER_V1 (fork): written always, read at launch only with the setting on.
+        persistPreference(LAST_FEED_SORT_PREFERENCE_KEY, feedSort.name)
     }
 
     fun navigateBack(): Boolean = if (routeStack.current is SubshellRoute.Search) {
@@ -5876,6 +5911,42 @@ class SubshellState(
         settings.updateCommentLayoutStyle(style)
     }
 
+    fun updateSwipeBackEnabled(enabled: Boolean) {
+        settings.updateSwipeBackEnabled(enabled)
+    }
+
+    fun updateSwipeDownCloseMedia(enabled: Boolean) {
+        settings.updateSwipeDownCloseMedia(enabled)
+    }
+
+    fun updateDoubleTapVideoFullscreen(enabled: Boolean) {
+        settings.updateDoubleTapVideoFullscreen(enabled)
+    }
+
+    fun updateVideoDownloadButton(enabled: Boolean) {
+        settings.updateVideoDownloadButton(enabled)
+    }
+
+    fun updateVideoControlsInTimeline(enabled: Boolean) {
+        settings.updateVideoControlsInTimeline(enabled)
+    }
+
+    fun updateRememberFeedSort(enabled: Boolean) {
+        settings.updateRememberFeedSort(enabled)
+    }
+
+    fun updateCompactCommentVoteButtons(enabled: Boolean) {
+        settings.updateCompactCommentVoteButtons(enabled)
+    }
+
+    fun updateSearchBarHeader(enabled: Boolean) {
+        settings.updateSearchBarHeader(enabled)
+    }
+
+    fun updateShowCreateButton(enabled: Boolean) {
+        settings.updateShowCreateButton(enabled)
+    }
+
     fun updateCommentThreadColours(colours: CommentThreadColours) {
         settings.updateCommentThreadColours(colours)
     }
@@ -6308,6 +6379,15 @@ class SubshellState(
         commentHierarchyStyle = commentHierarchyStyle,
         postCardStyle = postCardStyle,
         commentLayoutStyle = commentLayoutStyle,
+        swipeBackEnabled = swipeBackEnabled,
+        swipeDownCloseMedia = swipeDownCloseMedia,
+        doubleTapVideoFullscreen = doubleTapVideoFullscreen,
+        videoDownloadButton = videoDownloadButton,
+        videoControlsInTimeline = videoControlsInTimeline,
+        rememberFeedSort = rememberFeedSort,
+        compactCommentVoteButtons = compactCommentVoteButtons,
+        searchBarHeader = searchBarHeader,
+        showCreateButton = showCreateButton,
         commentThreadColours = commentThreadColours,
         swipeActionsEnabled = swipeActionsEnabled,
         postSwipeLeftAction = postSwipeLeftAction,
@@ -6401,6 +6481,15 @@ class SubshellState(
         commentHierarchyStyle = settings.commentHierarchyStyle
         postCardStyle = settings.postCardStyle
         commentLayoutStyle = settings.commentLayoutStyle
+        swipeBackEnabled = settings.swipeBackEnabled
+        swipeDownCloseMedia = settings.swipeDownCloseMedia
+        doubleTapVideoFullscreen = settings.doubleTapVideoFullscreen
+        videoDownloadButton = settings.videoDownloadButton
+        videoControlsInTimeline = settings.videoControlsInTimeline
+        rememberFeedSort = settings.rememberFeedSort
+        compactCommentVoteButtons = settings.compactCommentVoteButtons
+        searchBarHeader = settings.searchBarHeader
+        showCreateButton = settings.showCreateButton
         commentThreadColours = settings.commentThreadColours
         // ISSUE71_RESTORE_APPLIES_COMMENT_COLLAPSE_MODE_V1: the only setting a
         // restore wrote to disk but left stale in the live state.

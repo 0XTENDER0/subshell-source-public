@@ -4050,6 +4050,24 @@ private fun CommentRow(
                     )
                 }
                 comment.codeSample?.let { CodeBlock(it) }
+                // COMPACT_VOTES_V1 (fork): a compact comment keeps its vote buttons visible; the
+                // full action row (reply, copy, share, ...) still waits for a tap.
+                if (compact && !compactActionsShown && state.compactCommentVoteButtons) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                    ) {
+                        VoteControl(
+                            score = displayedUpvotes,
+                            vote = vote,
+                            mode = state.voteControlMode,
+                            palette = state.voteColorPalette,
+                            enabled = state.commentVoteControlEnabled(comment),
+                            onUpvote = { state.vote(comment, 1) },
+                            onDownvote = { state.vote(comment, -1) },
+                        )
+                    }
+                }
                 if (!compact || compactActionsShown) CommentActionRow(
                     placement = state.commentActionPlacement,
                     score = displayedUpvotes,

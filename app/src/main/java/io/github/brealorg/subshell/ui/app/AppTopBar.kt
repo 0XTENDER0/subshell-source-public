@@ -196,6 +196,7 @@ internal fun AppTopBar(
                         // ISSUE234_LAYOUT_CHOICE_BESIDE_THE_FEED_V1: Home and its custom feeds.
                         postLayoutButton = state.destination == MainDestination.HOME &&
                             state.selectedSubreddit == null,
+                        searchBarMode = state.searchBarHeader,
                     )
                 }
             }

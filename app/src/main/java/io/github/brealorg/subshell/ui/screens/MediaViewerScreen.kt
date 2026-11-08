@@ -100,6 +100,7 @@ import io.github.brealorg.subshell.ui.components.GifMedia
 import io.github.brealorg.subshell.ui.components.GalleryMetadataBelow
 import io.github.brealorg.subshell.ui.components.GalleryMetadataOverlay
 import io.github.brealorg.subshell.ui.components.LocalVideoPlayer
+import io.github.brealorg.subshell.ui.components.swipeDownToClose
 import io.github.brealorg.subshell.ui.components.RemoteGifMedia
 import io.github.brealorg.subshell.ui.components.RemoteImage
 import io.github.brealorg.subshell.ui.components.RemoteMedia
@@ -163,7 +164,9 @@ fun MediaViewerScreen(
                 tabletopVideoHeight = tabletopVideoHeight,
                 modifier = Modifier
                     .fillMaxSize()
-                    .predictiveMediaContent(viewerBack, state.motionReduced),
+                    .predictiveMediaContent(viewerBack, state.motionReduced)
+                    // SWIPEDOWN_MEDIA_V1 (fork)
+                    .swipeDownToClose(enabled = state.swipeDownCloseMedia, onClose = onBack),
             )
         }
         return
@@ -204,6 +207,8 @@ fun MediaViewerScreen(
             Modifier
                 .fillMaxSize()
                 .predictiveMediaContent(viewerBack, state.motionReduced)
+                // SWIPEDOWN_MEDIA_V1 (fork)
+                .swipeDownToClose(enabled = state.swipeDownCloseMedia, onClose = onBack)
                 .semantics { onClick(label = VIEWER_TOGGLE_CONTROLS_LABEL) { toggleControls(); true } },
         ) {
             when (post.kind) {
@@ -398,6 +403,7 @@ fun CommentMediaViewerScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     reduceMotion: Boolean = false,
+    closeOnSwipeDown: Boolean = false,
 ) {
     // ISSUE27_PREDICTIVE_MEDIA_BACK_V1 (see MediaViewerScreen).
     val viewerBack = rememberPredictiveRouteBackState()
@@ -430,6 +436,8 @@ fun CommentMediaViewerScreen(
             Modifier
                 .fillMaxSize()
                 .predictiveMediaContent(viewerBack, reduceMotion)
+                // SWIPEDOWN_MEDIA_V1 (fork)
+                .swipeDownToClose(enabled = closeOnSwipeDown, onClose = onBack)
                 .semantics { onClick(label = VIEWER_TOGGLE_CONTROLS_LABEL) { toggleControls(); true } },
         ) {
             ZoomableContent(

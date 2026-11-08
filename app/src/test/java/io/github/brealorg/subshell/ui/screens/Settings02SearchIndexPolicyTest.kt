@@ -30,10 +30,11 @@ class Settings02SearchIndexPolicyTest {
                 "post-swipe-right",
                 "comment-swipe-left",
                 "comment-swipe-right",
+                "compact-comment-vote-buttons",
             ),
             result.itemKeys,
         )
-        assertEquals(setOf("Appearance", "Navigation"), result.sections)
+        assertEquals(setOf("Appearance", "Navigation", "Comments"), result.sections)
     }
 
     @Test

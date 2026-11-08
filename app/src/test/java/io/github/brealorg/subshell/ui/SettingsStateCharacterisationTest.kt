@@ -32,6 +32,15 @@ class SettingsStateCharacterisationTest {
         Setter("updateCommentHierarchyStyle", CommentHierarchyStyle.entries, { s, v -> s.updateCommentHierarchyStyle(v as CommentHierarchyStyle) }, { it.commentHierarchyStyle }, { v -> SubshellSettings.COMMENT_HIERARCHY_STYLE to (v as CommentHierarchyStyle).name }),
         Setter("updatePostCardStyle", PostCardStyle.entries, { s, v -> s.updatePostCardStyle(v as PostCardStyle) }, { it.postCardStyle }, { v -> SubshellSettings.POST_CARD_STYLE to (v as PostCardStyle).name }),
         Setter("updateCommentLayoutStyle", CommentLayoutStyle.entries, { s, v -> s.updateCommentLayoutStyle(v as CommentLayoutStyle) }, { it.commentLayoutStyle }, { v -> SubshellSettings.COMMENT_LAYOUT_STYLE to (v as CommentLayoutStyle).name }),
+        Setter("updateSwipeBackEnabled", listOf(true, false), { s, v -> s.updateSwipeBackEnabled(v as Boolean) }, { it.swipeBackEnabled }, { v -> SubshellSettings.SWIPE_BACK_ENABLED to v.toString() }),
+        Setter("updateSwipeDownCloseMedia", listOf(true, false), { s, v -> s.updateSwipeDownCloseMedia(v as Boolean) }, { it.swipeDownCloseMedia }, { v -> SubshellSettings.SWIPE_DOWN_CLOSE_MEDIA to v.toString() }),
+        Setter("updateDoubleTapVideoFullscreen", listOf(true, false), { s, v -> s.updateDoubleTapVideoFullscreen(v as Boolean) }, { it.doubleTapVideoFullscreen }, { v -> SubshellSettings.DOUBLE_TAP_VIDEO_FULLSCREEN to v.toString() }),
+        Setter("updateVideoDownloadButton", listOf(true, false), { s, v -> s.updateVideoDownloadButton(v as Boolean) }, { it.videoDownloadButton }, { v -> SubshellSettings.VIDEO_DOWNLOAD_BUTTON to v.toString() }),
+        Setter("updateVideoControlsInTimeline", listOf(true, false), { s, v -> s.updateVideoControlsInTimeline(v as Boolean) }, { it.videoControlsInTimeline }, { v -> SubshellSettings.VIDEO_CONTROLS_IN_TIMELINE to v.toString() }),
+        Setter("updateRememberFeedSort", listOf(true, false), { s, v -> s.updateRememberFeedSort(v as Boolean) }, { it.rememberFeedSort }, { v -> SubshellSettings.REMEMBER_FEED_SORT to v.toString() }),
+        Setter("updateCompactCommentVoteButtons", listOf(true, false), { s, v -> s.updateCompactCommentVoteButtons(v as Boolean) }, { it.compactCommentVoteButtons }, { v -> SubshellSettings.COMPACT_COMMENT_VOTE_BUTTONS to v.toString() }),
+        Setter("updateSearchBarHeader", listOf(true, false), { s, v -> s.updateSearchBarHeader(v as Boolean) }, { it.searchBarHeader }, { v -> SubshellSettings.SEARCH_BAR_HEADER to v.toString() }),
+        Setter("updateShowCreateButton", listOf(true, false), { s, v -> s.updateShowCreateButton(v as Boolean) }, { it.showCreateButton }, { v -> SubshellSettings.SHOW_CREATE_BUTTON to v.toString() }),
         Setter("updateSwipeActionsEnabled", listOf(true, false), { s, v -> s.updateSwipeActionsEnabled(v as Boolean) }, { it.swipeActionsEnabled }, { v -> SubshellSettings.SWIPE_ACTIONS_ENABLED to v.toString() }),
         Setter("updatePostSwipeLeftAction", PostSwipeAction.entries, { s, v -> s.updatePostSwipeLeftAction(v as PostSwipeAction) }, { it.postSwipeLeftAction }, { v -> SubshellSettings.POST_SWIPE_LEFT_ACTION to (v as PostSwipeAction).name }),
         Setter("updatePostSwipeRightAction", PostSwipeAction.entries, { s, v -> s.updatePostSwipeRightAction(v as PostSwipeAction) }, { it.postSwipeRightAction }, { v -> SubshellSettings.POST_SWIPE_RIGHT_ACTION to (v as PostSwipeAction).name }),
@@ -94,7 +103,7 @@ class SettingsStateCharacterisationTest {
 
     @Test
     fun everySetterUpdatesItsFieldAndPersistsExactlyOnePreferenceWithTheExpectedKeyAndValue() {
-        assertEquals(64, setters.size)
+        assertEquals(73, setters.size)
         setters.forEach { setter ->
             val writes = mutableListOf<Pair<String, String>>()
             val state = state(writes)

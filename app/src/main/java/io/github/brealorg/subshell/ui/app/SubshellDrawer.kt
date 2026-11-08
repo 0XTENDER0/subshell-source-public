@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -70,6 +71,8 @@ import io.github.brealorg.subshell.ui.components.ScrollPositionIndicator
 import io.github.brealorg.subshell.ui.components.SubshellWordmark
 import io.github.brealorg.subshell.ui.ThemeChoice
 import io.github.brealorg.subshell.ui.drawerThemeChoices
+import io.github.brealorg.subshell.ui.components.PostLayoutDropdown
+import io.github.brealorg.subshell.ui.components.postLayoutIcon
 import io.github.brealorg.subshell.ui.symbols.Symbols
 import io.github.brealorg.subshell.ui.toggleDrawerDynamicGroup
 import kotlinx.coroutines.delay
@@ -378,6 +381,35 @@ internal fun SubshellDrawer(
                             state.secondaryDestination == null,
                         onClick = { onAction { state.navigate(MainDestination.YOU) } },
                     )
+                }
+                // SEARCHBAR_HEADER_V1 (fork): what the top bar gave up lives here.
+                if (state.searchBarHeader) {
+                    item("drawer-switch-account") {
+                        CompactDrawerItem(
+                            label = "Switch account",
+                            icon = Symbols.SwapHoriz,
+                            selected = false,
+                            isDestination = false,
+                            onClick = { onAction { state.requestAccountSwitcher() } },
+                        )
+                    }
+                    item("drawer-post-layout") {
+                        var layoutMenuOpen by remember { mutableStateOf(false) }
+                        Box {
+                            CompactDrawerItem(
+                                label = "Post layout · ${state.postLayout.label}",
+                                icon = postLayoutIcon(state.postLayout),
+                                selected = false,
+                                isDestination = false,
+                                onClick = { layoutMenuOpen = true },
+                            )
+                            PostLayoutDropdown(
+                                state = state,
+                                expanded = layoutMenuOpen,
+                                onDismiss = { layoutMenuOpen = false },
+                            )
+                        }
+                    }
                 }
                     }
             if (state.scrollPositionIndicator) {

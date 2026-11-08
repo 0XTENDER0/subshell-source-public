@@ -950,7 +950,8 @@ fun SubshellApp(
             state.destination == MainDestination.INBOX &&
             state.activeAccountIsAuthenticated &&
             inboxPrimaryTab != InboxPrimaryTab.MOD
-        val createButtonVisible = createPostButtonVisible || messageButtonVisible
+        // CREATE_FAB_V1 (fork): the floating Create / Message button can be turned off.
+        val createButtonVisible = state.showCreateButton && (createPostButtonVisible || messageButtonVisible)
 
         val predictiveRouteBackState = rememberPredictiveRouteBackState()
         val backExitNoticeState = rememberViewportErrorHostState()
@@ -1206,6 +1207,7 @@ fun SubshellApp(
                                 uri = route.uri,
                                 onBack = { state.closeCommentMedia() },
                                 reduceMotion = state.motionReduced,
+                                closeOnSwipeDown = state.swipeDownCloseMedia,
                             )
                         }
                         is SubshellRoute.Media -> {

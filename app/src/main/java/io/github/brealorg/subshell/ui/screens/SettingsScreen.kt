@@ -1621,6 +1621,16 @@ fun SettingsScreen(
                         onClick = { choiceDialogKey = "post-layout" },
                     )
                 }
+                // FEEDSORT_REMEMBER_V1 (fork)
+                if (searchResult.isItemVisible("remember-feed-sort")) item("remember-feed-sort") {
+                    ToggleRow(
+                        icon = Symbols.Sort,
+                        title = "Remember feed sort",
+                        description = "Keep the sort you chose after closing the app",
+                        checked = state.rememberFeedSort,
+                        onCheckedChange = state::updateRememberFeedSort,
+                    )
+                }
                 // POSTSTYLE_EDGE_TO_EDGE_V1: only Large posts are drawn as cards.
                 if (searchResult.isItemVisible("post-card-style")) item("post-card-style") {
                     ValueSettingRow(
@@ -1974,6 +1984,25 @@ fun SettingsScreen(
                         },
                     )
                 }
+                // SEARCHBAR_HEADER_V1 / CREATE_FAB_V1 (fork)
+                if (searchResult.isItemVisible("search-bar-header")) item("search-bar-header") {
+                    ToggleRow(
+                        icon = Symbols.Search,
+                        title = "Search bar header",
+                        description = "Wide search bar on top; sort beside the menu; post layout and account in the side menu",
+                        checked = state.searchBarHeader,
+                        onCheckedChange = state::updateSearchBarHeader,
+                    )
+                }
+                if (searchResult.isItemVisible("show-create-button")) item("show-create-button") {
+                    ToggleRow(
+                        icon = Symbols.Add,
+                        title = "Floating create button",
+                        description = "Turn off to remove the Create / Message button",
+                        checked = state.showCreateButton,
+                        onCheckedChange = state::updateShowCreateButton,
+                    )
+                }
             }
 
             if (
@@ -2132,6 +2161,16 @@ fun SettingsScreen(
                         description = "Ask for a second Back before leaving the app",
                         checked = state.backTwiceToExit,
                         onCheckedChange = state::updateBackTwiceToExit,
+                    )
+                }
+                // SWIPEBACK_V1 (fork)
+                if (searchResult.isItemVisible("swipe-back")) item("swipe-back") {
+                    ToggleRow(
+                        icon = Symbols.Swipe,
+                        title = "Swipe right to go back",
+                        description = "On an open post, swipe left to right like pressing Back",
+                        checked = state.swipeBackEnabled,
+                        onCheckedChange = state::updateSwipeBackEnabled,
                     )
                 }
                 if (searchResult.isItemVisible("launcher-shortcuts")) item("launcher-shortcuts") {
@@ -2524,6 +2563,43 @@ fun SettingsScreen(
                         onCheckedChange = state::updateVideoDoubleTapSeek,
                     )
                 }
+                // FORK media options (all off by default)
+                if (searchResult.isItemVisible("swipe-down-close-media")) item("swipe-down-close-media") {
+                    ToggleRow(
+                        icon = Symbols.Swipe,
+                        title = "Swipe down to close media",
+                        description = "Full screen pictures and videos",
+                        checked = state.swipeDownCloseMedia,
+                        onCheckedChange = state::updateSwipeDownCloseMedia,
+                    )
+                }
+                if (searchResult.isItemVisible("double-tap-video-fullscreen")) item("double-tap-video-fullscreen") {
+                    ToggleRow(
+                        icon = Symbols.Fullscreen,
+                        title = "Double-tap video for full screen",
+                        description = "Double-tap a video in a feed or post",
+                        checked = state.doubleTapVideoFullscreen,
+                        onCheckedChange = state::updateDoubleTapVideoFullscreen,
+                    )
+                }
+                if (searchResult.isItemVisible("video-download-button")) item("video-download-button") {
+                    ToggleRow(
+                        icon = Symbols.Download,
+                        title = "Download button on videos",
+                        description = "Show Download on the video instead of only in its options menu",
+                        checked = state.videoDownloadButton,
+                        onCheckedChange = state::updateVideoDownloadButton,
+                    )
+                }
+                if (searchResult.isItemVisible("video-controls-in-timeline")) item("video-controls-in-timeline") {
+                    ToggleRow(
+                        icon = Symbols.Fullscreen,
+                        title = "Sound and full screen by the seek bar",
+                        description = "Move them from the top corner to the bottom bar",
+                        checked = state.videoControlsInTimeline,
+                        onCheckedChange = state::updateVideoControlsInTimeline,
+                    )
+                }
                 if (searchResult.isItemVisible("video-hold-double-speed")) item("video-hold-double-speed") {
                     ToggleRow(
                         icon = Symbols.FastForward,
@@ -2848,6 +2924,16 @@ fun SettingsScreen(
                         description = "Standard, or compact: no cards, no side margin, more comments per screen",
                         value = state.commentLayoutStyle.label,
                         onClick = { choiceDialogKey = "comment-layout-style" },
+                    )
+                }
+                // COMPACT_VOTES_V1 (fork)
+                if (searchResult.isItemVisible("compact-comment-vote-buttons")) item("compact-comment-vote-buttons") {
+                    ToggleRow(
+                        icon = Symbols.ThumbUp,
+                        title = "Vote buttons in compact comments",
+                        description = "Show up and down arrows without tapping the comment",
+                        checked = state.compactCommentVoteButtons,
+                        onCheckedChange = state::updateCompactCommentVoteButtons,
                     )
                 }
                 if (

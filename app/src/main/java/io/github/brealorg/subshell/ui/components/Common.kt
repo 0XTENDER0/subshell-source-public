@@ -625,7 +625,11 @@ fun MainScreenHeader(
     searchContentDescription: String = "Search",
     // ISSUE234_LAYOUT_CHOICE_BESIDE_THE_FEED_V1
     postLayoutButton: Boolean = false,
+    // SEARCHBAR_HEADER_V1 (fork): [menu][sort][wide search bar]; the layout choice and the
+    // account menu live in the side menu instead.
+    searchBarMode: Boolean = false,
 ) {
+    val searchBarLayout = searchBarMode && feedSort != null && onSearchClick != null
     var menuExpanded by remember { mutableStateOf(false) }
     var sortExpanded by remember { mutableStateOf(false) }
     var timePeriodExpanded by remember { mutableStateOf(false) }
@@ -640,12 +644,14 @@ fun MainScreenHeader(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (drawerAtEnd) {
-            HeaderAccountMenu(
-                expanded = menuExpanded,
-                onExpandedChange = { menuExpanded = it },
-                state = state,
-            )
-            HeaderSearchButton(onSearchClick, searchContentDescription)
+            if (!searchBarLayout) {
+                HeaderAccountMenu(
+                    expanded = menuExpanded,
+                    onExpandedChange = { menuExpanded = it },
+                    state = state,
+                )
+                HeaderSearchButton(onSearchClick, searchContentDescription)
+            }
         } else {
             HeaderDrawerButton(state)
             Spacer(Modifier.width(6.dp))
@@ -661,7 +667,7 @@ fun MainScreenHeader(
             )
         } else {
             Box(
-                modifier = Modifier.weight(1f),
+                modifier = if (searchBarLayout) Modifier else Modifier.weight(1f),
                 contentAlignment = Alignment.CenterStart,
             ) {
                 Surface(
@@ -674,7 +680,7 @@ fun MainScreenHeader(
                         modifier = Modifier.padding(end = 8.dp),
                         verticalArrangement = Arrangement.Center,
                     ) {
-                        Text(
+                        if (!searchBarLayout) Text(
                             title,
                             style = MaterialTheme.typography.titleLarge.copy(
                                 lineHeight = CompactHomeTitleLineHeight,
@@ -695,7 +701,11 @@ fun MainScreenHeader(
                                 style = MaterialTheme.typography.labelLarge.copy(
                                     lineHeight = CompactHomeSortLineHeight,
                                 ),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = if (searchBarLayout) {
+                                    MaterialTheme.colorScheme.onSurface
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                },
                                 maxLines = 1,
                             )
                             Spacer(Modifier.width(2.dp))
@@ -819,7 +829,14 @@ fun MainScreenHeader(
                 }
             }
         }
-        if (postLayoutButton) {
+        if (searchBarLayout && onSearchClick != null) {
+            HeaderSearchPill(
+                onClick = onSearchClick,
+                contentDescription = searchContentDescription,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        if (postLayoutButton && !searchBarLayout) {
             PostLayoutMenuButton(state)
         }
         if (onExploreClick != null) {
@@ -834,12 +851,49 @@ fun MainScreenHeader(
         if (drawerAtEnd) {
             Spacer(Modifier.width(6.dp))
             HeaderDrawerButton(state)
-        } else {
+        } else if (!searchBarLayout) {
             HeaderSearchButton(onSearchClick, searchContentDescription)
             HeaderAccountMenu(
                 expanded = menuExpanded,
                 onExpandedChange = { menuExpanded = it },
                 state = state,
+            )
+        }
+    }
+}
+
+/** SEARCHBAR_HEADER_V1 (fork): the search entry drawn as a wide bar; a tap opens Search. */
+@Composable
+private fun HeaderSearchPill(
+    onClick: () -> Unit,
+    contentDescription: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier
+            .padding(horizontal = 4.dp)
+            .heightIn(min = 40.dp)
+            .semantics { this.contentDescription = contentDescription },
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                Symbols.Search,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                "Search",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
             )
         }
     }
