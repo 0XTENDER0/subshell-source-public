@@ -4056,7 +4056,22 @@ private fun CommentRow(
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
+                        // Reply, then Share, then the votes at the edge; icons only.
+                        SmallCommentAction(
+                            icon = Symbols.Reply,
+                            label = "",
+                            contentDescription = "Reply",
+                            enabled = state.localMutationsAllowed || state.activeAccountIsAuthenticated,
+                            onClick = { onReply(comment) },
+                        )
+                        SmallCommentAction(
+                            icon = Symbols.Share,
+                            label = "",
+                            contentDescription = "Share comment",
+                            onClick = { shareCommentLink(context, post, comment.id, notices) },
+                        )
                         VoteControl(
                             score = displayedUpvotes,
                             vote = vote,

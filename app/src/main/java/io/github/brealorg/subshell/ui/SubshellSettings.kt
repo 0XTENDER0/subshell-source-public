@@ -237,7 +237,7 @@ data class SubshellSettings(
     val commentLayoutStyle: CommentLayoutStyle = CommentLayoutStyle.STANDARD,
     // SWIPEBACK_V1 (fork): swipe left to right on an open post to go back.
     val swipeBackEnabled: Boolean = false,
-    // SWIPEDOWN_MEDIA_V1 (fork): swipe down in a full screen picture or video to close it.
+    // SWIPEUP_MEDIA_V1 (fork): swipe up in a full screen picture or video to close it (kept under its first name, swipeDownCloseMedia, so saved toggles survive).
     val swipeDownCloseMedia: Boolean = false,
     // DOUBLETAP_FULLSCREEN_V1 (fork): double-tap a video to open it full screen.
     val doubleTapVideoFullscreen: Boolean = false,

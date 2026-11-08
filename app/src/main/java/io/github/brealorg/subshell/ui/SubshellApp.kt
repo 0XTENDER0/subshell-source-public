@@ -995,7 +995,7 @@ fun SubshellApp(
         val drawerGesturesEnabled = drawerGesturesEnabled(
             inContext = inContext,
             swipeActionsEnabled = state.swipeActionsEnabled,
-            drawerOpen = drawerState.isOpen,
+            drawerOpen = rememberDrawerSettledOpen(drawerState),
         )
         LaunchedEffect(drawerState.currentValue, drawerState.targetValue, drawerGesturesEnabled) {
             uiDebugLog(

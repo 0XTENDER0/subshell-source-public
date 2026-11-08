@@ -1096,11 +1096,20 @@ fun LocalVideoPlayer(
             controlsShownByReader = controlsVisible
         }
     }
-    val playerFrameModifier = if (fullscreen) {
-        visibilityModifier.fillMaxSize()
-    } else {
-        visibilityModifier.fillMaxWidth().aspectRatio(aspectRatio)
-    }
+    val playerFrameModifier = (
+        if (fullscreen) {
+            visibilityModifier.fillMaxSize()
+        } else {
+            visibilityModifier.fillMaxWidth().aspectRatio(aspectRatio)
+        }
+        ).swipeUpToClose(
+        // SWIPEUP_MEDIA_V1 (fork): not while zoomed in or scrubbing; in landscape the
+        // vertical drag belongs to brightness and volume.
+        enabled = fullscreen && state.swipeDownCloseMedia,
+        portraitOnly = true,
+        allowed = { !videoZoomed && !isScrubbing },
+        onClose = onExitFullscreen ?: state::closeMedia,
+    )
 
     Box(
         playerFrameModifier
@@ -1682,6 +1691,17 @@ fun LocalVideoPlayer(
                         if (quickAtRowStart) quickControls() else timeText()
                         Spacer(Modifier.weight(1f))
                         if (quickAtRowStart) timeText() else quickControls()
+                        // VIDEO_CONTROLS_BAR_V1 (fork): the way back to the normal view sits
+                        // with the other bar controls, like any other video player.
+                        if (state.videoControlsInTimeline) {
+                            IconButton(onClick = { (onExitFullscreen ?: state::closeMedia).invoke() }) {
+                                Icon(
+                                    Symbols.FullscreenExit,
+                                    contentDescription = "Exit full screen",
+                                    tint = Color.White,
+                                )
+                            }
+                        }
                     }
                 } else if (durationMs != null && (state.videoControlsInTimeline || (state.videoDownloadButton && resolvedMediaActions != null))) {
                     // VIDEO_CONTROLS_BAR_V1 / VIDEO_DOWNLOAD_BUTTON_V1 (fork): the buttons sit in

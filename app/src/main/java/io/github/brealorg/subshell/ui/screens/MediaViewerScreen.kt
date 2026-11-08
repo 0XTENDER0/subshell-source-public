@@ -100,7 +100,7 @@ import io.github.brealorg.subshell.ui.components.GifMedia
 import io.github.brealorg.subshell.ui.components.GalleryMetadataBelow
 import io.github.brealorg.subshell.ui.components.GalleryMetadataOverlay
 import io.github.brealorg.subshell.ui.components.LocalVideoPlayer
-import io.github.brealorg.subshell.ui.components.swipeDownToClose
+import io.github.brealorg.subshell.ui.components.swipeUpToClose
 import io.github.brealorg.subshell.ui.components.RemoteGifMedia
 import io.github.brealorg.subshell.ui.components.RemoteImage
 import io.github.brealorg.subshell.ui.components.RemoteMedia
@@ -164,9 +164,7 @@ fun MediaViewerScreen(
                 tabletopVideoHeight = tabletopVideoHeight,
                 modifier = Modifier
                     .fillMaxSize()
-                    .predictiveMediaContent(viewerBack, state.motionReduced)
-                    // SWIPEDOWN_MEDIA_V1 (fork)
-                    .swipeDownToClose(enabled = state.swipeDownCloseMedia, onClose = onBack),
+                    .predictiveMediaContent(viewerBack, state.motionReduced),
             )
         }
         return
@@ -200,6 +198,8 @@ fun MediaViewerScreen(
         post.kind == PostKind.GIF ||
         (post.kind == PostKind.GALLERY && viewerTarget.galleryItem != null)
 
+    // SWIPEUP_MEDIA_V1 (fork): a zoomed-in picture is panned, not closed.
+    val mediaZoomed = remember(post.id) { mutableStateOf(false) }
     Box(modifier.fillMaxSize().predictiveMediaBackdrop(viewerBack, state.motionReduced)) {
         // LOWUI7_AUTO_HIDE_FOLLOWS_THE_ACCESSIBILITY_TIMEOUT_V1 (OCB-318): the
         // hidden chrome can be brought back without a tap on the picture.
@@ -207,12 +207,20 @@ fun MediaViewerScreen(
             Modifier
                 .fillMaxSize()
                 .predictiveMediaContent(viewerBack, state.motionReduced)
-                // SWIPEDOWN_MEDIA_V1 (fork)
-                .swipeDownToClose(enabled = state.swipeDownCloseMedia, onClose = onBack)
+                // SWIPEUP_MEDIA_V1 (fork): the setting keeps its old name, swipeDownCloseMedia.
+                .swipeUpToClose(
+                    enabled = state.swipeDownCloseMedia,
+                    allowed = { !mediaZoomed.value },
+                    onClose = onBack,
+                )
                 .semantics { onClick(label = VIEWER_TOGGLE_CONTROLS_LABEL) { toggleControls(); true } },
         ) {
             when (post.kind) {
-                PostKind.IMAGE -> ZoomableImage(post, onTap = toggleControls)
+                PostKind.IMAGE -> ZoomableImage(
+                    post,
+                    onTap = toggleControls,
+                    onZoomChanged = { mediaZoomed.value = it },
+                )
                 PostKind.GIF -> Box(
                     Modifier
                         .fillMaxSize()
@@ -245,6 +253,7 @@ fun MediaViewerScreen(
                     state = state,
                     controlsVisible = controlsVisible,
                     onTap = toggleControls,
+                    onZoomedChange = { mediaZoomed.value = it },
                 )
                 else -> Text(
                     "This post has no full-screen media.",
@@ -432,18 +441,20 @@ fun CommentMediaViewerScreen(
             .predictiveMediaBackdrop(viewerBack, reduceMotion),
     ) {
         var sourceAspectRatio by remember(uri) { mutableStateOf<Float?>(null) }
+        var commentMediaZoomed by remember(uri) { mutableStateOf(false) }
         Box(
             Modifier
                 .fillMaxSize()
                 .predictiveMediaContent(viewerBack, reduceMotion)
-                // SWIPEDOWN_MEDIA_V1 (fork)
-                .swipeDownToClose(enabled = closeOnSwipeDown, onClose = onBack)
+                // SWIPEUP_MEDIA_V1 (fork)
+                .swipeUpToClose(enabled = closeOnSwipeDown, allowed = { !commentMediaZoomed }, onClose = onBack)
                 .semantics { onClick(label = VIEWER_TOGGLE_CONTROLS_LABEL) { toggleControls(); true } },
         ) {
             ZoomableContent(
                 key = "comment-media-$uri",
                 contentAspectRatio = sourceAspectRatio,
                 onTap = toggleControls,
+                onZoomChanged = { commentMediaZoomed = it },
             ) {
                 RemoteImage(
                     uri = uri,
@@ -612,6 +623,7 @@ private fun GalleryViewer(
     state: SubshellState,
     controlsVisible: Boolean,
     onTap: () -> Unit,
+    onZoomedChange: (Boolean) -> Unit = {},
 ) {
     val pagerState = rememberPagerState(
         initialPage = state.selectedMediaIndex.coerceIn(0, (post.gallery.size - 1).coerceAtLeast(0)),
@@ -646,6 +658,7 @@ private fun GalleryViewer(
             onZoomChanged = { zoomed ->
                 if (pagerState.currentPage == page) {
                     currentPageZoomed = zoomed
+                    onZoomedChange(zoomed)
                 }
             },
             onOpenLink = { url ->
@@ -854,7 +867,7 @@ private fun GalleryViewerMedia(
 }
 
 @Composable
-private fun ZoomableImage(post: Post, onTap: () -> Unit) {
+private fun ZoomableImage(post: Post, onTap: () -> Unit, onZoomChanged: (Boolean) -> Unit = {}) {
     val imageUri = post.remoteImageUri
     if (imageUri != null) {
         var sourceAspectRatio by remember(post.id) { mutableStateOf<Float?>(null) }
@@ -862,6 +875,7 @@ private fun ZoomableImage(post: Post, onTap: () -> Unit) {
             key = "post-${post.id}",
             contentAspectRatio = sourceAspectRatio,
             onTap = onTap,
+            onZoomChanged = onZoomChanged,
         ) {
             RemoteImage(
                 uri = imageUri,
@@ -874,7 +888,7 @@ private fun ZoomableImage(post: Post, onTap: () -> Unit) {
             )
         }
     } else {
-        ZoomableAsset(post.mediaAsset, post.mediaLabel, onTap)
+        ZoomableAsset(post.mediaAsset, post.mediaLabel, onTap, onZoomChanged = onZoomChanged)
     }
 }
 

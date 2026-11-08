@@ -2567,7 +2567,7 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("swipe-down-close-media")) item("swipe-down-close-media") {
                     ToggleRow(
                         icon = Symbols.Swipe,
-                        title = "Swipe down to close media",
+                        title = "Swipe up to close media",
                         description = "Full screen pictures and videos",
                         checked = state.swipeDownCloseMedia,
                         onCheckedChange = state::updateSwipeDownCloseMedia,

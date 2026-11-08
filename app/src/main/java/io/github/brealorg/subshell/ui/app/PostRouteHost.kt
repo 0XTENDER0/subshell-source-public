@@ -54,6 +54,7 @@ import io.github.brealorg.subshell.ui.FeedSource
 import io.github.brealorg.subshell.ui.MainDestination
 import io.github.brealorg.subshell.ui.SubshellRoute
 import io.github.brealorg.subshell.ui.SubshellState
+import io.github.brealorg.subshell.ui.CommentSwipeAction
 import io.github.brealorg.subshell.ui.app.ExpandedContextSurface
 import io.github.brealorg.subshell.ui.components.swipeRightToGoBack
 import io.github.brealorg.subshell.ui.app.ExpandedListDetailSurface
@@ -715,6 +716,15 @@ internal fun PostRouteHost(
                     postDetail(
                         contextModifier.swipeRightToGoBack(
                             enabled = state.swipeBackEnabled && !expandedWindowLayout,
+                            // A comment's own right-swipe action keeps the right of the screen.
+                            startZoneFraction = if (
+                                state.swipeActionsEnabled &&
+                                state.commentSwipeRightAction != CommentSwipeAction.NONE
+                            ) {
+                                0.35f
+                            } else {
+                                1f
+                            },
                             onBack = state::closePost,
                         ),
                     )

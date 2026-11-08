@@ -96,7 +96,7 @@ internal val settingsSearchEntries: List<SettingsSearchEntry> = listOf(
     setting("video-audio-default", "Media & links", "audio language track default device language dub"),
     setting("video-speed-controls", "Media & links", "playback speed faster slower 2x 1.5x 0.5x"),
     setting("video-double-tap-seek", "Media & links", "double tap skip seek forward back 10 seconds"),
-    setting("swipe-down-close-media", "Media & links", "swipe down close dismiss fullscreen picture image viewer"),
+    setting("swipe-down-close-media", "Media & links", "swipe up close dismiss fullscreen picture image video viewer"),
     setting("double-tap-video-fullscreen", "Media & links", "double tap video fullscreen enlarge open"),
     setting("video-download-button", "Media & links", "download button video save visible menu"),
     setting("video-controls-in-timeline", "Media & links", "sound mute fullscreen buttons seekbar bottom bar top corner controls placement"),
