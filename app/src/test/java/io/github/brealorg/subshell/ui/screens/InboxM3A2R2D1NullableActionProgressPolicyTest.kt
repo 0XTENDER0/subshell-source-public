@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertFalse
@@ -20,7 +21,7 @@ class InboxM3A2R2D1NullableActionProgressPolicyTest {
                 "app/src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/ConversationScreen.kt",
             ),
         )
-        val source = candidates.firstOrNull(File::isFile)?.readText()
+        val source = candidates.firstOrNull(File::isFile)?.readSourceText()
             ?: error("ConversationScreen.kt not found")
 
         assertTrue(

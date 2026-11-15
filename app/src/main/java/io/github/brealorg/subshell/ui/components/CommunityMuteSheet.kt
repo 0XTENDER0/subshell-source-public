@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.text.format.DateFormat
 import android.text.format.DateUtils
 import androidx.compose.foundation.clickable
@@ -133,9 +135,9 @@ fun CommunityMuteSheet(
         ) {
             Text(
                 text = if (currentMute == null) {
-                    "Mute $communityLabel"
+                    stringResource(R.string.all_mute, communityLabel)
                 } else {
-                    "Mute settings"
+                    stringResource(R.string.all_mute_settings)
                 },
                 style = MaterialTheme.typography.headlineSmall,
             )
@@ -178,7 +180,7 @@ fun CommunityMuteSheet(
             }
 
             Text(
-                text = "Hide posts from Home, Popular and All. Direct visits and saved posts still work.",
+                text = stringResource(R.string.comp_hide_posts_from_home_popular_and_all),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
@@ -186,7 +188,7 @@ fun CommunityMuteSheet(
 
             if (currentMute != null) {
                 Text(
-                    text = "Change duration",
+                    text = stringResource(R.string.comp_change_duration),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
@@ -200,7 +202,7 @@ fun CommunityMuteSheet(
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         content = { Text(preset.label) },
                         supportingContent = {
-                            Text("Automatically unmute after ${preset.label.lowercase()}")
+                            Text(stringResource(R.string.comp_automatically_unmute_after, preset.label.lowercase()))
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -213,8 +215,8 @@ fun CommunityMuteSheet(
 
             ListItem(
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                content = { Text("Until…") },
-                supportingContent = { Text("Choose an exact date and time") },
+                content = { Text(stringResource(R.string.comp_until)) },
+                supportingContent = { Text(stringResource(R.string.comp_choose_an_exact_date_and_time)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { untilPickerFromMillis = clock() },
@@ -225,7 +227,7 @@ fun CommunityMuteSheet(
             ListItem(
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 content = { Text(CommunityMutePreset.INDEFINITE.label) },
-                supportingContent = { Text("Keep muted until you unmute it") },
+                supportingContent = { Text(stringResource(R.string.comp_keep_muted_until_you_unmute_it)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -244,9 +246,9 @@ fun CommunityMuteSheet(
                             contentDescription = null,
                         )
                     },
-                    content = { Text("Unmute community") },
+                    content = { Text(stringResource(R.string.comp_unmute_community)) },
                     supportingContent = {
-                        Text("Show posts from $communityLabel in mixed feeds again")
+                        Text(stringResource(R.string.comp_show_posts_from_in_mixed_feeds_again, communityLabel))
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -288,11 +290,11 @@ private fun CommunityMuteUntilPicker(
                     enabled = dateState.selectedDateMillis != null,
                     onClick = { chosenDayUtc = dateState.selectedDateMillis },
                 ) {
-                    Text("Next")
+                    Text(stringResource(R.string.comp_next))
                 }
             },
             dismissButton = {
-                TextButton(onClick = onDismiss) { Text("Cancel") }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.comp_cancel)) }
             },
         ) {
             DatePicker(state = dateState)
@@ -323,7 +325,7 @@ private fun CommunityMuteUntilPicker(
     LaunchedEffect(timeState.hour, timeState.minute) { refusedPastTime = false }
     TimePickerDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Mute until") },
+        title = { Text(stringResource(R.string.comp_mute_until)) },
         confirmButton = {
             TextButton(
                 onClick = {
@@ -338,13 +340,13 @@ private fun CommunityMuteUntilPicker(
             }
         },
         dismissButton = {
-            TextButton(onClick = { chosenDayUtc = null }) { Text("Back") }
+            TextButton(onClick = { chosenDayUtc = null }) { Text(stringResource(R.string.comp_back)) }
         },
     ) {
         TimePicker(state = timeState)
         if (refusedPastTime) {
             Text(
-                "Choose a time in the future",
+                stringResource(R.string.all_choose_a_time_in_the_future),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -221,7 +222,7 @@ internal fun RedditOnboardingScreen(
                             Icon(
                                 Symbols.ArrowBack,
                                 contentDescription =
-                                    "Back",
+                                    stringResource(R.string.all_back),
                             )
                         }
                     }
@@ -345,7 +346,7 @@ private fun RedditOnboardingLoading() {
         CircularProgressIndicator()
 
         Text(
-            "Checking Reddit connection setup…",
+            stringResource(R.string.all_checking_reddit_connection_setup),
             color =
                 MaterialTheme.colorScheme
                     .onSurfaceVariant,
@@ -358,14 +359,14 @@ private fun RedditOnboardingConfigurationFailure(
     onRetry: () -> Unit,
 ) {
     Text(
-        "Couldn't read Reddit setup",
+        stringResource(R.string.all_couldn_t_read_reddit_setup),
         style =
             MaterialTheme.typography
                 .headlineSmall,
     )
 
     Text(
-        "Nothing was changed. Try reading the encrypted local configuration again.",
+        stringResource(R.string.all_nothing_was_changed_try_reading_the_encrypted),
         color =
             MaterialTheme.colorScheme
                 .onSurfaceVariant,
@@ -374,7 +375,7 @@ private fun RedditOnboardingConfigurationFailure(
     Button(
         onClick = onRetry,
     ) {
-        Text("Try again")
+        Text(stringResource(R.string.scr_try_again))
     }
 }
 
@@ -406,7 +407,7 @@ private fun RedditOnboardingIntro(
     onAlreadyHaveClientId: () -> Unit,
 ) {
     Text(
-        "Connect subshell to Reddit",
+        stringResource(R.string.all_connect_subshell_to_reddit),
         style =
             MaterialTheme.typography
                 .headlineMedium,
@@ -414,8 +415,7 @@ private fun RedditOnboardingIntro(
     )
 
     Text(
-        "Reddit sign-in cannot start until subshell has a Client ID. " +
-            "You only need to set this up once for this subshell installation.",
+        "Reddit sign-in cannot start until subshell has a Client ID. You only need to set this up once for this subshell installation.",
         color =
             MaterialTheme.colorScheme
                 .onSurfaceVariant,
@@ -493,14 +493,14 @@ private fun RedditOnboardingIntro(
         onClick = onGetClientId,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Text("Show me how to get a Client ID")
+        Text(stringResource(R.string.scr_show_me_how_to_get_a_client))
     }
 
     OutlinedButton(
         onClick = onAlreadyHaveClientId,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Text("I already have a Client ID")
+        Text(stringResource(R.string.scr_i_already_have_a_client_id))
     }
 
     Text(
@@ -522,7 +522,7 @@ private fun RedditClientIdGuide(
     val uriHandler = LocalUriHandler.current
 
     Text(
-        "Get your Client ID",
+        stringResource(R.string.all_get_your_client_id),
         style =
             MaterialTheme.typography
                 .headlineSmall,
@@ -531,9 +531,9 @@ private fun RedditClientIdGuide(
 
     SetupStep(
         number = "1",
-        title = "Install or open RedReader",
+        title = stringResource(R.string.scr_install_or_open_redreader),
         body =
-            "RedReader is used once to create the Reddit authorization that gives you the Client ID subshell needs.",
+            stringResource(R.string.all_redreader_is_used_once_to_create_the),
     )
 
     // LOWUX1_STORE_BADGE_FAILURE_IS_SAID_V1 (OCB-247): with no store or
@@ -548,7 +548,7 @@ private fun RedditClientIdGuide(
             badgeRes =
                 R.drawable.google_play_badge,
             contentDescription =
-                "Get it on Google Play",
+                stringResource(R.string.all_get_it_on_google_play),
             onClick = {
                 storeOpenFailed = runCatching {
                     uriHandler.openUri(
@@ -563,7 +563,7 @@ private fun RedditClientIdGuide(
             badgeRes =
                 R.drawable.fdroid_badge,
             contentDescription =
-                "Get it on F-Droid",
+                stringResource(R.string.all_get_it_on_f_droid),
             onClick = {
                 storeOpenFailed = runCatching {
                     uriHandler.openUri(
@@ -576,7 +576,7 @@ private fun RedditClientIdGuide(
     }
     if (storeOpenFailed) {
         Text(
-            "Couldn't open a store on this device. Search for RedReader in your app store.",
+            stringResource(R.string.all_couldn_t_open_a_store_on_this),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.error,
         )
@@ -584,16 +584,16 @@ private fun RedditClientIdGuide(
 
     SetupStep(
         number = "2",
-        title = "Sign in to Reddit in RedReader",
+        title = stringResource(R.string.scr_sign_in_to_reddit_in_redreader),
         body =
             "Complete RedReader's normal Reddit sign-in and authorize it when Reddit asks.",
     )
 
     SetupStep(
         number = "3",
-        title = "Open Reddit's authorization email",
+        title = stringResource(R.string.scr_open_reddit_s_authorization_email),
         body =
-            "Find the line labeled App ID. The value beside App ID is the Client ID you will paste into subshell.",
+            stringResource(R.string.all_find_the_line_labeled_app_id_the),
     )
 
     RedditAuthorizationEmailExample()
@@ -602,7 +602,7 @@ private fun RedditClientIdGuide(
         onClick = onContinue,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Text("I found my Client ID")
+        Text(stringResource(R.string.scr_i_found_my_client_id))
     }
 }
 
@@ -657,7 +657,7 @@ private fun RedditAuthorizationEmailExample() {
             )
 
             Text(
-                "What to look for in Reddit's email",
+                stringResource(R.string.all_what_to_look_for_in_reddit_s),
                 style =
                     MaterialTheme.typography
                         .titleMedium,
@@ -666,7 +666,7 @@ private fun RedditAuthorizationEmailExample() {
             )
 
             Text(
-                "The real Reddit email contains these fields. The value after App ID is what subshell calls your Client ID.",
+                stringResource(R.string.all_the_real_reddit_email_contains_these_fields),
                 color =
                     MaterialTheme.colorScheme
                         .onSurfaceVariant,
@@ -688,7 +688,7 @@ private fun RedditAuthorizationEmailExample() {
                         Arrangement.spacedBy(6.dp),
                 ) {
                     Text(
-                        "App Name",
+                        stringResource(R.string.all_app_name),
                         style =
                             MaterialTheme.typography
                                 .labelMedium,
@@ -698,7 +698,7 @@ private fun RedditAuthorizationEmailExample() {
                     )
 
                     Text(
-                        "RedReader (Release)",
+                        stringResource(R.string.all_redreader_release),
                         fontWeight =
                             FontWeight.SemiBold,
                     )
@@ -706,7 +706,7 @@ private fun RedditAuthorizationEmailExample() {
                     Spacer(Modifier.height(4.dp))
 
                     Text(
-                        "App ID",
+                        stringResource(R.string.all_app_id),
                         style =
                             MaterialTheme.typography
                                 .labelMedium,
@@ -727,7 +727,7 @@ private fun RedditAuthorizationEmailExample() {
             }
 
             Text(
-                "Copy only the value shown after App ID from your real Reddit email.",
+                stringResource(R.string.all_copy_only_the_value_shown_after_app),
                 style =
                     MaterialTheme.typography
                         .bodySmall,
@@ -852,7 +852,7 @@ private fun RedditClientIdEntry(
     )
 
     Text(
-        "Paste your Client ID",
+        stringResource(R.string.all_paste_your_client_id),
         style =
             MaterialTheme.typography
                 .headlineSmall,
@@ -860,7 +860,7 @@ private fun RedditClientIdEntry(
     )
 
     Text(
-        "Paste only the App ID value from Reddit's authorization email.",
+        stringResource(R.string.all_paste_only_the_app_id_value_from),
         color =
             MaterialTheme.colorScheme
                 .onSurfaceVariant,
@@ -878,7 +878,7 @@ private fun RedditClientIdEntry(
         enabled = !busy,
         singleLine = true,
         label = {
-            Text("Client ID")
+            Text(stringResource(R.string.scr_client_id))
         },
         visualTransformation =
             if (visible) {
@@ -901,9 +901,9 @@ private fun RedditClientIdEntry(
                     },
                     contentDescription =
                         if (visible) {
-                            "Hide Client ID"
+                            stringResource(R.string.all_hide_client_id)
                         } else {
-                            "Show Client ID"
+                            stringResource(R.string.all_show_client_id)
                         },
                 )
             }
@@ -921,7 +921,7 @@ private fun RedditClientIdEntry(
 
                 draft.isNotBlank() && !valid ->
                     Text(
-                        "That doesn't look like a valid Reddit Client ID.",
+                        stringResource(R.string.all_that_doesn_t_look_like_a_valid),
                     )
 
                 else ->
@@ -945,9 +945,9 @@ private fun RedditClientIdEntry(
     ) {
         Text(
             if (advanced) {
-                "Hide advanced"
+                stringResource(R.string.all_hide_advanced)
             } else {
-                "Advanced"
+                stringResource(R.string.all_advanced)
             },
         )
     }
@@ -966,15 +966,14 @@ private fun RedditClientIdEntry(
                     Arrangement.spacedBy(12.dp),
             ) {
                 Text(
-                    "Reddit API values",
+                    stringResource(R.string.all_reddit_api_values),
                     style =
                         MaterialTheme.typography
                             .titleSmall,
                 )
 
                 Text(
-                    "Only change these if sign-in stopped working or you were told to. " +
-                        "Wrong values break sign-in.",
+                    "Only change these if sign-in stopped working or you were told to. Wrong values break sign-in.",
                     style =
                         MaterialTheme.typography
                             .bodySmall,
@@ -984,7 +983,7 @@ private fun RedditClientIdEntry(
                 )
 
                 ApiValueField(
-                    label = "Redirect URI",
+                    label = stringResource(R.string.scr_redirect_uri),
                     value = redirectUriDraft,
                     error = redirectUriError(redirectUriDraft),
                     enabled = !busy,
@@ -993,7 +992,7 @@ private fun RedditClientIdEntry(
                 )
 
                 ApiValueField(
-                    label = "User agent",
+                    label = stringResource(R.string.scr_user_agent),
                     value = userAgentDraft,
                     error = userAgentError(userAgentDraft),
                     enabled = !busy,
@@ -1012,7 +1011,7 @@ private fun RedditClientIdEntry(
                             userAgentDraft = configurationController.compatibilityUserAgent
                         },
                     ) {
-                        Text("Use defaults")
+                        Text(stringResource(R.string.scr_use_defaults))
                     }
                 }
             }
@@ -1076,9 +1075,9 @@ private fun RedditClientIdEntry(
 
         Text(
             if (busy) {
-                "Saving…"
+                stringResource(R.string.all_saving_2)
             } else {
-                "Save Client ID"
+                stringResource(R.string.all_save_client_id)
             },
         )
     }
@@ -1101,7 +1100,7 @@ private fun RedditOnboardingReady(
     )
 
     Text(
-        "Ready to connect",
+        stringResource(R.string.all_ready_to_connect),
         style =
             MaterialTheme.typography
                 .headlineMedium,
@@ -1128,7 +1127,7 @@ private fun RedditOnboardingReady(
                 Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                "Reddit account",
+                stringResource(R.string.all_reddit_account),
                 style =
                     MaterialTheme.typography
                         .titleMedium,
@@ -1157,7 +1156,7 @@ private fun RedditOnboardingReady(
                             Modifier.width(10.dp),
                         )
 
-                        Text("Working…")
+                        Text(stringResource(R.string.scr_working))
                     }
                 }
 
@@ -1167,7 +1166,7 @@ private fun RedditOnboardingReady(
                         onClick =
                             onCancelConnectAccount,
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.scr_cancel))
                     }
                 }
 
@@ -1185,7 +1184,7 @@ private fun RedditOnboardingReady(
                 modifier =
                     Modifier.fillMaxWidth(),
             ) {
-                Text("Connect Reddit")
+                Text(stringResource(R.string.scr_connect_reddit))
             }
         }
 
@@ -1199,7 +1198,7 @@ private fun RedditOnboardingReady(
                 modifier =
                     Modifier.fillMaxWidth(),
             ) {
-                Text("Try again")
+                Text(stringResource(R.string.scr_try_again))
             }
         }
 
@@ -1214,7 +1213,7 @@ private fun RedditOnboardingReady(
                     modifier =
                         Modifier.fillMaxWidth(),
                 ) {
-                    Text("Try again")
+                    Text(stringResource(R.string.scr_try_again))
                 }
             } else {
                 Button(
@@ -1225,7 +1224,7 @@ private fun RedditOnboardingReady(
                     modifier =
                         Modifier.fillMaxWidth(),
                 ) {
-                    Text("Review Client ID")
+                    Text(stringResource(R.string.scr_review_client_id))
                 }
             }
         }
@@ -1237,7 +1236,7 @@ private fun RedditOnboardingReady(
                 modifier =
                     Modifier.fillMaxWidth(),
             ) {
-                Text("Review Client ID")
+                Text(stringResource(R.string.scr_review_client_id))
             }
         }
 
@@ -1252,7 +1251,7 @@ private fun RedditOnboardingReady(
         TextButton(
             onClick = onShowGuide,
         ) {
-            Text("How setup works")
+            Text(stringResource(R.string.scr_how_setup_works))
         }
 
         // LOWUI8_CLIENT_ID_STAYS_DURING_A_SIGN_IN_V1 (OCB-323): replacing it
@@ -1263,7 +1262,7 @@ private fun RedditOnboardingReady(
             enabled = !redditOnboardingConnectPhaseIsWorking(connectAccountState.phase) &&
                 connectAccountState.phase != ConnectAccountPhase.AWAITING_CALLBACK,
         ) {
-            Text("Replace Client ID")
+            Text(stringResource(R.string.scr_replace_client_id))
         }
     }
 }
@@ -1367,7 +1366,7 @@ private fun RedditOnboardingConnected(
             Spacer(Modifier.height(22.dp))
 
             Text(
-                "You're connected",
+                stringResource(R.string.all_you_re_connected),
                 style =
                     MaterialTheme.typography
                         .headlineMedium,
@@ -1405,9 +1404,9 @@ private fun RedditOnboardingConnected(
             ) {
                 Text(
                     if (linkHandlingStepPending) {
-                        "Continue"
+                        stringResource(R.string.all_continue)
                     } else {
-                        "Start using subshell"
+                        stringResource(R.string.all_start_using_subshell)
                     },
                 )
             }
@@ -1465,7 +1464,7 @@ internal fun RedditLinkHandlingOnboardingScreen(
             Spacer(Modifier.height(22.dp))
 
             Text(
-                "Open Reddit links in subshell?",
+                stringResource(R.string.all_open_reddit_links_in_subshell),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -1473,7 +1472,7 @@ internal fun RedditLinkHandlingOnboardingScreen(
             Spacer(Modifier.height(10.dp))
 
             Text(
-                "Android decides which apps can open web links, so subshell can't enable Reddit links automatically.",
+                stringResource(R.string.all_android_decides_which_apps_can_open_web),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
@@ -1489,7 +1488,7 @@ internal fun RedditLinkHandlingOnboardingScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
-                        "After you tap Set as default:",
+                        stringResource(R.string.all_after_you_tap_set_as_default),
                         style = MaterialTheme.typography.titleSmall,
                     )
                     Text(
@@ -1497,7 +1496,7 @@ internal fun RedditLinkHandlingOnboardingScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
-                        "When you return, subshell will check what you enabled.",
+                        stringResource(R.string.all_when_you_return_subshell_will_check_what),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -1515,7 +1514,7 @@ internal fun RedditLinkHandlingOnboardingScreen(
             Spacer(Modifier.height(12.dp))
 
             Text(
-                "If another Reddit app already handles some Reddit links, you may need to move those selections to subshell on the same Android screen.",
+                stringResource(R.string.all_if_another_reddit_app_already_handles_some),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -1523,7 +1522,7 @@ internal fun RedditLinkHandlingOnboardingScreen(
             Spacer(Modifier.height(8.dp))
 
             Text(
-                "You can change this later in Settings.",
+                stringResource(R.string.all_you_can_change_this_later_in_settings),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -1534,14 +1533,14 @@ internal fun RedditLinkHandlingOnboardingScreen(
                 onClick = onOpenSettings,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Set as default")
+                Text(stringResource(R.string.scr_set_as_default))
             }
 
             TextButton(
                 onClick = onNotNow,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Not now")
+                Text(stringResource(R.string.scr_not_now))
             }
         }
     }

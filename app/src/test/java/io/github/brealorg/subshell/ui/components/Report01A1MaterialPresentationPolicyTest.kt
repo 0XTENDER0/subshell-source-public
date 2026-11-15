@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertTrue
@@ -7,7 +8,7 @@ import org.junit.Test
 
 class Report01A1MaterialPresentationPolicyTest {
     @Test fun reportFlowUsesMaterial3Components() {
-        val source = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/ContentSafetyDialogs.kt").readText()
+        val source = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/ContentSafetyDialogs.kt").readSourceText()
         assertTrue(source.contains("REPORT01A1_MATERIAL3_NATIVE_REPORT_REASON_SHEET_V1"))
         assertTrue(source.contains("ModalBottomSheet("))
         assertTrue(source.contains("ListItem("))

@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import androidx.compose.ui.res.pluralStringResource
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Icon
@@ -82,9 +85,9 @@ internal fun LazyListScope.communityWikiItems(
         item("wiki-loading") {
             CommunityWikiLoading(
                 label = if (selectedPagePath == null) {
-                    "Loading Wiki…"
+                    stringResource(R.string.all_loading_wiki)
                 } else {
-                    "Loading Wiki page…"
+                    stringResource(R.string.all_loading_wiki_page)
                 },
             )
         }
@@ -131,7 +134,7 @@ internal fun LazyListScope.communityWikiItems(
 
         if (page == null) {
             item("wiki-page-awaiting") {
-                CommunityWikiLoading("Loading Wiki page…")
+                CommunityWikiLoading(stringResource(R.string.all_loading_wiki_page))
             }
             return
         }
@@ -147,7 +150,7 @@ internal fun LazyListScope.communityWikiItems(
                 )
                 page.revisionAuthor?.let { author ->
                     Text(
-                        text = "Last revised by u/$author",
+                        text = stringResource(R.string.comp_last_revised_by_u, author),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -165,8 +168,8 @@ internal fun LazyListScope.communityWikiItems(
         item("wiki-page-body-${page.path}") {
             if (page.markdown.isBlank()) {
                 CommunityWikiNotice(
-                    title = "Empty Wiki page",
-                    message = "Reddit returned this Wiki page without Markdown content.",
+                    title = stringResource(R.string.comp_empty_wiki_page),
+                    message = stringResource(R.string.all_reddit_returned_this_wiki_page_without_markdown),
                 )
             } else {
                 MarkdownText(
@@ -181,7 +184,7 @@ internal fun LazyListScope.communityWikiItems(
     val index = state.index
     if (index == null) {
         item("wiki-index-awaiting") {
-            CommunityWikiLoading("Loading Wiki…")
+            CommunityWikiLoading(stringResource(R.string.all_loading_wiki))
         }
         return
     }
@@ -189,8 +192,8 @@ internal fun LazyListScope.communityWikiItems(
     if (index.pages.isEmpty()) {
         item("wiki-index-empty") {
             CommunityWikiNotice(
-                title = "No Wiki pages",
-                message = "Reddit did not return any Wiki pages for this community.",
+                title = stringResource(R.string.comp_no_wiki_pages),
+                message = stringResource(R.string.all_reddit_did_not_return_any_wiki_pages),
             )
         }
         return
@@ -204,11 +207,11 @@ internal fun LazyListScope.communityWikiItems(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
-                text = "Community pages",
+                text = stringResource(R.string.comp_community_pages),
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
-                text = "Choose a page to read it in subshell.",
+                text = stringResource(R.string.comp_choose_a_page_to_read_it_in),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -218,9 +221,9 @@ internal fun LazyListScope.communityWikiItems(
     if (groups.pages.isEmpty()) {
         item("wiki-readable-pages-empty") {
             CommunityWikiNotice(
-                title = "No general Wiki pages",
+                title = stringResource(R.string.comp_no_general_wiki_pages),
                 message =
-                    "This Wiki only returned configuration or moderation pages.",
+                    stringResource(R.string.all_this_wiki_only_returned_configuration_or_moderation),
             )
         }
     } else {
@@ -241,20 +244,22 @@ internal fun LazyListScope.communityWikiItems(
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 content = {
                     Text(
-                        text = "Configuration pages",
+                        text = stringResource(R.string.comp_configuration_pages),
                         fontWeight = FontWeight.SemiBold,
                     )
                 },
                 supportingContent = {
                     Text(
-                        text = "${groups.configuration.size} advanced ${
-                            if (groups.configuration.size == 1) "page" else "pages"
-                        }",
+                        text = pluralStringResource(
+                            R.plurals.wiki_advanced_pages,
+                            groups.configuration.size,
+                            groups.configuration.size,
+                        ),
                     )
                 },
                 trailingContent = {
                     Text(
-                        text = if (showConfigurationPages) "Hide" else "Show",
+                        text = if (showConfigurationPages) stringResource(R.string.all_hide) else stringResource(R.string.all_show),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -345,13 +350,12 @@ private fun CommunityWikiAuthorization(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                text = "Wiki access",
+                text = stringResource(R.string.comp_wiki_access),
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
                 text =
-                    "Reddit requires separate permission to read community Wiki pages. " +
-                        "This permission is read-only.",
+                    "Reddit requires separate permission to read community Wiki pages. This permission is read-only.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -361,11 +365,11 @@ private fun CommunityWikiAuthorization(
                 ) {
                     InlineProgressIndicator()
                     Spacer(Modifier.width(10.dp))
-                    Text("Waiting for Reddit…")
+                    Text(stringResource(R.string.comp_waiting_for_reddit))
                 }
             } else {
                 Button(onClick = onAuthorize) {
-                    Text("Enable Wiki access")
+                    Text(stringResource(R.string.comp_enable_wiki_access))
                 }
             }
         }
@@ -403,31 +407,30 @@ private fun CommunityWikiFailure(
     val message: String
     when (kind) {
         RedditCommunityWikiUiFailureKind.UNAVAILABLE -> {
-            title = "Wiki unavailable"
+            title = stringResource(R.string.comp_wiki_unavailable)
             message =
-                "This community Wiki is unavailable through Reddit's API " +
-                    "or the requested page does not exist."
+                stringResource(R.string.all2_this_community_wiki_is_unavailable_through_reddit)
         }
         RedditCommunityWikiUiFailureKind.CLIENT_CONFIGURATION -> {
-            title = "Wiki unavailable"
-            message = "Wiki access is not configured for this Reddit account."
+            title = stringResource(R.string.comp_wiki_unavailable)
+            message = stringResource(R.string.all_wiki_access_is_not_configured_for_this)
         }
         RedditCommunityWikiUiFailureKind.SESSION -> {
-            title = "Wiki access needs attention"
-            message = "The Reddit session could not be used to load this Wiki."
+            title = stringResource(R.string.comp_wiki_access_needs_attention)
+            message = stringResource(R.string.all_the_reddit_session_could_not_be_used)
         }
         RedditCommunityWikiUiFailureKind.HTTP -> {
-            title = "Couldn't load Wiki"
-            message = io.github.brealorg.subshell.ui.error.redditWikiHttpFailureMessage(httpStatusCode, details)
+            title = stringResource(R.string.comp_couldn_t_load_wiki)
+            message = io.github.brealorg.subshell.ui.error.redditWikiHttpFailureMessage(httpStatusCode, details).asString()
         }
         RedditCommunityWikiUiFailureKind.TRANSPORT -> {
-            title = "Couldn't reach Reddit"
+            title = stringResource(R.string.comp_couldn_t_reach_reddit)
             message = "subshell couldn't reach Reddit while loading this Wiki."
         }
         RedditCommunityWikiUiFailureKind.PROTOCOL -> {
-            title = "Couldn't read Wiki"
+            title = stringResource(R.string.comp_couldn_t_read_wiki)
             message =
-                "Reddit returned a Wiki response that subshell couldn't read."
+                stringResource(R.string.all_reddit_returned_a_wiki_response_that_subshell)
         }
     }
 
@@ -437,7 +440,7 @@ private fun CommunityWikiFailure(
         action = if (retryable && onRetry != null) {
             {
                 TextButton(onClick = onRetry) {
-                    Text("Retry")
+                    Text(stringResource(R.string.comp_retry))
                 }
             }
         } else {

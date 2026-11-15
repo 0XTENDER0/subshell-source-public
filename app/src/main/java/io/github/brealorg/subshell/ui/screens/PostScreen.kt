@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.pluralStringResource
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.WindowInsetsRulers
@@ -138,7 +141,10 @@ import io.github.brealorg.subshell.data.account.OwnContentType
 import io.github.brealorg.subshell.data.account.ownContentActions
 import io.github.brealorg.subshell.data.RedditCommentSort
 import io.github.brealorg.subshell.data.itemsOrEmpty
-import io.github.brealorg.subshell.model.redditReadableText
+import io.github.brealorg.subshell.ui.canonicalRedditCommentUrl
+import io.github.brealorg.subshell.ui.components.COPY_MENU_ENTRY_LABEL
+import io.github.brealorg.subshell.ui.components.CopySheet
+import io.github.brealorg.subshell.ui.components.commentCopySheetContent
 import io.github.brealorg.subshell.model.CodeSample
 import io.github.brealorg.subshell.model.Comment
 import io.github.brealorg.subshell.model.isMoreRepliesNode
@@ -538,8 +544,7 @@ fun PostScreen(
         val after = commentAuthorFullnames.keys.count { author -> state.avatarUriForAuthor(author) != null }
         uiDebugLog(
             "subshell-issue22",
-            "author-avatars post=${post.id} authors=${commentAuthorFullnames.size} " +
-                "known_before=$before known_after=$after",
+            "author-avatars post=${post.id} authors=${commentAuthorFullnames.size} known_before=$before known_after=$after",
         )
     }
     val liveStatusVisible = authenticated && (
@@ -671,9 +676,7 @@ fun PostScreen(
         if (duplicateViewportRowKeys.isNotEmpty()) {
             Log.e(
                 COMMENT_NAV_LOG_TAG,
-                "phase=duplicate_comment_identity post=${post.id} " +
-                    "count=${duplicateViewportRowKeys.size} " +
-                    "keys=${duplicateViewportRowKeys.sorted().joinToString(",")}",
+                "phase=duplicate_comment_identity post=${post.id} count=${duplicateViewportRowKeys.size} keys=${duplicateViewportRowKeys.sorted().joinToString(",")}",
             )
         }
     }
@@ -918,9 +921,7 @@ fun PostScreen(
                 commentHydrationBudget = COMMENT_AUTO_HYDRATION_MAX_PER_USER_GESTURE
                 uiDebugLog(
                     COMMENT_NAV_LOG_TAG,
-                    "phase=hydration_gesture_armed post=${post.id} " +
-                        "generation=$commentHydrationGestureGeneration " +
-                        "budget=$commentHydrationBudget",
+                    "phase=hydration_gesture_armed post=${post.id} generation=$commentHydrationGestureGeneration budget=$commentHydrationBudget",
                 )
                 if (focusedCommentId != null && !focusedUserOwnsScroll) {
                     FocusedCommentScrollOwnershipRegistry.markUserOwned(focusedTransactionKey)
@@ -932,8 +933,7 @@ fun PostScreen(
                     )
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=focused_scroll_ownership post=${post.id} target=$focusedCommentId " +
-                            "visit=${state.postVisitId} tx=${focusedTransactionKey ?: "none"}",
+                        "phase=focused_scroll_ownership post=${post.id} target=$focusedCommentId visit=${state.postVisitId} tx=${focusedTransactionKey ?: "none"}",
                     )
                 }
             }
@@ -974,8 +974,7 @@ fun PostScreen(
         listState.requestScrollToItem(index = index, scrollOffset = -anchor.offsetPx)
         uiDebugLog(
             COMMENT_NAV_LOG_TAG,
-            "phase=reading_row_held post=${post.id} reason=$reason anchor=${anchor.key} " +
-                "before=${anchor.lazyIndex} after=$index offset=${anchor.offsetPx}",
+            "phase=reading_row_held post=${post.id} reason=$reason anchor=${anchor.key} before=${anchor.lazyIndex} after=$index offset=${anchor.offsetPx}",
         )
     }
 
@@ -999,8 +998,7 @@ fun PostScreen(
                 if (listState.isScrollInProgress) {
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=tree_commit_waits_for_rest post=${post.id} " +
-                            "revision=${redditCommentsState.contentRevision}",
+                        "phase=tree_commit_waits_for_rest post=${post.id} revision=${redditCommentsState.contentRevision}",
                     )
                     snapshotFlow { listState.isScrollInProgress }.first { scrolling -> !scrolling }
                 }
@@ -1036,8 +1034,7 @@ fun PostScreen(
         ) {
             uiDebugLog(
                 COMMENT_NAV_LOG_TAG,
-                "phase=hydration_commit_release post=${post.id} node=${fence.moreNodeId} " +
-                    "reason=load_failed revision=${redditCommentsState.contentRevision}",
+                "phase=hydration_commit_release post=${post.id} node=${fence.moreNodeId} reason=load_failed revision=${redditCommentsState.contentRevision}",
             )
             holdReadingRow(latestCommentRows, visibleCommentRows(sortedComments, collapsedCommentIds), "load_failed")
             viewportSortedComments = sortedComments
@@ -1067,9 +1064,7 @@ fun PostScreen(
         if (initiallyScrolling) {
             uiDebugLog(
                 COMMENT_NAV_LOG_TAG,
-                "phase=hydration_commit_deferred post=${post.id} node=${fence.moreNodeId} " +
-                    "reason=user_scroll " +
-                    "revision=${redditCommentsState.contentRevision} gesture=${fence.gestureGeneration}",
+                "phase=hydration_commit_deferred post=${post.id} node=${fence.moreNodeId} reason=user_scroll revision=${redditCommentsState.contentRevision} gesture=${fence.gestureGeneration}",
             )
         }
 
@@ -1097,8 +1092,7 @@ fun PostScreen(
                         hydrationMaterializedCommentIds + materializedIds
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=hydration_materialized_ids post=${post.id} node=${fence.moreNodeId} " +
-                            "count=${materializedIds.size} revision=${redditCommentsState.contentRevision}",
+                        "phase=hydration_materialized_ids post=${post.id} node=${fence.moreNodeId} count=${materializedIds.size} revision=${redditCommentsState.contentRevision}",
                     )
                 }
                 hydrationTargetVisibleBeforeCommit = focusedCommentViewportRowIndex(
@@ -1147,24 +1141,17 @@ fun PostScreen(
                     }
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=hydration_anchor_kept post=${post.id} node=${fence.moreNodeId} " +
-                            "anchor=${anchor.key} before=${anchor.lazyIndex} after=$anchorIndex " +
-                            "offset=${anchor.offsetPx}",
+                        "phase=hydration_anchor_kept post=${post.id} node=${fence.moreNodeId} anchor=${anchor.key} before=${anchor.lazyIndex} after=$anchorIndex offset=${anchor.offsetPx}",
                     )
                 } else {
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=hydration_anchor_compose post=${post.id} node=${fence.moreNodeId} " +
-                            "rowsBefore=${rowsBefore.size} rowsAfter=${rowsAfter.size}",
+                        "phase=hydration_anchor_compose post=${post.id} node=${fence.moreNodeId} rowsBefore=${rowsBefore.size} rowsAfter=${rowsAfter.size}",
                     )
                 }
                 uiDebugLog(
                     COMMENT_NAV_LOG_TAG,
-                    "phase=hydration_commit_applied post=${post.id} node=${fence.moreNodeId} " +
-                        "revision=$viewportContentRevision scrollInProgress=false " +
-                        "placeholderVisible=${moreNodeVisible()} " +
-                        "materialized=${materializedIds.size} " +
-                        "targetVisibleBefore=$hydrationTargetVisibleBeforeCommit",
+                    "phase=hydration_commit_applied post=${post.id} node=${fence.moreNodeId} revision=$viewportContentRevision scrollInProgress=false placeholderVisible=${moreNodeVisible()} materialized=${materializedIds.size} targetVisibleBefore=$hydrationTargetVisibleBeforeCommit",
                 )
                 return@LaunchedEffect
             }
@@ -1179,9 +1166,9 @@ fun PostScreen(
         if (focusedCommentId != null && focusedLandingFailedReason != null && !focusedUserOwnsScroll) {
             ErrorPresentation(
                 kind = ErrorPresentationKind.DEGRADED,
-                title = "Couldn't find this comment",
-                message = "It may have been removed, or the connection failed",
-                primaryAction = ErrorAction(ErrorActionKind.RETRY, "Retry"),
+                title = stringResource(R.string.feed_couldn_t_find_this_comment),
+                message = stringResource(R.string.all_it_may_have_been_removed_or_the),
+                primaryAction = ErrorAction(ErrorActionKind.RETRY, stringResource(R.string.all_retry)),
             )
         } else {
             null
@@ -1214,8 +1201,7 @@ fun PostScreen(
             focusedOpeningIndicatorVisible = false
             uiDebugLog(
                 COMMENT_NAV_LOG_TAG,
-                "phase=transaction_skipped post=${post.id} target=$targetId " +
-                    "reason=user_scroll_owned visit=${state.postVisitId} tx=$transaction",
+                "phase=transaction_skipped post=${post.id} target=$targetId reason=user_scroll_owned visit=${state.postVisitId} tx=$transaction",
             )
             return@LaunchedEffect
         }
@@ -1231,13 +1217,11 @@ fun PostScreen(
 
         uiDebugLog(
             COMMENT_NAV_LOG_TAG,
-            "phase=transaction_start post=${post.id} target=$targetId " +
-                "sort=${sort.apiValue} visit=${state.postVisitId} tx=$transaction",
+            "phase=transaction_start post=${post.id} target=$targetId sort=${sort.apiValue} visit=${state.postVisitId} tx=$transaction",
         )
         uiDebugLog(
             COMMENT_NAV_LOG_TAG,
-            "phase=screen_entry post=${post.id} target=$targetId " +
-                "projected=${state.focusedCommentId ?: "none"} visit=${state.postVisitId}",
+            "phase=screen_entry post=${post.id} target=$targetId projected=${state.focusedCommentId ?: "none"} visit=${state.postVisitId}",
         )
 
         coroutineScope {
@@ -1250,8 +1234,7 @@ fun PostScreen(
                     focusedOpeningIndicatorVisible = true
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=opening_indicator_show post=${post.id} target=$targetId " +
-                            "visit=${state.postVisitId} tx=$transaction",
+                        "phase=opening_indicator_show post=${post.id} target=$targetId visit=${state.postVisitId} tx=$transaction",
                     )
                 }
             }
@@ -1326,8 +1309,7 @@ fun PostScreen(
                             if (!waitingForProjectedIndexLogged) {
                                 uiDebugLog(
                                     COMMENT_NAV_LOG_TAG,
-                                    "phase=layout_identity_wait post=${post.id} target=$targetId " +
-                                        "reason=projected_index_missing",
+                                    "phase=layout_identity_wait post=${post.id} target=$targetId reason=projected_index_missing",
                                 )
                                 waitingForProjectedIndexLogged = true
                             }
@@ -1370,11 +1352,7 @@ fun PostScreen(
                         )
                         uiDebugLog(
                             COMMENT_NAV_LOG_TAG,
-                            "phase=layout_identity post=${post.id} target=$targetId attempt=$attempt " +
-                                "requestedIndex=$requestedIndex currentIndex=$currentIndex " +
-                                "targetIndex=${targetItem?.index ?: -1} " +
-                                "keyAtCurrent=${keyAtCurrentIndex ?: "none"} " +
-                                "requestOffset=$requestOffset match=$identityMatches",
+                            "phase=layout_identity post=${post.id} target=$targetId attempt=$attempt requestedIndex=$requestedIndex currentIndex=$currentIndex targetIndex=${targetItem?.index ?: -1} keyAtCurrent=${keyAtCurrentIndex ?: "none"} requestOffset=$requestOffset match=$identityMatches",
                         )
                         if (identityMatches && targetItem != null) {
                             if (!focusedAnchorPolicyLocked) {
@@ -1386,9 +1364,7 @@ fun PostScreen(
                                 focusedAnchorPolicyLocked = true
                                 uiDebugLog(
                                     COMMENT_NAV_LOG_TAG,
-                                    "phase=anchor_policy post=${post.id} target=$targetId " +
-                                        "fraction=$focusedAnchorFraction itemSize=${targetItem.size} " +
-                                        "viewportSize=${layout.viewportEndOffset - layout.viewportStartOffset}",
+                                    "phase=anchor_policy post=${post.id} target=$targetId fraction=$focusedAnchorFraction itemSize=${targetItem.size} viewportSize=${layout.viewportEndOffset - layout.viewportStartOffset}",
                                 )
                             }
                             return@withTimeoutOrNull currentIndex to targetItem
@@ -1551,8 +1527,7 @@ fun PostScreen(
                     }
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=landing_failed post=${post.id} target=$targetId " +
-                            "reason=$focusedLandingFailedReason",
+                        "phase=landing_failed post=${post.id} target=$targetId reason=$focusedLandingFailedReason",
                     )
                     return@coroutineScope
                 }
@@ -1577,8 +1552,7 @@ fun PostScreen(
                     focusedLandingFailedReason = "target_row_not_visible"
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=landing_failed post=${post.id} target=$targetId " +
-                            "reason=$focusedLandingFailedReason",
+                        "phase=landing_failed post=${post.id} target=$targetId reason=$focusedLandingFailedReason",
                     )
                     return@coroutineScope
                 }
@@ -1593,8 +1567,7 @@ fun PostScreen(
                     focusedLandingFailedReason = "target_index_missing"
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=landing_failed post=${post.id} target=$targetId " +
-                            "reason=$focusedLandingFailedReason",
+                        "phase=landing_failed post=${post.id} target=$targetId reason=$focusedLandingFailedReason",
                     )
                     return@coroutineScope
                 }
@@ -1602,9 +1575,7 @@ fun PostScreen(
                 val targetComment = latestSortedComments.findCommentById(targetId)
                 uiDebugLog(
                     COMMENT_NAV_LOG_TAG,
-                    "phase=target_materialized post=${post.id} target=$targetId " +
-                        "index=$initialFocusedListIndex author=${targetComment?.author ?: "unknown"} " +
-                        "bodyLength=${targetComment?.body?.length ?: -1}",
+                    "phase=target_materialized post=${post.id} target=$targetId index=$initialFocusedListIndex author=${targetComment?.author ?: "unknown"} bodyLength=${targetComment?.body?.length ?: -1}",
                 )
                 // AUDIT298C_RECREATION_DOES_NOT_LAND_AGAIN_V1: after a
                 // recreation the thread on screen is already the canonical one
@@ -1623,8 +1594,7 @@ fun PostScreen(
                     )
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=full_discussion_start post=${post.id} target=$targetId " +
-                            "cached=$canonicalWasReady revision=$beforeRefreshRevision",
+                        "phase=full_discussion_start post=${post.id} target=$targetId cached=$canonicalWasReady revision=$beforeRefreshRevision",
                     )
                     latestRefreshPreservingTarget(
                         accountStableId,
@@ -1659,9 +1629,7 @@ fun PostScreen(
                     val canonicalState = latestRedditCommentsState
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=canonical_stabilization_settled post=${post.id} target=$targetId " +
-                            "ready=$canonicalSettled revision=${canonicalState.contentRevision} " +
-                            "failure=${canonicalState.failureKind?.name?.lowercase() ?: "none"}",
+                        "phase=canonical_stabilization_settled post=${post.id} target=$targetId ready=$canonicalSettled revision=${canonicalState.contentRevision} failure=${canonicalState.failureKind?.name?.lowercase() ?: "none"}",
                     )
                     if (
                         canonicalState.matches(accountStableId, post.id, sort) &&
@@ -1693,18 +1661,12 @@ fun PostScreen(
                             )
                             uiDebugLog(
                                 COMMENT_NAV_LOG_TAG,
-                                "phase=canonical_target_continuity post=${post.id} target=$targetId " +
-                                    "raw=true revision=${canonicalState.contentRevision} " +
-                                    "projectedBefore=$projectedBeforeCommit " +
-                                    "projectedAfter=$projectedAfterCommit " +
-                                    "pathSize=${canonicalFocusedPathIds.size}",
+                                "phase=canonical_target_continuity post=${post.id} target=$targetId raw=true revision=${canonicalState.contentRevision} projectedBefore=$projectedBeforeCommit projectedAfter=$projectedAfterCommit pathSize=${canonicalFocusedPathIds.size}",
                             )
                         } else {
                             Log.e(
                                 COMMENT_NAV_LOG_TAG,
-                                "phase=canonical_target_tree_lost post=${post.id} target=$targetId " +
-                                    "revision=${canonicalState.contentRevision} " +
-                                    "projectedBefore=$projectedBeforeCommit",
+                                "phase=canonical_target_tree_lost post=${post.id} target=$targetId revision=${canonicalState.contentRevision} projectedBefore=$projectedBeforeCommit",
                             )
                         }
                     }
@@ -1714,16 +1676,14 @@ fun PostScreen(
                     focusedLandingFailedReason = "target_layout_identity_not_verified"
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=landing_failed post=${post.id} target=$targetId " +
-                            "reason=$focusedLandingFailedReason",
+                        "phase=landing_failed post=${post.id} target=$targetId reason=$focusedLandingFailedReason",
                     )
                     return@coroutineScope
                 }
                 var focusedListIndex = positionedTarget.first
                 uiDebugLog(
                     COMMENT_NAV_LOG_TAG,
-                    "phase=coarse_position post=${post.id} target=$targetId " +
-                        "index=$focusedListIndex offset=${positionedTarget.second.offset}",
+                    "phase=coarse_position post=${post.id} target=$targetId index=$focusedListIndex offset=${positionedTarget.second.offset}",
                 )
 
                 var verified = false
@@ -1748,11 +1708,7 @@ fun PostScreen(
                     )
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=target_geometry post=${post.id} target=$targetId pass=$pass " +
-                            "offset=${verifiedTargetItem.offset} size=${verifiedTargetItem.size} " +
-                            "viewportStart=${layout.viewportStartOffset} " +
-                            "viewportEnd=${layout.viewportEndOffset} " +
-                            "anchorFraction=$focusedAnchorFraction error=$lastErrorPx",
+                        "phase=target_geometry post=${post.id} target=$targetId pass=$pass offset=${verifiedTargetItem.offset} size=${verifiedTargetItem.size} viewportStart=${layout.viewportStartOffset} viewportEnd=${layout.viewportEndOffset} anchorFraction=$focusedAnchorFraction error=$lastErrorPx",
                     )
                     if (
                         focusedCommentOffsetVerified(
@@ -1769,8 +1725,7 @@ fun PostScreen(
                     val consumedPx = listState.scrollBy(lastErrorPx.toFloat())
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=center_adjust post=${post.id} target=$targetId pass=$pass " +
-                            "requested=$lastErrorPx consumed=${consumedPx.toInt()}",
+                        "phase=center_adjust post=${post.id} target=$targetId pass=$pass requested=$lastErrorPx consumed=${consumedPx.toInt()}",
                     )
                     if (
                         kotlin.math.abs(consumedPx) < 0.5f &&
@@ -1787,8 +1742,7 @@ fun PostScreen(
                         verified = true
                         uiDebugLog(
                             COMMENT_NAV_LOG_TAG,
-                            "phase=landing_constrained post=${post.id} target=$targetId " +
-                                "error=$lastErrorPx",
+                            "phase=landing_constrained post=${post.id} target=$targetId error=$lastErrorPx",
                         )
                         break
                     }
@@ -1840,8 +1794,7 @@ fun PostScreen(
                     focusedLandingFailedReason = "target_offset_not_verified"
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=landing_failed post=${post.id} target=$targetId " +
-                            "reason=$focusedLandingFailedReason error=$lastErrorPx",
+                        "phase=landing_failed post=${post.id} target=$targetId reason=$focusedLandingFailedReason error=$lastErrorPx",
                     )
                     return@coroutineScope
                 }
@@ -1857,8 +1810,7 @@ fun PostScreen(
                     focusedArrivalPulseGeneration += 1
                     uiDebugLog(
                         COMMENT_NAV_LOG_TAG,
-                        "phase=landing_verified post=${post.id} target=$targetId " +
-                            "anchorFraction=$focusedAnchorFraction error=$lastErrorPx",
+                        "phase=landing_verified post=${post.id} target=$targetId anchorFraction=$focusedAnchorFraction error=$lastErrorPx",
                     )
                     onFocusedCommentLandingVerified(targetId)
                     uiDebugLog(
@@ -1895,8 +1847,7 @@ fun PostScreen(
                                 )
                             uiDebugLog(
                                 COMMENT_NAV_LOG_TAG,
-                                "phase=anchor_rematerialize post=${post.id} target=$targetId " +
-                                    "index=$currentIndex requestOffset=$rematerializeRequestOffset",
+                                "phase=anchor_rematerialize post=${post.id} target=$targetId index=$currentIndex requestOffset=$rematerializeRequestOffset",
                             )
                             listState.requestScrollToItem(
                                 index = currentIndex,
@@ -1920,8 +1871,7 @@ fun PostScreen(
                         }
                         uiDebugLog(
                             COMMENT_NAV_LOG_TAG,
-                            "phase=anchor_preserved post=${post.id} target=$targetId " +
-                                "error=$deltaPx consumed=${consumedPx.toInt()}",
+                            "phase=anchor_preserved post=${post.id} target=$targetId error=$deltaPx consumed=${consumedPx.toInt()}",
                         )
                     }
                 }
@@ -2144,10 +2094,7 @@ fun PostScreen(
         ) - focusedProtectedPathIds
         uiDebugLog(
             COMMENT_NAV_LOG_TAG,
-            "phase=new_comment_reveal post=${post.id} new=${newIds.size} " +
-                "hydrationExcluded=${hydrationMaterializedCommentIds.size} " +
-                "collapseCandidates=${siblingBranchesToCollapse.size} " +
-                "focusedProtected=${focusedProtectedPathIds.size}",
+            "phase=new_comment_reveal post=${post.id} new=${newIds.size} hydrationExcluded=${hydrationMaterializedCommentIds.size} collapseCandidates=${siblingBranchesToCollapse.size} focusedProtected=${focusedProtectedPathIds.size}",
         )
         // AUDIT298C_EVERY_TREE_CHANGE_HOLDS_THE_READING_ROW_V1: unfolding new
         // comments and folding their siblings changes rows above the reader
@@ -2194,15 +2141,12 @@ fun PostScreen(
         val collapsedTargetAncestors = targetAncestorIds.intersect(state.collapsedCommentIds)
         uiDebugLog(
             COMMENT_NAV_LOG_TAG,
-            "phase=hydration_target_continuity post=${post.id} target=$targetId " +
-                "revision=$revision before=true after=$targetVisibleAfter " +
-                "collapsedAncestors=${collapsedTargetAncestors.size}",
+            "phase=hydration_target_continuity post=${post.id} target=$targetId revision=$revision before=true after=$targetVisibleAfter collapsedAncestors=${collapsedTargetAncestors.size}",
         )
         if (!targetVisibleAfter) {
             Log.e(
                 COMMENT_NAV_LOG_TAG,
-                "phase=hydration_target_projection_lost post=${post.id} target=$targetId " +
-                    "revision=$revision collapsedAncestors=${collapsedTargetAncestors.joinToString(",")}",
+                "phase=hydration_target_projection_lost post=${post.id} target=$targetId revision=$revision collapsedAncestors=${collapsedTargetAncestors.joinToString(",")}",
             )
         }
         hydrationContinuityRevision = null
@@ -2230,8 +2174,7 @@ fun PostScreen(
                 focusedUserOwnsScroll = true
                 uiDebugLog(
                     COMMENT_NAV_LOG_TAG,
-                    "phase=anchor_released post=${post.id} target=${focusedCommentId ?: "none"} " +
-                        "reason=retry_more",
+                    "phase=anchor_released post=${post.id} target=${focusedCommentId ?: "none"} reason=retry_more",
                 )
             }
             val layout = listState.layoutInfo
@@ -2275,17 +2218,12 @@ fun PostScreen(
                 )
                 uiDebugLog(
                     COMMENT_NAV_LOG_TAG,
-                    "phase=hydration_commit_fence post=${post.id} node=${moreNode.id} " +
-                        "revision=$viewportContentRevision gesture=$commentHydrationGestureGeneration " +
-                        "userInitiated=$userInitiated placeholderVisible=$moreVisible",
+                    "phase=hydration_commit_fence post=${post.id} node=${moreNode.id} revision=$viewportContentRevision gesture=$commentHydrationGestureGeneration userInitiated=$userInitiated placeholderVisible=$moreVisible",
                 )
             }
             uiDebugLog(
                 COMMENT_NAV_LOG_TAG,
-                "phase=inline_hydration_start post=${post.id} node=${moreNode.id} " +
-                    "remaining=${moreNode.moreCount} automatic=${!userInitiated} " +
-                    "gesture=$commentHydrationGestureGeneration budget=$commentHydrationBudget " +
-                    "fromEnd=$fromEnd",
+                "phase=inline_hydration_start post=${post.id} node=${moreNode.id} remaining=${moreNode.moreCount} automatic=${!userInitiated} gesture=$commentHydrationGestureGeneration budget=$commentHydrationBudget fromEnd=$fromEnd",
             )
             // AUDIT298C_SMALL_NODES_LOAD_TOGETHER_V1: small nodes near it come along
             // (from their start; not for a load from below or a Retry).
@@ -2411,7 +2349,7 @@ fun PostScreen(
                         deleteState.phase == PostDeletePhase.AUTHORIZATION_REQUIRED -> "Permission required"
                         deleteState.failureKind == PostDeleteFailureKind.OUTCOME_UNKNOWN &&
                             deleteState.phase == PostDeletePhase.FAILED -> "Deletion not confirmed"
-                        else -> "Delete post?"
+                        else -> stringResource(R.string.all_delete_post_2)
                     },
                 )
             },
@@ -2429,7 +2367,7 @@ fun PostScreen(
             confirmButton = {
                 when (deleteState.phase) {
                     PostDeletePhase.AUTHORIZATION_REQUIRED -> TextButton(onClick = onAuthorizePostDelete) {
-                        Text("Authorize")
+                        Text(stringResource(R.string.feed_authorize))
                     }
                     PostDeletePhase.AUTHORIZING,
                     PostDeletePhase.AWAITING_CALLBACK,
@@ -2440,9 +2378,9 @@ fun PostScreen(
                         Spacer(Modifier.width(8.dp))
                         Text(
                             when (deleteState.phase) {
-                                PostDeletePhase.SENDING -> "Deleting…"
-                                PostDeletePhase.CHECKING -> "Checking…"
-                                else -> "Authorizing…"
+                                PostDeletePhase.SENDING -> stringResource(R.string.all_deleting)
+                                PostDeletePhase.CHECKING -> stringResource(R.string.all_checking)
+                                else -> stringResource(R.string.all_authorizing)
                             },
                         )
                     }
@@ -2450,7 +2388,7 @@ fun PostScreen(
                     // H3_POST_DELETE_CHECK_AGAIN_READS_ONLY_V1
                     PostDeletePhase.FAILED
                     -> if (deleteState.failureKind == PostDeleteFailureKind.OUTCOME_UNKNOWN) {
-                        TextButton(onClick = onCheckPostDelete) { Text("Check again") }
+                        TextButton(onClick = onCheckPostDelete) { Text(stringResource(R.string.feed_check_again)) }
                     } else {
                         PostDeleteConfirmButton(
                             deleteState = deleteState,
@@ -2489,7 +2427,7 @@ fun PostScreen(
                             deletingPost = false
                             onResetPostDeleteState()
                         },
-                    ) { Text("Cancel") }
+                    ) { Text(stringResource(R.string.feed_cancel)) }
                 }
             },
         )
@@ -2499,7 +2437,7 @@ fun PostScreen(
         val existing = state.commentComposerDraft
         AlertDialog(
             onDismissRequest = { composerConflict = null },
-            title = { Text("Discard your unsent reply?") },
+            title = { Text(stringResource(R.string.feed_discard_your_unsent_reply)) },
             text = {
                 Text(
                     unsentCommentDraftConflictText(
@@ -2518,12 +2456,12 @@ fun PostScreen(
                         state.openCommentComposer(post, request.comment)
                     },
                 ) {
-                    Text("Discard and reply")
+                    Text(stringResource(R.string.feed_discard_and_reply))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { composerConflict = null }) {
-                    Text("Keep draft")
+                    Text(stringResource(R.string.feed_keep_draft))
                 }
             },
         )
@@ -2536,11 +2474,10 @@ fun PostScreen(
                 editingCommentId = null
                 onResetCommentEditState()
             },
-            title = { Text("Can't edit this comment yet") },
+            title = { Text(stringResource(R.string.feed_can_t_edit_this_comment_yet)) },
             text = {
                 Text(
-                    "Comments with media attached in subshell can't be edited yet. " +
-                        "subshell can't safely keep that media during an edit.",
+                    stringResource(R.string.all2_comments_with_media_attached_in_subshell_can),
                 )
             },
             confirmButton = {
@@ -2603,12 +2540,12 @@ fun PostScreen(
                 Text(
                     when {
                         deleteState.phase == CommentDeletePhase.AUTHORIZATION_REQUIRED ->
-                            "Permission required"
+                            stringResource(R.string.all_permission_required)
                         deleteState.phase == CommentDeletePhase.FAILED &&
                             deleteState.failureKind ==
                                 CommentDeleteFailureKind.OUTCOME_NOT_CONFIRMED ->
-                            "Deletion not confirmed"
-                        else -> "Delete comment?"
+                            stringResource(R.string.all_deletion_not_confirmed)
+                        else -> stringResource(R.string.all_delete_comment)
                     },
                 )
             },
@@ -2625,7 +2562,7 @@ fun PostScreen(
             },
             confirmButton = {
                 when (deleteState.phase) {
-                    CommentDeletePhase.AUTHORIZATION_REQUIRED -> TextButton(onClick = onAuthorizeCommentDelete) { Text("Authorize") }
+                    CommentDeletePhase.AUTHORIZATION_REQUIRED -> TextButton(onClick = onAuthorizeCommentDelete) { Text(stringResource(R.string.feed_authorize)) }
                     CommentDeletePhase.AUTHORIZING, CommentDeletePhase.AWAITING_CALLBACK, CommentDeletePhase.SENDING -> TextButton(onClick = {}, enabled = false) {
                         InlineProgressIndicator()
                         Spacer(Modifier.width(8.dp))
@@ -2646,7 +2583,7 @@ fun PostScreen(
                         },
                     ) {
                         Text(
-                            "Delete",
+                            stringResource(R.string.all_delete),
                             color = MaterialTheme.colorScheme.error,
                         )
                     }
@@ -2662,7 +2599,7 @@ fun PostScreen(
                                     onResetCommentDeleteState()
                                 },
                             ) {
-                                Text("Check again")
+                                Text(stringResource(R.string.feed_check_again))
                             }
                         } else {
                             TextButton(
@@ -2680,7 +2617,7 @@ fun PostScreen(
                                 },
                             ) {
                                 Text(
-                                    "Retry",
+                                    stringResource(R.string.all_retry),
                                     color = MaterialTheme.colorScheme.error,
                                 )
                             }
@@ -2704,9 +2641,9 @@ fun PostScreen(
                                 deleteState.failureKind ==
                                     CommentDeleteFailureKind.OUTCOME_NOT_CONFIRMED
                             ) {
-                                "Close"
+                                stringResource(R.string.all_close)
                             } else {
-                                "Cancel"
+                                stringResource(R.string.all_cancel)
                             },
                         )
                     }
@@ -2764,8 +2701,7 @@ fun PostScreen(
             focusedOpeningIndicatorVisible = false
             uiDebugLog(
                 COMMENT_NAV_LOG_TAG,
-                "phase=anchor_released post=${post.id} target=$focusedCommentId " +
-                    "reason=$reason",
+                "phase=anchor_released post=${post.id} target=$focusedCommentId reason=$reason",
             )
         }
     }
@@ -3230,9 +3166,7 @@ fun PostScreen(
             if (onScreen) {
                 uiDebugLog(
                     COMMENT_NAV_LOG_TAG,
-                    "phase=hydration_visible_node post=${post.id} node=${moreNode.id} " +
-                        "first=${listState.firstVisibleItemIndex} total=${listState.layoutInfo.totalItemsCount} " +
-                        "rows=${mainCommentRows.size}",
+                    "phase=hydration_visible_node post=${post.id} node=${moreNode.id} first=${listState.firstVisibleItemIndex} total=${listState.layoutInfo.totalItemsCount} rows=${mainCommentRows.size}",
                 )
                 loadMore(moreNode, false)
                 return@collect
@@ -3241,9 +3175,7 @@ fun PostScreen(
             commentHydrationBudget -= 1
             uiDebugLog(
                 COMMENT_NAV_LOG_TAG,
-                "phase=hydration_budget_consume post=${post.id} " +
-                    "generation=$commentHydrationGestureGeneration " +
-                    "remaining=$commentHydrationBudget node=${moreNode.id}",
+                "phase=hydration_budget_consume post=${post.id} generation=$commentHydrationGestureGeneration remaining=$commentHydrationBudget node=${moreNode.id}",
             )
             loadMore(moreNode, false)
         }
@@ -3257,7 +3189,7 @@ fun PostScreen(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
-        RouteTopBar(title = "Post", scrollBehavior = routeTopBarScroll, onBack = onBack)
+        RouteTopBar(title = stringResource(R.string.feed_post), scrollBehavior = routeTopBarScroll, onBack = onBack)
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -3429,7 +3361,7 @@ fun PostScreen(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Text(
-                                        "${post.comments} comments",
+                                        pluralStringResource(R.plurals.comments_count, post.comments, post.comments),
                                         style = MaterialTheme.typography.titleMedium,
                                         modifier = Modifier.weight(1f),
                                     )
@@ -3745,7 +3677,7 @@ fun PostScreen(
                             onClick = onBack,
                             modifier = Modifier.align(Alignment.TopStart).padding(4.dp),
                         ) {
-                            Icon(Symbols.ArrowBack, contentDescription = "Back")
+                            Icon(Symbols.ArrowBack, contentDescription = stringResource(R.string.feed_back))
                         }
                         if (focusedOpeningIndicatorVisible) {
                             Column(
@@ -3756,7 +3688,7 @@ fun PostScreen(
                                 InlineProgressIndicator()
                                 Spacer(Modifier.height(12.dp))
                                 Text(
-                                    text = "Opening comment…",
+                                    text = stringResource(R.string.feed_opening_comment),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -3764,7 +3696,7 @@ fun PostScreen(
                                     onClick = { releaseFocusedAnchorForReaderNavigation("show_thread") },
                                     modifier = Modifier.padding(top = 8.dp).heightIn(min = 48.dp),
                                 ) {
-                                    Text("Show thread")
+                                    Text(stringResource(R.string.feed_show_thread))
                                 }
                             }
                         }
@@ -3859,12 +3791,12 @@ private fun LiveCommentStatus(
             Text(
                 text = when {
                     state.fullDiscussionLoading && !state.fullDiscussionLoaded && hasCachedComments ->
-                        "Loading full discussion…"
+                        stringResource(R.string.all_loading_full_discussion)
                     loading && hasCachedComments ->
-                        "Showing cached comments · refreshing…"
-                    loading -> "Loading comments…"
+                        stringResource(R.string.all_showing_cached_comments_refreshing)
+                    loading -> stringResource(R.string.all_loading_comments)
 
-                    else -> "No comments returned."
+                    else -> stringResource(R.string.all_no_comments_returned)
                 },
                 modifier = Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -3982,6 +3914,9 @@ private fun CommentRow(
     var reportDialogVisible by rememberSaveable(comment.id) {
         mutableStateOf(false)
     }
+    var copySheetVisible by rememberSaveable(comment.id) {
+        mutableStateOf(false)
+    }
     val onAuthorClick = {
         if (authorProfileTarget == null) {
             if (comment.author.equals("[deleted]", ignoreCase = true)) {
@@ -4004,8 +3939,7 @@ private fun CommentRow(
         if (focused) {
             uiDebugLog(
                 COMMENT_NAV_LOG_TAG,
-                "phase=focused_row_composed target=${comment.id} author=${comment.author} " +
-                    "bodyLength=${comment.body.length}",
+                "phase=focused_row_composed target=${comment.id} author=${comment.author} bodyLength=${comment.body.length}",
             )
         }
     }
@@ -4477,7 +4411,7 @@ private fun CommentRow(
             ) {
                 Icon(
                     if (collapsed) Symbols.ExpandMore else Symbols.ExpandLess,
-                    contentDescription = if (collapsed) "Expand thread" else "Collapse thread",
+                    contentDescription = if (collapsed) stringResource(R.string.all_expand_thread) else stringResource(R.string.all_collapse_thread),
                     modifier = Modifier.size(19.dp),
                 )
             }
@@ -4505,8 +4439,8 @@ private fun CommentRow(
                     ErrorNotice(
                         presentation = ErrorPresentation(
                             kind = ErrorPresentationKind.INLINE,
-                            title = "Account unavailable",
-                            message = "This Reddit account is no longer available.",
+                            title = stringResource(R.string.feed_account_unavailable),
+                            message = stringResource(R.string.all_this_reddit_account_is_no_longer_available),
                         ),
                         modifier = Modifier.padding(top = 6.dp, end = 6.dp),
                         onAction = {},
@@ -4559,7 +4493,7 @@ private fun CommentRow(
                     LocalUriMedia(
                         uri = mediaUri,
                         mimeType = comment.localMediaMimeType,
-                        contentDescription = "Comment media",
+                        contentDescription = stringResource(R.string.feed_comment_media),
                         modifier = Modifier
                             .padding(top = 9.dp, end = 6.dp)
                             .fillMaxWidth()
@@ -4577,13 +4511,8 @@ private fun CommentRow(
                     onUpvote = { state.vote(comment, 1) },
                     onDownvote = { state.vote(comment, -1) },
                     onReply = { onReply(comment) },
-                    onCopy = {
-                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        clipboard.setPrimaryClip(
-                            ClipData.newPlainText("Comment by ${comment.author}", comment.body.redditReadableText()),
-                        )
-                        notices.noticeCopied("Comment") // ISSUE222_NO_TOASTS_V1
-                    },
+                    // ISSUE300_ONE_COPY_ENTRY_OPENS_A_SHEET_V1
+                    onCopy = { copySheetVisible = true },
                     onShare = { shareCommentLink(context, post, comment.id, notices) },
                     showSaveAction = state.activeAccountIsAuthenticated,
                     saved = state.effectiveCommentSaved(comment),
@@ -4605,6 +4534,15 @@ private fun CommentRow(
                         postHint = post.id,
                     ),
                 )
+                if (copySheetVisible) {
+                    CopySheet(
+                        content = commentCopySheetContent(
+                            body = comment.body,
+                            redditLink = canonicalRedditCommentUrl(post, comment.id),
+                        ),
+                        onDismiss = { copySheetVisible = false },
+                    )
+                }
                 if (reportDialogVisible) {
                     RedditContentReportDialog(
                         targetLabel = "comment",
@@ -4626,11 +4564,11 @@ private fun CommentRow(
             val hiddenReplies = comment.descendantCount()
             Text(
                 when {
-                    newReplies == 1 -> "1 new reply · $hiddenReplies hidden"
-                    newReplies > 1 -> "$newReplies new replies · $hiddenReplies hidden"
-                    hiddenReplies == 0 -> "Comment collapsed"
-                    hiddenReplies == 1 -> "Comment collapsed · 1 reply hidden"
-                    else -> "Comment collapsed · $hiddenReplies replies hidden"
+                    newReplies > 0 ->
+                        pluralStringResource(R.plurals.comment_new_replies_hidden, newReplies, newReplies, hiddenReplies)
+                    hiddenReplies == 0 -> stringResource(R.string.comment_collapsed)
+                    else ->
+                        pluralStringResource(R.plurals.comment_collapsed_replies_hidden, hiddenReplies, hiddenReplies)
                 },
                 style = MaterialTheme.typography.labelMedium,
                 color = if (newReplies > 0) {
@@ -4641,7 +4579,7 @@ private fun CommentRow(
                 // ISSUE219_COLLAPSED_COMMENT_ROW_IS_A_LABELLED_TARGET_V1: 48 dp tall
                 // and says what it does.
                 modifier = Modifier
-                    .clickable(onClickLabel = "Expand comment", role = Role.Button) {
+                    .clickable(onClickLabel = stringResource(R.string.feed_expand_comment), role = Role.Button) {
                         onToggleComment(comment.id)
                     }
                     .heightIn(min = 48.dp)
@@ -4692,11 +4630,11 @@ private fun MoreRepliesRow(
         return
     }
     val label = when {
-        !fullDiscussionReady && fullDiscussionLoading -> "Loading full discussion…"
-        !fullDiscussionReady -> "Full discussion unavailable"
-        loading -> "Loading replies…"
-        failed -> io.github.brealorg.subshell.ui.error.redditMoreRepliesFailedLabel(failureDetails)
-        else -> "Loading replies…"
+        !fullDiscussionReady && fullDiscussionLoading -> stringResource(R.string.all_loading_full_discussion)
+        !fullDiscussionReady -> stringResource(R.string.all_full_discussion_unavailable)
+        loading -> stringResource(R.string.all_loading_replies)
+        failed -> io.github.brealorg.subshell.ui.error.redditMoreRepliesFailedLabel(failureDetails).asString()
+        else -> stringResource(R.string.all_loading_replies)
     }
     Row(
         modifier = Modifier
@@ -4713,7 +4651,7 @@ private fun MoreRepliesRow(
                 if (failed && fullDiscussionReady && !loading) {
                     Modifier
                         .heightIn(min = 48.dp)
-                        .clickable(onClickLabel = "Retry", role = Role.Button) { onRetry(comment) }
+                        .clickable(onClickLabel = stringResource(R.string.feed_retry), role = Role.Button) { onRetry(comment) }
                 } else {
                     Modifier
                 },
@@ -4760,7 +4698,7 @@ private fun RemovedCommentBadge() {
         color = MaterialTheme.colorScheme.error,
     ) {
         Text(
-            "Removed",
+            stringResource(R.string.all_removed),
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onError,
@@ -4836,7 +4774,7 @@ private fun CodeBlock(sample: CodeSample) {
                 ) {
                     Icon(Symbols.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(5.dp))
-                    Text("Copy")
+                    Text(stringResource(R.string.feed_copy))
                 }
             }
             SelectionContainer {
@@ -4897,8 +4835,8 @@ private fun CommentActionRow(
         )
         SmallCommentAction(
             icon = Symbols.Reply,
-            label = "Reply",
-            contentDescription = "Reply",
+            label = stringResource(R.string.feed_reply),
+            contentDescription = stringResource(R.string.feed_reply),
             enabled = replyEnabled,
             onClick = onReply,
         )
@@ -4907,16 +4845,16 @@ private fun CommentActionRow(
     var ownCommentSheetVisible by remember { mutableStateOf(false) }
     if (ownCommentSheetVisible) {
         io.github.brealorg.subshell.ui.components.ItemActionsSheet(
-            title = "Your comment",
+            title = stringResource(R.string.feed_your_comment),
             groups = listOf(
                 listOfNotNull(
-                    io.github.brealorg.subshell.ui.components.SheetAction("Edit comment", Symbols.Edit) {
+                    io.github.brealorg.subshell.ui.components.SheetAction(stringResource(R.string.all_edit_comment), Symbols.Edit) {
                         onEdit()
                     }.takeIf { canEdit },
                 ),
                 listOfNotNull(
                     io.github.brealorg.subshell.ui.components.SheetAction(
-                        "Delete comment",
+                        stringResource(R.string.all_delete_comment_2),
                         Symbols.Delete,
                         destructive = true,
                     ) { onDelete() }.takeIf { canDelete },
@@ -4934,7 +4872,7 @@ private fun CommentActionRow(
             ) {
                 Icon(
                     Symbols.MoreVert,
-                    contentDescription = "Comment options",
+                    contentDescription = stringResource(R.string.feed_comment_options),
                     modifier = Modifier.size(19.dp),
                 )
             }
@@ -4946,7 +4884,7 @@ private fun CommentActionRow(
                 // post): Edit and Delete are one entry opening a sheet.
                 if (canEdit || canDelete) {
                     DropdownMenuItem(
-                        text = { Text("Your comment…") },
+                        text = { Text(stringResource(R.string.feed_your_comment_2)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Symbols.Edit,
@@ -4963,7 +4901,7 @@ private fun CommentActionRow(
                     // COMMENTSAVE01A3_COMMENT_SAVE_ICON_CONSISTENCY_V1
                     DropdownMenuItem(
                         text = {
-                            Text(if (saved) "Unsave comment" else "Save comment")
+                            Text(if (saved) stringResource(R.string.all_unsave_comment) else stringResource(R.string.all_save_comment))
                         },
                         leadingIcon = {
                             Icon(
@@ -4995,7 +4933,7 @@ private fun CommentActionRow(
                 )
                 if (showReportAction) {
                     DropdownMenuItem(
-                        text = { Text("Report comment") },
+                        text = { Text(stringResource(R.string.feed_report_comment)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Symbols.Flag,
@@ -5010,7 +4948,7 @@ private fun CommentActionRow(
                     )
                 }
                 DropdownMenuItem(
-                    text = { Text("Share comment") },
+                    text = { Text(stringResource(R.string.feed_share_comment)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Symbols.Share,
@@ -5023,7 +4961,7 @@ private fun CommentActionRow(
                     },
                 )
                 DropdownMenuItem(
-                    text = { Text("Copy text") },
+                    text = { Text(COPY_MENU_ENTRY_LABEL) },
                     leadingIcon = {
                         Icon(
                             imageVector = Symbols.ContentCopy,

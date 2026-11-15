@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.backup
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertFalse
@@ -15,7 +16,7 @@ class Backup04A2CommunityMutesOptInPolicyTest {
     fun repositoryOwnsIndependentDefaultOffCommunityMuteOptIn() {
         val source = repository(
             "app/src/main/java/${SUBSHELL_PACKAGE_DIR}/backup/SettingsBackupRepository.kt",
-        ).readText()
+        ).readSourceText()
 
         assertTrue(source.contains("BACKUP04A2_COMMUNITY_MUTES_DEVICE_LOCAL_PRIVACY_OPT_IN_V1"))
         assertTrue(source.contains("preferences.getBoolean(KEY_COMMUNITY_MUTES_BACKUP, false)"))
@@ -28,7 +29,7 @@ class Backup04A2CommunityMutesOptInPolicyTest {
     fun uiExposesSeparatePrivacySwitchAndRestoreDisclosure() {
         val screen = repository(
             "app/src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/BackupRestoreScreen.kt",
-        ).readText()
+        ).readSourceText()
 
         assertTrue(screen.contains("includeHiddenCommunities"))
         assertTrue(screen.contains("includeCommunityMutes"))
@@ -41,7 +42,7 @@ class Backup04A2CommunityMutesOptInPolicyTest {
 
     @Test
     fun policyFreezesSchemaSixAbsoluteExpiryAndIndependentOptIn() {
-        val policy = repository("docs/backup/subshell-backup03-portability-policy-v1.md").readText()
+        val policy = repository("docs/backup/subshell-backup03-portability-policy-v1.md").readSourceText()
 
         assertTrue(policy.contains("BACKUP04A2_COMMUNITY_MUTES_SCHEMA_V6_OPT_IN_V1"))
         assertTrue(policy.contains("SCHEMA_V6_STATUS=RESOLVED_BACKUP04A2"))
@@ -57,9 +58,9 @@ class Backup04A2CommunityMutesOptInPolicyTest {
         // The persistence wiring lives in RememberSubshellState.kt.
         val state = repository(
             "app/src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/SubshellState.kt",
-        ).readText() + repository(
+        ).readSourceText() + repository(
             "app/src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/RememberSubshellState.kt",
-        ).readText()
+        ).readSourceText()
 
         assertTrue(state.contains("BACKUP04A2_PRIVACY_SENSITIVE_SIXTH_MODULE_POST_COMMIT_V1"))
         assertTrue(state.contains("communityMuteEntries?.let { restored ->"))

@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import androidx.compose.ui.res.stringResource
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
 import io.github.brealorg.subshell.ui.error.ReportFailureDiagnostic
 import io.github.brealorg.subshell.ui.error.redditModeratorLogFailureMessage
 import androidx.compose.material3.IconButton
@@ -73,7 +76,7 @@ fun ModeratorLogButton(
             modifier = Modifier.size(18.dp),
         )
         Spacer(Modifier.width(6.dp))
-        Text("Mod log")
+        Text(stringResource(R.string.comp_mod_log))
     }
 }
 
@@ -122,13 +125,13 @@ fun ModeratorLogDialog(
                                 IconButton(onClick = onDismiss) {
                                     Icon(
                                         imageVector = Symbols.ArrowBack,
-                                        contentDescription = "Back to Mod tools",
+                                        contentDescription = stringResource(R.string.comp_back_to_mod_tools),
                                     )
                                 }
                             }
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "Mod log",
+                                    text = stringResource(R.string.comp_mod_log),
                                     style = MaterialTheme.typography.headlineSmall,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
@@ -147,7 +150,7 @@ fun ModeratorLogDialog(
                             ) {
                                 Icon(
                                     imageVector = Symbols.Refresh,
-                                    contentDescription = "Refresh mod log",
+                                    contentDescription = stringResource(R.string.comp_refresh_mod_log),
                                 )
                             }
                         }
@@ -155,11 +158,11 @@ fun ModeratorLogDialog(
                     if (state.authorizationRequired) {
                         item("mod-log-authorization") {
                             ModeratorLogNotice(
-                                title = "Mod log permission required",
-                                message = "Reddit needs the modlog permission to read moderation history for r/$community.",
+                                title = stringResource(R.string.comp_mod_log_permission_required),
+                                message = stringResource(R.string.all_reddit_needs_the_modlog_permission_to_read, community),
                                 // ISSUE96_CANCEL_WAITING_AUTHORIZATION_V1: waiting for the
                                 // browser used to hide every action.
-                                actionLabel = if (state.authorizing) "Cancel authorization" else "Authorize",
+                                actionLabel = if (state.authorizing) stringResource(R.string.all_cancel_authorization) else stringResource(R.string.all_authorize),
                                 onAction = if (state.authorizing) onCancelAuthorization else onAuthorize,
                             )
                         }
@@ -174,14 +177,14 @@ fun ModeratorLogDialog(
                     if (state.failureKind != null && !pageFailure) {
                         item("mod-log-failure") {
                             ModeratorLogNotice(
-                                title = "Mod log unavailable",
+                                title = stringResource(R.string.comp_mod_log_unavailable),
                                 // BLOCKPAGE02_SMALLER_READ_SURFACES_NAME_THE_BLOCK_PAGE_V1
                                 message = redditModeratorLogFailureMessage(
-                                    "Reddit moderation history could not be loaded.",
+                                    UiText.Resource(R.string.modlog_error_history_not_loaded),
                                     state.failureHttpStatusCode,
                                     state.failureDetails,
-                                ),
-                                actionLabel = if (state.failureRetryable) "Retry" else null,
+                                ).asString(),
+                                actionLabel = if (state.failureRetryable) stringResource(R.string.all_retry) else null,
                                 onAction = onRefresh,
                             )
                         }
@@ -199,7 +202,7 @@ fun ModeratorLogDialog(
                                 InlineProgressIndicator()
                                 Spacer(Modifier.width(10.dp))
                                 Text(
-                                    text = "Loading mod log…",
+                                    text = stringResource(R.string.comp_loading_mod_log),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
@@ -215,8 +218,8 @@ fun ModeratorLogDialog(
                     ) {
                         item("mod-log-empty") {
                             ModeratorLogNotice(
-                                title = "No recent actions",
-                                message = "Reddit returned no recent moderation actions for r/$community.",
+                                title = stringResource(R.string.comp_no_recent_actions),
+                                message = stringResource(R.string.all_reddit_returned_no_recent_moderation_actions_for, community),
                                 actionLabel = null,
                                 onAction = {},
                             )
@@ -239,13 +242,13 @@ fun ModeratorLogDialog(
                             }
                             if (pageFailure && !state.loading) {
                                 ModeratorLogNotice(
-                                    title = "Couldn't load more of the mod log",
+                                    title = stringResource(R.string.comp_couldn_t_load_more_of_the_mod),
                                     message = redditModeratorLogFailureMessage(
-                                        "Reddit did not send the next page.",
+                                        UiText.Resource(R.string.modlog_error_no_next_page),
                                         state.failureHttpStatusCode,
                                         state.failureDetails,
-                                    ),
-                                    actionLabel = if (state.failureRetryable) "Retry" else null,
+                                    ).asString(),
+                                    actionLabel = if (state.failureRetryable) stringResource(R.string.all_retry) else null,
                                     onAction = onAppend,
                                 )
                             } else if (state.loading) {
@@ -316,7 +319,7 @@ private fun ModeratorLogRow(entry: RedditModeratorLogEntry) {
                     }
                     entry.targetAuthor?.let { author ->
                         Text(
-                            text = "Target: u/$author",
+                            text = stringResource(R.string.comp_target_u, author),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

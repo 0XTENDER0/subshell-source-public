@@ -342,7 +342,7 @@ internal fun RedditListingDto.toNetworkPage(nowEpochSeconds: Long): NetworkPage<
         nextCursor = data.after?.trim()?.takeIf(String::isNotEmpty),
     )
 
-private fun RedditPostDataDto.toPost(nowEpochSeconds: Long): Post {
+internal fun RedditPostDataDto.toPost(nowEpochSeconds: Long): Post {
     val crosspost = crosspostParentList
         .asSequence()
         .mapNotNull { parent -> parent.toCrosspostPreview(nowEpochSeconds) }

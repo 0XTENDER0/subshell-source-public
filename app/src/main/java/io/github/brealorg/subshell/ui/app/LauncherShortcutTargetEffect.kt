@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -82,24 +85,24 @@ internal fun LauncherShortcutTargetEffect(
                     ?.username
                 presentNotice(
                     noticeHost,
-                    title = username?.let { name -> "Switch to u/$name" } ?: "Switch account",
-                    message = "This shortcut belongs to another account",
+                    title = username?.let { name -> UiText.Resource(R.string.notice_launchershor_switch_to_u, name) } ?: UiText.Resource(R.string.notice_launchershor_switch_account),
+                    message = UiText.Resource(R.string.notice_launchershor_this_shortcut_belongs_to_another_account),
                 )
             }
             LauncherShortcutResolution.AccountGone -> presentNotice(
                 noticeHost,
-                title = "Account not on this device",
-                message = "This shortcut belongs to an account that is no longer signed in",
+                title = UiText.Resource(R.string.notice_launchershor_account_not_on_this_device),
+                message = UiText.Resource(R.string.notice_launchershor_this_shortcut_belongs_to_an_account_that),
             )
             LauncherShortcutResolution.FeedsFailed -> presentNotice(
                 noticeHost,
-                title = "Couldn't open the custom feed",
-                message = "Your custom feeds did not load",
+                title = UiText.Resource(R.string.notice_launchershor_couldn_t_open_the_custom_feed),
+                message = UiText.Resource(R.string.notice_launchershor_your_custom_feeds_did_not_load),
             )
             LauncherShortcutResolution.FeedMissing -> presentNotice(
                 noticeHost,
-                title = "Custom feed not found",
-                message = "It may have been deleted or renamed",
+                title = UiText.Resource(R.string.notice_launchershor_custom_feed_not_found),
+                message = UiText.Resource(R.string.notice_launchershor_it_may_have_been_deleted_or_renamed),
             )
         }
         consume()
@@ -108,8 +111,8 @@ internal fun LauncherShortcutTargetEffect(
 
 private fun presentNotice(
     noticeHost: ViewportErrorHostState,
-    title: String,
-    message: String,
+    title: UiText,
+    message: UiText,
 ) {
     // clear() first forgets an earlier dismissal of the same notice.
     noticeHost.clear(LauncherShortcutNoticeScope)

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.s
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
@@ -250,7 +251,7 @@ class Issue295ModActionsInMenuComposeTest {
             removalMessageOutcome = RedditRemovalStepOutcome.NOT_REQUESTED,
         )
         composeRule.waitForIdle()
-        assertEquals("Post removed", notices.currentRequest?.presentation?.title)
+        assertEquals("Post removed", notices.currentRequest?.presentation?.title?.s)
         assertNull(quick.awaiting)
     }
 

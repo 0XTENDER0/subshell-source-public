@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Immutable
 import io.github.brealorg.subshell.data.account.TextPostWriteRequest
 import io.github.brealorg.subshell.data.account.normalizeCrosspostSourceFullname
@@ -122,8 +124,8 @@ internal fun PostComposerDraft.isValidSourceBoundCrosspostDraft(): Boolean {
 // CROSSPOST01A1E3_UNKNOWN_DESTINATION_SUPPORT_V1
 internal fun crosspostDestinationSupportBlockingMessage(
     destination: ComposerCrosspostDestination,
-): String? = when (destination.allowCrossposts) {
-    false -> "This community does not allow crossposts"
+): UiText? = when (destination.allowCrossposts) {
+    false -> UiText.Resource(R.string.xpost_this_community_does_not_allow_crossposts)
     true, null -> null
 }
 
@@ -133,27 +135,27 @@ internal fun validateCrosspostComposerDraftIssue(
     activeAccountIsAuthenticated: Boolean,
     policy: ComposerCommunityPolicy,
 ): ComposerValidationIssue? {
-    fun issue(field: ComposerValidationField, message: String) = ComposerValidationIssue(field, message)
+    fun issue(field: ComposerValidationField, message: UiText) = ComposerValidationIssue(field, message)
     if (!activeAccountIsAuthenticated || activeAccountStableId.isBlank()) {
-        return issue(ComposerValidationField.GENERAL, "Connect an account before crossposting")
+        return issue(ComposerValidationField.GENERAL, UiText.Resource(R.string.xpost_connect_an_account_before_crossposting))
     }
     if (draft.accountStableId != activeAccountStableId) {
-        return issue(ComposerValidationField.GENERAL, "This crosspost draft belongs to another account")
+        return issue(ComposerValidationField.GENERAL, UiText.Resource(R.string.xpost_this_crosspost_draft_belongs_to_another_account))
     }
     if (!draft.isValidSourceBoundCrosspostDraft()) {
-        return issue(ComposerValidationField.GENERAL, "The crosspost source or draft is invalid")
+        return issue(ComposerValidationField.GENERAL, UiText.Resource(R.string.xpost_the_crosspost_source_or_draft_is_invalid))
     }
     val target = normalizeCrosspostComposerCommunity(draft.community)
-        ?: return issue(ComposerValidationField.COMMUNITY, "Choose a destination community")
+        ?: return issue(ComposerValidationField.COMMUNITY, UiText.Resource(R.string.xpost_choose_a_destination_community))
     if (!policy.loadedFromReddit || normalizeCrosspostComposerCommunity(policy.community) != target) {
-        return issue(ComposerValidationField.COMMUNITY, "Load the destination's posting requirements")
+        return issue(ComposerValidationField.COMMUNITY, UiText.Resource(R.string.xpost_load_the_destination_s_posting_requirements))
     }
     val destination = policy.crosspostDestination
-        ?: return issue(ComposerValidationField.COMMUNITY, "Crosspost permissions are not available")
+        ?: return issue(ComposerValidationField.COMMUNITY, UiText.Resource(R.string.xpost_crosspost_permissions_are_not_available))
     if (destination.accountStableId != activeAccountStableId ||
         normalizeCrosspostComposerCommunity(destination.community) != target
     ) {
-        return issue(ComposerValidationField.COMMUNITY, "Reload permissions for this account and destination")
+        return issue(ComposerValidationField.COMMUNITY, UiText.Resource(R.string.xpost_reload_permissions_for_this_account_and_destination))
     }
     crosspostDestinationSupportBlockingMessage(destination)?.let { message ->
         return issue(
@@ -162,23 +164,23 @@ internal fun validateCrosspostComposerDraftIssue(
         )
     }
     if (destination.userIsBanned != false || destination.userCanSubmit == false) {
-        return issue(ComposerValidationField.COMMUNITY, "Posting permission is denied or not confirmed")
+        return issue(ComposerValidationField.COMMUNITY, UiText.Resource(R.string.xpost_posting_permission_is_denied_or_not_confirmed))
     }
     val restrictedGrant = destination.userCanSubmit == true ||
         destination.userIsContributor == true || destination.userIsModerator == true
     when (destination.subredditType?.trim()?.lowercase(Locale.ROOT)) {
         "public" -> Unit
         "restricted", "private" -> if (!restrictedGrant) {
-            return issue(ComposerValidationField.COMMUNITY, "Posting here requires confirmed community permission")
+            return issue(ComposerValidationField.COMMUNITY, UiText.Resource(R.string.xpost_posting_here_requires_confirmed_community_permission))
         }
-        else -> return issue(ComposerValidationField.COMMUNITY, "This destination type is not supported yet")
+        else -> return issue(ComposerValidationField.COMMUNITY, UiText.Resource(R.string.xpost_this_destination_type_is_not_supported_yet))
     }
     // CROSSPOST01A1E4_SHARED_POST_REQUIREMENTS_PREFLIGHT_V1
     when (composerSubmitPreflightAction(policy)) {
         ComposerSubmitPreflightAction.AUTHORIZE -> {
             return issue(
                 ComposerValidationField.COMMUNITY,
-                "Authorize access to the destination's posting requirements",
+                UiText.Resource(R.string.xpost_authorize_access_to_the_destination_s_posting),
             )
         }
 
@@ -187,27 +189,27 @@ internal fun validateCrosspostComposerDraftIssue(
         -> Unit
     }
     if (destination.nsfw == true && !draft.nsfw) {
-        return issue(ComposerValidationField.GENERAL, "Mark this post NSFW for the destination community")
+        return issue(ComposerValidationField.GENERAL, UiText.Resource(R.string.xpost_mark_this_post_nsfw_for_the_destination))
     }
     if (policy.flairAuthorizationRequired || (policy.flairRequired && !policy.flairOptionsLoaded)) {
-        return issue(ComposerValidationField.FLAIR, "Load or authorize the destination's post flair")
+        return issue(ComposerValidationField.FLAIR, UiText.Resource(R.string.xpost_load_or_authorize_the_destination_s_post))
     }
     draft.flair?.let { selected ->
         if (!policy.flairOptionsLoaded) {
-            return issue(ComposerValidationField.FLAIR, "Reload the destination's post flair")
+            return issue(ComposerValidationField.FLAIR, UiText.Resource(R.string.xpost_reload_the_destination_s_post_flair))
         }
         val option = policy.flairOptions.singleOrNull { it.templateId == selected.templateId }
-            ?: return issue(ComposerValidationField.FLAIR, "Choose a current flair from the destination community")
+            ?: return issue(ComposerValidationField.FLAIR, UiText.Resource(R.string.xpost_choose_a_current_flair_from_the_destination))
         if (selected.text.length > COMPOSER_FLAIR_TEXT_MAX_LENGTH ||
             (!option.editable && selected.text != option.text) ||
             (option.editable && selected.text.isBlank())
         ) {
-            return issue(ComposerValidationField.FLAIR, "Use valid text for the selected post flair")
+            return issue(ComposerValidationField.FLAIR, UiText.Resource(R.string.xpost_use_valid_text_for_the_selected_post))
         }
     }
     if (policy.domainWhitelist.isNotEmpty() || policy.domainBlacklist.isNotEmpty()) {
         // No source URL is retained in the capsule. Never invent a domain from the wrapper URL.
-        return issue(ComposerValidationField.GENERAL, "Source-domain requirements need additional verification")
+        return issue(ComposerValidationField.GENERAL, UiText.Resource(R.string.xpost_source_domain_requirements_need_additional_verification))
     }
     // Reuse title, flair-required and body-requirement validation only; no TEXT request is built.
     // A required body fails closed because native crosspost submit cannot replace the source body.

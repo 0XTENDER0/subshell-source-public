@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import io.github.brealorg.subshell.model.CommunityModerator
 import java.io.File
@@ -50,8 +51,8 @@ class Moderation02A5A6PresentationPolicyTest {
     @Test
     fun editorStaysInsideModeratorWorkspaceAndKeepsA5A7OutOfScope() {
         val team = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/ModeratorTeam.kt")
-            .readText()
-        val app = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/SubshellApp.kt").readText()
+            .readSourceText()
+        val app = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/SubshellApp.kt").readSourceText()
 
         assertTrue(team.contains("MODERATION02A5A6_PERMISSION_EDITOR_V1"))
         assertTrue(team.contains("Edit permissions"))
@@ -73,10 +74,10 @@ class Moderation02A5A6PresentationPolicyTest {
     }
     @Test
     fun moderatorTeamRuntimeUsesOneTopLevelSubshellAppParameter() {
-        val app = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/SubshellApp.kt").readText()
+        val app = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/SubshellApp.kt").readSourceText()
         // The moderator bundles are built in MainActivityEntryPoints.kt.
-        val main = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/MainActivity.kt").readText() +
-            File("src/main/java/${SUBSHELL_PACKAGE_DIR}/MainActivityEntryPoints.kt").readText()
+        val main = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/MainActivity.kt").readSourceText() +
+            File("src/main/java/${SUBSHELL_PACKAGE_DIR}/MainActivityEntryPoints.kt").readSourceText()
 
         assertTrue(app.contains("MODERATION02A5A6_MODERATOR_TEAM_RUNTIME_BUNDLE_V1"))
         assertTrue(app.contains("data class ModeratorTeamRuntimeEntryPoints("))
@@ -93,7 +94,7 @@ class Moderation02A5A6PresentationPolicyTest {
     @Test
     fun editPermissionActionIsAttachedToItsModeratorCard() {
         val team = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/ModeratorTeam.kt")
-            .readText()
+            .readSourceText()
         val action = team
             .substringAfter("MODERATION02A5A6_PERMISSION_ACTION_CARD_ATTACHMENT_V1")
             .substringBefore("// MODERATION02A5A5_INVITE_EDITOR_V1")

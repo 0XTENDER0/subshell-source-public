@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.ui.semantics.Role
 import io.github.brealorg.subshell.data.normalizeRedditCommunityName
@@ -83,7 +85,7 @@ fun ModeratorTeamButton(onClick: () -> Unit) {
         Icon(imageVector = Symbols.Person, contentDescription = null,
             modifier = Modifier.size(18.dp))
         Spacer(modifier = Modifier.width(6.dp))
-        Text("Moderators")
+        Text(stringResource(R.string.comp_moderators))
     }
 }
 
@@ -297,15 +299,15 @@ fun ModeratorTeamContent(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Symbols.ArrowBack, "Back to Mod tools")
+                    Icon(Symbols.ArrowBack, stringResource(R.string.all_back_to_mod_tools))
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Moderators", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.comp_moderators), style = MaterialTheme.typography.headlineSmall)
                     Text("r/$communityName", style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 IconButton(enabled = canRead && !projection.loading, onClick = { onLoad(true) }) {
-                    Icon(Symbols.Refresh, "Refresh moderators")
+                    Icon(Symbols.Refresh, stringResource(R.string.all_refresh_moderators))
                 }
             }
         }
@@ -321,12 +323,11 @@ fun ModeratorTeamContent(
                 ) {
                     Icon(Symbols.PersonAdd, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Invite moderator")
+                    Text(stringResource(R.string.comp_invite_moderator))
                 }
                 if (canRead && projection.ready && !canInvite) {
                     Text(
-                        "Reddit requires All moderator permissions to invite moderators. " +
-                            "This account is not reported with All permissions.",
+                        stringResource(R.string.all2_reddit_requires_all_moderator_permissions_to_invite),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -341,11 +342,9 @@ fun ModeratorTeamContent(
             ) {
                 Column(modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Moderator permissions", style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.comp_moderator_permissions), style = MaterialTheme.typography.titleSmall)
                     Text(
-                        "Permissions are reported by Reddit. " +
-                            "Eligible moderators can be edited individually. " +
-                            "Moderator invitations are sent separately.",
+                        stringResource(R.string.all2_permissions_are_reported_by_reddit_eligible_moderators),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -362,7 +361,7 @@ fun ModeratorTeamContent(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        Text("Invitation sent", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.comp_invitation_sent), style = MaterialTheme.typography.titleSmall)
                         Text(
                             "u/$username becomes a moderator after accepting the invitation on Reddit.",
                             style = MaterialTheme.typography.bodyMedium,
@@ -382,9 +381,9 @@ fun ModeratorTeamContent(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        Text("Permissions updated", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.comp_permissions_updated), style = MaterialTheme.typography.titleSmall)
                         Text(
-                            "Reddit acknowledged the permission change for u/$username.",
+                            stringResource(R.string.all_reddit_acknowledged_the_permission_change_for_u, username),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
@@ -402,9 +401,9 @@ fun ModeratorTeamContent(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        Text("Moderator removed", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.comp_moderator_removed), style = MaterialTheme.typography.titleSmall)
                         Text(
-                            "Reddit acknowledged removal of u/$username. Refreshing the moderator list.",
+                            stringResource(R.string.all_reddit_acknowledged_removal_of_u_refreshing_the, username),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
@@ -416,8 +415,8 @@ fun ModeratorTeamContent(
                 SubshellSearchField(
                     query = query,
                     onQueryChange = { query = it.take(100) },
-                    placeholder = "Search moderators",
-                    supportingText = { Text("Filters the loaded moderator list") },
+                    placeholder = stringResource(R.string.comp_search_moderators),
+                    supportingText = { Text(stringResource(R.string.comp_filters_the_loaded_moderator_list)) },
                 )
             }
         }
@@ -428,7 +427,7 @@ fun ModeratorTeamContent(
                     verticalAlignment = Alignment.CenterVertically) {
                     InlineProgressIndicator()
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(if (projection.ready) "Refreshing moderators…" else "Loading moderators…")
+                    Text(if (projection.ready) stringResource(R.string.all_refreshing_moderators) else stringResource(R.string.all_loading_moderators))
                 }
             }
         }
@@ -439,11 +438,11 @@ fun ModeratorTeamContent(
                     Text(
                         text = when (notice) {
                             ModeratorTeamNotice.ACCESS_UNAVAILABLE ->
-                                "Moderator overview is unavailable for this account."
+                                stringResource(R.string.all_moderator_overview_is_unavailable_for_this_account)
                             ModeratorTeamNotice.MODERATORS_UNAVAILABLE ->
-                                "Moderator information could not be loaded. This does not mean the community has no moderators."
+                                stringResource(R.string.all_moderator_information_could_not_be_loaded_this)
                             ModeratorTeamNotice.REFRESH_FAILED ->
-                                "Could not refresh. Showing previously loaded moderator information."
+                                stringResource(R.string.all_could_not_refresh_showing_previously_loaded_moderator)
                         },
                         modifier = Modifier.padding(16.dp),
                         style = MaterialTheme.typography.bodyMedium,
@@ -454,7 +453,7 @@ fun ModeratorTeamContent(
         if (projection.ready && rows.isEmpty() && !projection.loading) {
             item("moderator-team-empty") {
                 Text(
-                    text = if (query.isBlank()) "Reddit returned no moderators." else "No matching moderators.",
+                    text = if (query.isBlank()) stringResource(R.string.all_reddit_returned_no_moderators) else stringResource(R.string.all_no_matching_moderators),
                     modifier = Modifier.padding(16.dp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -513,7 +512,7 @@ fun ModeratorTeamContent(
                                 modifier = Modifier.size(18.dp),
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Edit permissions")
+                            Text(stringResource(R.string.comp_edit_permissions))
                         }
                     }
                     if (canRemove) {
@@ -534,7 +533,7 @@ fun ModeratorTeamContent(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                "Remove moderator",
+                                stringResource(R.string.all_remove_moderator),
                                 color = MaterialTheme.colorScheme.error,
                             )
                         }
@@ -545,7 +544,7 @@ fun ModeratorTeamContent(
         if (projection.ready && projection.moderators.isNotEmpty()) {
             item("moderator-team-count") {
                 Text(
-                    text = "${projection.moderators.size} moderators loaded · Reddit order",
+                    text = stringResource(R.string.comp_moderators_loaded_reddit_order, projection.moderators.size),
                     modifier = Modifier.padding(horizontal = 4.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -573,7 +572,7 @@ private fun ModeratorTeamRow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 RemoteIdentityImage(
                     uri = avatarUri,
-                    contentDescription = "Avatar for u/${moderator.username}",
+                    contentDescription = stringResource(R.string.comp_avatar_for_u, moderator.username),
                     modifier = Modifier.size(44.dp).clip(CircleShape),
                 ) {
                     Surface(modifier = Modifier.fillMaxSize(), shape = CircleShape,
@@ -585,17 +584,17 @@ private fun ModeratorTeamRow(
                     }
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("u/${moderator.username}", style = MaterialTheme.typography.titleMedium,
+                    Text(stringResource(R.string.comp_u, moderator.username), style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold)
                     if (isCurrentUser) {
-                        Text("You", style = MaterialTheme.typography.labelMedium,
+                        Text(stringResource(R.string.comp_you), style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
             if (labels.isEmpty()) {
                 // The existing parser cannot distinguish omitted permissions from an empty list.
-                Text("Permission details not provided", style = MaterialTheme.typography.bodyMedium,
+                Text(stringResource(R.string.comp_permission_details_not_provided), style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -689,7 +688,7 @@ private fun ModeratorInviteEditor(
 
     pendingConfirmation?.let { pending ->
         val permissionSummary = if (pending.allPermissions) {
-            "All permissions"
+            stringResource(R.string.all_all_permissions)
         } else {
             pending.permissions
                 .map(::moderatorInvitePermissionLabel)
@@ -698,7 +697,7 @@ private fun ModeratorInviteEditor(
         }
         AlertDialog(
             onDismissRequest = { if (!busy) pendingConfirmation = null },
-            title = { Text("Invite u/${pending.username}?") },
+            title = { Text(stringResource(R.string.comp_invite_u, pending.username)) },
             text = {
                 Text(
                     "Reddit will send a moderator invitation for r/$communityName with: " +
@@ -713,7 +712,7 @@ private fun ModeratorInviteEditor(
                         onInvite(pending)
                     },
                 ) {
-                    Text("Send invitation")
+                    Text(stringResource(R.string.comp_send_invitation))
                 }
             },
             dismissButton = {
@@ -721,7 +720,7 @@ private fun ModeratorInviteEditor(
                     enabled = !busy,
                     onClick = { pendingConfirmation = null },
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.comp_cancel))
                 }
             },
         )
@@ -742,10 +741,10 @@ private fun ModeratorInviteEditor(
         item("moderator-invite-header") {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(enabled = !busy, onClick = onBack) {
-                    Icon(Symbols.ArrowBack, "Back to moderators")
+                    Icon(Symbols.ArrowBack, stringResource(R.string.all_back_to_moderators))
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Invite moderator", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.comp_invite_moderator), style = MaterialTheme.typography.headlineSmall)
                     Text("r/$communityName", style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -758,7 +757,7 @@ private fun ModeratorInviteEditor(
                 color = MaterialTheme.colorScheme.secondaryContainer,
             ) {
                 Text(
-                    "Reddit sends an invitation. The account becomes a moderator only after accepting it.",
+                    stringResource(R.string.all_reddit_sends_an_invitation_the_account_becomes),
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyMedium,
                 )
@@ -769,20 +768,20 @@ private fun ModeratorInviteEditor(
                 SubshellSearchField(
                     query = username,
                     onQueryChange = { username = it.take(24) },
-                    placeholder = "Search Reddit users",
+                    placeholder = stringResource(R.string.comp_search_reddit_users),
                     enabled = !busy,
                     supportingText = {
                         Text(
                             when {
                                 normalizedUsername != null && normalizedUsername.lowercase() in existingNames ->
-                                    "This account is already in the active moderator list"
+                                    stringResource(R.string.all_this_account_is_already_in_the_active)
                                 normalizedUsername != null && normalizedUsername.equals(
                                     activeUsername.trim().removePrefix("u/").removePrefix("U/"),
                                     ignoreCase = true,
-                                ) -> "You cannot invite your own account"
+                                ) -> stringResource(R.string.all_you_cannot_invite_your_own_account)
                                 normalizedUsername != null ->
-                                    "Select a result, or use the exact username after reviewing it"
-                                else -> "Enter a valid Reddit username"
+                                    stringResource(R.string.all_select_a_result_or_use_the_exact)
+                                else -> stringResource(R.string.all_enter_a_valid_reddit_username)
                             },
                         )
                     },
@@ -800,16 +799,16 @@ private fun ModeratorInviteEditor(
                     ) {
                         ModeratorInviteAvatar(requireNotNull(selectedPerson))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("u/${selectedPerson!!.username}", style = MaterialTheme.typography.titleMedium,
+                            Text(stringResource(R.string.comp_u, selectedPerson!!.username), style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold)
-                            Text("Selected moderator invite", style = MaterialTheme.typography.labelMedium,
+                            Text(stringResource(R.string.comp_selected_moderator_invite), style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         IconButton(enabled = !busy, onClick = {
                             selectedPerson = null
                             username = ""
                         }) {
-                            Icon(Symbols.Close, "Change moderator invite target")
+                            Icon(Symbols.Close, stringResource(R.string.all_change_moderator_invite_target))
                         }
                     }
                 }
@@ -824,14 +823,14 @@ private fun ModeratorInviteEditor(
                             verticalAlignment = Alignment.CenterVertically) {
                             InlineProgressIndicator()
                             Spacer(modifier = Modifier.width(10.dp))
-                            Text("Searching Reddit users…")
+                            Text(stringResource(R.string.comp_searching_reddit_users))
                         }
                     }
                 }
                 people.isNotEmpty() -> {
                     items(items = people, key = { "moderator-invite-${it.username.lowercase()}" }) { person ->
                         ListCard(
-                            headline = "u/${person.username}",
+                            headline = stringResource(R.string.comp_u, person.username),
                             supporting = person.description,
                             onClick = {
                                 selectedPerson = person
@@ -856,14 +855,11 @@ private fun ModeratorInviteEditor(
                                     verticalArrangement = Arrangement.spacedBy(4.dp),
                                 ) {
                                     Text(
-                                        "No profile match",
+                                        stringResource(R.string.all_no_profile_match),
                                         style = MaterialTheme.typography.titleSmall,
                                     )
                                     Text(
-                                        "Reddit search did not return a profile for " +
-                                            "u/$exactUsernameFallback. You can still try this exact " +
-                                            "username; Reddit validates the account when the " +
-                                            "invitation is sent.",
+                                        stringResource(R.string.all2_reddit_search_did_not_return_a_profile, exactUsernameFallback),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
@@ -871,7 +867,7 @@ private fun ModeratorInviteEditor(
                             }
                         } else {
                             Text(
-                                "No matching Reddit users.",
+                                stringResource(R.string.all_no_matching_reddit_users),
                                 modifier = Modifier.padding(horizontal = 4.dp),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -882,10 +878,10 @@ private fun ModeratorInviteEditor(
         }
         item("moderator-invite-permissions-title") {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("Permissions", style = MaterialTheme.typography.titleMedium,
+                Text(stringResource(R.string.comp_permissions), style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Choose only the permissions this moderator needs.",
+                    stringResource(R.string.all_choose_only_the_permissions_this_moderator_needs),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -893,8 +889,8 @@ private fun ModeratorInviteEditor(
         }
         item("moderator-invite-all-permissions") {
             ModeratorInvitePermissionRow(
-                label = "All permissions",
-                description = "Full moderator access",
+                label = stringResource(R.string.comp_all_permissions),
+                description = stringResource(R.string.comp_full_moderator_access),
                 checked = allPermissions,
                 enabled = !busy,
                 onCheckedChange = { checked ->
@@ -919,7 +915,7 @@ private fun ModeratorInviteEditor(
         }
         if (!permissionValid) {
             item("moderator-invite-permission-required") {
-                Text("Choose at least one permission or All permissions.",
+                Text(stringResource(R.string.comp_choose_at_least_one_permission_or_all),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
@@ -929,10 +925,10 @@ private fun ModeratorInviteEditor(
                 Surface(modifier = Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large,
                     color = MaterialTheme.colorScheme.tertiaryContainer) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text("Authorization required", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.comp_authorization_required), style = MaterialTheme.typography.titleSmall)
                         Text("subshell needs Reddit's moderator-management permission before it can send this invitation.")
                         FilledTonalButton(enabled = !state.authorizing, onClick = onAuthorize) {
-                            Text(if (state.authorizing) "Authorizing…" else "Authorize moderator invites")
+                            Text(if (state.authorizing) stringResource(R.string.all_authorizing) else stringResource(R.string.all_authorize_moderator_invites))
                         }
                     }
                 }
@@ -943,7 +939,7 @@ private fun ModeratorInviteEditor(
                 Surface(modifier = Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large,
                     color = MaterialTheme.colorScheme.primaryContainer) {
                     Text(
-                        "Authorization updated. Review the target and permissions, then press Invite moderator again.",
+                        stringResource(R.string.all_authorization_updated_review_the_target_and_permissions),
                         modifier = Modifier.padding(16.dp),
                     )
                 }
@@ -967,7 +963,7 @@ private fun ModeratorInviteEditor(
                     !(stateMatches && state.authorizationRequired) && !outcomeUnknown,
                 onClick = { request?.let { pendingConfirmation = it } },
             ) {
-                Text(if (busy && state.sending) "Sending invitation…" else "Invite moderator")
+                Text(if (busy && state.sending) stringResource(R.string.all_sending_invitation) else stringResource(R.string.all_invite_moderator))
             }
         }
     }
@@ -977,7 +973,7 @@ private fun ModeratorInviteEditor(
 private fun ModeratorInviteAvatar(person: RedditPeopleSearchItem) {
     RemoteIdentityImage(
         uri = person.avatarImageUri,
-        contentDescription = "Avatar for u/${person.username}",
+        contentDescription = stringResource(R.string.comp_avatar_for_u, person.username),
         modifier = Modifier.size(44.dp).clip(CircleShape),
     ) {
         Surface(modifier = Modifier.fillMaxSize(), shape = CircleShape,
@@ -1174,7 +1170,7 @@ private fun ModeratorPermissionEditor(
 
     pendingConfirmation?.let { pending ->
         val permissionSummary = if (pending.allPermissions) {
-            "All permissions"
+            stringResource(R.string.all_all_permissions)
         } else {
             pending.permissions
                 .map(::moderatorInvitePermissionLabel)
@@ -1183,7 +1179,7 @@ private fun ModeratorPermissionEditor(
         }
         AlertDialog(
             onDismissRequest = { if (!busy) pendingConfirmation = null },
-            title = { Text("Update u/${pending.username}?") },
+            title = { Text(stringResource(R.string.comp_update_u, pending.username)) },
             text = {
                 Text(
                     "Replace this moderator's permissions for r/$communityName with: " +
@@ -1198,7 +1194,7 @@ private fun ModeratorPermissionEditor(
                         onUpdate(pending)
                     },
                 ) {
-                    Text("Save changes")
+                    Text(stringResource(R.string.comp_save_changes))
                 }
             },
             dismissButton = {
@@ -1206,7 +1202,7 @@ private fun ModeratorPermissionEditor(
                     enabled = !busy,
                     onClick = { pendingConfirmation = null },
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.comp_cancel))
                 }
             },
         )
@@ -1223,10 +1219,10 @@ private fun ModeratorPermissionEditor(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(enabled = !busy, onClick = onBack) {
-                    Icon(Symbols.ArrowBack, "Back to moderators")
+                    Icon(Symbols.ArrowBack, stringResource(R.string.all_back_to_moderators))
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Edit permissions", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.comp_edit_permissions), style = MaterialTheme.typography.headlineSmall)
                     Text(
                         "u/${target.username} · r/$communityName",
                         style = MaterialTheme.typography.bodyMedium,
@@ -1242,9 +1238,7 @@ private fun ModeratorPermissionEditor(
                 color = MaterialTheme.colorScheme.secondaryContainer,
             ) {
                 Text(
-                    "This replaces the selected moderator permissions. Reddit may refuse a " +
-                        "change when the target is above you in the moderator hierarchy. " +
-                        "subshell never edits your own moderator permissions here.",
+                    stringResource(R.string.all2_this_replaces_the_selected_moderator_permissions_reddit),
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyMedium,
                 )
@@ -1252,8 +1246,8 @@ private fun ModeratorPermissionEditor(
         }
         item("moderator-permission-all") {
             ModeratorInvitePermissionRow(
-                label = "All permissions",
-                description = "Full moderator access",
+                label = stringResource(R.string.comp_all_permissions),
+                description = stringResource(R.string.comp_full_moderator_access),
                 checked = allPermissions,
                 enabled = !busy,
                 onCheckedChange = { checked ->
@@ -1285,7 +1279,7 @@ private fun ModeratorPermissionEditor(
         if (!permissionValid) {
             item("moderator-permission-required") {
                 Text(
-                    "Choose at least one permission or All permissions.",
+                    stringResource(R.string.all_choose_at_least_one_permission_or_all),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -1294,7 +1288,7 @@ private fun ModeratorPermissionEditor(
         if (permissionValid && !changed) {
             item("moderator-permission-unchanged") {
                 Text(
-                    "No permission changes selected.",
+                    stringResource(R.string.all_no_permission_changes_selected),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -1311,17 +1305,16 @@ private fun ModeratorPermissionEditor(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
-                        Text("Authorization required", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.comp_authorization_required), style = MaterialTheme.typography.titleSmall)
                         Text(
-                            "subshell needs Reddit's moderator-management permission before " +
-                                "it can update moderator permissions.",
+                            "subshell needs Reddit's moderator-management permission before it can update moderator permissions.",
                         )
                         FilledTonalButton(enabled = !state.authorizing, onClick = onAuthorize) {
                             Text(
                                 if (state.authorizing) {
-                                    "Authorizing…"
+                                    stringResource(R.string.all_authorizing)
                                 } else {
-                                    "Authorize permission changes"
+                                    stringResource(R.string.all_authorize_permission_changes)
                                 },
                             )
                         }
@@ -1337,8 +1330,7 @@ private fun ModeratorPermissionEditor(
                     color = MaterialTheme.colorScheme.primaryContainer,
                 ) {
                     Text(
-                        "Authorization updated. Review the permissions, then press Save " +
-                            "permissions again.",
+                        stringResource(R.string.all2_authorization_updated_review_the_permissions_then_press),
                         modifier = Modifier.padding(16.dp),
                     )
                 }
@@ -1362,7 +1354,7 @@ private fun ModeratorPermissionEditor(
                     !(stateMatches && state.authorizationRequired) && !outcomeUnknown,
                 onClick = { request?.let { pendingConfirmation = it } },
             ) {
-                Text(if (busy && state.sending) "Saving permissions…" else "Save permissions")
+                Text(if (busy && state.sending) stringResource(R.string.all_saving_permissions) else stringResource(R.string.all_save_permissions))
             }
         }
     }
@@ -1379,8 +1371,7 @@ private fun moderatorPermissionUpdateFailureMessage(
         ModeratorPermissionUpdateFailureKind.SESSION ->
             "The Reddit session could not authorize this moderator permission change."
         ModeratorPermissionUpdateFailureKind.AUTHORIZATION ->
-            "Reddit refused this permission change. The target may be outside your editable " +
-                "moderator hierarchy."
+            "Reddit refused this permission change. The target may be outside your editable moderator hierarchy."
         ModeratorPermissionUpdateFailureKind.HTTP ->
             "Reddit rejected the moderator permission change."
         ModeratorPermissionUpdateFailureKind.TRANSPORT ->
@@ -1390,8 +1381,7 @@ private fun moderatorPermissionUpdateFailureMessage(
         ModeratorPermissionUpdateFailureKind.VALIDATION ->
             "Reddit rejected the moderator permission details."
         ModeratorPermissionUpdateFailureKind.OUTCOME_UNKNOWN ->
-            "The permission-change outcome is unknown. Refresh the moderator list before " +
-                "trying again."
+            "The permission-change outcome is unknown. Refresh the moderator list before trying again."
         ModeratorPermissionUpdateFailureKind.ALREADY_MUTATING ->
             "Another moderator permission change is already in progress."
         ModeratorPermissionUpdateFailureKind.ACCOUNT_CHANGED ->
@@ -1440,13 +1430,10 @@ internal fun ModeratorRemovalEditor(
     pendingConfirmation?.let { pending ->
         AlertDialog(
             onDismissRequest = { if (!busy) pendingConfirmation = null },
-            title = { Text("Remove u/${pending.username}?") },
+            title = { Text(stringResource(R.string.comp_remove_u, pending.username)) },
             text = {
                 Text(
-                    "Remove u/${pending.username} from the moderator team for " +
-                        "r/$communityName? Their moderator access will be revoked. " +
-                        "Re-adding them requires a new invitation. Reddit may refuse the " +
-                        "removal when the target is above you in the moderator hierarchy.",
+                    "Remove u/${pending.username} from the moderator team for r/$communityName? Their moderator access will be revoked. Re-adding them requires a new invitation. Reddit may refuse the removal when the target is above you in the moderator hierarchy.",
                 )
             },
             confirmButton = {
@@ -1458,7 +1445,7 @@ internal fun ModeratorRemovalEditor(
                     },
                 ) {
                     Text(
-                        "Remove moderator",
+                        stringResource(R.string.all_remove_moderator),
                         color = MaterialTheme.colorScheme.error,
                     )
                 }
@@ -1468,7 +1455,7 @@ internal fun ModeratorRemovalEditor(
                     enabled = !busy,
                     onClick = { pendingConfirmation = null },
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.comp_cancel))
                 }
             },
         )
@@ -1485,10 +1472,10 @@ internal fun ModeratorRemovalEditor(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(enabled = !busy, onClick = onBack) {
-                    Icon(Symbols.ArrowBack, "Back to moderators")
+                    Icon(Symbols.ArrowBack, stringResource(R.string.all_back_to_moderators))
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Remove moderator", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.comp_remove_moderator), style = MaterialTheme.typography.headlineSmall)
                     Text(
                         "u/${target.username} · r/$communityName",
                         style = MaterialTheme.typography.bodyMedium,
@@ -1504,9 +1491,7 @@ internal fun ModeratorRemovalEditor(
                 color = MaterialTheme.colorScheme.errorContainer,
             ) {
                 Text(
-                    "Removing a moderator revokes their moderator access. " +
-                        "Re-adding them requires a new invitation. Reddit decides whether " +
-                        "this moderator can be removed based on the moderator hierarchy.",
+                    "Removing a moderator revokes their moderator access. Re-adding them requires a new invitation. Reddit decides whether this moderator can be removed based on the moderator hierarchy.",
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onErrorContainer,
@@ -1531,17 +1516,16 @@ internal fun ModeratorRemovalEditor(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
-                        Text("Authorization required", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.comp_authorization_required), style = MaterialTheme.typography.titleSmall)
                         Text(
-                            "subshell needs Reddit's moderator-management permission before " +
-                                "it can remove this moderator.",
+                            "subshell needs Reddit's moderator-management permission before it can remove this moderator.",
                         )
                         FilledTonalButton(enabled = !state.authorizing, onClick = onAuthorize) {
                             Text(
                                 if (state.authorizing) {
-                                    "Authorizing…"
+                                    stringResource(R.string.all_authorizing)
                                 } else {
-                                    "Authorize moderator removal"
+                                    stringResource(R.string.all_authorize_moderator_removal)
                                 },
                             )
                         }
@@ -1557,8 +1541,7 @@ internal fun ModeratorRemovalEditor(
                     color = MaterialTheme.colorScheme.primaryContainer,
                 ) {
                     Text(
-                        "Authorization updated. Review the target, then press Remove " +
-                            "moderator again.",
+                        stringResource(R.string.all2_authorization_updated_review_the_target_then_press),
                         modifier = Modifier.padding(16.dp),
                     )
                 }
@@ -1584,9 +1567,9 @@ internal fun ModeratorRemovalEditor(
             ) {
                 Text(
                     if (busy && state.removing) {
-                        "Removing moderator…"
+                        stringResource(R.string.all_removing_moderator)
                     } else {
-                        "Remove moderator"
+                        stringResource(R.string.all_remove_moderator)
                     },
                     color = MaterialTheme.colorScheme.error,
                 )

@@ -2,6 +2,8 @@ package io.github.brealorg.subshell.ui
 
 
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -1063,9 +1065,7 @@ fun SubshellApp(
         LaunchedEffect(drawerState.currentValue, drawerState.targetValue, drawerGesturesEnabled) {
             uiDebugLog(
                 "subshell-issue23",
-                "drawer current=${drawerState.currentValue} target=${drawerState.targetValue} " +
-                    "swipe=${state.swipeActionsEnabled} inContext=$inContext " +
-                    "gesturesEnabled=$drawerGesturesEnabled",
+                "drawer current=${drawerState.currentValue} target=${drawerState.targetValue} swipe=${state.swipeActionsEnabled} inContext=$inContext gesturesEnabled=$drawerGesturesEnabled",
             )
         }
         CompositionLocalProvider(LocalLayoutDirection provides drawerLayoutDirection) {
@@ -1330,6 +1330,7 @@ fun SubshellApp(
                             expandedWindowLayout = expandedWindowLayout,
                             inboxPrimaryTabState = inboxPrimaryTabState,
                             inboxModSectionState = inboxModSectionState,
+                            onWebSignInAgain = accountConnect.onWebSignInAgain,
                         )
                         is SubshellRoute.Secondary -> SecondaryRouteHost(
                             accountConnect = accountConnect,
@@ -1439,7 +1440,7 @@ fun SubshellApp(
                                 ExpandedListDetailSurface(
                                     scaffoldPadding = padding,
                                     listTitle = "You",
-                                    listSubtitle = "Drafts",
+                                    listSubtitle = stringResource(R.string.all2_drafts),
                                     listContent = { listModifier ->
                                         mainYouProfileContent(
                                             state.activeAccountUsername,

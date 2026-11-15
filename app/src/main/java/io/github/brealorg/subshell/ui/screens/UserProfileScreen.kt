@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import io.github.brealorg.subshell.R
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.ui.error.ReportFailureDiagnostic
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.FlowRow
@@ -329,13 +333,13 @@ fun UserProfileScreen(
     // saved route, a short link) used to crash while building the feed keys.
     if (authenticated && !isValidRedditUsername(username)) {
         Column(modifier = modifier.fillMaxSize().padding(24.dp)) {
-            Text("This user can't be shown", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.scr_this_user_can_t_be_shown), style = MaterialTheme.typography.titleMedium)
             Text(
                 "u/$username isn't a valid Reddit username.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            onBack?.let { back -> TextButton(onClick = back) { Text("Back") } }
+            onBack?.let { back -> TextButton(onClick = back) { Text(stringResource(R.string.scr_back)) } }
         }
         return
     }
@@ -668,19 +672,21 @@ fun UserProfileScreen(
                 failureKind = submittedPostsFailure,
                 details = activeRedditFeedState.failureDetails,
                 retryable = activeRedditFeedState.failureRetryable,
-            ).copy(title = "Couldn't load more profile posts")
+            ).copy(title = UiText.Plain(stringResource(R.string.all_couldn_t_load_more_profile_posts)))
         } else {
             redditFeedErrorPresentation(
                 failureKind = submittedPostsFailure,
                 details = activeRedditFeedState.failureDetails,
                 retryable = activeRedditFeedState.failureRetryable,
                 showingCachedContent = true,
-            ).copy(title = "Couldn't refresh posts")
+            ).copy(title = UiText.Plain(stringResource(R.string.all_couldn_t_refresh_posts)))
         }
         base.copy(
-            message = base.message.replace(
-                "Posts already loaded",
-                "Profile posts already loaded",
+            message = UiText.Plain(
+                (base.message as UiText.Plain).value.replace(
+                    stringResource(R.string.all_posts_already_loaded),
+                    stringResource(R.string.all_profile_posts_already_loaded),
+                ),
             ),
         )
     } else {
@@ -1269,7 +1275,7 @@ fun UserProfileScreen(
     ) {
         if (onBack != null) {
             RouteTopBar(
-                title = "u/${user.username}",
+                title = stringResource(R.string.scr_u, user.username),
                 scrollBehavior = routeTopBarScroll,
                 onBack = if (showBackButton) onBack else null,
                 actions = {
@@ -1293,7 +1299,7 @@ fun UserProfileScreen(
                                         modifier = Modifier.size(17.dp),
                                     )
                                     Spacer(Modifier.width(6.dp))
-                                    Text(if (userBlockInProgress) "Blocking…" else "Unblock")
+                                    Text(if (userBlockInProgress) stringResource(R.string.all_blocking) else stringResource(R.string.all_unblock))
                                 }
                             } else {
                                 OutlinedButton(
@@ -1308,7 +1314,7 @@ fun UserProfileScreen(
                                         modifier = Modifier.size(17.dp),
                                     )
                                     Spacer(Modifier.width(6.dp))
-                                    Text(if (userBlockInProgress) "Unblocking…" else "Block")
+                                    Text(if (userBlockInProgress) stringResource(R.string.all_unblocking) else stringResource(R.string.all_block))
                                 }
                             }
                         } else if (following) {
@@ -1324,7 +1330,7 @@ fun UserProfileScreen(
                                     modifier = Modifier.size(17.dp),
                                 )
                                 Spacer(Modifier.width(6.dp))
-                                Text("Following")
+                                Text(stringResource(R.string.scr_following))
                             }
                         } else {
                             Button(
@@ -1333,7 +1339,7 @@ fun UserProfileScreen(
                                 modifier = Modifier.height(40.dp),
                                 contentPadding = PaddingValues(horizontal = 17.dp),
                             ) {
-                                Text("Follow")
+                                Text(stringResource(R.string.scr_follow))
                             }
                         }
                     }
@@ -1534,7 +1540,7 @@ fun UserProfileScreen(
                             } else {
                                 ProfileBannerPlaceholder(
                                     accent = accent,
-                                    label = if (profileUnavailable) null else "No profile banner",
+                                    label = if (profileUnavailable) null else stringResource(R.string.all_no_profile_banner),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(112.dp),
@@ -1595,10 +1601,10 @@ fun UserProfileScreen(
                                     end = 14.dp,
                                 ),
                             ) {
-                                Text("u/${user.username}", style = MaterialTheme.typography.headlineSmall)
+                                Text(stringResource(R.string.scr_u, user.username), style = MaterialTheme.typography.headlineSmall)
                                 Text(
                                     if (profileUnavailable) {
-                                        "Unavailable on Reddit"
+                                        stringResource(R.string.all_unavailable_on_reddit)
                                     } else {
                                         "Redditor for ${user.accountAge}"
                                     },
@@ -1711,7 +1717,7 @@ fun UserProfileScreen(
                                         details = activeRedditFeedState.failureDetails,
                                         retryable = activeRedditFeedState.failureRetryable,
                                         showingCachedContent = false,
-                                    ).copy(title = "Couldn't load profile posts"),
+                                    ).copy(title = UiText.Plain(stringResource(R.string.all_couldn_t_load_profile_posts))),
                                     diagnosticScopeKey = "profile_posts",
                                     onAction = { action ->
                                         if (action == ErrorActionKind.RETRY) {
@@ -1727,8 +1733,8 @@ fun UserProfileScreen(
                                 val presentation = when {
                                     activeRedditFeedState.inProgress ->
                                         ProfileEmptyPresentation(
-                                            title = "Loading posts…",
-                                            description = "Fetching submitted posts for u/$username.",
+                                            title = stringResource(R.string.scr_loading_posts),
+                                            description = stringResource(R.string.scr_fetching_submitted_posts_for_u, username),
                                         )
                                     knownPublicPostActivity ->
                                         profilePrivacyEmptyPresentation()
@@ -1745,8 +1751,8 @@ fun UserProfileScreen(
                             }
                         } else {
                             EmptyProfileTab(
-                                "No local posts",
-                                "This user has no post fixtures yet.",
+                                stringResource(R.string.all_no_local_posts),
+                                stringResource(R.string.all_this_user_has_no_post_fixtures_yet),
                             )
                         }
                     }
@@ -1827,14 +1833,14 @@ fun UserProfileScreen(
 
                                 else ->
                                     EmptyProfileTab(
-                                        "Loading comments…",
-                                        "Fetching Reddit comments for u/$username.",
+                                        stringResource(R.string.all_loading_comments),
+                                        stringResource(R.string.all_fetching_reddit_comments_for_u, username),
                                     )
                             }
                         } else {
                             EmptyProfileTab(
-                                "No local comments",
-                                "This user has no comment fixtures yet.",
+                                stringResource(R.string.all_no_local_comments),
+                                stringResource(R.string.all_this_user_has_no_comment_fixtures_yet),
                             )
                         }
                     }
@@ -1920,14 +1926,14 @@ fun UserProfileScreen(
 
                                 activeRedditSavedHistoryState.inProgress ->
                                     EmptyProfileTab(
-                                        "Loading saved posts and comments…",
-                                        "Fetching Reddit Saved for u/$username.",
+                                        stringResource(R.string.all_loading_saved_posts_and_comments),
+                                        stringResource(R.string.all_fetching_reddit_saved_for_u, username),
                                     )
 
                                 activeRedditSavedHistoryState.loaded ->
                                     EmptyProfileTab(
-                                        "No saved posts or comments",
-                                        "Saved posts and comments will appear here.",
+                                        stringResource(R.string.all_no_saved_posts_or_comments),
+                                        stringResource(R.string.all_saved_posts_and_comments_will_appear_here),
                                     )
 
                                 // ISSUE117_SAVED_ROW_NEVER_BLANK_V1: not loaded,
@@ -1937,8 +1943,8 @@ fun UserProfileScreen(
                                 // shown as loading.
                                 else ->
                                     EmptyProfileTab(
-                                        "Loading saved posts and comments…",
-                                        "Fetching Reddit Saved for u/$username.",
+                                        stringResource(R.string.all_loading_saved_posts_and_comments),
+                                        stringResource(R.string.all_fetching_reddit_saved_for_u, username),
                                     )
                             }
                         }
@@ -2051,7 +2057,7 @@ fun UserProfileScreen(
                                     activeRedditAccountHistoryState.inProgress ->
                                         EmptyProfileTab(
                                             "Loading ${authenticatedRedditAccountHistoryKind.activityLabel.lowercase()}…",
-                                            "Fetching Reddit account history for u/$username.",
+                                            stringResource(R.string.all_fetching_reddit_account_history_for_u, username),
                                         )
                                     else ->
                                         EmptyProfileTab(
@@ -2120,7 +2126,7 @@ fun UserProfileScreen(
                             activeBlockedAccountsState.inProgress -> {
                             item("blocked-accounts-loading") {
                                 EmptyProfileTab(
-                                    "Loading blocked accounts…",
+                                    stringResource(R.string.all_loading_blocked_accounts),
                                     "Fetching your authoritative blocked-account list from Reddit.",
                                 )
                             }
@@ -2130,8 +2136,8 @@ fun UserProfileScreen(
                             visibleBlockedAccounts.isEmpty() -> {
                             item("blocked-accounts-empty") {
                                 EmptyProfileTab(
-                                    "No blocked accounts",
-                                    "Accounts you block on Reddit will appear here.",
+                                    stringResource(R.string.all_no_blocked_accounts),
+                                    stringResource(R.string.all_accounts_you_block_on_reddit_will_appear),
                                 )
                             }
                         }
@@ -2143,11 +2149,11 @@ fun UserProfileScreen(
                                     verticalArrangement = Arrangement.spacedBy(3.dp),
                                 ) {
                                     Text(
-                                        "Blocked accounts",
+                                        stringResource(R.string.all_blocked_accounts),
                                         style = MaterialTheme.typography.titleLarge,
                                     )
                                     Text(
-                                        "Manage people you've blocked on Reddit.",
+                                        stringResource(R.string.all_manage_people_you_ve_blocked_on_reddit),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
@@ -2187,8 +2193,8 @@ fun UserProfileScreen(
                     if (profileDrafts.isEmpty()) {
                         item("no-drafts") {
                             EmptyProfileTab(
-                                "No drafts",
-                                "Leaving Create saves anything you have started here.",
+                                stringResource(R.string.all_no_drafts),
+                                stringResource(R.string.all_leaving_create_saves_anything_you_have_started),
                             )
                         }
                     } else {
@@ -2504,9 +2510,9 @@ private fun BlockedAccountRow(
     onUnblock: () -> Unit,
 ) {
     ListCard(
-        headline = "u/${account.username}",
+        headline = stringResource(R.string.scr_u, account.username),
         supporting = account.blockedAtEpochSeconds?.let { epochSeconds ->
-            "Blocked ${formatBlockedAccountDate(epochSeconds)}"
+            stringResource(R.string.all_blocked_2, formatBlockedAccountDate(epochSeconds))
         },
         onClick = onOpen,
         shape = MaterialTheme.shapes.large,
@@ -2528,7 +2534,7 @@ private fun BlockedAccountRow(
                 enabled = !inProgress,
                 contentPadding = PaddingValues(horizontal = 14.dp),
             ) {
-                Text(if (inProgress) "Unblocking…" else "Unblock")
+                Text(if (inProgress) stringResource(R.string.all_unblocking) else stringResource(R.string.all_unblock))
             }
         },
     )
@@ -2546,26 +2552,26 @@ internal fun BlockedAccountsError(
     val needsAuthorization = state.failureKind == ContentSafetyFailureKind.AUTHORIZATION
     val message = when (state.failureKind) {
         ContentSafetyFailureKind.AUTHORIZATION ->
-            "Reddit authorization is required to read blocked accounts."
+            stringResource(R.string.all_reddit_authorization_is_required_to_read_blocked)
         ContentSafetyFailureKind.HTTP ->
             state.statusCode?.let { "Reddit rejected the blocked-account request. HTTP $it" }
                 ?: "Reddit rejected the blocked-account request."
         ContentSafetyFailureKind.TRANSPORT ->
-            "Couldn't reach Reddit to load blocked accounts."
+            stringResource(R.string.all_couldn_t_reach_reddit_to_load_blocked)
         ContentSafetyFailureKind.PROTOCOL ->
             "Reddit returned an unexpected blocked-account response."
         else ->
-            "Blocked accounts couldn't be loaded from Reddit."
+            stringResource(R.string.all_blocked_accounts_couldn_t_be_loaded_from)
     }
     ErrorNotice(
         presentation = ErrorPresentation(
             kind = ErrorPresentationKind.INLINE,
-            title = "Couldn't load blocked accounts",
+            title = stringResource(R.string.scr_couldn_t_load_blocked_accounts),
             message = message,
             primaryAction = when {
                 state.authorizing -> null
-                needsAuthorization -> ErrorAction(ErrorActionKind.SIGN_IN, "Authorize")
-                state.retryable -> ErrorAction(ErrorActionKind.RETRY, "Retry")
+                needsAuthorization -> ErrorAction(ErrorActionKind.SIGN_IN, stringResource(R.string.all_authorize))
+                state.retryable -> ErrorAction(ErrorActionKind.RETRY, stringResource(R.string.all_retry))
                 else -> null
             },
         ).withFailureDetails(state.failureDetails),
@@ -2614,7 +2620,7 @@ private fun ProfileDraftCard(
                         append(
                             draft.community.takeIf(String::isNotBlank)
                                 ?.let { "r/$it" }
-                                ?: "No community selected",
+                                ?: stringResource(R.string.all_no_community_selected),
                         )
                         append(" · ${draft.type.label}")
                         draft.flair?.text?.takeIf(String::isNotBlank)?.let { flair ->
@@ -2636,7 +2642,7 @@ private fun ProfileDraftCard(
                 }
             }
             IconButton(onClick = onDelete) {
-                Icon(Symbols.Delete, contentDescription = "Delete draft")
+                Icon(Symbols.Delete, contentDescription = stringResource(R.string.scr_delete_draft))
             }
         }
     }
@@ -2744,12 +2750,12 @@ private fun SavedHistoryStatus(
         ) {
             Text(
                 text = when {
-                    state.authorizing -> "Waiting for Reddit authorization…"
+                    state.authorizing -> stringResource(R.string.all_waiting_for_reddit_authorization)
                     state.authorizationRequired ->
-                        "Reddit needs history permission before subshell can load Saved."
+                        stringResource(R.string.all_reddit_needs_history_permission_before_subshell_can)
                     state.failureKind != null ->
-                        "Could not load saved posts and comments from Reddit."
-                    else -> "Saved is unavailable."
+                        stringResource(R.string.all_could_not_load_saved_posts_and_comments)
+                    else -> stringResource(R.string.all_saved_is_unavailable)
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (state.failureKind != null) {
@@ -2764,12 +2770,12 @@ private fun SavedHistoryStatus(
                         enabled = !state.authorizing,
                         onClick = onAuthorize,
                     ) {
-                        Text(if (state.authorizing) "Authorizing…" else "Enable activity")
+                        Text(if (state.authorizing) stringResource(R.string.all_authorizing) else stringResource(R.string.all_enable_activity))
                     }
 
                 state.failureKind != null && state.failureRetryable ->
                     TextButton(onClick = onRetry) {
-                        Text("Retry")
+                        Text(stringResource(R.string.scr_retry))
                     }
             }
         }
@@ -2795,13 +2801,13 @@ private fun AccountHistoryStatus(
             Text(
                 text = when {
                     state.authorizing ->
-                        "Waiting for Reddit authorization…"
+                        stringResource(R.string.all_waiting_for_reddit_authorization)
                     state.authorizationRequired ->
                         "Reddit needs history permission before subshell can load ${kind.activityLabel.lowercase()} activity for this account."
                     state.failureKind != null ->
-                        state.failureKind.accountHistoryFailureMessage(state.failureDetails?.httpStatusCode)
+                        state.failureKind.accountHistoryFailureMessage(state.failureDetails?.httpStatusCode).asString()
                     else ->
-                        "Reddit account history is unavailable."
+                        stringResource(R.string.all_reddit_account_history_is_unavailable)
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color =
@@ -2820,38 +2826,38 @@ private fun AccountHistoryStatus(
                     ) {
                         Text(
                             if (state.authorizing) {
-                                "Authorizing…"
+                                stringResource(R.string.all_authorizing)
                             } else {
-                                "Enable activity"
+                                stringResource(R.string.all_enable_activity)
                             },
                         )
                     }
 
                 state.failureKind != null && state.failureRetryable ->
                     TextButton(onClick = onRetry) {
-                        Text("Retry")
+                        Text(stringResource(R.string.scr_retry))
                     }
             }
         }
     }
 }
 
-private fun RedditAccountHistoryUiFailureKind.accountHistoryFailureMessage(httpStatusCode: Int?): String = when (this) {
+private fun RedditAccountHistoryUiFailureKind.accountHistoryFailureMessage(httpStatusCode: Int?): UiText = when (this) {
     RedditAccountHistoryUiFailureKind.CLIENT_CONFIGURATION ->
-        "Reddit account history is not configured for this account."
+        UiText.Resource(R.string.history_error_not_configured)
     RedditAccountHistoryUiFailureKind.SESSION ->
-        "The Reddit session needs attention before account history can load."
+        UiText.Resource(R.string.history_error_session)
     // ISSUE208_SERVER_FAILURES_ARE_NOT_REJECTIONS_V1
     RedditAccountHistoryUiFailureKind.HTTP ->
-        redditReadHttpReason(httpStatusCode, "Reddit rejected the account history request.")
+        redditReadHttpReason(httpStatusCode, UiText.Resource(R.string.history_error_rejected))
     RedditAccountHistoryUiFailureKind.TRANSPORT ->
-        "Reddit could not be reached. Cached activity remains available."
+        UiText.Resource(R.string.history_error_transport)
     RedditAccountHistoryUiFailureKind.PROTOCOL ->
-        "Reddit returned an unexpected account history response."
+        UiText.Resource(R.string.history_error_protocol)
     RedditAccountHistoryUiFailureKind.STORAGE ->
-        "Account history could not be read from local storage."
+        UiText.Resource(R.string.history_error_storage)
     RedditAccountHistoryUiFailureKind.END_REACHED ->
-        "There is no more Reddit account history to load."
+        UiText.Resource(R.string.history_error_end_reached)
 }
 
 @Composable
@@ -2889,11 +2895,11 @@ private fun ProfileCommentsStatus(
             Text(
                 text = when {
                     state.authorizing ->
-                        "Waiting for Reddit authorization…"
+                        stringResource(R.string.all_waiting_for_reddit_authorization)
                     state.authorizationRequired ->
-                        "Reddit needs one additional permission before subshell can load profile comments for this account."
+                        stringResource(R.string.all_reddit_needs_one_additional_permission_before_subshell)
                     else ->
-                        "Reddit profile comments are unavailable."
+                        stringResource(R.string.all_reddit_profile_comments_are_unavailable)
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -2906,9 +2912,9 @@ private fun ProfileCommentsStatus(
                 ) {
                     Text(
                         if (state.authorizing) {
-                            "Authorizing…"
+                            stringResource(R.string.all_authorizing)
                         } else {
-                            "Enable comments"
+                            stringResource(R.string.all_enable_comments)
                         },
                     )
                 }
@@ -2972,8 +2978,8 @@ internal fun ProfileComment(
         ?: relatedPost?.title
         ?.trim()
         ?.takeIf(String::isNotEmpty)
-        ?: "Open discussion"
-    val communityLabel = communityName?.let(state::subredditLabel) ?: "Reddit"
+        ?: stringResource(R.string.all_open_discussion)
+    val communityLabel = communityName?.let(state::subredditLabel) ?: stringResource(R.string.all_reddit)
 
     // M3225_LIST_ROWS_ARE_LIST_ITEMS_V1: a comment card (Markdown body, not a
     // list row); its click is clipped to the card and says it is a button.
@@ -3032,7 +3038,7 @@ internal fun ProfileComment(
                 if (saved) {
                     Icon(
                         imageVector = Symbols.BookmarkFilled,
-                        contentDescription = "Saved comment",
+                        contentDescription = stringResource(R.string.scr_saved_comment),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(18.dp),
                     )
@@ -3051,7 +3057,7 @@ internal fun ProfileComment(
                 )
             }
             Text(
-                text = if (comment.score == 1) "1 point" else "${comment.score} points",
+                text = pluralStringResource(R.plurals.profile_points, comment.score, comment.score),
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -3069,17 +3075,14 @@ internal fun profileUnavailablePresentation(): ProfileEmptyPresentation =
     ProfileEmptyPresentation(
         title = "Profile unavailable",
         description =
-            "This Reddit profile could not be found. The account may have been deleted, " +
-                "suspended, or otherwise unavailable.",
+            "This Reddit profile could not be found. The account may have been deleted, suspended, or otherwise unavailable.",
     )
 
 internal fun profilePrivacyEmptyPresentation(): ProfileEmptyPresentation =
     ProfileEmptyPresentation(
         title = "Profile privacy may be enabled",
         description =
-            "This user may have enabled Reddit's profile privacy settings. " +
-                "Some posts and comments can be hidden from their profile while " +
-                "remaining visible elsewhere on Reddit.",
+            "This user may have enabled Reddit's profile privacy settings. Some posts and comments can be hidden from their profile while remaining visible elsewhere on Reddit.",
     )
 
 internal fun publicProfileEmptyPresentation(
@@ -3102,7 +3105,7 @@ internal fun publicProfileEmptyPresentation(
 private fun ProfileBannerPlaceholder(
     accent: Color,
     modifier: Modifier = Modifier,
-    label: String? = "No profile banner",
+    label: String? = stringResource(R.string.all_no_profile_banner),
 ) {
     Box(
         modifier = modifier.background(

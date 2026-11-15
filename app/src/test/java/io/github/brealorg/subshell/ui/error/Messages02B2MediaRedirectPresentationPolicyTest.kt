@@ -1,10 +1,17 @@
 package io.github.brealorg.subshell.ui.error
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.error.FailureDetails
 import io.github.brealorg.subshell.data.error.LocalFailureKind
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// TRANSLATE03: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Messages02B2MediaRedirectPresentationPolicyTest {
     @Test
     fun unresolved308IsPresentedAsRedirectNotRejection() {
@@ -16,8 +23,8 @@ class Messages02B2MediaRedirectPresentationPolicyTest {
             ),
         )
 
-        assertTrue(presentation.message.contains("redirected", ignoreCase = true))
-        assertTrue(!presentation.message.contains("rejected", ignoreCase = true))
+        assertTrue(presentation.message.s.contains("redirected", ignoreCase = true))
+        assertTrue(!presentation.message.s.contains("rejected", ignoreCase = true))
     }
 
     @Test
@@ -31,7 +38,7 @@ class Messages02B2MediaRedirectPresentationPolicyTest {
             ),
         )
 
-        assertTrue(presentation.message.contains("blocked", ignoreCase = true))
-        assertTrue(presentation.message.contains("secure", ignoreCase = true))
+        assertTrue(presentation.message.s.contains("blocked", ignoreCase = true))
+        assertTrue(presentation.message.s.contains("secure", ignoreCase = true))
     }
 }

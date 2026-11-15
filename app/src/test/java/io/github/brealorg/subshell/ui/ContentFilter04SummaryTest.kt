@@ -60,9 +60,9 @@ class ContentFilter04SummaryTest {
 
     @Test
     fun theRowTextCountsPosts() {
-        assertEquals("1 post hidden by your filters", filteredPostsSummaryText(1, revealed = false))
-        assertEquals("3 posts hidden by your filters", filteredPostsSummaryText(3, revealed = false))
-        assertEquals("Showing 3 posts your filters hide", filteredPostsSummaryText(3, revealed = true))
+        assertEquals("1 post hidden by your filters", filteredPostsSummaryText(1, revealed = false).s)
+        assertEquals("3 posts hidden by your filters", filteredPostsSummaryText(3, revealed = false).s)
+        assertEquals("Showing 3 posts your filters hide", filteredPostsSummaryText(3, revealed = true).s)
     }
 
     @Test

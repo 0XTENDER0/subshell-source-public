@@ -108,12 +108,12 @@ class Issue239CommunityPostNotificationsComposeTest {
         openMenu()
         clickText("Notify about new posts")
         assertTrue(state.isWatchingCommunityPosts("pics"))
-        assertEquals("Notifications on for r/pics", notices.currentRequest?.presentation?.title)
+        assertEquals("Notifications on for r/pics", notices.currentRequest?.presentation?.title?.s)
 
         openMenu()
         clickText("Stop new-post notifications")
         assertFalse(state.isWatchingCommunityPosts("pics"))
-        assertEquals("Notifications off for r/pics", notices.currentRequest?.presentation?.title)
+        assertEquals("Notifications off for r/pics", notices.currentRequest?.presentation?.title?.s)
     }
 
     @Test
@@ -128,7 +128,7 @@ class Issue239CommunityPostNotificationsComposeTest {
         assertFalse(state.isWatchingCommunityPosts("pics"))
         assertEquals(
             "You get notifications from $MAX_WATCHED_COMMUNITIES communities",
-            notices.currentRequest?.presentation?.title,
+            notices.currentRequest?.presentation?.title?.s,
         )
     }
 

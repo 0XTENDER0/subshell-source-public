@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.data.account.ModeratorReportTarget
 import io.github.brealorg.subshell.data.account.ModeratorReportsUiState
 import io.github.brealorg.subshell.data.account.RedditModerationUiState
@@ -60,5 +63,5 @@ internal fun moderatorReportLookupContent(
     return ModeratorReportLookupContent(queueItems, recentTargets, queueMessage)
 }
 
-internal fun moderatorReportQuantity(count: Int): String =
-    if (count == 1) "1 report" else "$count reports"
+internal fun moderatorReportQuantity(count: Int): UiText =
+    UiText.Plural(R.plurals.report_count, count, count)

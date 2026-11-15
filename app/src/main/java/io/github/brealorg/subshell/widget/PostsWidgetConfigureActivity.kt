@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.widget
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
@@ -109,13 +111,13 @@ internal fun PostsWidgetSourcePicker(
 ) {
     var filter by rememberSaveable { mutableStateOf("") }
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Show posts from") }) },
+        topBar = { TopAppBar(title = { Text(stringResource(R.string.sw_show_posts_from)) }) },
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             OutlinedTextField(
                 value = filter,
                 onValueChange = { value -> filter = value },
-                label = { Text("Find a community") },
+                label = { Text(stringResource(R.string.sw_find_a_community)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             )
@@ -125,7 +127,7 @@ internal fun PostsWidgetSourcePicker(
                 if (query.isEmpty()) {
                     item(key = "home") {
                         SourceRow(
-                            label = "Home",
+                            label = stringResource(R.string.sw_home),
                             supporting = "Your Home feed",
                             selected = current.community == null,
                             onClick = { onPick(PostsWidgetSource.Home) },
@@ -136,7 +138,7 @@ internal fun PostsWidgetSourcePicker(
                 when {
                     communities == null -> item(key = "loading") {
                         ListItem(
-                            content = { Text("Loading your communities…") },
+                            content = { Text(stringResource(R.string.sw_loading_your_communities)) },
                             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         )
                     }
@@ -172,7 +174,7 @@ private fun SourceRow(label: String, supporting: String?, selected: Boolean, onC
             )
         },
         supportingContent = supporting?.let { text -> { Text(text) } },
-        trailingContent = if (selected) ({ Icon(Symbols.Check, contentDescription = "Shown now", tint = MaterialTheme.colorScheme.primary) }) else null,
+        trailingContent = if (selected) ({ Icon(Symbols.Check, contentDescription = stringResource(R.string.sw_shown_now), tint = MaterialTheme.colorScheme.primary) }) else null,
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         modifier = Modifier.clickable(onClick = onClick),
     )

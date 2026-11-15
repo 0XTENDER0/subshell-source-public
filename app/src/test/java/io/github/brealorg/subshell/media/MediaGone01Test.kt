@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.media
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -67,12 +68,12 @@ class MediaGone01Test {
     @Test
     fun aRemovedImageReadsRemovedWithoutAnAction() {
         val removed = remoteMediaErrorPresentation(RemoteMediaKind.IMAGE, FailureDetails(httpStatusCode = 404, retryable = false))
-        assertEquals("Image removed", removed.title)
+        assertEquals("Image removed", removed.title.s)
         assertNull(removed.primaryAction)
-        assertEquals("GIF removed", remoteMediaErrorPresentation(RemoteMediaKind.GIF, FailureDetails(httpStatusCode = 410)).title)
+        assertEquals("GIF removed", remoteMediaErrorPresentation(RemoteMediaKind.GIF, FailureDetails(httpStatusCode = 410)).title.s)
         assertEquals(
             "Couldn't load image",
-            remoteMediaErrorPresentation(RemoteMediaKind.IMAGE, FailureDetails(httpStatusCode = 500, retryable = true)).title,
+            remoteMediaErrorPresentation(RemoteMediaKind.IMAGE, FailureDetails(httpStatusCode = 500, retryable = true)).title.s,
         )
     }
 

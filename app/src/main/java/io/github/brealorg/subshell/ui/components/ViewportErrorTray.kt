@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -78,8 +80,12 @@ internal fun ViewportErrorTrayHost(
         exit = slideOutVertically(targetOffsetY = { height -> height }) + fadeOut(),
     ) {
         val current = request ?: return@AnimatedVisibility
+        // ISSUE303B_AN_EXPIRED_WEB_SIGN_IN_OFFERS_SIGN_IN_AGAIN_V1: the tray's
+        // one action button also carries a sign-in action; onRetry is the
+        // reporter's callback for the primary action either way.
         val retryAction = current.presentation.primaryAction?.takeIf { action ->
-            action.kind == ErrorActionKind.RETRY && current.onRetry != null
+            (action.kind == ErrorActionKind.RETRY || action.kind == ErrorActionKind.SIGN_IN) &&
+                current.onRetry != null
         }
         val showDetails = current.failureDetails.hasMeaningfulExpandedDetails()
         // ISSUE32_TRAY_MESSAGE_CAN_BE_READ_IN_FULL_V1 (owner: a cut-off message
@@ -121,7 +127,7 @@ internal fun ViewportErrorTrayHost(
                     )
                     Spacer(Modifier.width(10.dp))
                     Text(
-                        text = current.presentation.title,
+                        text = current.presentation.title.asString(),
                         modifier = Modifier.weight(1f),
                         style = MaterialTheme.typography.titleSmall,
                         color = if (info) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error,
@@ -135,13 +141,13 @@ internal fun ViewportErrorTrayHost(
                         if (info) {
                             Icon(
                                 imageVector = Symbols.Close,
-                                contentDescription = "Dismiss notice",
+                                contentDescription = stringResource(R.string.comp_dismiss_notice),
                                 modifier = Modifier.size(18.dp),
                             )
                         } else {
                             Icon(
                                 imageVector = Symbols.Close,
-                                contentDescription = "Dismiss error",
+                                contentDescription = stringResource(R.string.comp_dismiss_error),
                                 modifier = Modifier.size(18.dp),
                             )
                         }
@@ -149,7 +155,7 @@ internal fun ViewportErrorTrayHost(
                 }
 
                 Text(
-                    text = current.presentation.message,
+                    text = current.presentation.message.asString(),
                     modifier = Modifier.padding(start = 30.dp, end = 8.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -176,18 +182,18 @@ internal fun ViewportErrorTrayHost(
                 ) {
                     if (messageCut || messageExpanded) {
                         TextButton(onClick = { messageExpanded = !messageExpanded }) {
-                            Text(if (messageExpanded) "Less" else "More")
+                            Text(if (messageExpanded) stringResource(R.string.all_less) else stringResource(R.string.all_more))
                         }
                     }
                     if (showDetails) {
                         TextButton(onClick = state::openDetails) {
-                            Text("Details")
+                            Text(stringResource(R.string.comp_details))
                         }
                     }
                     retryAction?.let { action ->
                         TextButton(onClick = state::retryCurrent) {
                             Text(
-                                text = action.label,
+                                text = action.label.asString(),
                                 color = accent,
                             )
                         }
@@ -226,7 +232,7 @@ internal fun ViewportErrorDetailsSheet(
                     tint = MaterialTheme.colorScheme.error,
                 )
                 Text(
-                    text = "Error details",
+                    text = stringResource(R.string.comp_error_details),
                     style = MaterialTheme.typography.titleLarge,
                 )
             }
@@ -246,7 +252,7 @@ internal fun ViewportErrorDetailsSheet(
                     },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Retry")
+                    Text(stringResource(R.string.comp_retry))
                 }
             }
         }
@@ -263,7 +269,7 @@ private fun FailureDetailsTable(
             add(item.label to item.value)
         }
         if (details?.retryable == null) {
-            add("Retryable" to if (retryAvailable) "Yes" else "Not available")
+            add(stringResource(R.string.all_retryable) to if (retryAvailable) "Yes" else stringResource(R.string.all_not_available))
         }
     }
 

@@ -146,6 +146,11 @@ internal class AuthConnectViewModel internal constructor(
     ): AuthBrowserLaunchResult =
         connectFlow.beginReauthentication(accountStableId)
 
+    suspend fun beginWebSignInAgain(
+        accountStableId: String,
+    ): AuthBrowserLaunchResult =
+        connectFlow.beginWebSignInAgain(accountStableId)
+
     fun browserLaunchFailed() {
         viewModelScope.launch { connectFlow.browserLaunchFailed() }
     }

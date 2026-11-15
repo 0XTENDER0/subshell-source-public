@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -145,18 +147,18 @@ fun PostManageScreen(
     if (scopedState.phase == PostManagePhase.AUTHORIZATION_REQUIRED) {
         AlertDialog(
             onDismissRequest = onCancelAuthorization,
-            title = { Text("Permission required") },
+            title = { Text(stringResource(R.string.scr_permission_required)) },
             text = {
                 Text(postManageAuthorizationMessage(scopedState.operation))
             },
             confirmButton = {
                 TextButton(onClick = onAuthorize) {
-                    Text("Authorize")
+                    Text(stringResource(R.string.scr_authorize))
                 }
             },
             dismissButton = {
                 TextButton(onClick = onCancelAuthorization) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.scr_cancel))
                 }
             },
         )
@@ -217,7 +219,7 @@ fun PostManageScreen(
         topBar = {
             RouteTopBar(
                 scrollBehavior = routeTopBarScroll,
-                title = { Text(if (asModerator) "Moderate post" else "Manage post") },
+                title = { Text(if (asModerator) stringResource(R.string.all_moderate_post) else stringResource(R.string.all_manage_post)) },
                 navigationIcon = {
                     IconButton(
                         enabled = !closeLocked,
@@ -229,7 +231,7 @@ fun PostManageScreen(
                     ) {
                         Icon(
                             Symbols.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.scr_back),
                         )
                     }
                 },
@@ -253,7 +255,7 @@ fun PostManageScreen(
                     Row(modifier = Modifier.padding(16.dp)) {
                         InlineProgressIndicator()
                         Spacer(Modifier.size(12.dp))
-                        Text("Loading current Reddit settings…")
+                        Text(stringResource(R.string.scr_loading_current_reddit_settings))
                     }
                 }
                 scopedState.phase == PostManagePhase.FAILED && snapshot == null -> {
@@ -270,8 +272,8 @@ fun PostManageScreen(
                     val controlsEnabled = !scopedState.inProgress
                     ListItem(
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                        content = { Text("Post flair") },
-                        supportingContent = { Text(snapshot.flairText ?: "No flair") },
+                        content = { Text(stringResource(R.string.scr_post_flair)) },
+                        supportingContent = { Text(snapshot.flairText ?: stringResource(R.string.all_no_flair)) },
                         trailingContent = {
                             TextButton(
                                 enabled = controlsEnabled,
@@ -290,9 +292,9 @@ fun PostManageScreen(
                             ) {
                                 Text(
                                     if (snapshot.flairAuthorizationRequired) {
-                                        "Grant access"
+                                        stringResource(R.string.all_grant_access)
                                     } else {
-                                        "Change"
+                                        stringResource(R.string.all_change)
                                     },
                                 )
                             }
@@ -316,9 +318,9 @@ fun PostManageScreen(
                                 )
                             },
                         ),
-                        content = { Text("NSFW") },
+                        content = { Text(stringResource(R.string.scr_nsfw)) },
                         supportingContent = {
-                            Text("Mark this post as not safe for work")
+                            Text(stringResource(R.string.scr_mark_this_post_as_not_safe_for))
                         },
                         trailingContent = {
                             Switch(
@@ -345,9 +347,9 @@ fun PostManageScreen(
                                 )
                             },
                         ),
-                        content = { Text("Spoiler") },
+                        content = { Text(stringResource(R.string.scr_spoiler)) },
                         supportingContent = {
-                            Text("Hide previews behind a spoiler warning")
+                            Text(stringResource(R.string.scr_hide_previews_behind_a_spoiler_warning))
                         },
                         trailingContent = {
                             Switch(
@@ -376,9 +378,9 @@ fun PostManageScreen(
                                     )
                                 },
                             ),
-                            content = { Text("Reply notifications") },
+                            content = { Text(stringResource(R.string.scr_reply_notifications)) },
                             supportingContent = {
-                                Text("Receive Reddit inbox replies for this post")
+                                Text(stringResource(R.string.scr_receive_reddit_inbox_replies_for_this_post))
                             },
                             trailingContent = {
                                 Switch(
@@ -392,11 +394,10 @@ fun PostManageScreen(
                             HorizontalDivider()
                             ListItem(
                                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                                content = { Text("Published media") },
+                                content = { Text(stringResource(R.string.scr_published_media)) },
                                 supportingContent = {
                                     Text(
-                                        "Reddit does not expose a supported operation to replace " +
-                                            "the published media asset. Metadata above can still be changed.",
+                                        stringResource(R.string.all2_reddit_does_not_expose_a_supported_operation),
                                     )
                                 },
                             )
@@ -414,9 +415,9 @@ fun PostManageScreen(
                             Spacer(Modifier.size(12.dp))
                             Text(
                                 if (scopedState.phase == PostManagePhase.SENDING) {
-                                    "Saving on Reddit…"
+                                    stringResource(R.string.all_saving_on_reddit)
                                 } else {
-                                    "Authorizing…"
+                                    stringResource(R.string.all_authorizing)
                                 },
                             )
                         }
@@ -425,7 +426,7 @@ fun PostManageScreen(
                                 onClick = onCancelAuthorization,
                                 modifier = Modifier.padding(horizontal = 8.dp),
                             ) {
-                                Text("Cancel authorization")
+                                Text(stringResource(R.string.scr_cancel_authorization))
                             }
                         }
                     }
@@ -451,8 +452,7 @@ private fun postManageAuthorizationMessage(
     -> "Reddit's flair permission is required to change post flair."
     PostManageOperation.SET_NSFW,
     PostManageOperation.SET_SPOILER,
-    -> "Reddit's post-moderation permission is required by this endpoint. " +
-        "subshell requests it only when you change NSFW or spoiler status."
+    -> "Reddit's post-moderation permission is required by this endpoint. subshell requests it only when you change NSFW or spoiler status."
     PostManageOperation.SET_SEND_REPLIES ->
         "Reddit's edit permission is required to change reply notifications."
     null -> "Reddit requires additional permission for this change."

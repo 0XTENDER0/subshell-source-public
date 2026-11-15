@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,7 +53,7 @@ internal fun SubshellSearchField(
         Icon(Symbols.Search, contentDescription = null)
     },
     trailingIcon: (@Composable () -> Unit)? = null,
-    clearLabel: String = "Clear search",
+    clearLabel: String = stringResource(R.string.all_clear_search),
     containerColor: Color = SearchBarDefaults.colors().containerColor,
     supportingText: (@Composable () -> Unit)? = null,
     fieldModifier: Modifier = Modifier,

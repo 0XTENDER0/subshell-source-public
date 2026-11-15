@@ -90,7 +90,7 @@ fun ErrorNotice(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
-                        text = presentation.title,
+                        text = presentation.title.asString(),
                         style = if (blocking) {
                             MaterialTheme.typography.titleMedium
                         } else {
@@ -99,7 +99,7 @@ fun ErrorNotice(
                         color = MaterialTheme.colorScheme.error,
                     )
                     Text(
-                        text = presentation.message,
+                        text = presentation.message.asString(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -226,12 +226,12 @@ private fun DegradedErrorNotice(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Text(
-                    text = presentation.title,
+                    text = presentation.title.asString(),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.error,
                 )
                 Text(
-                    text = presentation.message,
+                    text = presentation.message.asString(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -252,13 +252,13 @@ private fun DegradedErrorNotice(
                 ) {
                     presentation.secondaryAction?.let { action ->
                         TextButton(onClick = { onAction(action.kind) }) {
-                            Text(action.label)
+                            Text(action.label.asString())
                         }
                     }
                     presentation.primaryAction?.let { action ->
                         TextButton(onClick = { onAction(action.kind) }) {
                             Text(
-                                text = action.label,
+                                text = action.label.asString(),
                                 color = MaterialTheme.colorScheme.error,
                             )
                         }
@@ -285,7 +285,7 @@ private fun ErrorActionRow(
     ) {
         secondaryAction?.let { action ->
             TextButton(onClick = { onAction(action.kind) }) {
-                Text(action.label)
+                Text(action.label.asString())
             }
         }
         primaryAction?.let { action ->
@@ -297,12 +297,12 @@ private fun ErrorActionRow(
                         contentColor = MaterialTheme.colorScheme.onErrorContainer,
                     ),
                 ) {
-                    Text(action.label)
+                    Text(action.label.asString())
                 }
             } else {
                 TextButton(onClick = { onAction(action.kind) }) {
                     Text(
-                        text = action.label,
+                        text = action.label.asString(),
                         color = MaterialTheme.colorScheme.error,
                     )
                 }

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.harness.readSourceText
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.ui.unit.LayoutDirection
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
@@ -160,5 +161,5 @@ class Issue16SwipeActionsPolicyTest {
     }
 
     private fun source(relative: String): String =
-        File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative").readText()
+        File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative").readSourceText()
 }

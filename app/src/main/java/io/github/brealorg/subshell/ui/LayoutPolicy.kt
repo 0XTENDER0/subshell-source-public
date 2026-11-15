@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -62,17 +64,18 @@ internal fun navigationBarBaseHeightForFontScale(fontScale: Float): Dp =
     }
 
 // A11Y01A11_LARGE_TEXT_BOTTOM_NAV_LABEL_V1
+@androidx.annotation.StringRes
 internal fun navigationVisualLabel(
     destination: MainDestination,
     fontScale: Float,
-): String =
+): Int =
     if (
         destination == MainDestination.SUBS &&
         fontScale >= LargeTextNavigationBarFontScaleThreshold
     ) {
-        "Subs"
+        io.github.brealorg.subshell.R.string.nav_subs
     } else {
-        destination.label
+        destination.labelRes
     }
 
 // A11Y01A2_EXPANDED_MAIN_BREAKPOINT_V1
@@ -84,7 +87,8 @@ internal fun useNavigationRail(windowSizeClass: WindowSizeClass): Boolean =
 
 // M3224_NAVIGATION_RAIL_FROM_MEDIUM_WIDTH_V1: the rail names the destination
 // as the bottom bar does ("Communities", not "Subs").
-internal fun navigationRailVisualLabel(destination: MainDestination): String = destination.label
+@androidx.annotation.StringRes
+internal fun navigationRailVisualLabel(destination: MainDestination): Int = destination.labelRes
 
 internal fun useExpandedHomePostListDetail(
     expandedWindow: Boolean,

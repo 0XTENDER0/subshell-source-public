@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import io.github.brealorg.subshell.ui.symbols.Symbols
 import java.io.File
@@ -13,14 +14,14 @@ class Mute01A2VisibilityManagementPolicyTest {
             .listFiles { file -> file.extension == "kt" }
             .orEmpty()
             .sortedBy { file -> file.name }
-            .joinToString("") { file -> file.readText() }
+            .joinToString("") { file -> file.readSourceText() }
         return source("ui/SubshellApp.kt") + extracted
     }
 
     private fun source(relative: String): String {
         val path = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative")
         check(path.isFile) { "Missing source fixture: ${path.path}" }
-        return path.readText()
+        return path.readSourceText()
     }
 
     @Test
@@ -38,6 +39,7 @@ class Mute01A2VisibilityManagementPolicyTest {
     fun drawerRetainsCommunityNavigationAndAddsMuteManagement() {
         val source = appSource()
 
+        // TRANSLATE04: the source is read with its string resources expanded (readSourceText).
         assertTrue(source.contains("label = \"Muted communities\""))
         assertTrue(source.contains("activeCommunityMutes.size.toString()"))
         assertTrue(source.contains("badge = if (state.isCommunityMuted(community.name))"))

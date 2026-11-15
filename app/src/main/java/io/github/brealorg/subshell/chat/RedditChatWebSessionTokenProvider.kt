@@ -23,14 +23,81 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 internal sealed interface RedditChatWebTokenResult {
+    /**
+     * [fresh] is true for a token minted by this call, false for one from the
+     * cache. A Matrix 401 on a fresh token means Reddit's web sign-in itself has
+     * expired (ISSUE303B_A_MATRIX_401_ON_A_FRESH_TOKEN_IS_AN_EXPIRED_WEB_SIGN_IN_V1): Reddit then mints
+     * a logged-out token, and only signing in again helps.
+     */
     data class Success(
         val token: String,
         val expiresAtEpochMs: Long?,
+        val fresh: Boolean = false,
     ) : RedditChatWebTokenResult
 
     data object NoRedditWebSession : RedditChatWebTokenResult
-    data object Failed : RedditChatWebTokenResult
+
+    /**
+     * ISSUE303_CHAT_TOKEN_FAILURE_NAMES_ITS_STEP_V1: [step] is a short code
+     * (no content) that a device report shows, so a failed mint says whether
+     * the page never loaded, Reddit answered with an error status, the answer
+     * had no token, the script failed, or no WebView could be made.
+     */
+    data class Failed(val step: String) : RedditChatWebTokenResult
 }
+
+/** ISSUE303B_THE_MINT_LOADS_THE_HOME_PAGE_V1 */
+internal const val REDDIT_CHAT_TOKEN_BOOTSTRAP_URL = "https://www.reddit.com/"
+
+internal const val CHAT_WEB_TOKEN_PAGE_TIMEOUT = "CHAT_WEB_TOKEN_PAGE_TIMEOUT"
+internal const val CHAT_WEB_TOKEN_FETCH_TIMEOUT = "CHAT_WEB_TOKEN_FETCH_TIMEOUT"
+internal const val CHAT_WEB_TOKEN_NO_TOKEN = "CHAT_WEB_TOKEN_NO_TOKEN"
+internal const val CHAT_WEB_TOKEN_SCRIPT = "CHAT_WEB_TOKEN_SCRIPT"
+internal const val CHAT_WEB_TOKEN_WEBVIEW = "CHAT_WEB_TOKEN_WEBVIEW"
+internal const val CHAT_WEB_TOKEN_CANCELLED = "CHAT_WEB_TOKEN_CANCELLED"
+internal const val CHAT_WEB_TOKEN_HTTP_PREFIX = "CHAT_WEB_TOKEN_HTTP_"
+
+/** The token answer read into a result; [status] is the HTTP status the page script saw. */
+internal fun redditChatTokenAnswer(
+    status: Int,
+    responseBody: String,
+): RedditChatWebTokenResult {
+    if (status !in 200..299) {
+        val code = if (status in 100..599) status.toString() else "OTHER"
+        return RedditChatWebTokenResult.Failed(CHAT_WEB_TOKEN_HTTP_PREFIX + code)
+    }
+    val parsed = runCatching { JSONObject(responseBody) }.getOrNull()
+    val token = parsed
+        ?.optString("token")
+        ?.trim()
+        ?.takeIf(String::isNotEmpty)
+        ?: return RedditChatWebTokenResult.Failed(CHAT_WEB_TOKEN_NO_TOKEN)
+    val expires = redditChatTokenExpiryEpochMs(expires = parsed.opt("expires"), token = token)
+    return RedditChatWebTokenResult.Success(token = token, expiresAtEpochMs = expires)
+}
+
+/**
+ * ISSUE303B_A_MATRIX_401_ON_A_FRESH_TOKEN_IS_AN_EXPIRED_WEB_SIGN_IN_V1: a cached
+ * token can simply be stale (it is dropped and the next call mints again); a
+ * just-minted one refused with 401 is the logged-out token Reddit mints for an
+ * expired `reddit_session` (seen on the Pixel 11, 2026-11-14).
+ */
+internal fun redditChatWebSignInExpired(
+    token: RedditChatWebTokenResult.Success,
+    matrixStatusCode: Int,
+): Boolean = token.fresh && matrixStatusCode == 401
+
+/**
+ * ISSUE303_CSRF_COMES_FROM_THE_COOKIE_STORE_V1: the csrf_token value as the
+ * cookie store holds it (the page's document.cookie may not show it). Only a
+ * plain token shape is returned, so it can be put into the script as is.
+ */
+internal fun redditChatCsrfCookieValue(cookieHeader: String): String? = cookieHeader
+    .split(';')
+    .map { it.trim() }
+    .firstOrNull { it.startsWith("csrf_token=") }
+    ?.substringAfter('=', missingDelimiterValue = "")
+    ?.takeIf { value -> value.length in 1..256 && value.all { it.isLetterOrDigit() || it == '-' || it == '_' } }
 
 internal data class RedditChatCachedWebToken(
     val token: String,
@@ -112,104 +179,122 @@ internal class RedditChatWebSessionTokenProvider(
                 }
                 cachedToken = null
 
-                val bootstrapUrl = if (cookies.contains("csrf_token=")) {
-                    REDDIT_BOOTSTRAP_URL
-                } else {
-                    REDDIT_ORIGIN + "/"
-                }
-
-                // SECAUDIT12_CHAT_BRIDGE_ANSWERS_ONLY_ITS_OWN_SCRIPT_V1 (security
-                // audit #12): any reddit.com frame in this WebView can call the
-                // bridge. Only the injected script knows this mint's nonce, so
-                // a call without it is ignored (it can neither feed a token nor
-                // end the mint early).
-                val bridgeNonce = UUID.randomUUID().toString()
-                suspendCancellableCoroutine<RedditChatWebTokenResult> { continuation ->
-                    val handler = Handler(Looper.getMainLooper())
-                    var finished = false
-                    var fetchStarted = false
-                    lateinit var webView: WebView
-
-                    fun complete(result: RedditChatWebTokenResult) {
-                        if (finished) return
-                        finished = true
-                        handler.removeCallbacksAndMessages(null)
-                        runCatching {
-                            webView.removeJavascriptInterface(BRIDGE_NAME)
-                            webView.stopLoading()
-                            webView.loadUrl("about:blank")
-                            webView.destroy()
-                        }
-                        if (continuation.isActive) continuation.resume(result)
-                    }
-
-                    val bridge = object {
-                        @JavascriptInterface
-                        fun onToken(nonce: String?, responseBody: String) {
-                            if (!redditChatBridgeCallIsOwn(bridgeNonce, nonce)) return
-                            handler.post {
-                                val parsed = runCatching { JSONObject(responseBody) }.getOrNull()
-                                val token = parsed
-                                    ?.optString("token")
-                                    ?.trim()
-                                    ?.takeIf(String::isNotEmpty)
-                                if (token == null) {
-                                    complete(RedditChatWebTokenResult.Failed)
-                                } else {
-                                    val expires = redditChatTokenExpiryEpochMs(
-                                        expires = parsed.opt("expires"),
-                                        token = token,
-                                    )
-                                    if (
-                                        expires != null &&
-                                        nowEpochMs() < expires - TOKEN_EXPIRY_SKEW_MS
-                                    ) {
-                                        cachedToken = RedditChatCachedWebToken(
-                                            token = token,
-                                            expiresAtEpochMs = expires,
-                                            redditSessionFingerprint = sessionFingerprint,
-                                        )
-                                    }
-                                    complete(
-                                        RedditChatWebTokenResult.Success(
-                                            token = token,
-                                            expiresAtEpochMs = expires,
-                                        ),
-                                    )
-                                }
-                            }
-                        }
-
-                        @JavascriptInterface
-                        fun onError(nonce: String?, reason: String) {
-                            if (!redditChatBridgeCallIsOwn(bridgeNonce, nonce)) return
-                            @Suppress("UNUSED_VARIABLE")
-                            val ignored = reason
-                            handler.post { complete(RedditChatWebTokenResult.Failed) }
-                        }
-                    }
-
-                    webView = createPinnedWebView(
-                        bridge = bridge,
-                        onRedditPageReady = {
-                            if (!fetchStarted) {
-                                fetchStarted = true
-                                webView.evaluateJavascript(redditChatTokenFetchScript(bridgeNonce), null)
-                            }
-                        },
-                    )
-                    continuation.invokeOnCancellation {
-                        handler.post { complete(RedditChatWebTokenResult.Failed) }
-                    }
-                    handler.postDelayed(
-                        { complete(RedditChatWebTokenResult.Failed) },
-                        TOKEN_TIMEOUT_MS,
-                    )
-                    webView.loadUrl(bootstrapUrl)
-                }
+                // ISSUE303B_THE_MINT_LOADS_THE_HOME_PAGE_V1: Reddit answers the
+                // token call from robots.txt with a 403 block page (seen on the
+                // Pixel 11 with a valid sign-in, 2026-11-14), which is what broke
+                // #303; from the home page it answers with a token.
+                mint(bootstrapUrl = REDDIT_CHAT_TOKEN_BOOTSTRAP_URL, sessionFingerprint = sessionFingerprint)
             }
         } finally {
             mintMutex.unlock()
+        }
+    }
+
+    private suspend fun mint(
+        bootstrapUrl: String,
+        sessionFingerprint: String,
+    ): RedditChatWebTokenResult {
+        // SECAUDIT12_CHAT_BRIDGE_ANSWERS_ONLY_ITS_OWN_SCRIPT_V1 (security
+        // audit #12): any reddit.com frame in this WebView can call the
+        // bridge. Only the injected script knows this mint's nonce, so
+        // a call without it is ignored (it can neither feed a token nor
+        // end the mint early).
+        val bridgeNonce = UUID.randomUUID().toString()
+        return suspendCancellableCoroutine<RedditChatWebTokenResult> { continuation ->
+            val handler = Handler(Looper.getMainLooper())
+            var finished = false
+            var fetchStarted = false
+            var webView: WebView? = null
+
+            fun complete(result: RedditChatWebTokenResult) {
+                if (finished) return
+                finished = true
+                handler.removeCallbacksAndMessages(null)
+                webView?.let { view ->
+                    runCatching {
+                        view.removeJavascriptInterface(BRIDGE_NAME)
+                        view.stopLoading()
+                        view.loadUrl("about:blank")
+                        view.destroy()
+                    }
+                }
+                if (continuation.isActive) continuation.resume(result)
+            }
+
+            val bridge = object {
+                @JavascriptInterface
+                fun onToken(nonce: String?, status: Int, responseBody: String) {
+                    if (!redditChatBridgeCallIsOwn(bridgeNonce, nonce)) return
+                    handler.post {
+                        val result = redditChatTokenAnswer(
+                            status = status,
+                            responseBody = responseBody,
+                        )
+                        if (result is RedditChatWebTokenResult.Success) {
+                            val expires = result.expiresAtEpochMs
+                            if (
+                                expires != null &&
+                                nowEpochMs() < expires - TOKEN_EXPIRY_SKEW_MS
+                            ) {
+                                cachedToken = RedditChatCachedWebToken(
+                                    token = result.token,
+                                    expiresAtEpochMs = expires,
+                                    redditSessionFingerprint = sessionFingerprint,
+                                )
+                            }
+                            complete(result.copy(fresh = true))
+                        } else {
+                            complete(result)
+                        }
+                    }
+                }
+
+                @JavascriptInterface
+                fun onError(nonce: String?, reason: String) {
+                    if (!redditChatBridgeCallIsOwn(bridgeNonce, nonce)) return
+                    @Suppress("UNUSED_VARIABLE")
+                    val ignored = reason
+                    handler.post { complete(RedditChatWebTokenResult.Failed(CHAT_WEB_TOKEN_SCRIPT)) }
+                }
+            }
+
+            continuation.invokeOnCancellation {
+                handler.post { complete(RedditChatWebTokenResult.Failed(CHAT_WEB_TOKEN_CANCELLED)) }
+            }
+            // A WebView that cannot be made (the provider is missing or
+            // being updated) is a failed mint, not a crash of the send.
+            val view = try {
+                createPinnedWebView(
+                    bridge = bridge,
+                    onRedditPageReady = { readyView ->
+                        if (!fetchStarted) {
+                            fetchStarted = true
+                            val csrf = redditChatCsrfCookieValue(
+                                CookieManager.getInstance().getCookie(REDDIT_ORIGIN).orEmpty(),
+                            )
+                            readyView.evaluateJavascript(
+                                redditChatTokenFetchScript(bridgeNonce, csrf),
+                                null,
+                            )
+                        }
+                    },
+                )
+            } catch (_: RuntimeException) {
+                complete(RedditChatWebTokenResult.Failed(CHAT_WEB_TOKEN_WEBVIEW))
+                return@suspendCancellableCoroutine
+            }
+            webView = view
+            handler.postDelayed(
+                {
+                    complete(
+                        RedditChatWebTokenResult.Failed(
+                            if (fetchStarted) CHAT_WEB_TOKEN_FETCH_TIMEOUT else CHAT_WEB_TOKEN_PAGE_TIMEOUT,
+                        ),
+                    )
+                },
+                TOKEN_TIMEOUT_MS,
+            )
+            view.loadUrl(bootstrapUrl)
         }
     }
 
@@ -226,7 +311,7 @@ internal class RedditChatWebSessionTokenProvider(
     @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     private fun createPinnedWebView(
         bridge: Any,
-        onRedditPageReady: () -> Unit,
+        onRedditPageReady: (WebView) -> Unit,
     ): WebView = WebView(appContext).apply {
         settings.javaScriptEnabled = true
         settings.domStorageEnabled = true
@@ -261,7 +346,7 @@ internal class RedditChatWebSessionTokenProvider(
 
             override fun onPageFinished(view: WebView, url: String) {
                 if (isRedditHttps(Uri.parse(url))) {
-                    onRedditPageReady()
+                    onRedditPageReady(view)
                 }
             }
         }
@@ -276,7 +361,6 @@ internal class RedditChatWebSessionTokenProvider(
     companion object {
         private const val BRIDGE_NAME = "SubshellChatTokenBridge"
         private const val REDDIT_ORIGIN = "https://www.reddit.com"
-        private const val REDDIT_BOOTSTRAP_URL = "https://www.reddit.com/robots.txt"
         private const val TOKEN_TIMEOUT_MS = 12_000L
         internal const val TOKEN_EXPIRY_SKEW_MS = 5 * 60 * 1_000L
     }
@@ -317,9 +401,17 @@ internal fun redditChatBridgeCallIsOwn(expectedNonce: String, receivedNonce: Str
             receivedNonce.toByteArray(Charsets.UTF_8),
         )
 
-/** The token fetch, run in the main frame only; [nonce] is a UUID (no quote can break out). */
-internal fun redditChatTokenFetchScript(nonce: String): String {
+/**
+ * The token fetch, run in the main frame only; [nonce] is a UUID and [csrf] a
+ * plain token (letters, digits, - and _), so no quote can break out. Without
+ * [csrf] the script reads the page's own cookie. The bridge gets the HTTP
+ * status with the answer (ISSUE303_CHAT_TOKEN_FAILURE_NAMES_ITS_STEP_V1).
+ */
+internal fun redditChatTokenFetchScript(nonce: String, csrf: String? = null): String {
     require(nonce.all { it.isLetterOrDigit() || it == '-' }) { "Bridge nonce must be a UUID" }
+    require(csrf == null || csrf.all { it.isLetterOrDigit() || it == '-' || it == '_' }) {
+        "CSRF value must be a plain token"
+    }
     return """
             (function(){
               var nonce = '$nonce';
@@ -327,7 +419,8 @@ internal fun redditChatTokenFetchScript(nonce: String): String {
                 var csrfCookie = document.cookie.split(';')
                   .map(function(v){ return v.trim(); })
                   .find(function(v){ return v.indexOf('csrf_token=') === 0; });
-                var csrf = csrfCookie ? decodeURIComponent(csrfCookie.substring('csrf_token='.length)) : '';
+                var csrf = '${csrf.orEmpty()}' ||
+                  (csrfCookie ? decodeURIComponent(csrfCookie.substring('csrf_token='.length)) : '');
                 fetch('/svc/shreddit/token', {
                   method: 'POST',
                   credentials: 'include',
@@ -337,8 +430,11 @@ internal fun redditChatTokenFetchScript(nonce: String): String {
                   },
                   body: JSON.stringify({csrf_token: csrf})
                 })
-                .then(function(response){ return response.text(); })
-                .then(function(body){ SubshellChatTokenBridge.onToken(nonce, body); })
+                .then(function(response){
+                  return response.text().then(function(body){
+                    SubshellChatTokenBridge.onToken(nonce, response.status, body);
+                  });
+                })
                 .catch(function(error){ SubshellChatTokenBridge.onError(nonce, String(error)); });
               } catch (error) {
                 SubshellChatTokenBridge.onError(nonce, String(error));

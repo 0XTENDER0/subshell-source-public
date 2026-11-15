@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,10 +43,10 @@ internal fun NewPostNotificationsSettingsScreen(
     val routeTopBarScroll = rememberRouteTopBarScrollBehavior()
     Column(modifier.fillMaxSize().nestedScroll(routeTopBarScroll.nestedScrollConnection)) {
         RouteTopBar(
-            title = { Text("New posts") },
+            title = { Text(stringResource(R.string.sw_new_posts)) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Symbols.ArrowBack, contentDescription = "Back")
+                    Icon(Symbols.ArrowBack, contentDescription = stringResource(R.string.sw_back))
                 }
             },
             scrollBehavior = routeTopBarScroll,
@@ -71,9 +73,8 @@ internal fun NewPostNotificationsSettingsScreen(
                     color = MaterialTheme.colorScheme.surfaceContainerLow,
                 ) {
                     NotificationTypeRow(
-                        title = "Also new comments",
-                        description = "A notification for each new comment in these communities. " +
-                            "Your own posts and comments never notify you.",
+                        title = stringResource(R.string.sw_also_new_comments),
+                        description = "A notification for each new comment in these communities. Your own posts and comments never notify you.",
                         checked = state.notifyNewComments,
                         enabled = state.communityPostNotificationsAvailable,
                         onCheckedChange = state::updateNotifyNewComments,
@@ -100,7 +101,7 @@ internal fun NewPostNotificationsSettingsScreen(
                                     content = { Text(label) },
                                     trailingContent = {
                                         IconButton(onClick = { state.setWatchingCommunityPosts(name, watch = false) }) {
-                                            Icon(Symbols.Close, contentDescription = "Stop notifications from $label")
+                                            Icon(Symbols.Close, contentDescription = stringResource(R.string.sw_stop_notifications_from, label))
                                         }
                                     },
                                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
@@ -117,8 +118,7 @@ internal fun NewPostNotificationsSettingsScreen(
 internal fun newPostNotificationsExplanation(available: Boolean, empty: Boolean): String = when {
     !available -> "Sign in to a Reddit account to get notifications about new posts."
     empty -> "No communities yet. Open a community and choose ⋮ › Notify about new posts."
-    else -> "A notification for each new post, checked every 15 minutes. " +
-        "Add a community from its ⋮ menu; up to $MAX_WATCHED_COMMUNITIES."
+    else -> "A notification for each new post, checked every 15 minutes. Add a community from its ⋮ menu; up to $MAX_WATCHED_COMMUNITIES."
 }
 
 /** The summary under Settings › Notifications › New posts. */

@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.layout.layout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -130,7 +132,7 @@ internal fun FlairRichTextLabel(
                             uri = imageUrl,
                             label = segment.emojiRef
                                 ?.takeIf(String::isNotBlank)
-                                ?: "Flair emoji",
+                                ?: stringResource(R.string.all_flair_emoji),
                             modifier = Modifier.size(emojiSize),
                             aspectRatio = null,
                             containerColor = Color.Transparent,

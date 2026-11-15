@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.data.account.localFixtureAccountSummaries
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
@@ -200,5 +201,5 @@ class Backup02A2TransactionalRestoreTest {
     }
 
     private fun source(relative: String): String =
-        File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative").readText()
+        File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative").readSourceText()
 }

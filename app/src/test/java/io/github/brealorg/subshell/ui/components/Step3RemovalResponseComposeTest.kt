@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.s
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasClickAction
@@ -215,7 +216,7 @@ class Step3RemovalResponseComposeTest {
 
         assertEquals(
             "Reddit removed the item, but the removal message was not sent.",
-            notices.currentRequest?.presentation?.message,
+            notices.currentRequest?.presentation?.message?.s,
         )
     }
 

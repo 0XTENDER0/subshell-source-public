@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.data.auth.reddit
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.account.NsfwPreferencesResult
 import io.github.brealorg.subshell.data.account.QuarantineOptInResult
 import io.github.brealorg.subshell.data.auth.AuthAccountIdentity
@@ -32,6 +36,9 @@ import org.junit.Test
  * (ISSUE211_QUARANTINE_OPT_IN_NEEDS_SUBSCRIBE_V1), and "View anyway" says why
  * when it did not go through (ISSUE211_QUARANTINE_OPT_IN_RESULT_IS_SHOWN_V1).
  */
+// TRANSLATE03: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue211QuarantineOptInTest {
     private val config = OAuthProviderConfiguration(
         provider = OAuthProvider.REDDIT,
@@ -118,7 +125,7 @@ class Issue211QuarantineOptInTest {
         assertEquals(QuarantineOptInResult.Sent, answering(302).sendQuarantineOptIn("example"))
         assertEquals(QuarantineOptInResult.Refused(403), answering(403).sendQuarantineOptIn("example"))
         assertTrue(
-            quarantineOptInPresentation(QuarantineOptInResult.Refused(403), "r/x")!!.message.contains("verified email"),
+            quarantineOptInPresentation(QuarantineOptInResult.Refused(403), "r/x")!!.message.s.contains("verified email"),
         )
     }
 
@@ -127,8 +134,8 @@ class Issue211QuarantineOptInTest {
         assertNull(quarantineOptInPresentation(QuarantineOptInResult.Sent, "r/x"))
         assertNull(quarantineOptInPresentation(QuarantineOptInResult.OutcomeUnknown, "r/x"))
         val missing = assertNotNull(quarantineOptInPresentation(QuarantineOptInResult.MissingPermission, "r/x"))
-        assertEquals("Couldn't open r/x", missing!!.title)
-        assertTrue(missing.message.contains("permission"))
+        assertEquals("Couldn't open r/x", missing!!.title.s)
+        assertTrue(missing.message.s.contains("permission"))
         assertNotNull(quarantineOptInPresentation(QuarantineOptInResult.Refused(403), "r/x"))
     }
 

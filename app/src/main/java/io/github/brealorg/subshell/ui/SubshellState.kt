@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.ui.theme.AppTextScale
 import io.github.brealorg.subshell.ui.theme.AppUiScale
 import io.github.brealorg.subshell.backup.PortableCommunityMute
@@ -240,11 +242,11 @@ internal fun accountSessionForPersistence(
     }
 }
 
-enum class MainDestination(val label: String) {
-    HOME("Home"),
-    SUBS("Communities"),
-    INBOX("Inbox"),
-    YOU("You"),
+enum class MainDestination(val label: String, @androidx.annotation.StringRes val labelRes: Int) {
+    HOME("Home", io.github.brealorg.subshell.R.string.nav_home),
+    SUBS("Communities", io.github.brealorg.subshell.R.string.nav_communities),
+    INBOX("Inbox", io.github.brealorg.subshell.R.string.nav_inbox),
+    YOU("You", io.github.brealorg.subshell.R.string.nav_you),
 }
 
 // LOWUI4_LIBRARY_RETIRED_V1 (OCB-225): nothing opened LIBRARY since the You
@@ -257,35 +259,35 @@ enum class SecondaryDestination {
     NEW_MESSAGE,
 }
 
-enum class FeedSort(val label: String) {
-    BEST("Best"),
-    HOT("Hot"),
-    NEW("New"),
-    RISING("Rising"),
-    TOP("Top"),
-    CONTROVERSIAL("Controversial"),
+enum class FeedSort(@androidx.annotation.StringRes val labelRes: Int) {
+    BEST(io.github.brealorg.subshell.R.string.sort_feed_best),
+    HOT(io.github.brealorg.subshell.R.string.sort_feed_hot),
+    NEW(io.github.brealorg.subshell.R.string.sort_feed_new),
+    RISING(io.github.brealorg.subshell.R.string.sort_feed_rising),
+    TOP(io.github.brealorg.subshell.R.string.sort_feed_top),
+    CONTROVERSIAL(io.github.brealorg.subshell.R.string.sort_feed_controversial),
 }
 
-enum class CommunitySort(val label: String) {
-    HOT("Hot"),
-    NEW("New"),
-    RISING("Rising"),
-    TOP("Top"),
-    CONTROVERSIAL("Controversial"),
+enum class CommunitySort(@androidx.annotation.StringRes val labelRes: Int) {
+    HOT(io.github.brealorg.subshell.R.string.sort_community_hot),
+    NEW(io.github.brealorg.subshell.R.string.sort_community_new),
+    RISING(io.github.brealorg.subshell.R.string.sort_community_rising),
+    TOP(io.github.brealorg.subshell.R.string.sort_community_top),
+    CONTROVERSIAL(io.github.brealorg.subshell.R.string.sort_community_controversial),
 }
 
-enum class FeedSource(val label: String) {
-    HOME("Home"),
-    POPULAR("Popular"),
-    ALL("All"),
-    SAVED("Saved"),
+enum class FeedSource(@androidx.annotation.StringRes val labelRes: Int) {
+    HOME(io.github.brealorg.subshell.R.string.source_feed_home),
+    POPULAR(io.github.brealorg.subshell.R.string.source_feed_popular),
+    ALL(io.github.brealorg.subshell.R.string.source_feed_all),
+    SAVED(io.github.brealorg.subshell.R.string.source_feed_saved),
 }
 
-enum class SearchScope(val label: String) {
-    ALL("All"),
-    POSTS("Posts"),
-    COMMUNITIES("Communities"),
-    USERS("People"),
+enum class SearchScope(@androidx.annotation.StringRes val labelRes: Int) {
+    ALL(io.github.brealorg.subshell.R.string.scope_search_all),
+    POSTS(io.github.brealorg.subshell.R.string.scope_search_posts),
+    COMMUNITIES(io.github.brealorg.subshell.R.string.scope_search_communities),
+    USERS(io.github.brealorg.subshell.R.string.scope_search_users),
 }
 
 enum class SearchArea {
@@ -294,27 +296,27 @@ enum class SearchArea {
     CURRENT_COMMUNITY,
 }
 
-enum class CommentActionPlacement(val label: String) {
-    LEFT("Left"),
-    BALANCED("Balanced"),
-    RIGHT("Right"),
+enum class CommentActionPlacement(@androidx.annotation.StringRes val labelRes: Int) {
+    LEFT( io.github.brealorg.subshell.R.string.comment_action_placement_left),
+    BALANCED( io.github.brealorg.subshell.R.string.comment_action_placement_balanced),
+    RIGHT( io.github.brealorg.subshell.R.string.comment_action_placement_right),
 }
 
-enum class CommentTimeFormat(val label: String, val example: String) {
-    RELATIVE("Relative", "2h"),
-    LOCAL_24_HOUR("24-hour", "20:20"),
-    LOCAL_12_HOUR("12-hour", "8:20 PM"),
+enum class CommentTimeFormat(@androidx.annotation.StringRes val labelRes: Int, val example: String) {
+    RELATIVE( io.github.brealorg.subshell.R.string.comment_time_format_relative, "2h"),
+    LOCAL_24_HOUR( io.github.brealorg.subshell.R.string.comment_time_format_local_24_hour, "20:20"),
+    LOCAL_12_HOUR( io.github.brealorg.subshell.R.string.comment_time_format_local_12_hour, "8:20 PM"),
 }
 
-enum class SubredditLabelStyle(val label: String, val example: String) {
-    MODERN("Modern", "r/linux"),
-    CLASSIC("Classic", "/r/linux"),
-    PLAIN("Plain", "linux"),
+enum class SubredditLabelStyle(@androidx.annotation.StringRes val labelRes: Int, val example: String) {
+    MODERN( io.github.brealorg.subshell.R.string.subreddit_label_style_modern, "r/linux"),
+    CLASSIC( io.github.brealorg.subshell.R.string.subreddit_label_style_classic, "/r/linux"),
+    PLAIN( io.github.brealorg.subshell.R.string.subreddit_label_style_plain, "linux"),
 }
 
-enum class ChromeBehavior(val label: String) {
-    ALWAYS_SHOW("Always show"),
-    HIDE_ON_SCROLL("Hide on scroll"),
+enum class ChromeBehavior(@androidx.annotation.StringRes val labelRes: Int) {
+    ALWAYS_SHOW( io.github.brealorg.subshell.R.string.chrome_behavior_always_show),
+    HIDE_ON_SCROLL( io.github.brealorg.subshell.R.string.chrome_behavior_hide_on_scroll),
 }
 
 internal fun videoAutoplayAllows(setting: VideoAutoplay, unmetered: Boolean): Boolean = when (setting) {
@@ -323,26 +325,26 @@ internal fun videoAutoplayAllows(setting: VideoAutoplay, unmetered: Boolean): Bo
     VideoAutoplay.NEVER -> false
 }
 
-enum class VideoAutoplay(val label: String) {
-    ALWAYS("Always"),
-    WIFI_ONLY("Wi-Fi only"),
-    NEVER("Never"),
+enum class VideoAutoplay(@androidx.annotation.StringRes val labelRes: Int) {
+    ALWAYS( io.github.brealorg.subshell.R.string.video_autoplay_always),
+    WIFI_ONLY( io.github.brealorg.subshell.R.string.video_autoplay_wifi_only),
+    NEVER( io.github.brealorg.subshell.R.string.video_autoplay_never),
 }
 
-enum class VideoQuality(val label: String) {
-    HIGH("High"),
-    MEDIUM("Medium"),
-    LOW("Low"),
+enum class VideoQuality(@androidx.annotation.StringRes val labelRes: Int) {
+    HIGH( io.github.brealorg.subshell.R.string.video_quality_high),
+    MEDIUM( io.github.brealorg.subshell.R.string.video_quality_medium),
+    LOW( io.github.brealorg.subshell.R.string.video_quality_low),
 }
 
 // VIDEO04_PLAYBACK_OPTIONS_PLACEMENT_V1 (#227, owner): where the playback options
 // button shows; post and full screen by default, a reader may widen or narrow it.
 // VIDEO05_SETTING_ROWS_SHOW_SHORT_VALUES_V1: the row shows a short value so its
 // description keeps its width (device: one word per line); the dialog says it all.
-enum class PlaybackOptionsPlacement(val label: String, val rowLabel: String) {
-    POST_AND_FULLSCREEN("Post and full screen", "Post + full screen"),
-    FULLSCREEN_ONLY("Full screen only", "Full screen"),
-    EVERYWHERE("Feed, post and full screen", "Everywhere"),
+enum class PlaybackOptionsPlacement(@androidx.annotation.StringRes val labelRes: Int, val rowLabel: String) {
+    POST_AND_FULLSCREEN( io.github.brealorg.subshell.R.string.playback_options_placement_post_and_fullscreen, "Post + full screen"),
+    FULLSCREEN_ONLY( io.github.brealorg.subshell.R.string.playback_options_placement_fullscreen_only, "Full screen"),
+    EVERYWHERE( io.github.brealorg.subshell.R.string.playback_options_placement_everywhere, "Everywhere"),
 }
 
 internal fun videoPictureInPictureAllowed(
@@ -375,35 +377,35 @@ internal fun playbackOptionsButtonShown(
 
 // VIDEO05_PLAYBACK_DEFAULTS_IN_SETTINGS_V1 (#227, owner): Settings holds the
 // defaults; the playback options panel overrides them for one video only.
-enum class VideoSubtitleDefault(val label: String, val rowLabel: String) {
-    OFF("Off", "Off"),
-    WHEN_MARKED("Auto · when the video marks them", "Auto"),
-    SYSTEM_CAPTIONS("Follow Android caption settings", "System"),
+enum class VideoSubtitleDefault(@androidx.annotation.StringRes val labelRes: Int, val rowLabel: String) {
+    OFF( io.github.brealorg.subshell.R.string.video_subtitle_default_off, "Off"),
+    WHEN_MARKED( io.github.brealorg.subshell.R.string.video_subtitle_default_when_marked, "Auto"),
+    SYSTEM_CAPTIONS( io.github.brealorg.subshell.R.string.video_subtitle_default_system_captions, "System"),
 }
 
-enum class VideoAudioDefault(val label: String, val rowLabel: String) {
-    VIDEO_DEFAULT("The video's own", "Video's own"),
-    DEVICE_LANGUAGE("Your device language", "Device"),
+enum class VideoAudioDefault(@androidx.annotation.StringRes val labelRes: Int, val rowLabel: String) {
+    VIDEO_DEFAULT( io.github.brealorg.subshell.R.string.video_audio_default_video_default, "Video's own"),
+    DEVICE_LANGUAGE( io.github.brealorg.subshell.R.string.video_audio_default_device_language, "Device"),
 }
 
 enum class VideoTimelineSize(
-    val label: String,
+    @androidx.annotation.StringRes val labelRes: Int,
     val trackHeightDp: Int,
     val restingThumbDiameterDp: Int,
     val scrubbingThumbDiameterDp: Int,
     val touchTargetHeightDp: Int,
 ) {
-    COMPACT("Thin", 3, 10, 14, 48),
-    STANDARD("Standard", 4, 12, 16, 48),
-    LARGE("Large", 6, 16, 20, 48),
+    COMPACT( io.github.brealorg.subshell.R.string.video_timeline_size_compact, 3, 10, 14, 48),
+    STANDARD( io.github.brealorg.subshell.R.string.video_timeline_size_standard, 4, 12, 16, 48),
+    LARGE( io.github.brealorg.subshell.R.string.video_timeline_size_large, 6, 16, 20, 48),
 }
 
-enum class FeedPreviewState(val label: String) {
-    CONTENT("Content"),
-    LOADING("Loading"),
-    OFFLINE("Offline"),
-    ERROR("Error"),
-    EMPTY("Empty"),
+enum class FeedPreviewState(@androidx.annotation.StringRes val labelRes: Int) {
+    CONTENT( io.github.brealorg.subshell.R.string.feed_preview_state_content),
+    LOADING( io.github.brealorg.subshell.R.string.feed_preview_state_loading),
+    OFFLINE( io.github.brealorg.subshell.R.string.feed_preview_state_offline),
+    ERROR( io.github.brealorg.subshell.R.string.feed_preview_state_error),
+    EMPTY( io.github.brealorg.subshell.R.string.feed_preview_state_empty),
 }
 
 private data class VideoSurfaceVisibility(
@@ -966,6 +968,10 @@ class SubshellState(
     initialResumeFeedPosition: Boolean = false,
     initialResumeFeedPositionAge: FeedPositionAge = FeedPositionAge.TWELVE_HOURS,
     initialResumeFeedPositionStart: FeedPositionStart = FeedPositionStart.SHOW_STORED,
+    // ISSUE302_START_FEED_V1 / ISSUE300_DEFAULT_FEED_SORT_V1
+    initialStartFeed: StartFeed = StartFeed.HOME,
+    initialDefaultFeedSort: FeedSort = FeedSort.BEST,
+    initialDefaultCommunitySort: CommunitySort = CommunitySort.HOT,
     feedPositionFile: FeedPositionFile? = null,
     private val clock: () -> Long = System::currentTimeMillis,
 ) {
@@ -1036,8 +1042,9 @@ class SubshellState(
     var focusedCommentId by mutableStateOf(initialFocusedCommentId)
     var postVisitId by mutableIntStateOf(initialPostVisitId.coerceAtLeast(0))
         private set
-    var feedSort by mutableStateOf(FeedSort.BEST)
-    var feedSource by mutableStateOf(FeedSource.HOME)
+    // ISSUE302_START_FEED_V1: a start without a restored route opens the chosen feed and sort.
+    var feedSort by mutableStateOf(startFeedSort(initialStartFeed.source, initialDefaultFeedSort))
+    var feedSource by mutableStateOf(initialStartFeed.source)
     var hideReadPosts by mutableStateOf(false)
         private set
     var searchVisible by mutableStateOf(false)
@@ -1121,6 +1128,9 @@ class SubshellState(
         initialResumeFeedPosition = initialResumeFeedPosition,
         initialResumeFeedPositionAge = initialResumeFeedPositionAge,
         initialResumeFeedPositionStart = initialResumeFeedPositionStart,
+        initialStartFeed = initialStartFeed,
+        initialDefaultFeedSort = initialDefaultFeedSort,
+        initialDefaultCommunitySort = initialDefaultCommunitySort,
         initialPostLayout = initialPostLayout,
         initialListThumbnailSide = initialListThumbnailSide,
         initialCommunityDiscoveryLayout = initialCommunityDiscoveryLayout,
@@ -1335,6 +1345,9 @@ class SubshellState(
         private set
     var resumeFeedPositionStart by settings::resumeFeedPositionStart
         private set
+    val startFeed: StartFeed get() = settings.startFeed
+    val defaultFeedSort: FeedSort get() = settings.defaultFeedSort
+    val defaultCommunitySort: CommunitySort get() = settings.defaultCommunitySort
     var postLayout by settings::postLayout
         private set
     var listThumbnailSide by settings::listThumbnailSide
@@ -1485,14 +1498,14 @@ class SubshellState(
             ?: if (processSnapshotRejected) {
                 SubshellRouteStack.forDestination(
                     destination = MainDestination.HOME,
-                    source = FeedSource.HOME,
-                    sort = FeedSort.BEST,
+                    source = initialStartFeed.source,
+                    sort = startFeedSort(initialStartFeed.source, initialDefaultFeedSort),
                 )
             } else {
                 SubshellRouteStack.restored(
                     destination = initialDestination,
-                    source = FeedSource.HOME,
-                    sort = FeedSort.BEST,
+                    source = initialStartFeed.source,
+                    sort = startFeedSort(initialStartFeed.source, initialDefaultFeedSort),
                     selectedCommunity = selectedSubreddit,
                     communitySort = initialCommunitySort,
                     postRoute = selectedPost?.let { post ->
@@ -1688,6 +1701,7 @@ class SubshellState(
             backgroundResumeWasManual = navigationLifecycleMediaWasManual,
             messageConversationDrafts = inboxActivity.messageConversationDraftsForSnapshot(),
             messageConversationMedia = inboxActivity.messageConversationMediaForSnapshot(),
+            modmailDrafts = inboxActivity.modmailDraftsForSnapshot(),
             settledOverrides = if (activeAccountIsAuthenticated) {
                 SettledAccountOverrides(
                     accountStableId = activeAccountId,
@@ -2010,6 +2024,7 @@ class SubshellState(
         restoredProcessSnapshot?.let { snapshot ->
             inboxActivity.restoreMessageConversationDrafts(snapshot.messageConversationDrafts)
             inboxActivity.restoreMessageConversationMedia(snapshot.messageConversationMedia)
+            inboxActivity.restoreModmailDrafts(snapshot.modmailDrafts)
             snapshot.settledOverrides
                 ?.takeIf { overrides -> overrides.accountStableId == activeAccountId }
                 ?.let { overrides ->
@@ -2245,6 +2260,18 @@ class SubshellState(
 
     fun updateResumeFeedPositionStart(start: FeedPositionStart) {
         settings.updateResumeFeedPositionStart(start)
+    }
+
+    fun updateStartFeed(feed: StartFeed) {
+        settings.updateStartFeed(feed)
+    }
+
+    fun updateDefaultFeedSort(sort: FeedSort) {
+        settings.updateDefaultFeedSort(sort)
+    }
+
+    fun updateDefaultCommunitySort(sort: CommunitySort) {
+        settings.updateDefaultCommunitySort(sort)
     }
 
     internal fun appendPostPaging(queryKey: RepositoryQueryKey) {
@@ -2637,7 +2664,7 @@ class SubshellState(
     fun commentsForPost(post: Post): List<Comment> =
         repository.commentsForPost(post.id).itemsOrEmpty()
 
-    val postComposerValidationMessage: String?
+    val postComposerValidationMessage: UiText?
         get() = if (activeAccountIsAuthenticated) {
             validateRemoteTextPostComposerDraft(postComposerDraft)
         } else {
@@ -2713,16 +2740,15 @@ class SubshellState(
     fun applyAuthenticatedMainFeedLanding(source: FeedSource) {
         require(
             source == FeedSource.HOME ||
-                source == FeedSource.POPULAR,
+                source == FeedSource.POPULAR ||
+                source == FeedSource.ALL,
         ) {
-            "Authenticated account landing must use Home or Popular"
+            "Authenticated account landing must use Home, Popular or All"
         }
         feedSource = source
-        feedSort = if (source == FeedSource.HOME) {
-            FeedSort.BEST
-        } else {
-            FeedSort.HOT
-        }
+        // ISSUE300_DEFAULT_FEED_SORT_V1: the default sort (Best before #300, so
+        // Home on Best and Popular on Hot as before).
+        feedSort = startFeedSort(source, defaultFeedSort)
         navigate(MainDestination.HOME)
     }
 
@@ -4483,6 +4509,20 @@ class SubshellState(
         inboxItemId: String,
     ): ComposerMediaAttachment? = inboxActivity.messageConversationMedia(accountStableId, inboxItemId)
 
+    fun modmailDraft(
+        accountStableId: String,
+        conversationId: String,
+    ): io.github.brealorg.subshell.data.account.RedditModmailDraft? =
+        inboxActivity.modmailDraft(accountStableId, conversationId)
+
+    fun updateModmailDraft(
+        accountStableId: String,
+        conversationId: String,
+        draft: io.github.brealorg.subshell.data.account.RedditModmailDraft,
+    ) {
+        inboxActivity.updateModmailDraft(accountStableId, conversationId, draft)
+    }
+
     fun updateMessageConversationMedia(
         accountStableId: String,
         inboxItemId: String,
@@ -4575,6 +4615,7 @@ class SubshellState(
                 sort = preferredCommunitySort(
                     communitySortPreferences,
                     normalizedName,
+                    defaultCommunitySort,
                 ),
             ),
         )
@@ -4601,7 +4642,7 @@ class SubshellState(
                 // A link's sort (REDDITURL01_COMMUNITY_SORT_LINK_V1) applies
                 // to this visit only; it is not stored as the preference.
                 sort = sort ?: if (switchingCommunity) {
-                    preferredCommunitySort(communitySortPreferences, normalizedName)
+                    preferredCommunitySort(communitySortPreferences, normalizedName, defaultCommunitySort)
                 } else {
                     communitySort
                 },
@@ -5033,8 +5074,7 @@ class SubshellState(
             event = "feed_playback_request",
             mediaId = mediaId,
             transitionId = activeVideoTransitionId,
-            details = "action=${if (playNow) "play" else if (manuallyPausedNow) "paused" else "revoked"} " +
-                "selected=${activeVideoMediaId ?: "none"}",
+            details = "action=${if (playNow) "play" else if (manuallyPausedNow) "paused" else "revoked"} selected=${activeVideoMediaId ?: "none"}",
         )
         when {
             playNow || manuallyPausedNow -> onApply(playNow, activeVideoTransitionId)
@@ -6441,6 +6481,9 @@ class SubshellState(
         resumeFeedPosition = resumeFeedPosition,
         resumeFeedPositionAge = resumeFeedPositionAge,
         resumeFeedPositionStart = resumeFeedPositionStart,
+        startFeed = startFeed,
+        defaultFeedSort = defaultFeedSort,
+        defaultCommunitySort = defaultCommunitySort,
         postLayout = postLayout,
         listThumbnailSide = listThumbnailSide,
         mutedCommunityDirectViewMode = mutedCommunityDirectViewMode,
@@ -6531,8 +6574,13 @@ class SubshellState(
         contentFilters = settings.contentFilters
         communitySortPreferences = settings.communitySortPreferences
         listingTimePeriod = settings.listingTimePeriod
+        // ISSUE302_START_FEED_V1 / ISSUE300_DEFAULT_FEED_SORT_V1: before the community sort
+        // below, which falls back to the restored default.
+        this.settings.startFeed = settings.startFeed
+        this.settings.defaultFeedSort = settings.defaultFeedSort
+        this.settings.defaultCommunitySort = settings.defaultCommunitySort
         selectedSubreddit?.let { communityName ->
-            communitySort = preferredCommunitySort(communitySortPreferences, communityName)
+            communitySort = preferredCommunitySort(communitySortPreferences, communityName, defaultCommunitySort)
         }
         drawerCommunitiesMode = settings.drawerCommunitiesMode
         drawerRecentCommunities = settings.drawerRecentCommunities

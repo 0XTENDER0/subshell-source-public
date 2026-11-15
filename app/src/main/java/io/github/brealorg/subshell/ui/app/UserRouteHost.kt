@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -181,7 +183,7 @@ internal fun UserRouteHost(
             ExpandedListDetailSurface(
                 scaffoldPadding = padding,
                 listTitle = "You",
-                listSubtitle = "Blocked",
+                listSubtitle = stringResource(R.string.all_blocked),
                 listContent = { listModifier ->
                     mainYouProfileContent(
                         state.activeAccountUsername,

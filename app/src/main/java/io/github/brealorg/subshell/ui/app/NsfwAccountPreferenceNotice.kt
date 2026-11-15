@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -31,11 +34,10 @@ internal const val REDDIT_PREFERENCES_URL = "https://www.reddit.com/settings/pre
 
 internal fun nsfwAccountPreferencePresentation(): ErrorPresentation = ErrorPresentation(
     kind = ErrorPresentationKind.DEGRADED,
-    title = "Your Reddit account hides NSFW content",
-    message = "Reddit leaves NSFW posts and communities out for this account until " +
-        "\"Show mature content\" is on in your Reddit settings.",
-    primaryAction = ErrorAction(ErrorActionKind.RETRY, "Open Reddit settings"),
-    secondaryAction = ErrorAction(ErrorActionKind.DISMISS, "Dismiss"),
+    title = UiText.Resource(R.string.notice_nsfwaccountp_your_reddit_account_hides_nsfw_content),
+    message = UiText.Resource(R.string.notice_nsfwaccountp_reddit_leaves_nsfw_posts_and_communities_out),
+    primaryAction = ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.notice_nsfwaccountp_open_reddit_settings)),
+    secondaryAction = ErrorAction(ErrorActionKind.DISMISS, UiText.Resource(R.string.notice_nsfwaccountp_dismiss)),
 )
 
 /** True when the account's answer means the notice should show. */
@@ -58,12 +60,10 @@ internal fun nsfwSearchPreferenceNeedsNotice(result: NsfwPreferencesResult): Boo
 
 internal fun nsfwSearchPreferencePresentation(): ErrorPresentation = ErrorPresentation(
     kind = ErrorPresentationKind.DEGRADED,
-    title = "Your Reddit account leaves NSFW out of search",
-    message = "NSFW communities won't show in search, and Random NSFW community finds none, until " +
-        "\"Include mature content in search results\" is on. Reddit's newer settings page may show " +
-        "it on when it isn't; old.reddit.com/prefs shows the real value.",
-    primaryAction = ErrorAction(ErrorActionKind.RETRY, "Open Reddit preferences"),
-    secondaryAction = ErrorAction(ErrorActionKind.DISMISS, "Dismiss"),
+    title = UiText.Resource(R.string.notice_nsfwaccountp_your_reddit_account_leaves_nsfw_out_of),
+    message = UiText.Resource(R.string.notice_nsfwaccountp_nsfw_communities_won_t_show_in_search),
+    primaryAction = ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.notice_nsfwaccountp_open_reddit_preferences)),
+    secondaryAction = ErrorAction(ErrorActionKind.DISMISS, UiText.Resource(R.string.notice_nsfwaccountp_dismiss)),
 )
 
 @Composable

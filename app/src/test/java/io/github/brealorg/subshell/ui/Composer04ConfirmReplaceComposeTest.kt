@@ -96,23 +96,23 @@ class Composer04ConfirmReplaceComposeTest {
     fun theLossRuleNamesWhatWouldBeRemoved() {
         val linked = PostComposerDraft(type = ComposerPostType.LINK, linkUrl = "https://example.com")
         val withPhoto = linked.copy(type = ComposerPostType.MEDIA, linkUrl = "", media = listOf(image(1)))
-        assertEquals("Remove the link?", composerContentLoss(linked, withPhoto)?.title)
+        assertEquals("Remove the link?", composerContentLoss(linked, withPhoto)?.title?.s)
 
         val withVideo = PostComposerDraft(type = ComposerPostType.MEDIA, media = listOf(video))
         assertEquals(
             "Remove the video?",
-            composerContentLoss(withVideo, withVideo.copy(media = listOf(image(1))))?.title,
+            composerContentLoss(withVideo, withVideo.copy(media = listOf(image(1))))?.title?.s,
         )
         assertEquals(
             "Remove 3 images?",
-            composerContentLoss(gallery, gallery.copy(media = listOf(video)))?.title,
+            composerContentLoss(gallery, gallery.copy(media = listOf(video)))?.title?.s,
         )
         assertEquals(
             "Remove the image?",
             composerContentLoss(
                 gallery.copy(media = listOf(image(1))),
                 gallery.copy(type = ComposerPostType.LINK, media = emptyList()),
-            )?.title,
+            )?.title?.s,
         )
     }
 

@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,14 +34,13 @@ internal fun crashReportPromptPresentation(records: List<CrashRecord>): ErrorPre
     return ErrorPresentation(
         kind = ErrorPresentationKind.DEGRADED,
         title = if (onlyNotResponding) {
-            "subshell stopped responding last time"
+            UiText.Resource(R.string.notice_crashreportp_subshell_stopped_responding_last_time)
         } else {
-            "subshell closed unexpectedly last time"
+            UiText.Resource(R.string.notice_crashreportp_subshell_closed_unexpectedly_last_time)
         },
-        message = "A diagnostic report helps fix it. It holds no posts, names or messages, " +
-            "and you see it before anything is sent.",
-        primaryAction = ErrorAction(ErrorActionKind.RETRY, "Send report"),
-        secondaryAction = ErrorAction(ErrorActionKind.DISMISS, "Dismiss"),
+        message = UiText.Resource(R.string.notice_crashreportp_a_diagnostic_report_helps_fix_it_it),
+        primaryAction = ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.notice_crashreportp_send_report)),
+        secondaryAction = ErrorAction(ErrorActionKind.DISMISS, UiText.Resource(R.string.notice_crashreportp_dismiss)),
     )
 }
 

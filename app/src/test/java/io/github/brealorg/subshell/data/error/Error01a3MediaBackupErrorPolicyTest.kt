@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.data.error
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.backup.BackupFailureOperation
 import io.github.brealorg.subshell.backup.toBackupFailureDetails
 import io.github.brealorg.subshell.data.network.NetworkTransportFailureKind
@@ -17,6 +21,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// TRANSLATE03: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Error01a3MediaBackupErrorPolicyTest {
     @Test
     fun remoteImageTransportFailureIsReadableAndRetryable() {
@@ -27,8 +34,8 @@ class Error01a3MediaBackupErrorPolicyTest {
         val presentation = remoteMediaErrorPresentation(RemoteMediaKind.IMAGE, details)
 
         assertEquals(ErrorPresentationKind.INLINE, presentation.kind)
-        assertEquals("Couldn't load image", presentation.title)
-        assertTrue(presentation.message.contains("couldn't reach"))
+        assertEquals("Couldn't load image", presentation.title.s)
+        assertTrue(presentation.message.s.contains("couldn't reach"))
         assertEquals("Network: DNS", presentation.technicalDetail)
         assertEquals(ErrorActionKind.RETRY, presentation.primaryAction?.kind)
     }
@@ -62,7 +69,7 @@ class Error01a3MediaBackupErrorPolicyTest {
         assertEquals(LocalFailureKind.UNKNOWN, details.localKind)
         assertFalse(visible.contains("secret-value"))
         assertFalse(visible.contains("/data/user/0/private"))
-        assertTrue(presentation.message.contains("failed"))
+        assertTrue(presentation.message.s.contains("failed"))
     }
 
     @Test
@@ -71,7 +78,7 @@ class Error01a3MediaBackupErrorPolicyTest {
         val presentation = backupErrorPresentation(BackupFailureOperation.CONNECT_FOLDER, details)
 
         assertEquals(LocalFailureKind.PERMISSION, details.localKind)
-        assertTrue(presentation.message.contains("didn't grant"))
+        assertTrue(presentation.message.s.contains("didn't grant"))
         assertEquals("Local: Permission", presentation.technicalDetail)
     }
 }

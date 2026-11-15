@@ -1,6 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.ui.error.ReportFailureDiagnostic
 
 import androidx.compose.foundation.clickable
@@ -122,7 +124,7 @@ fun ModeratorUserManagementButton(
             modifier = Modifier.size(18.dp),
         )
         Spacer(Modifier.width(6.dp))
-        Text("User management")
+        Text(stringResource(R.string.comp_user_management))
     }
 }
 
@@ -169,11 +171,10 @@ fun ModeratorUserManagementDialog(
     pendingUnban?.let { user ->
         AlertDialog(
             onDismissRequest = { pendingUnban = null },
-            title = { Text("Unban u/${user.username}?") },
+            title = { Text(stringResource(R.string.comp_unban_u, user.username)) },
             text = {
                 Text(
-                    "This restores the account's ability to participate in r/$community. " +
-                        "Reddit will be checked again after the action.",
+                    stringResource(R.string.all2_this_restores_the_account_s_ability_to, community),
                 )
             },
             confirmButton = {
@@ -190,12 +191,12 @@ fun ModeratorUserManagementDialog(
                         onMutate(request)
                     },
                 ) {
-                    Text("Unban")
+                    Text(stringResource(R.string.comp_unban))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { pendingUnban = null }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.comp_cancel))
                 }
             },
         )
@@ -204,11 +205,10 @@ fun ModeratorUserManagementDialog(
     pendingUnmute?.let { user ->
         AlertDialog(
             onDismissRequest = { pendingUnmute = null },
-            title = { Text("Unmute u/${user.username}?") },
+            title = { Text(stringResource(R.string.comp_unmute_u, user.username)) },
             text = {
                 Text(
-                    "This allows u/${user.username} to send modmail to r/$community again. " +
-                        "Reddit will be checked again after the action.",
+                    "This allows u/${user.username} to send modmail to r/$community again. Reddit will be checked again after the action.",
                 )
             },
             confirmButton = {
@@ -225,12 +225,12 @@ fun ModeratorUserManagementDialog(
                         onMutateMuted(request)
                     },
                 ) {
-                    Text("Unmute")
+                    Text(stringResource(R.string.comp_unmute))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { pendingUnmute = null }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.comp_cancel))
                 }
             },
         )
@@ -239,11 +239,10 @@ fun ModeratorUserManagementDialog(
     pendingUnapprove?.let { user ->
         AlertDialog(
             onDismissRequest = { pendingUnapprove = null },
-            title = { Text("Unapprove u/${user.username}?") },
+            title = { Text(stringResource(R.string.comp_unapprove_u, user.username)) },
             text = {
                 Text(
-                    "This removes u/${user.username} from the approved-user list for " +
-                        "r/$community. Reddit will be checked again after the action.",
+                    "This removes u/${user.username} from the approved-user list for r/$community. Reddit will be checked again after the action.",
                 )
             },
             confirmButton = {
@@ -260,12 +259,12 @@ fun ModeratorUserManagementDialog(
                         onMutateApproved(request)
                     },
                 ) {
-                    Text("Unapprove")
+                    Text(stringResource(R.string.comp_unapprove))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { pendingUnapprove = null }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.comp_cancel))
                 }
             },
         )
@@ -440,13 +439,13 @@ private fun ModeratorUserManagementOverview(
                     IconButton(onClick = onBackToModTools) {
                         Icon(
                             imageVector = Symbols.ArrowBack,
-                            contentDescription = "Back to Mod tools",
+                            contentDescription = stringResource(R.string.comp_back_to_mod_tools),
                         )
                     }
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        "User management",
+                        stringResource(R.string.all_user_management),
                         style = MaterialTheme.typography.headlineSmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -465,7 +464,7 @@ private fun ModeratorUserManagementOverview(
                 ) {
                     Icon(
                         Symbols.Refresh,
-                        contentDescription = "Refresh user management",
+                        contentDescription = stringResource(R.string.comp_refresh_user_management),
                     )
                 }
             }
@@ -485,9 +484,9 @@ private fun ModeratorUserManagementOverview(
                         label = {
                             Text(
                                 when (section) {
-                                    ModeratorUserManagementSection.BANNED -> "Banned"
-                                    ModeratorUserManagementSection.MUTED -> "Muted"
-                                    ModeratorUserManagementSection.APPROVED -> "Approved"
+                                    ModeratorUserManagementSection.BANNED -> stringResource(R.string.all_banned)
+                                    ModeratorUserManagementSection.MUTED -> stringResource(R.string.all_muted)
+                                    ModeratorUserManagementSection.APPROVED -> stringResource(R.string.all_approved)
                                 },
                             )
                         },
@@ -499,11 +498,10 @@ private fun ModeratorUserManagementOverview(
         if (state.authorizationRequired) {
             item("user-management-auth") {
                 ModeratorUserManagementNotice(
-                    title = "User management permission required",
+                    title = stringResource(R.string.comp_user_management_permission_required),
                     message =
-                        "Reddit needs the modcontributors scope for banned, muted, and " +
-                            "approved users and their moderation actions in r/$community.",
-                    actionLabel = if (state.authorizing) null else "Authorize",
+                        stringResource(R.string.all2_reddit_needs_the_modcontributors_scope_for_banned, community),
+                    actionLabel = if (state.authorizing) null else stringResource(R.string.all_authorize),
                     onAction = onAuthorize,
                 )
             }
@@ -516,21 +514,19 @@ private fun ModeratorUserManagementOverview(
                         state.failureHttpStatusCode == 403
                 ModeratorUserManagementNotice(
                     title = if (permissionDenied) {
-                        "Manage Users permission required"
+                        stringResource(R.string.all_manage_users_permission_required)
                     } else if (
                         state.failureKind == ModeratorUserManagementFailureKind.OUTCOME_UNKNOWN
                     ) {
-                        "Action outcome not confirmed"
+                        stringResource(R.string.all_action_outcome_not_confirmed)
                     } else {
-                        "User management unavailable"
+                        stringResource(R.string.all_user_management_unavailable)
                     },
                     message = when {
                         permissionDenied ->
-                            "Reddit denied this request. Your moderator role may not include " +
-                                "Manage Users / Access permission for r/$community."
+                            stringResource(R.string.all2_reddit_denied_this_request_your_moderator_role, community)
                         state.failureKind == ModeratorUserManagementFailureKind.OUTCOME_UNKNOWN ->
-                            "subshell did not confirm the requested server state. Refresh user " +
-                                "management before acting again."
+                            "subshell did not confirm the requested server state. Refresh user management before acting again."
                         state.failureKind == ModeratorUserManagementFailureKind.ALREADY_MUTATING ->
                             "Another user-management action is already in progress."
                         // LOW_NET_USER_MUTATION_KEEPS_REDDITS_ERROR_V1 (OCB-552)
@@ -539,9 +535,9 @@ private fun ModeratorUserManagementOverview(
                             "Reddit refused this action for r/$community: " +
                                 state.failureDetails.toSafeTechnicalDetail()
                         else ->
-                            "Reddit user management could not be completed for r/$community."
+                            stringResource(R.string.all_reddit_user_management_could_not_be_completed, community)
                     },
-                    actionLabel = "Retry".takeIf {
+                    actionLabel = stringResource(R.string.all_retry).takeIf {
                         state.failureRetryable && !state.mutationInProgress
                     },
                     onAction = onRefresh,
@@ -570,7 +566,7 @@ private fun ModeratorUserManagementOverview(
                 ) {
                     Icon(Symbols.PersonAdd, null, Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Ban user")
+                    Text(stringResource(R.string.comp_ban_user))
                 }
             }
 
@@ -588,7 +584,7 @@ private fun ModeratorUserManagementOverview(
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        "Banned users",
+                        stringResource(R.string.all_banned_users),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(1f),
                     )
@@ -611,8 +607,8 @@ private fun ModeratorUserManagementOverview(
             ) {
                 item("banned-empty") {
                     ModeratorUserManagementNotice(
-                        "No banned users",
-                        "Reddit returned no banned users for r/$community.",
+                        stringResource(R.string.all_no_banned_users),
+                        stringResource(R.string.all_reddit_returned_no_banned_users_for_r, community),
                         null,
                         {},
                     )
@@ -633,7 +629,7 @@ private fun ModeratorUserManagementOverview(
                         enabled = !state.loading && !state.mutationInProgress,
                         onClick = onAppend,
                     ) {
-                        Text(if (state.loading) "Loading…" else "Load more")
+                        Text(if (state.loading) stringResource(R.string.all_loading) else stringResource(R.string.all_load_more))
                     }
                 }
             }
@@ -658,7 +654,7 @@ private fun ModeratorUserManagementOverview(
                 ) {
                     Icon(Symbols.VolumeOff, null, Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Mute user")
+                    Text(stringResource(R.string.comp_mute_user))
                 }
             }
 
@@ -676,7 +672,7 @@ private fun ModeratorUserManagementOverview(
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        "Muted users",
+                        stringResource(R.string.all_muted_users),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(1f),
                     )
@@ -699,8 +695,8 @@ private fun ModeratorUserManagementOverview(
             ) {
                 item("muted-empty") {
                     ModeratorUserManagementNotice(
-                        "No muted users",
-                        "Reddit returned no muted users for r/$community.",
+                        stringResource(R.string.all_no_muted_users),
+                        stringResource(R.string.all_reddit_returned_no_muted_users_for_r, community),
                         null,
                         {},
                     )
@@ -720,7 +716,7 @@ private fun ModeratorUserManagementOverview(
                         enabled = !state.mutedLoading && !state.mutationInProgress,
                         onClick = onAppendMuted,
                     ) {
-                        Text(if (state.mutedLoading) "Loading…" else "Load more")
+                        Text(if (state.mutedLoading) stringResource(R.string.all_loading) else stringResource(R.string.all_load_more))
                     }
                 }
             }
@@ -729,9 +725,9 @@ private fun ModeratorUserManagementOverview(
                 item("verified-approved-$username-${state.verifiedApproved}") {
                     ModeratorUserManagementNotice(
                         title = if (state.verifiedApproved == true) {
-                            "Approval confirmed"
+                            stringResource(R.string.all_approval_confirmed)
                         } else {
-                            "Unapprove confirmed"
+                            stringResource(R.string.all_unapprove_confirmed)
                         },
                         message = "Reddit now reports u/$username as " +
                             if (state.verifiedApproved == true) {
@@ -753,7 +749,7 @@ private fun ModeratorUserManagementOverview(
                 ) {
                     Icon(Symbols.PersonAdd, null, Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Approve user")
+                    Text(stringResource(R.string.comp_approve_user))
                 }
             }
 
@@ -771,7 +767,7 @@ private fun ModeratorUserManagementOverview(
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        "Approved users",
+                        stringResource(R.string.all_approved_users),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(1f),
                     )
@@ -794,8 +790,8 @@ private fun ModeratorUserManagementOverview(
             ) {
                 item("approved-empty") {
                     ModeratorUserManagementNotice(
-                        "No approved users",
-                        "Reddit returned no approved users for r/$community.",
+                        stringResource(R.string.all_no_approved_users),
+                        stringResource(R.string.all_reddit_returned_no_approved_users_for_r, community),
                         null,
                         {},
                     )
@@ -815,7 +811,7 @@ private fun ModeratorUserManagementOverview(
                         enabled = !state.approvedLoading && !state.mutationInProgress,
                         onClick = onAppendApproved,
                     ) {
-                        Text(if (state.approvedLoading) "Loading…" else "Load more")
+                        Text(if (state.approvedLoading) stringResource(R.string.all_loading) else stringResource(R.string.all_load_more))
                     }
                 }
             }
@@ -839,7 +835,7 @@ private fun ModeratorBannedUsersLoadingCard() {
         ) {
             InlineProgressIndicator()
             Spacer(Modifier.width(10.dp))
-            Text("Loading banned users…")
+            Text(stringResource(R.string.comp_loading_banned_users))
         }
     }
 }
@@ -866,7 +862,7 @@ private fun ModeratorBannedUserCard(
             },
             content = {
                 Text(
-                    text = "u/${user.username}",
+                    text = stringResource(R.string.comp_u, user.username),
                     fontWeight = FontWeight.SemiBold,
                 )
             },
@@ -874,7 +870,7 @@ private fun ModeratorBannedUserCard(
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     user.note?.let { note ->
                         Text(
-                            text = "Moderator note · $note",
+                            text = stringResource(R.string.comp_moderator_note, note),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 3,
@@ -884,7 +880,7 @@ private fun ModeratorBannedUserCard(
                     user.createdEpochSeconds?.let { epoch ->
                         moderatorBanAgeLabel(epoch)?.let { age ->
                             Text(
-                                text = "Banned $age",
+                                text = stringResource(R.string.comp_banned, age),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -897,7 +893,7 @@ private fun ModeratorBannedUserCard(
                     enabled = !busy,
                     onClick = onUnban,
                 ) {
-                    Text("Unban")
+                    Text(stringResource(R.string.comp_unban))
                 }
             },
         )
@@ -918,7 +914,7 @@ private fun ModeratorMutedUsersLoadingCard() {
         ) {
             InlineProgressIndicator()
             Spacer(Modifier.width(10.dp))
-            Text("Loading muted users…")
+            Text(stringResource(R.string.comp_loading_muted_users))
         }
     }
 }
@@ -940,13 +936,13 @@ private fun ModeratorMutedUserCard(
                 ModeratorUserAvatar(user.username, user.avatarImageUri, 44)
             },
             content = {
-                Text("u/${user.username}", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.comp_u, user.username), fontWeight = FontWeight.SemiBold)
             },
             supportingContent = {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     user.note?.let { note ->
                         Text(
-                            "Moderator note · $note",
+                            stringResource(R.string.all_moderator_note, note),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 3,
@@ -956,7 +952,7 @@ private fun ModeratorMutedUserCard(
                     user.createdEpochSeconds?.let { epoch ->
                         moderatorBanAgeLabel(epoch)?.let { age ->
                             Text(
-                                "Muted $age",
+                                stringResource(R.string.all_muted_2, age),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -965,7 +961,7 @@ private fun ModeratorMutedUserCard(
                 }
             },
             trailingContent = {
-                TextButton(enabled = !busy, onClick = onUnmute) { Text("Unmute") }
+                TextButton(enabled = !busy, onClick = onUnmute) { Text(stringResource(R.string.comp_unmute)) }
             },
         )
     }
@@ -985,7 +981,7 @@ private fun ModeratorApprovedUsersLoadingCard() {
         ) {
             InlineProgressIndicator()
             Spacer(Modifier.width(10.dp))
-            Text("Loading approved users…")
+            Text(stringResource(R.string.comp_loading_approved_users))
         }
     }
 }
@@ -1007,13 +1003,13 @@ private fun ModeratorApprovedUserCard(
                 ModeratorUserAvatar(user.username, user.avatarImageUri, 44)
             },
             content = {
-                Text("u/${user.username}", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.comp_u, user.username), fontWeight = FontWeight.SemiBold)
             },
             supportingContent = {
                 user.createdEpochSeconds?.let { epoch ->
                     moderatorBanAgeLabel(epoch)?.let { age ->
                         Text(
-                            "Approved $age",
+                            stringResource(R.string.all_approved_2, age),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -1021,7 +1017,7 @@ private fun ModeratorApprovedUserCard(
                 }
             },
             trailingContent = {
-                TextButton(enabled = !busy, onClick = onUnapprove) { Text("Unapprove") }
+                TextButton(enabled = !busy, onClick = onUnapprove) { Text(stringResource(R.string.comp_unapprove)) }
             },
         )
     }
@@ -1100,12 +1096,12 @@ private fun ModeratorBanUserEditor(
                 IconButton(onClick = onBack) {
                     Icon(
                         Symbols.ArrowBack,
-                        contentDescription = "Back to User management",
+                        contentDescription = stringResource(R.string.comp_back_to_user_management),
                     )
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Ban user",
+                        text = stringResource(R.string.comp_ban_user),
                         style = MaterialTheme.typography.headlineSmall,
                     )
                     Text(
@@ -1124,9 +1120,7 @@ private fun ModeratorBanUserEditor(
                 color = MaterialTheme.colorScheme.surfaceContainerLow,
             ) {
                 Text(
-                    text = "This is a real subreddit ban. Leave duration blank for a " +
-                        "permanent ban. subshell verifies the banned-user relationship after " +
-                        "the action.",
+                    text = "This is a real subreddit ban. Leave duration blank for a permanent ban. subshell verifies the banned-user relationship after the action.",
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1152,7 +1146,7 @@ private fun ModeratorBanUserEditor(
                             username = value.take(24)
                             selectedPerson = null
                         },
-                        placeholder = "Username",
+                        placeholder = stringResource(R.string.comp_username),
                         trailingIcon = if (username.isNotEmpty()) {
                             {
                                 IconButton(
@@ -1161,7 +1155,7 @@ private fun ModeratorBanUserEditor(
                                 ) {
                                     Icon(
                                         Symbols.Close,
-                                        contentDescription = "Clear user search",
+                                        contentDescription = stringResource(R.string.comp_clear_user_search),
                                     )
                                 }
                             }
@@ -1171,13 +1165,13 @@ private fun ModeratorBanUserEditor(
                         supportingText = {
                             when {
                                 normalizedLookup.length == 1 ->
-                                    Text("Type at least 2 characters for Reddit suggestions.")
+                                    Text(stringResource(R.string.comp_type_at_least_2_characters_for_reddit))
                                 peopleSearchState.loading && searchMatches ->
-                                    Text("Searching Reddit users…")
+                                    Text(stringResource(R.string.comp_searching_reddit_users))
                                 peopleSearchState.loaded && searchMatches && people.isEmpty() ->
-                                    Text("No matching users. An exact username can still be used.")
+                                    Text(stringResource(R.string.comp_no_matching_users_an_exact_username_can))
                                 else ->
-                                    Text("Search Reddit users or enter an exact username.")
+                                    Text(stringResource(R.string.comp_search_reddit_users_or_enter_an_exact))
                             }
                         },
                     )
@@ -1202,11 +1196,11 @@ private fun ModeratorBanUserEditor(
                 onValueChange = { value ->
                     duration = value.filter(Char::isDigit).take(3)
                 },
-                label = { Text("Duration days") },
+                label = { Text(stringResource(R.string.comp_duration_days)) },
                 supportingText = {
                     Text(
                         if (duration.isBlank()) {
-                            "Permanent · enter 1–999 for a temporary ban"
+                            stringResource(R.string.all_permanent_enter_1_999_for_a_temporary)
                         } else {
                             "1–999 days"
                         },
@@ -1222,9 +1216,9 @@ private fun ModeratorBanUserEditor(
             OutlinedTextField(
                 value = banReason,
                 onValueChange = { banReason = it.take(MODERATOR_BAN_REASON_MAX_CHARS) },
-                label = { Text("Ban reason (optional)") },
+                label = { Text(stringResource(R.string.comp_ban_reason_optional)) },
                 supportingText = {
-                    Text("${banReason.length}/$MODERATOR_BAN_REASON_MAX_CHARS")
+                    Text(stringResource(R.string.comp_text_2, banReason.length, MODERATOR_BAN_REASON_MAX_CHARS))
                 },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
@@ -1237,9 +1231,9 @@ private fun ModeratorBanUserEditor(
                 onValueChange = {
                     moderatorNote = it.take(MODERATOR_BAN_NOTE_MAX_CHARS)
                 },
-                label = { Text("Moderator note (optional)") },
+                label = { Text(stringResource(R.string.comp_moderator_note_optional)) },
                 supportingText = {
-                    Text("${moderatorNote.length}/$MODERATOR_BAN_NOTE_MAX_CHARS")
+                    Text(stringResource(R.string.comp_text_2, moderatorNote.length, MODERATOR_BAN_NOTE_MAX_CHARS))
                 },
                 maxLines = 3,
                 modifier = Modifier.fillMaxWidth(),
@@ -1252,9 +1246,9 @@ private fun ModeratorBanUserEditor(
                 onValueChange = {
                     messageToUser = it.take(MODERATOR_BAN_MESSAGE_MAX_CHARS)
                 },
-                label = { Text("Message to user (optional)") },
+                label = { Text(stringResource(R.string.comp_message_to_user_optional)) },
                 supportingText = {
-                    Text("${messageToUser.length}/$MODERATOR_BAN_MESSAGE_MAX_CHARS")
+                    Text(stringResource(R.string.comp_text_2, messageToUser.length, MODERATOR_BAN_MESSAGE_MAX_CHARS))
                 },
                 maxLines = 4,
                 modifier = Modifier.fillMaxWidth(),
@@ -1295,13 +1289,13 @@ private fun ModeratorBanUserEditor(
                         modifier = Modifier.size(18.dp),
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("Confirm ban")
+                    Text(stringResource(R.string.comp_confirm_ban))
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = onBack,
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.comp_cancel))
                 }
             }
         }
@@ -1357,11 +1351,11 @@ private fun ModeratorMuteUserEditor(
                 IconButton(onClick = onBack) {
                     Icon(
                         Symbols.ArrowBack,
-                        contentDescription = "Back to User management",
+                        contentDescription = stringResource(R.string.comp_back_to_user_management),
                     )
                 }
                 Column(Modifier.weight(1f)) {
-                    Text("Mute user", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.comp_mute_user), style = MaterialTheme.typography.headlineSmall)
                     Text(
                         "r/$communityName",
                         style = MaterialTheme.typography.bodyMedium,
@@ -1377,9 +1371,7 @@ private fun ModeratorMuteUserEditor(
                 color = MaterialTheme.colorScheme.surfaceContainerLow,
             ) {
                 Text(
-                    "Muting prevents this user from sending new modmail to r/$communityName " +
-                        "while Reddit's mute is active. subshell verifies the muted-user " +
-                        "relationship after the action.",
+                    "Muting prevents this user from sending new modmail to r/$communityName while Reddit's mute is active. subshell verifies the muted-user relationship after the action.",
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1404,24 +1396,24 @@ private fun ModeratorMuteUserEditor(
                             username = it.take(24)
                             selectedPerson = null
                         },
-                        placeholder = "Username",
+                        placeholder = stringResource(R.string.comp_username),
                         trailingIcon = if (username.isNotEmpty()) {
                             {
                                 IconButton(enabled = !busy, onClick = { username = "" }) {
-                                    Icon(Symbols.Close, "Clear user search")
+                                    Icon(Symbols.Close, stringResource(R.string.all_clear_user_search))
                                 }
                             }
                         } else null,
                         supportingText = {
                             when {
                                 normalizedLookup.length == 1 ->
-                                    Text("Type at least 2 characters for Reddit suggestions.")
+                                    Text(stringResource(R.string.comp_type_at_least_2_characters_for_reddit))
                                 peopleSearchState.loading && searchMatches ->
-                                    Text("Searching Reddit users…")
+                                    Text(stringResource(R.string.comp_searching_reddit_users))
                                 peopleSearchState.loaded && searchMatches && people.isEmpty() ->
-                                    Text("No matching users. An exact username can still be used.")
+                                    Text(stringResource(R.string.comp_no_matching_users_an_exact_username_can))
                                 else ->
-                                    Text("Search Reddit users or enter an exact username.")
+                                    Text(stringResource(R.string.comp_search_reddit_users_or_enter_an_exact))
                             }
                         },
                     )
@@ -1442,9 +1434,9 @@ private fun ModeratorMuteUserEditor(
             OutlinedTextField(
                 value = moderatorNote,
                 onValueChange = { moderatorNote = it.take(MODERATOR_MUTE_NOTE_MAX_CHARS) },
-                label = { Text("Moderator note (optional)") },
+                label = { Text(stringResource(R.string.comp_moderator_note_optional)) },
                 supportingText = {
-                    Text("${moderatorNote.length}/$MODERATOR_MUTE_NOTE_MAX_CHARS")
+                    Text(stringResource(R.string.comp_text_2, moderatorNote.length, MODERATOR_MUTE_NOTE_MAX_CHARS))
                 },
                 maxLines = 3,
                 modifier = Modifier.fillMaxWidth(),
@@ -1473,9 +1465,9 @@ private fun ModeratorMuteUserEditor(
                 ) {
                     Icon(Symbols.VolumeOff, null, Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Confirm mute")
+                    Text(stringResource(R.string.comp_confirm_mute))
                 }
-                TextButton(modifier = Modifier.fillMaxWidth(), onClick = onBack) { Text("Cancel") }
+                TextButton(modifier = Modifier.fillMaxWidth(), onClick = onBack) { Text(stringResource(R.string.comp_cancel)) }
             }
         }
     }
@@ -1504,13 +1496,13 @@ private fun ModeratorSelectedMuteUser(
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    "Selected mute target",
+                    stringResource(R.string.all_selected_mute_target),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             IconButton(enabled = enabled, onClick = onClear) {
-                Icon(Symbols.Close, "Change mute target")
+                Icon(Symbols.Close, stringResource(R.string.all_change_mute_target))
             }
         }
     }
@@ -1564,11 +1556,11 @@ private fun ModeratorApproveUserEditor(
                 IconButton(onClick = onBack) {
                     Icon(
                         Symbols.ArrowBack,
-                        contentDescription = "Back to User management",
+                        contentDescription = stringResource(R.string.comp_back_to_user_management),
                     )
                 }
                 Column(Modifier.weight(1f)) {
-                    Text("Approve user", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.comp_approve_user), style = MaterialTheme.typography.headlineSmall)
                     Text(
                         "r/$communityName",
                         style = MaterialTheme.typography.bodyMedium,
@@ -1584,10 +1576,7 @@ private fun ModeratorApproveUserEditor(
                 color = MaterialTheme.colorScheme.surfaceContainerLow,
             ) {
                 Text(
-                    "Approving adds this account to r/$communityName's approved-user list. " +
-                        "Reddit controls how approved-user status affects participation based " +
-                        "on the community's settings. subshell verifies the relationship " +
-                        "after the action.",
+                    "Approving adds this account to r/$communityName's approved-user list. Reddit controls how approved-user status affects participation based on the community's settings. subshell verifies the relationship after the action.",
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1612,24 +1601,24 @@ private fun ModeratorApproveUserEditor(
                             username = it.take(24)
                             selectedPerson = null
                         },
-                        placeholder = "Username",
+                        placeholder = stringResource(R.string.comp_username),
                         trailingIcon = if (username.isNotEmpty()) {
                             {
                                 IconButton(enabled = !busy, onClick = { username = "" }) {
-                                    Icon(Symbols.Close, "Clear user search")
+                                    Icon(Symbols.Close, stringResource(R.string.all_clear_user_search))
                                 }
                             }
                         } else null,
                         supportingText = {
                             when {
                                 normalizedLookup.length == 1 ->
-                                    Text("Type at least 2 characters for Reddit suggestions.")
+                                    Text(stringResource(R.string.comp_type_at_least_2_characters_for_reddit))
                                 peopleSearchState.loading && searchMatches ->
-                                    Text("Searching Reddit users…")
+                                    Text(stringResource(R.string.comp_searching_reddit_users))
                                 peopleSearchState.loaded && searchMatches && people.isEmpty() ->
-                                    Text("No matching users. An exact username can still be used.")
+                                    Text(stringResource(R.string.comp_no_matching_users_an_exact_username_can))
                                 else ->
-                                    Text("Search Reddit users or enter an exact username.")
+                                    Text(stringResource(R.string.comp_search_reddit_users_or_enter_an_exact))
                             }
                         },
                     )
@@ -1668,13 +1657,13 @@ private fun ModeratorApproveUserEditor(
                 ) {
                     Icon(Symbols.PersonAdd, null, Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Confirm approve")
+                    Text(stringResource(R.string.comp_confirm_approve))
                 }
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = onBack,
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.comp_cancel))
                 }
             }
         }
@@ -1723,7 +1712,7 @@ private fun ModeratorUserSearchResult(
     onClick: () -> Unit,
 ) {
     ListCard(
-        headline = "u/${person.username}",
+        headline = stringResource(R.string.comp_u, person.username),
         supporting = person.description,
         supportingMaxLines = 2,
         onClick = onClick,
@@ -1762,17 +1751,17 @@ private fun ModeratorSelectedBanUser(
             )
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "u/${person.username}",
+                    text = stringResource(R.string.comp_u, person.username),
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    text = "Selected ban target",
+                    text = stringResource(R.string.comp_selected_ban_target),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             IconButton(enabled = enabled, onClick = onClear) {
-                Icon(Symbols.Close, contentDescription = "Change ban target")
+                Icon(Symbols.Close, contentDescription = stringResource(R.string.comp_change_ban_target))
             }
         }
     }
@@ -1786,7 +1775,7 @@ private fun ModeratorUserAvatar(
 ) {
     RemoteIdentityImage(
         uri = avatarImageUri,
-        contentDescription = "Avatar for u/$username",
+        contentDescription = stringResource(R.string.comp_avatar_for_u, username),
         modifier = Modifier
             .size(size.dp)
             .clip(CircleShape),

@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.ActivityNotFoundException
 import android.text.format.DateUtils
 import androidx.compose.foundation.layout.Arrangement
@@ -170,12 +172,10 @@ internal fun UpdatesScreen(
     permissionNeededFor?.let { release ->
         AlertDialog(
             onDismissRequest = { permissionNeededFor = null },
-            title = { Text("Allow subshell to install its update") },
+            title = { Text(stringResource(R.string.sw_allow_subshell_to_install_its_update)) },
             text = {
                 Text(
-                    "Android asks once whether subshell may install apps. subshell installs only its own " +
-                        "update from the GitHub release, after checking it against the published SHA-256, " +
-                        "and Android asks you before it installs.",
+                    stringResource(R.string.all2_android_asks_once_whether_subshell_may_install),
                 )
             },
             confirmButton = {
@@ -189,10 +189,10 @@ internal fun UpdatesScreen(
                             // No settings page to open; View release still works.
                         }
                     },
-                ) { Text("Open Android settings") }
+                ) { Text(stringResource(R.string.sw_open_android_settings)) }
             },
             dismissButton = {
-                TextButton(onClick = { permissionNeededFor = null }) { Text("Not now") }
+                TextButton(onClick = { permissionNeededFor = null }) { Text(stringResource(R.string.sw_not_now)) }
             },
         )
     }
@@ -211,9 +211,9 @@ internal fun UpdatesContent(
     val routeTopBarScroll = rememberRouteTopBarScrollBehavior()
     Column(modifier.fillMaxSize().nestedScroll(routeTopBarScroll.nestedScrollConnection)) {
         RouteTopBar(
-            title = { Text("Updates") },
+            title = { Text(stringResource(R.string.sw_updates)) },
             navigationIcon = {
-                IconButton(onClick = onBack) { Icon(Symbols.ArrowBack, contentDescription = "Back") }
+                IconButton(onClick = onBack) { Icon(Symbols.ArrowBack, contentDescription = stringResource(R.string.sw_back)) }
             },
             scrollBehavior = routeTopBarScroll,
         )
@@ -224,12 +224,12 @@ internal fun UpdatesContent(
         ) {
             item("versions") {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    VersionLine("Installed", state.installedVersionName)
+                    VersionLine(stringResource(R.string.all2_installed), state.installedVersionName)
                     if (state.runtimeEnabled) {
-                        VersionLine("Latest", state.latest?.versionName ?: "Not checked yet")
+                        VersionLine(stringResource(R.string.all2_latest), state.latest?.versionName ?: stringResource(R.string.all2_not_checked_yet))
                         if (state.lastCheckedEpochMillis > 0L) {
                             VersionLine(
-                                "Last checked",
+                                stringResource(R.string.all2_last_checked),
                                 DateUtils.getRelativeTimeSpanString(
                                     state.lastCheckedEpochMillis,
                                     state.nowEpochMillis,
@@ -268,7 +268,7 @@ internal fun UpdatesContent(
             item("check") {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(onClick = onCheckNow, enabled = !state.checking) {
-                        Text(if (state.checking) "Checking…" else "Check now")
+                        Text(if (state.checking) stringResource(R.string.all2_checking) else stringResource(R.string.all2_check_now))
                     }
                     state.checkMessage?.let { message ->
                         Text(
@@ -338,7 +338,7 @@ private fun AvailableRelease(
                 }
                 is UpdateInstallState.Installing ->
                     Text(
-                        if (install.waitingForYou) UPDATE_WAITING_FOR_YOU else "Android is installing the update…",
+                        if (install.waitingForYou) UPDATE_WAITING_FOR_YOU else stringResource(R.string.all2_android_is_installing_the_update),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 is UpdateInstallState.Failed ->
@@ -354,13 +354,13 @@ private fun AvailableRelease(
                 (install is UpdateInstallState.Installing && !install.waitingForYou)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (waiting) {
-                    Button(onClick = onContinueInstall) { Text("Continue") }
+                    Button(onClick = onContinueInstall) { Text(stringResource(R.string.sw_continue)) }
                 } else {
                     Button(onClick = onUpdate, enabled = !busy) {
-                        Text(if (install is UpdateInstallState.Failed) "Try again" else "Update")
+                        Text(if (install is UpdateInstallState.Failed) stringResource(R.string.all2_try_again) else stringResource(R.string.all2_update))
                     }
                 }
-                TextButton(onClick = onViewRelease) { Text("View release") }
+                TextButton(onClick = onViewRelease) { Text(stringResource(R.string.sw_view_release)) }
             }
         }
     }

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.theme
 
+import io.github.brealorg.subshell.harness.readSourceText
 import android.app.Application
 import android.view.ContextThemeWrapper
 import androidx.compose.foundation.shape.CornerBasedShape
@@ -93,7 +94,7 @@ class Issue221ThemeFoundationsTest {
     fun noSurfaceIsLevelledWithTonalElevation() {
         val offenders = File("src/main/java").walkTopDown()
             .filter { it.isFile && it.extension == "kt" }
-            .filter { file -> file.readText().contains("tonalElevation =") }
+            .filter { file -> file.readSourceText().contains("tonalElevation =") }
             .map { it.name }
             .toList()
         assertEquals(emptyList<String>(), offenders)
@@ -105,7 +106,7 @@ class Issue221ThemeFoundationsTest {
         val offenders = File("src/main/java").walkTopDown()
             .filter { it.isFile && it.extension == "kt" }
             .flatMap { file ->
-                val text = file.readText()
+                val text = file.readSourceText()
                 call.findAll(text).mapNotNull { match ->
                     var depth = 1
                     var end = match.range.last + 1

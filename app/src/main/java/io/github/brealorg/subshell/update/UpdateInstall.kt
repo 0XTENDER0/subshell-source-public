@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.app.ActivityManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver

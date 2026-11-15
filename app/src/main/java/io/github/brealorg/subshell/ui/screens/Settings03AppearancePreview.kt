@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.snap
@@ -96,11 +98,11 @@ internal fun AppearanceSettingsPreview(
                         verticalArrangement = Arrangement.spacedBy(3.dp),
                     ) {
                         Text(
-                            "Live preview",
+                            stringResource(R.string.all_live_preview),
                             style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
-                            "Theme, voting, code typeface and motion. Tap to replay the preview.",
+                            stringResource(R.string.all_theme_voting_code_typeface_and_motion_tap),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -155,7 +157,7 @@ private fun AppearanceStateBadge(
                 style = MaterialTheme.typography.labelLarge,
             )
             Text(
-                if (reduceMotion) "Reduced motion" else "Motion on",
+                if (reduceMotion) stringResource(R.string.all_reduced_motion) else stringResource(R.string.all_motion_on),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -371,7 +373,7 @@ private fun AppearanceMotionTrack(
         verticalArrangement = Arrangement.spacedBy(3.dp),
     ) {
         Text(
-            if (reduceMotion) "Reduced" else "Motion",
+            if (reduceMotion) stringResource(R.string.all_reduced) else stringResource(R.string.all_motion),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

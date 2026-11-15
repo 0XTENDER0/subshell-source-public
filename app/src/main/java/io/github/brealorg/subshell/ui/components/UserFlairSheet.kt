@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.ui.error.ReportFailureDiagnostic
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -102,9 +104,9 @@ fun UserFlairSheet(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Icon(Symbols.Person, contentDescription = null)
                 Column {
-                    Text("User flair", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.comp_user_flair), style = MaterialTheme.typography.headlineSmall)
                     Text(
-                        "Choose how you appear in r/$communityName.",
+                        stringResource(R.string.all_choose_how_you_appear_in_r, communityName),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -142,7 +144,7 @@ fun UserFlairSheet(
                 ) {
                     Column(Modifier.padding(14.dp)) {
                         Text(
-                            "Current flair",
+                            stringResource(R.string.all_current_flair),
                             style = MaterialTheme.typography.labelLarge,
                         )
                         ServerStyledFlairLabel(
@@ -162,7 +164,7 @@ fun UserFlairSheet(
             when {
                 uiState.loading -> Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     CircularProgressIndicator()
-                    Text("Loading Reddit flair options…")
+                    Text(stringResource(R.string.comp_loading_reddit_flair_options))
                 }
                 uiState.authorizationRequired -> {
                     Surface(
@@ -173,10 +175,10 @@ fun UserFlairSheet(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            Text("Flair access required", style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(R.string.comp_flair_access_required), style = MaterialTheme.typography.titleMedium)
                             Text("subshell needs Reddit's flair permission for this account.")
                             Button(onClick = { state.authorizeUserFlair() }) {
-                                Text("Allow flair access")
+                                Text(stringResource(R.string.comp_allow_flair_access))
                             }
                         }
                     }
@@ -194,10 +196,10 @@ fun UserFlairSheet(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            Text("Couldn't load user flair", style = MaterialTheme.typography.titleMedium)
-                            Text("Failure: ${uiState.failureKind}")
+                            Text(stringResource(R.string.comp_couldn_t_load_user_flair), style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(R.string.comp_failure, uiState.failureKind))
                             TextButton(onClick = { state.loadUserFlair(communityName, force = true) }) {
-                                Text("Retry")
+                                Text(stringResource(R.string.comp_retry))
                             }
                         }
                     }
@@ -243,7 +245,7 @@ fun UserFlairSheet(
                                         content = {
                                             ServerStyledFlairLabel(
                                                 text = option.text.ifBlank {
-                                                    "Editable flair"
+                                                    stringResource(R.string.all_editable_flair)
                                                 },
                                                 richText = option.richText,
                                                 textColor = option.textColor,
@@ -255,7 +257,7 @@ fun UserFlairSheet(
                                             )
                                         },
                                         supportingContent = if (option.editable) {
-                                            { Text("Custom text allowed") }
+                                            { Text(stringResource(R.string.comp_custom_text_allowed)) }
                                         } else null,
                                         leadingContent = {
                                             RadioButton(
@@ -276,9 +278,9 @@ fun UserFlairSheet(
                                 if (it.length <= USER_FLAIR_TEXT_MAX_CHARS) editedText = it
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text("Flair text") },
+                            label = { Text(stringResource(R.string.comp_flair_text)) },
                             supportingText = {
-                                Text("${editedText.length}/$USER_FLAIR_TEXT_MAX_CHARS")
+                                Text(stringResource(R.string.comp_text_2, editedText.length, USER_FLAIR_TEXT_MAX_CHARS))
                             },
                             singleLine = true,
                         )
@@ -295,9 +297,9 @@ fun UserFlairSheet(
                 Text(
                     text = when (uiState.failureKind) {
                         UserFlairFailureKind.OUTCOME_UNKNOWN ->
-                            "Reddit may have changed your flair. Check the community before applying again."
-                        UserFlairFailureKind.TRANSPORT -> "Couldn't apply the flair: no connection to Reddit."
-                        else -> "Reddit didn't apply the flair. Your choice is kept; try again."
+                            stringResource(R.string.all_reddit_may_have_changed_your_flair_check)
+                        UserFlairFailureKind.TRANSPORT -> stringResource(R.string.all_couldn_t_apply_the_flair_no_connection)
+                        else -> stringResource(R.string.all_reddit_didn_t_apply_the_flair_your)
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error,
@@ -308,7 +310,7 @@ fun UserFlairSheet(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
             ) {
-                TextButton(onClick = onDismiss) { Text("Cancel") }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.comp_cancel)) }
                 Spacer(Modifier.width(8.dp))
                 Button(
                     enabled = canApply,
@@ -321,7 +323,7 @@ fun UserFlairSheet(
                         )
                     },
                 ) {
-                    Text(if (uiState.mutating) "Applying…" else "Apply")
+                    Text(if (uiState.mutating) stringResource(R.string.all_applying) else stringResource(R.string.all_apply))
                 }
             }
         }

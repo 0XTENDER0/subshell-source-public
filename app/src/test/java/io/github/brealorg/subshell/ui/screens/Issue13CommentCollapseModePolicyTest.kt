@@ -1,5 +1,10 @@
 package io.github.brealorg.subshell.ui.screens
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.label
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import io.github.brealorg.subshell.ui.CommentCollapseMode
 import io.github.brealorg.subshell.ui.SubshellSettings
@@ -9,6 +14,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// TRANSLATE08: reads string resources (enum labels), so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue13CommentCollapseModePolicyTest {
     @Test
     fun commentIsTheDefaultAndEveryModeRoundTrips() {
@@ -102,6 +110,6 @@ class Issue13CommentCollapseModePolicyTest {
     private fun source(relative: String): String {
         val path = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative")
         check(path.isFile) { "Missing source fixture: ${path.path}" }
-        return path.readText()
+        return path.readSourceText()
     }
 }

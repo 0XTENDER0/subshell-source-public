@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import io.github.brealorg.subshell.model.CommunityModerator
 import java.io.File
@@ -52,7 +53,7 @@ class Moderation02A5A7PresentationPolicyTest {
     @Test
     fun removalStaysInModeratorWorkspaceAndRequiresDestructiveConfirmation() {
         val team = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/ModeratorTeam.kt")
-            .readText()
+            .readSourceText()
 
         assertTrue(team.contains("MODERATION02A5A7_REMOVE_MODERATOR_V1"))
         assertTrue(team.contains("Remove moderator"))
@@ -67,10 +68,10 @@ class Moderation02A5A7PresentationPolicyTest {
 
     @Test
     fun removalUsesExistingModeratorTeamRuntimeBundle() {
-        val app = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/SubshellApp.kt").readText()
+        val app = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/SubshellApp.kt").readSourceText()
         // The moderator bundles are built in MainActivityEntryPoints.kt.
-        val main = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/MainActivity.kt").readText() +
-            File("src/main/java/${SUBSHELL_PACKAGE_DIR}/MainActivityEntryPoints.kt").readText()
+        val main = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/MainActivity.kt").readSourceText() +
+            File("src/main/java/${SUBSHELL_PACKAGE_DIR}/MainActivityEntryPoints.kt").readSourceText()
 
         assertTrue(app.contains("data class ModeratorTeamRuntimeEntryPoints("))
         assertTrue(app.contains("moderatorRemovalState:"))
@@ -87,7 +88,7 @@ class Moderation02A5A7PresentationPolicyTest {
     @Test
     fun acknowledgedRemovalRefreshesInsteadOfOptimisticallyFilteringTheRoster() {
         val team = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/ModeratorTeam.kt")
-            .readText()
+            .readSourceText()
         val completionSlice = team
             .substringAfter("LaunchedEffect(removalState.completionRevision, removedUsername)")
             .substringBefore("if (showInviteEditor)")

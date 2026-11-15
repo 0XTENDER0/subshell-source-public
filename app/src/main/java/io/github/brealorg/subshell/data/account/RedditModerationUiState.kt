@@ -2,6 +2,7 @@ package io.github.brealorg.subshell.data.account
 
 import io.github.brealorg.subshell.data.error.FailureDetails
 import io.github.brealorg.subshell.data.normalizeRedditCommunityName
+import io.github.brealorg.subshell.model.Post
 
 enum class RedditModerationUiFailureKind {
     CLIENT_CONFIGURATION,
@@ -16,11 +17,11 @@ enum class RedditModerationUiFailureKind {
  * shows for one community. [path] is Reddit's /r/<name>/about/<path> listing;
  * "spam" holds what Reddit's filters and moderators removed.
  */
-enum class RedditModeratorQueueList(val label: String, val path: String) {
-    QUEUE("Queue", "modqueue"),
-    REMOVED("Removed", "spam"),
-    EDITED("Edited", "edited"),
-    UNMODERATED("Unmoderated", "unmoderated"),
+enum class RedditModeratorQueueList(@androidx.annotation.StringRes val labelRes: Int, val path: String) {
+    QUEUE( io.github.brealorg.subshell.R.string.reddit_moderator_queue_list_queue, "modqueue"),
+    REMOVED( io.github.brealorg.subshell.R.string.reddit_moderator_queue_list_removed, "spam"),
+    EDITED( io.github.brealorg.subshell.R.string.reddit_moderator_queue_list_edited, "edited"),
+    UNMODERATED( io.github.brealorg.subshell.R.string.reddit_moderator_queue_list_unmoderated, "unmoderated"),
 }
 
 enum class RedditModeratorQueueKind {
@@ -38,6 +39,8 @@ data class RedditModeratorQueueItem(
     val permalink: String? = null,
     val reportDetails: RedditModeratorReportDetails = RedditModeratorReportDetails(),
     val contentState: RedditModeratorContentState = RedditModeratorContentState(),
+    // ISSUE301_QUEUE_CARD_SHOWS_WHY_AND_WHAT_V1
+    val details: RedditModeratorQueueItemDetails = RedditModeratorQueueItemDetails(),
 ) {
     init {
         require(fullname.matches(Regex("t[13]_[a-z0-9]+")))
@@ -47,6 +50,36 @@ data class RedditModeratorQueueItem(
         require(reportCount >= 0)
     }
 }
+
+/**
+ * ISSUE301_QUEUE_CARD_SHOWS_WHY_AND_WHAT_V1 (#301, u/vpsj): what a queue card shows
+ * besides the title, so a moderator can decide from the card. Moderator-only,
+ * in-memory presentation data, like the report details.
+ */
+data class RedditModeratorQueueItemDetails(
+    /** A post as the feed reads it (picture, gallery, video, flair), or null for a comment. */
+    val post: Post? = null,
+    /** The first picture in a comment, or null. */
+    val commentImageUrl: String? = null,
+    /** "3h", "2d" … */
+    val ageLabel: String? = null,
+    /** The first lines of a post's text. */
+    val snippet: String? = null,
+    val postFlair: String? = null,
+    val authorFlair: String? = null,
+    /** The title of the post a comment was written on. */
+    val linkTitle: String? = null,
+    /** The removal reason a moderator picked (Removed list). */
+    val removalReasonTitle: String? = null,
+    /** Who removed it, as Reddit names them (Removed list). */
+    val removedBy: String? = null,
+    /**
+     * ISSUE301B_AUTOMOD_HELD_IS_NAMED_V1: AutoModerator filtered it into the queue
+     * (`removed_by_category = automod_filtered`, or `banned_by = AutoModerator`
+     * while `removed = false`); not removed, and Reddit does not send the rule.
+     */
+    val heldByAutoModerator: Boolean = false,
+)
 
 // MOD01A22_EXACT_MODERATION_TARGET_V1
 data class RedditModeratorQueueTarget(

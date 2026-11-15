@@ -159,7 +159,7 @@ class Feeds01CustomFeedPagingComposeTest {
         )
 
         assertEquals("no automatic retry of a failing request", 0, calls.appends)
-        assertEquals("Couldn't load more posts", host.currentRequest?.presentation?.title)
+        assertEquals("Couldn't load more posts", host.currentRequest?.presentation?.title?.s)
         host.retryCurrent()
         assertEquals(1, calls.appends)
         assertEquals(0, calls.refreshes)
@@ -177,7 +177,7 @@ class Feeds01CustomFeedPagingComposeTest {
             host = host,
         )
 
-        assertEquals("Couldn't refresh the feed", host.currentRequest?.presentation?.title)
+        assertEquals("Couldn't refresh the feed", host.currentRequest?.presentation?.title?.s)
         host.retryCurrent()
         assertEquals(1, calls.refreshes)
         assertEquals(0, calls.appends)

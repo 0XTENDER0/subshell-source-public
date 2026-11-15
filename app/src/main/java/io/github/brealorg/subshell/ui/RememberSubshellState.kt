@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.SharedPreferences
 import io.github.brealorg.subshell.data.privateprefs.SealedKeysPreferences
 import io.github.brealorg.subshell.ui.theme.AppTextScale
@@ -757,6 +759,22 @@ fun rememberSubshellState(
                 SubshellSettings.RESUME_FEED_POSITION_START,
                 FeedPositionStart.entries,
                 DefaultSubshellSettings.resumeFeedPositionStart,
+            ),
+            // ISSUE302_START_FEED_V1 / ISSUE300_DEFAULT_FEED_SORT_V1
+            initialStartFeed = enumValue(
+                SubshellSettings.START_FEED,
+                StartFeed.entries,
+                DefaultSubshellSettings.startFeed,
+            ),
+            initialDefaultFeedSort = enumValue(
+                SubshellSettings.DEFAULT_FEED_SORT,
+                FeedSort.entries,
+                DefaultSubshellSettings.defaultFeedSort,
+            ),
+            initialDefaultCommunitySort = enumValue(
+                SubshellSettings.DEFAULT_COMMUNITY_SORT,
+                CommunitySort.entries,
+                DefaultSubshellSettings.defaultCommunitySort,
             ),
             feedPositionFile = FeedPositionFile {
                 java.io.File(

@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.label
 import io.github.brealorg.subshell.ui.theme.AppTextScale
 import io.github.brealorg.subshell.backup.BackupRetention
 import io.github.brealorg.subshell.backup.BackupRetentionPolicy
@@ -40,6 +44,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// TRANSLATE08: reads string resources (enum labels), so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class SettingsBackupContractTest {
     private val customizedSettings = SubshellSettings(
         themeMode = ThemeMode.LIGHT,

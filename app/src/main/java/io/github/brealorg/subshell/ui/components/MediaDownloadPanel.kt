@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -119,7 +122,10 @@ internal fun MediaDownloadPanel(
 internal const val MEDIA_ACTION_ERROR_SCOPE = "media-actions"
 
 /** Shows a media share/download failure in the viewport error tray. */
-internal fun ViewportErrorHostState.reportMediaActionFailure(title: String, message: String) {
+internal fun ViewportErrorHostState.reportMediaActionFailure(title: String, message: String) =
+    reportMediaActionFailure(UiText.Plain(title), UiText.Plain(message))
+
+internal fun ViewportErrorHostState.reportMediaActionFailure(title: UiText, message: UiText) {
     clear(MEDIA_ACTION_ERROR_SCOPE)
     present(
         scopeKey = MEDIA_ACTION_ERROR_SCOPE,

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertEquals
@@ -71,5 +72,5 @@ class Issue16SwipeActionsSettingsPresentationPolicyTest {
     }
 
     private fun source(relative: String): String =
-        File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative").readText()
+        File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative").readSourceText()
 }

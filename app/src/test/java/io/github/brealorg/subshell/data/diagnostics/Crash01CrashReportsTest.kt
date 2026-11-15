@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.data.diagnostics
 
+import io.github.brealorg.subshell.ui.s
 import android.app.ActivityManager
 import android.app.Application
 import android.app.ApplicationExitInfo
@@ -235,8 +236,8 @@ class Crash01CrashReportsTest {
         val request = requireNotNull(host.currentRequest)
         assertEquals(CRASH_REPORT_PROMPT_SCOPE, request.scopeKey)
         assertEquals(TrayTone.INFO, request.tone)
-        assertEquals("subshell closed unexpectedly last time", request.presentation.title)
-        assertEquals("Send report", request.presentation.primaryAction?.label)
+        assertEquals("subshell closed unexpectedly last time", request.presentation.title.s)
+        assertEquals("Send report", request.presentation.primaryAction?.label?.s)
         composeRule.runOnIdle { requireNotNull(request.onRetry).invoke() }
         composeRule.waitForIdle()
 
@@ -250,7 +251,7 @@ class Crash01CrashReportsTest {
         assertNull(crashReportPromptPresentation(emptyList()))
         assertEquals(
             "subshell stopped responding last time",
-            crashReportPromptPresentation(listOf(CrashRecord(CrashKind.NOT_RESPONDING, 1L, null)))?.title,
+            crashReportPromptPresentation(listOf(CrashRecord(CrashKind.NOT_RESPONDING, 1L, null)))?.title?.s,
         )
     }
 

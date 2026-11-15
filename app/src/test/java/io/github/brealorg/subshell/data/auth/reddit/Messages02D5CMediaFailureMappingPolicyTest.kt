@@ -11,6 +11,7 @@ class Messages02D5CMediaFailureMappingPolicyTest {
         val expected = mapOf(
             MessageReplyFailureKind.VALIDATION to DirectChatStartFailureKind.VALIDATION,
             MessageReplyFailureKind.CHAT_SESSION_REQUIRED to DirectChatStartFailureKind.SESSION,
+            MessageReplyFailureKind.CHAT_WEB_SIGN_IN_EXPIRED to DirectChatStartFailureKind.SESSION,
             MessageReplyFailureKind.CHAT_ROOM_UNAVAILABLE to DirectChatStartFailureKind.ROOM,
             MessageReplyFailureKind.MEDIA_CAPTION_UNSUPPORTED to
                 DirectChatStartFailureKind.VALIDATION,

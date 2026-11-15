@@ -94,7 +94,7 @@ internal class RedditChatMatrixTypingWriter(
         val webToken = when (val result = tokenProvider.token()) {
             is RedditChatWebTokenResult.Success -> result.token
             RedditChatWebTokenResult.NoRedditWebSession,
-            RedditChatWebTokenResult.Failed,
+            is RedditChatWebTokenResult.Failed,
             -> return logFailure(typing, "web_session")
         }
 

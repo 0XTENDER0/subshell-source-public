@@ -1,50 +1,52 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.model.Post
 import io.github.brealorg.subshell.ui.components.redditFlairFallbackText
 import java.util.Locale
 
 enum class ContentFilterType(
-    val label: String,
-    val singularLabel: String,
+    @androidx.annotation.StringRes val labelRes: Int,
+    @androidx.annotation.StringRes val singularLabelRes: Int,
     val storageKey: String,
-    val placeholder: String,
-    val description: String,
+    @androidx.annotation.StringRes val placeholderRes: Int,
+    @androidx.annotation.StringRes val descriptionRes: Int,
 ) {
     WORD(
-        label = "Words",
-        singularLabel = "word or phrase",
+        labelRes = R.string.content_filter_word_label,
+        singularLabelRes = R.string.content_filter_word_singular_label,
         storageKey = "content_filter_words",
-        placeholder = "e.g. giveaway",
-        description = "Matches text in post titles and bodies",
+        placeholderRes = R.string.content_filter_word_placeholder,
+        descriptionRes = R.string.content_filter_word_description,
     ),
     COMMUNITY(
-        label = "Communities",
-        singularLabel = "community",
+        labelRes = R.string.content_filter_community_label,
+        singularLabelRes = R.string.content_filter_community_singular_label,
         storageKey = "content_filter_communities",
-        placeholder = "e.g. r/example",
-        description = "Matches a complete community name",
+        placeholderRes = R.string.content_filter_community_placeholder,
+        descriptionRes = R.string.content_filter_community_description,
     ),
     USER(
-        label = "Users",
-        singularLabel = "user",
+        labelRes = R.string.content_filter_user_label,
+        singularLabelRes = R.string.content_filter_user_singular_label,
         storageKey = "content_filter_users",
-        placeholder = "e.g. u/example",
-        description = "Matches a complete author name",
+        placeholderRes = R.string.content_filter_user_placeholder,
+        descriptionRes = R.string.content_filter_user_description,
     ),
     DOMAIN(
-        label = "Domains",
-        singularLabel = "domain",
+        labelRes = R.string.content_filter_domain_label,
+        singularLabelRes = R.string.content_filter_domain_singular_label,
         storageKey = "content_filter_domains",
-        placeholder = "e.g. example.com",
-        description = "Matches a domain and its subdomains",
+        placeholderRes = R.string.content_filter_domain_placeholder,
+        descriptionRes = R.string.content_filter_domain_description,
     ),
     FLAIR(
-        label = "Flairs",
-        singularLabel = "flair",
+        labelRes = R.string.content_filter_flair_label,
+        singularLabelRes = R.string.content_filter_flair_singular_label,
         storageKey = "content_filter_flairs",
-        placeholder = "e.g. Meme",
-        description = "Matches complete post flair text",
+        placeholderRes = R.string.content_filter_flair_placeholder,
+        descriptionRes = R.string.content_filter_flair_description,
     ),
     ;
 

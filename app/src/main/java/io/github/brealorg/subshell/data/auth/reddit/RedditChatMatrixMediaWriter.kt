@@ -2,6 +2,7 @@ package io.github.brealorg.subshell.data.auth.reddit
 
 import io.github.brealorg.subshell.chat.RedditChatWebTokenSource
 import io.github.brealorg.subshell.chat.RedditChatWebTokenResult
+import io.github.brealorg.subshell.chat.redditChatWebSignInExpired
 import android.os.SystemClock
 import android.util.Log
 
@@ -109,8 +110,9 @@ internal class RedditChatMatrixMediaWriter(
                 // report tells which part of the Direct Chat media path stops.
                 RedditChatWebTokenResult.NoRedditWebSession ->
                     return@withContext failed(MessageReplyFailureKind.CHAT_SESSION_REQUIRED, step = CHAT_STEP_NO_WEB_SESSION)
-                RedditChatWebTokenResult.Failed ->
-                    return@withContext failed(MessageReplyFailureKind.CHAT_SESSION_REQUIRED, step = CHAT_STEP_TOKEN_FAILED)
+                // ISSUE303_CHAT_TOKEN_FAILURE_NAMES_ITS_STEP_V1: the mint's own step.
+                is RedditChatWebTokenResult.Failed ->
+                    return@withContext failed(MessageReplyFailureKind.CHAT_SESSION_REQUIRED, step = result.step)
             }
             val webToken = webTokenResult.token
 
@@ -130,6 +132,14 @@ internal class RedditChatMatrixMediaWriter(
                     is MatrixHttpResult.HttpFailure -> {
                         if (whoami.statusCode == 401 || whoami.statusCode == 403) {
                             invalidateAuthorization(webToken)
+                        }
+                        // ISSUE303B_A_MATRIX_401_ON_A_FRESH_TOKEN_IS_AN_EXPIRED_WEB_SIGN_IN_V1
+                        if (redditChatWebSignInExpired(webTokenResult, whoami.statusCode)) {
+                            return@withContext failed(
+                                MessageReplyFailureKind.CHAT_WEB_SIGN_IN_EXPIRED,
+                                statusCode = whoami.statusCode,
+                                step = CHAT_STEP_WHOAMI,
+                            )
                         }
                         return@withContext mapHttp(whoami.statusCode, CHAT_STEP_WHOAMI)
                     }
@@ -310,20 +320,6 @@ internal class RedditChatMatrixMediaWriter(
                                     sentMatrixEventId = send.eventId,
                                 )
                             }
-
-                            MatrixSendResult.ProtocolFailure -> {
-                                // A successful HTTP response without a verifiable text event_id is
-                                // uncertain after the media has already committed. Never blind-retry.
-                                Log.w(
-                                    MATRIX_DUAL_WRITE_LOG_TAG,
-                                    "stage=text_outcome_unknown kind=protocol media_accepted=true",
-                                )
-                                failed(MessageReplyFailureKind.OUTCOME_UNKNOWN).copy(
-                                    sentMediaUri = sentMediaUri,
-                                    sentMatrixMediaId = sentMatrixMediaId,
-                                    sentMatrixEventId = send.eventId,
-                                )
-                            }
                         }
                     }
                 }
@@ -342,10 +338,19 @@ internal class RedditChatMatrixMediaWriter(
                     }
                     mapHttp(send.statusCode, CHAT_STEP_IMAGE_SEND, roomRefused)
                 }
+                // ISSUE303_AN_UNKNOWN_IMAGE_SEND_KEEPS_ITS_MEDIA_ID_V1: the upload
+                // is done, so the media id is known; the conversation recognises
+                // the image by it once Reddit lists it, instead of offering a
+                // second send.
                 is MatrixSendResult.UnknownOutcome ->
-                    failed(MessageReplyFailureKind.OUTCOME_UNKNOWN)
-                MatrixSendResult.ProtocolFailure ->
-                    failed(MessageReplyFailureKind.API)
+                    failed(
+                        MessageReplyFailureKind.OUTCOME_UNKNOWN,
+                        statusCode = send.statusCode,
+                        step = CHAT_STEP_IMAGE_SEND,
+                    ).copy(
+                        sentMediaUri = redditMatrixDownloadUri(contentUri),
+                        sentMatrixMediaId = redditMatrixMediaId(contentUri),
+                    )
             }
         } finally {
             discardStagedMedia(staged.file)
@@ -532,21 +537,7 @@ internal class RedditChatMatrixMediaWriter(
             .build()
         return try {
             client.newCall(request).execute().use { response ->
-                val body = response.body.string()
-                if (!response.isSuccessful) {
-                    MatrixSendResult.HttpFailure(response.code, redditChatMatrixErrcode(body))
-                } else {
-                    val eventId = parseObject(body)
-                        ?.get("event_id")
-                        ?.primitiveOrNull
-                        ?.contentOrNull
-                        ?.takeIf(String::isNotEmpty)
-                    if (eventId == null) {
-                        MatrixSendResult.ProtocolFailure
-                    } else {
-                        MatrixSendResult.Accepted(eventId)
-                    }
-                }
+                matrixSendAnswer(response.code, response.isSuccessful, response.body.string(), transactionId)
             }
         } catch (_: SocketTimeoutException) {
             MatrixSendResult.UnknownOutcome(transactionId)
@@ -581,27 +572,39 @@ internal class RedditChatMatrixMediaWriter(
             .build()
         return try {
             client.newCall(request).execute().use { response ->
-                val responseBody = response.body.string()
-                if (!response.isSuccessful) {
-                    MatrixSendResult.HttpFailure(response.code, redditChatMatrixErrcode(responseBody))
-                } else {
-                    val eventId = parseObject(responseBody)
-                        ?.get("event_id")
-                        ?.primitiveOrNull
-                        ?.contentOrNull
-                        ?.takeIf(String::isNotEmpty)
-                    if (eventId == null) {
-                        MatrixSendResult.ProtocolFailure
-                    } else {
-                        MatrixSendResult.Accepted(eventId)
-                    }
-                }
+                matrixSendAnswer(response.code, response.isSuccessful, response.body.string(), transactionId)
             }
         } catch (_: SocketTimeoutException) {
             MatrixSendResult.UnknownOutcome(transactionId)
         } catch (_: IOException) {
             MatrixSendResult.UnknownOutcome(transactionId)
         }
+    }
+
+    // ISSUE303_A_SEND_WITHOUT_A_CLEAR_ANSWER_IS_READ_BACK_V1: a 5xx/408/421/425
+    // or a 2xx without an event id may have been stored (Matrix keys the PUT on
+    // its transaction id), so it is an unknown outcome and goes through the
+    // read-back like a lost answer; it is never sent again.
+    private fun matrixSendAnswer(
+        statusCode: Int,
+        successful: Boolean,
+        body: String,
+        transactionId: String,
+    ): MatrixSendResult {
+        if (!successful) {
+            return if (isRedditWriteOutcomeUnknownStatus(statusCode)) {
+                MatrixSendResult.UnknownOutcome(transactionId, statusCode)
+            } else {
+                MatrixSendResult.HttpFailure(statusCode, redditChatMatrixErrcode(body))
+            }
+        }
+        val eventId = parseObject(body)
+            ?.get("event_id")
+            ?.primitiveOrNull
+            ?.contentOrNull
+            ?.takeIf(String::isNotEmpty)
+            ?: return MatrixSendResult.UnknownOutcome(transactionId, statusCode)
+        return MatrixSendResult.Accepted(eventId)
     }
 
     // CHATREAD01_LOST_SEND_READ_BACK_BY_TRANSACTION_V1 (OCB-485): a send whose
@@ -733,8 +736,9 @@ internal class RedditChatMatrixMediaWriter(
         data class HttpFailure(val statusCode: Int, val errcode: String? = null) : MatrixSendResult
         // DEAD03_NO_MATRIX_SEND_TRANSPORT_FAILURE_V1 (OCB-484): every IOException
         // during a send is an unknown outcome, so there is no transport variant.
-        data class UnknownOutcome(val transactionId: String) : MatrixSendResult
-        data object ProtocolFailure : MatrixSendResult
+        // A 2xx without an event id is an unknown outcome too (ISSUE303), so
+        // there is no protocol variant either.
+        data class UnknownOutcome(val transactionId: String, val statusCode: Int? = null) : MatrixSendResult
     }
 
     companion object {
@@ -802,7 +806,6 @@ internal fun redditChatMatrixHttpFailureKind(statusCode: Int, step: String): Mes
 
 // CHAT01_CHAT_SESSION_FAILURE_STEP_V1: which Direct Chat media step failed.
 internal const val CHAT_STEP_NO_WEB_SESSION = "CHAT_NO_WEB_SESSION"
-internal const val CHAT_STEP_TOKEN_FAILED = "CHAT_WEB_TOKEN_FAILED"
 internal const val CHAT_STEP_WHOAMI = "CHAT_MATRIX_WHOAMI"
 internal const val CHAT_STEP_IDENTITY_MISMATCH = "CHAT_MATRIX_ACCOUNT_MISMATCH"
 internal const val CHAT_STEP_ROOM = "CHAT_MATRIX_ROOM"

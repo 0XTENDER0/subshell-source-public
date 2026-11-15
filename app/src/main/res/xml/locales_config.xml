@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TRANSLATE00_LOCALES_CONFIG_V1: the languages the app offers in Android's
+     per-app language setting. Add a line here when a values-<code> folder
+     has enough translated text to be useful. -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="nb" />
+</locale-config>

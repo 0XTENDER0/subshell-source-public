@@ -395,6 +395,28 @@ internal class RoomSubshellCacheStore(
         )
     }
 
+    /**
+     * LINKEDPOST01_A_POST_OPENED_FROM_A_LINK_IS_STORED_V1: a post opened from a
+     * link, notification, Inbox item, search hit or queue item came from Reddit
+     * and lived only in memory, so after process death the restore found no
+     * stored post and dropped the screen. It is stored as a one-post list of its
+     * account: the orphan clean-up keeps a row a list points at, the query cap
+     * bounds how many there are, and the row is the account's scoped (sealed) row.
+     */
+    fun storeLinkedPost(accountStableId: String, post: Post) {
+        if (accountStableId.isBlank() || post.id.isBlank()) return
+        writePostPage(
+            request = RepositoryPageRequest(
+                limit = 1,
+                queryKey = linkedPostQueryKey(accountStableId, post.id),
+                operation = RepositoryLoadOperation.REFRESH,
+            ),
+            posts = listOf(post),
+            nextCursor = null,
+            successfulRefreshEpochMs = clock.nowEpochMs(),
+        )
+    }
+
     fun writePostResult(
         request: RepositoryPageRequest,
         result: RepositoryResult<List<Post>>,
@@ -1059,13 +1081,13 @@ internal class RoomSubshellCacheStore(
     ): CachedLiveInboxSnapshot? {
         val metadata = dao.liveInboxList(account) ?: return null
         if (touch) dao.touchLiveInboxList(account, clock.nowEpochMs())
+        val items = dao.liveInboxEntries(account)
+            .decodedAllOrNull { entity -> decodeInboxPayload(entity.payload) }
+            ?: return null
         return CachedLiveInboxSnapshot(
-            items = dao.liveInboxEntries(account)
-                .decodedAllOrNull { entity -> decodeInboxPayload(entity.payload) }
-                ?: return null,
+            items = items,
             nextCursor = metadata.nextCursor,
-            locallySeenIds = dao.liveInboxSeen(account)
-                .mapTo(linkedSetOf()) { entity -> entity.itemId },
+            locallySeenIds = liveInboxSeenStillCovering(dao.liveInboxSeen(account), items),
             lastSuccessfulRefreshEpochMs = metadata.lastSuccessfulRefreshEpochMs,
         )
     }
@@ -1790,6 +1812,11 @@ internal fun accountScopedPostRowKey(accountStableId: String, postId: String): S
         postId,
     )
 
+// LINKEDPOST01_A_POST_OPENED_FROM_A_LINK_IS_STORED_V1: one list per post and account.
+internal fun linkedPostQueryKey(accountStableId: String, postId: String): RepositoryQueryKey =
+    RepositoryQueryKey("linked-post|${postId.replace("%", "%25").replace("|", "%7c")}")
+        .scopedToAccount(stableId = accountStableId, source = AccountSessionSource.AUTHENTICATED)
+
 internal fun cachedPostIdOfRowKey(rowKey: String): String =
     rowKey.substringAfterLast(CACHED_POST_ROW_SEPARATOR)
 
@@ -1833,3 +1860,28 @@ internal fun processRuntimeCacheStore(context: android.content.Context): RoomSub
             }
     }
 }
+
+/**
+ * ISSUE305_A_SEEN_MARK_COVERS_WHAT_WAS_THERE_V1 (#305, owner's choice): a seen
+ * mark kept after a failed server read (INBOXM3A2R2C1, MED4A) is per item, and
+ * a message thread's item is the thread, so one failed mark-read silenced
+ * every later message in it (no notification, never unread). A mark now only
+ * covers what the item held when it was seen: when the item's newest message
+ * is later than the mark (beyond [SEEN_MARK_CLOCK_SLACK_MS] for the phone's
+ * clock against Reddit's), the item counts as unseen again. The rows and
+ * their format are unchanged.
+ */
+internal fun liveInboxSeenStillCovering(
+    seen: List<CachedLiveInboxSeenEntity>,
+    items: List<io.github.brealorg.subshell.model.InboxItem>,
+): LinkedHashSet<String> {
+    val newestById = items.associate { item -> item.id to item.createdEpochSeconds }
+    return seen
+        .filter { mark ->
+            val newestSeconds = newestById[mark.itemId] ?: return@filter true
+            newestSeconds * 1_000L <= mark.seenAtEpochMs + SEEN_MARK_CLOCK_SLACK_MS
+        }
+        .mapTo(linkedSetOf()) { mark -> mark.itemId }
+}
+
+internal const val SEEN_MARK_CLOCK_SLACK_MS = 120_000L

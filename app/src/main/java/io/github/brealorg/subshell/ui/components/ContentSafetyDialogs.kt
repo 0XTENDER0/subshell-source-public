@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.selection.selectable
@@ -98,9 +100,9 @@ ModalBottomSheet(
                     Icon(Symbols.Flag, contentDescription = null, modifier = Modifier.padding(12.dp))
                 }
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text("Report $targetLabel", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.comp_report, targetLabel), style = MaterialTheme.typography.headlineSmall)
                     Text(
-                        "Tell Reddit why this $targetLabel should be reported.",
+                        stringResource(R.string.all_tell_reddit_why_this_should_be_reported, targetLabel),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -123,9 +125,9 @@ ModalBottomSheet(
                     ) {
                         CircularProgressIndicator()
                         Column {
-                            Text("Loading report reasons", style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(R.string.comp_loading_report_reasons), style = MaterialTheme.typography.titleMedium)
                             Text(
-                                "Checking r/$communityName rules on Reddit…",
+                                stringResource(R.string.all_checking_r_rules_on_reddit, communityName),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -137,16 +139,16 @@ ModalBottomSheet(
                         contentColor = MaterialTheme.colorScheme.onErrorContainer,
                     ) {
                         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("Couldn't load report reasons", style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(R.string.comp_couldn_t_load_report_reasons), style = MaterialTheme.typography.titleMedium)
                             Text("subshell won't guess whether r/$communityName accepts custom reports.")
                             TextButton(onClick = { state.ensureReportReasonPolicy(communityName, force = true) }) {
-                                Text("Retry")
+                                Text(stringResource(R.string.comp_retry))
                             }
                         }
                     }
                     policy != null -> {
                         if (policy.options.isNotEmpty()) {
-                            Text("Community rules", style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(R.string.comp_community_rules), style = MaterialTheme.typography.titleMedium)
                             policy.options.forEach { option ->
                                 val selected = !otherSelected && selectedReason == option.wireReason
                                 // LOWUI7_CHOICE_ROWS_SAY_WHICH_IS_SELECTED_V1 (OCB-131)
@@ -181,8 +183,8 @@ ModalBottomSheet(
                                     containerColor = if (otherSelected) MaterialTheme.colorScheme.secondaryContainer
                                     else MaterialTheme.colorScheme.surfaceContainerLow,
                                 ),
-                                content = { Text("Something else") },
-                                supportingContent = { Text("Write a custom reason for Reddit.") },
+                                content = { Text(stringResource(R.string.comp_something_else)) },
+                                supportingContent = { Text(stringResource(R.string.comp_write_a_custom_reason_for_reddit)) },
                                 leadingContent = { RadioButton(selected = otherSelected, onClick = null) },
                             )
                             if (otherSelected) {
@@ -190,8 +192,8 @@ ModalBottomSheet(
                                     value = customReason,
                                     onValueChange = { next -> if (next.length <= REPORT_REASON_MAX_CHARS) customReason = next },
                                     modifier = Modifier.fillMaxWidth(),
-                                    label = { Text("Report reason") },
-                                    supportingText = { Text("${customReason.length}/$REPORT_REASON_MAX_CHARS") },
+                                    label = { Text(stringResource(R.string.comp_report_reason)) },
+                                    supportingText = { Text(stringResource(R.string.comp_text_2, customReason.length, REPORT_REASON_MAX_CHARS)) },
                                     minLines = 2,
                                     maxLines = 4,
                                 )
@@ -200,7 +202,7 @@ ModalBottomSheet(
                             Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
                                 Text(
                                     if (policy.freeFormReportsKnown) "r/$communityName accepts only its listed report reasons."
-                                    else "Reddit didn't confirm that r/$communityName accepts custom report reasons.",
+                                    else stringResource(R.string.all_reddit_didn_t_confirm_that_r_accepts, communityName),
                                     modifier = Modifier.padding(14.dp),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -209,7 +211,7 @@ ModalBottomSheet(
                         }
                         if (policy.options.isEmpty() && !policy.freeFormReportsAllowed) {
                             Text(
-                                "No safe report reason is available from Reddit for this $targetLabel.",
+                                stringResource(R.string.all_no_safe_report_reason_is_available_from, targetLabel),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -226,9 +228,9 @@ ModalBottomSheet(
                     .padding(top = 4.dp, bottom = 12.dp),
                 horizontalArrangement = Arrangement.End,
             ) {
-                TextButton(onClick = onDismiss) { Text("Cancel") }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.comp_cancel)) }
                 Spacer(Modifier.width(8.dp))
-                Button(onClick = { onReport(reason) }, enabled = canReport) { Text("Report") }
+                Button(onClick = { onReport(reason) }, enabled = canReport) { Text(stringResource(R.string.comp_report_2)) }
             }
         }
     }

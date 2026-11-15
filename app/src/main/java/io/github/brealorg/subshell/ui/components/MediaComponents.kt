@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import androidx.compose.ui.res.pluralStringResource
+import io.github.brealorg.subshell.ui.UiText
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.runtime.rememberUpdatedState
@@ -387,7 +390,7 @@ fun PostMedia(
             runCatching { uriHandler.openUri(url) }
                 .onFailure {
                     // ISSUE222_NO_TOASTS_V1
-                    mediaErrorHost.noticeFailure("Couldn't open the link", "No app on this device can open it")
+                    mediaErrorHost.noticeFailure(UiText.Resource(R.string.nt_couldn_t_open_the_link_2), UiText.Resource(R.string.nt_no_app_on_this_device_can_open_2))
                 }
         }
     }
@@ -551,7 +554,7 @@ fun PostMedia(
                                 ) {
                                     Icon(
                                         imageVector = Symbols.OpenInNew,
-                                        contentDescription = "Open external link",
+                                        contentDescription = stringResource(R.string.feed_open_external_link),
                                         modifier = Modifier.padding(8.dp),
                                     )
                                 }
@@ -570,13 +573,13 @@ fun PostMedia(
                         onOpenReddit = {
                             val intent = redditPollExternalIntent(context, post)
                             if (intent == null) {
-                                mediaErrorHost.noticeFailure("Couldn't open the poll on Reddit", "No app on this device can open it")
+                                mediaErrorHost.noticeFailure(UiText.Resource(R.string.nt_couldn_t_open_the_poll_on_reddit), UiText.Resource(R.string.nt_no_app_on_this_device_can_open_2))
                             } else {
                                 val handoffStore = RedditExternalPollHandoffStore(context)
                                 handoffStore.mark(post.id)
                                 if (runCatching { context.startActivity(intent) }.isFailure) {
                                     handoffStore.clear()
-                                    mediaErrorHost.noticeFailure("Couldn't open the poll on Reddit", "No app on this device can open it")
+                                    mediaErrorHost.noticeFailure(UiText.Resource(R.string.nt_couldn_t_open_the_poll_on_reddit), UiText.Resource(R.string.nt_no_app_on_this_device_can_open_2))
                                 }
                             }
                         },
@@ -652,13 +655,13 @@ fun PostMedia(
                     }
 
                     Text(
-                        if (videoShareTarget) "Preparing video" else "Preparing media",
+                        if (videoShareTarget) stringResource(R.string.all_preparing_video) else stringResource(R.string.all_preparing_media),
                         modifier = Modifier.padding(top = 18.dp),
                         style = MaterialTheme.typography.titleLarge,
                     )
 
                     Text(
-                        "Getting it ready to share",
+                        stringResource(R.string.all_getting_it_ready_to_share),
                         modifier = Modifier.padding(top = 6.dp),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -673,7 +676,7 @@ fun PostMedia(
                     )
 
                     Text(
-                        if (videoShareTarget) "Larger videos can take a moment" else "Large files can take a moment",
+                        if (videoShareTarget) stringResource(R.string.all_larger_videos_can_take_a_moment) else stringResource(R.string.all_large_files_can_take_a_moment),
                         modifier = Modifier.padding(top = 10.dp),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -681,13 +684,13 @@ fun PostMedia(
                 }
             } else {
                 Text(
-                    "Media actions",
+                    stringResource(R.string.all_media_actions),
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
                     style = MaterialTheme.typography.titleMedium,
                 )
                 ListItem(
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                    content = { Text("Share media") },
+                    content = { Text(stringResource(R.string.feed_share_media)) },
                     leadingContent = {
                         Icon(Symbols.Share, contentDescription = null)
                     },
@@ -712,7 +715,7 @@ fun PostMedia(
                 )
             ListItem(
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                content = { Text("Share post link") },
+                content = { Text(stringResource(R.string.feed_share_post_link)) },
                 leadingContent = {
                     Icon(Symbols.Link, contentDescription = null)
                 },
@@ -723,7 +726,7 @@ fun PostMedia(
             )
             ListItem(
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                content = { Text("Download") },
+                content = { Text(stringResource(R.string.feed_download)) },
                 leadingContent = {
                     Icon(Symbols.Download, contentDescription = null)
                 },
@@ -753,7 +756,7 @@ fun PostMedia(
             if (target.post.kind == PostKind.GALLERY && galleryItems.size > 1) {
                 ListItem(
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                    content = { Text("Download all ${galleryItems.size}") },
+                    content = { Text(stringResource(R.string.feed_download_all, galleryItems.size)) },
                     leadingContent = {
                         Icon(Symbols.PhotoLibrary, contentDescription = null)
                     },
@@ -779,8 +782,8 @@ fun PostMedia(
                                 delay(MEDIA_DOWNLOAD_SAVED_VISIBLE_MS)
                             } else {
                                 mediaErrorHost?.reportMediaActionFailure(
-                                    title = "Could not download",
-                                    message = "None of the ${galleryItems.size} items could be saved",
+                                    title = UiText.Resource(R.string.media_could_not_download),
+                                    message = UiText.Plural(R.plurals.gallery_none_saved, galleryItems.size, galleryItems.size),
                                 )
                             }
                             mediaDownload = null
@@ -915,7 +918,7 @@ fun LocalUriMedia(
                 ) {
                     Icon(Symbols.HideImage, contentDescription = null)
                     Text(
-                        "Preview unavailable",
+                        stringResource(R.string.all_preview_unavailable),
                         modifier = Modifier.padding(top = 6.dp),
                         style = MaterialTheme.typography.labelMedium,
                     )
@@ -934,7 +937,7 @@ fun LocalUriMedia(
             ) {
                 Icon(
                     Symbols.PlayArrowFilled,
-                    contentDescription = "Video preview",
+                    contentDescription = stringResource(R.string.feed_video_preview),
                     tint = Color.White,
                     modifier = Modifier.padding(10.dp).size(28.dp),
                 )
@@ -972,14 +975,14 @@ private fun SensitiveMediaCover(
                 tint = foreground,
             )
             Text(
-                if (post.nsfw) "Sensitive media · tap to reveal" else "Spoiler · tap to reveal",
+                if (post.nsfw) stringResource(R.string.all_sensitive_media_tap_to_reveal) else stringResource(R.string.all_spoiler_tap_to_reveal),
                 modifier = Modifier.padding(top = 8.dp),
                 color = foreground,
                 style = MaterialTheme.typography.labelLarge,
             )
             if (!preloaded) {
                 Text(
-                    "Loads after you tap",
+                    stringResource(R.string.all_loads_after_you_tap),
                     modifier = Modifier.padding(top = 3.dp),
                     color = foreground,
                     style = MaterialTheme.typography.labelSmall,
@@ -1012,9 +1015,9 @@ private fun HiddenSensitiveMediaRow(
             )
             Text(
                 text = if (post.nsfw) {
-                    "Sensitive preview hidden · open separately"
+                    stringResource(R.string.all_sensitive_preview_hidden_open_separately)
                 } else {
-                    "Spoiler preview hidden · open separately"
+                    stringResource(R.string.all_spoiler_preview_hidden_open_separately)
                 },
                 modifier = Modifier.padding(start = 10.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1077,12 +1080,12 @@ internal fun MediaFailurePlaceholder(
             tint = if (gone) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error,
         )
         Text(
-            text = presentation.title,
+            text = presentation.title.asString(),
             style = MaterialTheme.typography.titleSmall,
             color = if (gone) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error,
         )
         Text(
-            text = presentation.message,
+            text = presentation.message.asString(),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -1095,7 +1098,7 @@ internal fun MediaFailurePlaceholder(
         }
         if (presentation.primaryAction?.kind == ErrorActionKind.RETRY) {
             TextButton(onClick = onRetry) {
-                Text(presentation.primaryAction.label)
+                Text(presentation.primaryAction.label.asString())
             }
         }
         val host = mediaSourceHost(sourceUri)
@@ -1107,7 +1110,7 @@ internal fun MediaFailurePlaceholder(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             TextButton(onClick = { runCatching { uriHandler.openUri(sourceUri.trim()) } }) {
-                Text(presentation.primaryAction.label)
+                Text(presentation.primaryAction.label.asString())
             }
         }
     }
@@ -1190,7 +1193,7 @@ fun RemoteImage(
                 } else {
                     Icon(
                         Symbols.HideImage,
-                        contentDescription = "Image unavailable",
+                        contentDescription = stringResource(R.string.feed_image_unavailable),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -1332,7 +1335,7 @@ fun RemoteGifMedia(
                     ) {
                         Icon(
                             Symbols.PlayArrowFilled,
-                            contentDescription = "GIF paused",
+                            contentDescription = stringResource(R.string.feed_gif_paused),
                             modifier = Modifier.padding(11.dp),
                             tint = Color.White,
                         )
@@ -1455,7 +1458,7 @@ fun GifMedia(
             ) {
                 Icon(
                     Symbols.PlayArrowFilled,
-                    contentDescription = "GIF paused",
+                    contentDescription = stringResource(R.string.feed_gif_paused),
                     modifier = Modifier.padding(11.dp),
                     tint = Color.White,
                 )
@@ -1571,7 +1574,7 @@ internal fun GalleryMedia(
             ) {
                 Icon(
                     Symbols.Fullscreen,
-                    contentDescription = "Open image ${activeIndex + 1} of ${post.gallery.size} full screen",
+                    contentDescription = stringResource(R.string.feed_open_image_of_full_screen, activeIndex + 1, post.gallery.size),
                 )
             }
             activeItem?.let { item ->
@@ -1706,7 +1709,7 @@ private fun GalleryMetadataSurface(
                 Row(
                     modifier = Modifier
                         .heightIn(min = 48.dp)
-                        .clickable(onClickLabel = "Open link", role = Role.Button) { onOpenLink(outboundUrl) }
+                        .clickable(onClickLabel = stringResource(R.string.feed_open_link), role = Role.Button) { onOpenLink(outboundUrl) }
                         .padding(vertical = 2.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(5.dp),
@@ -1812,15 +1815,15 @@ internal fun LinkPanel(
     var linkAction by remember(post.id) { mutableStateOf<LinkActionTarget?>(null) }
     linkAction?.let { target -> LinkActionsSheet(target = target, onDismiss = { linkAction = null }) }
     LinkCardSurface(
-        domain = post.domain ?: "External link",
+        domain = post.domain ?: stringResource(R.string.all_external_link),
         address = UrlCleaner.cardLabel(post.mediaLabel),
-        iconDescription = "Open link preview",
+        iconDescription = stringResource(R.string.all_open_link_preview),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 4.dp)
             .combinedClickable(
                 onClick = onOpenLink,
-                onLongClickLabel = "Link actions",
+                onLongClickLabel = stringResource(R.string.all_link_actions),
                 onLongClick = {
                     externalPostUrl(post)?.let { url -> linkAction = linkActionTarget(url, cleanLinks) }
                 },
@@ -1980,8 +1983,6 @@ private fun CrosspostPanel(post: Post, state: SubshellState) {
     val sourceCommunityAccent = sourceCommunityIdentity
         ?.let { community -> Color(community.accent) }
         ?: accentFor(source.community)
-    val pointLabel = if (source.score == 1) "point" else "points"
-    val commentLabel = if (source.comments == 1) "comment" else "comments"
 
     Surface(
         modifier = Modifier
@@ -2035,7 +2036,7 @@ private fun CrosspostPanel(post: Post, state: SubshellState) {
                             }
                         }
                         Text(
-                            text = "u/${source.author}",
+                            text = stringResource(R.string.feed_u, source.author),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
@@ -2097,8 +2098,11 @@ private fun CrosspostPanel(post: Post, state: SubshellState) {
             }
 
             Text(
-                text = "${compactNumber(source.score)} $pointLabel · " +
-                    "${compactNumber(source.comments)} $commentLabel",
+                text = stringResource(
+                    R.string.points_comments_line,
+                    pluralStringResource(R.plurals.points_compact, source.score, compactNumber(source.score)),
+                    pluralStringResource(R.plurals.comments_compact, source.comments, compactNumber(source.comments)),
+                ),
                 modifier = Modifier
                     .clickable(
                         enabled = sourceTarget != null,
@@ -2266,9 +2270,9 @@ private fun PollPanel(
                 Spacer(Modifier.width(8.dp))
                 Text(
                     text = when {
-                        state.localMutationsAllowed && localResultsVisible -> "Local poll result"
-                        state.localMutationsAllowed -> "Choose one"
-                        poll.isClosed -> "Poll closed"
+                        state.localMutationsAllowed && localResultsVisible -> stringResource(R.string.all_local_poll_result)
+                        state.localMutationsAllowed -> stringResource(R.string.all_choose_one)
+                        poll.isClosed -> stringResource(R.string.all_poll_closed)
                         else -> "Read-only Reddit poll"
                     },
                     style = MaterialTheme.typography.titleMedium,
@@ -2312,12 +2316,12 @@ private fun PollPanel(
                             )
                             when {
                                 resultsVisible -> Text(
-                                    text = "${(fraction * 100).toInt()}%",
+                                    text = stringResource(R.string.feed_text_3, (fraction * 100).toInt()),
                                     style = MaterialTheme.typography.labelLarge,
                                 )
                                 selected -> Icon(
                                     Symbols.Check,
-                                    contentDescription = if (selectable) null else "Selected",
+                                    contentDescription = if (selectable) null else stringResource(R.string.all_selected),
                                     modifier = Modifier.size(18.dp),
                                 )
                             }
@@ -2340,14 +2344,14 @@ private fun PollPanel(
                     enabled = pendingChoice != null,
                     modifier = Modifier.align(Alignment.End),
                 ) {
-                    Text("Vote")
+                    Text(stringResource(R.string.feed_vote))
                 }
             } else if (!state.localMutationsAllowed && canOpenOnReddit) {
                 TextButton(
                     onClick = onOpenReddit,
                     modifier = Modifier.align(Alignment.End),
                 ) {
-                    Text(if (poll.isClosed) "Open on Reddit" else "Open on Reddit to vote")
+                    Text(if (poll.isClosed) stringResource(R.string.all_open_on_reddit) else stringResource(R.string.all_open_on_reddit_to_vote))
                 }
             }
 

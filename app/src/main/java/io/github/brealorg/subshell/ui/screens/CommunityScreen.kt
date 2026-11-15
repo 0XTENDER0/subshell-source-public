@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.ui.communityFeedWithPinnedPosts
 import io.github.brealorg.subshell.ui.CommunityFeedWithPinned
 import io.github.brealorg.subshell.data.account.RedditCommunityPinnedPostsUiState
@@ -125,6 +128,7 @@ import io.github.brealorg.subshell.ui.components.CommunityAvatar
 import io.github.brealorg.subshell.ui.components.CommunityMuteSheet
 import io.github.brealorg.subshell.ui.components.communityMuteStatusText
 import io.github.brealorg.subshell.ui.components.ModeratorToolsSheet
+import io.github.brealorg.subshell.ui.components.ModeratorQueueItemThumbnail
 import io.github.brealorg.subshell.ui.components.ErrorNotice
 import io.github.brealorg.subshell.ui.components.PostCard
 import io.github.brealorg.subshell.ui.components.RepositoryPagingFooter
@@ -433,7 +437,7 @@ fun CommunityScreen(
         ).copy(
             // The community itself still works; only Join/Leave waits.
             kind = ErrorPresentationKind.DEGRADED,
-            title = "Couldn't check your communities",
+            title = UiText.Plain(stringResource(R.string.all_couldn_t_check_your_communities)),
         )
     }
     ReportViewportError(
@@ -528,10 +532,7 @@ fun CommunityScreen(
             )
             uiDebugLog(
                 "subshell-issue17",
-                "entry-refresh surface=community community=${community.name} sort=${state.communitySort.name.lowercase()}" +
-                    " query=${pagingKey.value} " +
-                    "decision=${decision.logToken} " +
-                    "cached=${state.postPagingSnapshot(pagingKey).items.size}",
+                "entry-refresh surface=community community=${community.name} sort=${state.communitySort.name.lowercase()} query=${pagingKey.value} decision=${decision.logToken} cached=${state.postPagingSnapshot(pagingKey).items.size}",
             )
             if (decision.execute) {
                 onRefreshRedditFeed(
@@ -709,7 +710,7 @@ fun CommunityScreen(
                 retryable = activeRedditFeedState.failureRetryable,
                 showingCachedContent = true,
             ).copy(
-                title = "Couldn't refresh ${state.subredditLabel(community.name)}",
+                title = UiText.Plain("Couldn't refresh ${state.subredditLabel(community.name)}"),
             )
         }
     } else {
@@ -767,11 +768,7 @@ fun CommunityScreen(
         if (authenticatedRedditFeed) {
             uiDebugLog(
                 FEED_ORDER_LOG_TAG,
-                "display community=${community.name} sort=${state.communitySort.name.lowercase()} " +
-                    "stored=${allPosts.size} visible=${visiblePosts.size} " +
-                    "storedHead=${allPosts.take(FEED_ORDER_SAMPLE_SIZE).joinToString(",") { it.id }} " +
-                    "visibleHead=${visiblePosts.take(FEED_ORDER_SAMPLE_SIZE).joinToString(",") { it.id }} " +
-                    "hasNext=${pagingSnapshot.nextCursor != null}",
+                "display community=${community.name} sort=${state.communitySort.name.lowercase()} stored=${allPosts.size} visible=${visiblePosts.size} storedHead=${allPosts.take(FEED_ORDER_SAMPLE_SIZE).joinToString(",") { it.id }} visibleHead=${visiblePosts.take(FEED_ORDER_SAMPLE_SIZE).joinToString(",") { it.id }} hasNext=${pagingSnapshot.nextCursor != null}",
             )
         }
     }
@@ -1017,7 +1014,7 @@ fun CommunityScreen(
                             // USERFLAIR01A1_COMMUNITY_OVERFLOW_ENTRY_V1
                             if (state.activeAccountIsAuthenticated) {
                                 DropdownMenuItem(
-                                    text = { Text("User flair") },
+                                    text = { Text(stringResource(R.string.scr_user_flair)) },
                                     leadingIcon = {
                                         Icon(Symbols.Person, contentDescription = null)
                                     },
@@ -1036,7 +1033,7 @@ fun CommunityScreen(
                                             if (watchingPosts) {
                                                 "Stop new-post notifications"
                                             } else {
-                                                "Notify about new posts"
+                                                stringResource(R.string.all_notify_about_new_posts)
                                             },
                                         )
                                     },
@@ -1057,9 +1054,9 @@ fun CommunityScreen(
                                 text = {
                                     Text(
                                         if (communityMuted) {
-                                            "Unmute community"
+                                            stringResource(R.string.all_unmute_community)
                                         } else {
-                                            "Mute community…"
+                                            stringResource(R.string.all_mute_community)
                                         },
                                     )
                                 },
@@ -1079,7 +1076,7 @@ fun CommunityScreen(
                                 !state.isCommunityHidden(community.name)
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text("Add to home screen") },
+                                    text = { Text(stringResource(R.string.scr_add_to_home_screen)) },
                                     leadingIcon = {
                                         Icon(Symbols.AddToHomeScreen, contentDescription = null)
                                     },
@@ -1089,7 +1086,7 @@ fun CommunityScreen(
                                             LauncherShortcutEntry.Community(community.name),
                                         )
                                         if (!requested) {
-                                            userNotices.noticeFailure("Couldn't add the shortcut", "Your launcher did not accept it") // ISSUE222_NO_TOASTS_V1
+                                            userNotices.noticeFailure(UiText.Resource(R.string.nt_couldn_t_add_the_shortcut), UiText.Resource(R.string.nt_your_launcher_did_not_accept_it)) // ISSUE222_NO_TOASTS_V1
                                         }
                                     },
                                 )
@@ -1211,7 +1208,7 @@ fun CommunityScreen(
                                     if (membershipTargetBusy) {
                                         InlineProgressIndicator()
                                         Spacer(Modifier.width(5.dp))
-                                        Text("Leaving…")
+                                        Text(stringResource(R.string.scr_leaving))
                                     } else {
                                         Icon(
                                             Symbols.Check,
@@ -1219,7 +1216,7 @@ fun CommunityScreen(
                                             modifier = Modifier.size(17.dp),
                                         )
                                         Spacer(Modifier.width(5.dp))
-                                        Text("Joined")
+                                        Text(stringResource(R.string.scr_joined))
                                     }
                                 }
                             } else {
@@ -1230,15 +1227,15 @@ fun CommunityScreen(
                                     if (membershipTargetBusy) {
                                         InlineProgressIndicator()
                                         Spacer(Modifier.width(5.dp))
-                                        Text("Joining…")
+                                        Text(stringResource(R.string.scr_joining))
                                     } else if (
                                         authenticatedRedditFeed &&
                                         !membershipTruthReady &&
                                         membershipSyncFailure == null
                                     ) {
-                                        Text("Loading…")
+                                        Text(stringResource(R.string.scr_loading))
                                     } else {
-                                        Text("Join")
+                                        Text(stringResource(R.string.scr_join))
                                     }
                                 }
                             }
@@ -1320,13 +1317,13 @@ fun CommunityScreen(
                                             style = MaterialTheme.typography.labelLarge,
                                         )
                                         Text(
-                                            text = "Hidden from Home, Popular and All",
+                                            text = stringResource(R.string.scr_hidden_from_home_popular_and_all),
                                             style = MaterialTheme.typography.bodySmall,
                                         )
                                     }
                                     Icon(
                                         imageVector = Symbols.KeyboardArrowRight,
-                                        contentDescription = "Open mute settings",
+                                        contentDescription = stringResource(R.string.scr_open_mute_settings),
                                         modifier = Modifier.size(20.dp),
                                     )
                                 }
@@ -1386,16 +1383,17 @@ fun CommunityScreen(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
-                                "Posts",
+                                stringResource(R.string.all_posts),
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.weight(1f),
                             )
                             Box {
                                 TextButton(onClick = { sortMenuExpanded.value = true }) {
+                                    val sortLabel = stringResource(state.communitySort.labelRes)
                                     Text(
-                                        state.communitySort.label,
+                                        sortLabel,
                                         modifier = Modifier.semantics {
-                                            contentDescription = "Sort posts: ${state.communitySort.label}"
+                                            contentDescription = "Sort posts: $sortLabel"
                                         },
                                     )
                                     Icon(Symbols.KeyboardArrowDown, contentDescription = null)
@@ -1406,7 +1404,7 @@ fun CommunityScreen(
                                 ) {
                                     CommunitySort.entries.forEach { sort ->
                                         DropdownMenuItem(
-                                            text = { Text(sort.label) },
+                                            text = { Text(stringResource(sort.labelRes)) },
                                             modifier = Modifier.semantics { selected = sort == state.communitySort },
                                             trailingIcon = if (sort == state.communitySort) {
                                                 { Icon(Symbols.Check, contentDescription = null) }
@@ -1424,15 +1422,16 @@ fun CommunityScreen(
                             if (authenticatedRedditFeed && state.communitySort.supportsTimePeriod) {
                                 Box {
                                     TextButton(onClick = { timePeriodMenuExpanded.value = true }) {
+                                        val periodLabel = stringResource(state.listingTimePeriod.labelRes)
                                         Text(
-                                            state.listingTimePeriod.label,
+                                            periodLabel,
                                             modifier = Modifier.semantics {
-                                                contentDescription = "Time: ${state.listingTimePeriod.label}"
+                                                contentDescription = "Time: $periodLabel"
                                             },
                                         )
                                         Icon(
                                             Symbols.KeyboardArrowDown,
-                                            contentDescription = "Choose listing time period",
+                                            contentDescription = stringResource(R.string.scr_choose_listing_time_period),
                                         )
                                     }
                                     DropdownMenu(
@@ -1441,7 +1440,7 @@ fun CommunityScreen(
                                     ) {
                                         RedditListingTimePeriod.entries.forEach { timePeriod ->
                                             DropdownMenuItem(
-                                                text = { Text(timePeriod.label) },
+                                                text = { Text(stringResource(timePeriod.labelRes)) },
                                                 modifier = Modifier.semantics {
                                                     selected = timePeriod == state.listingTimePeriod
                                                 },
@@ -1556,30 +1555,30 @@ fun CommunityScreen(
                                     ) {
                                         Text(
                                             when {
-                                                hiddenPostsHideAllPosts -> "All posts are hidden"
-                                                contentFiltersHideAllPosts -> "All posts are filtered"
+                                                hiddenPostsHideAllPosts -> stringResource(R.string.all_all_posts_are_hidden)
+                                                contentFiltersHideAllPosts -> stringResource(R.string.all_all_posts_are_filtered)
                                                 nsfwPreferenceHidesAllPosts -> "NSFW posts are hidden"
                                                 authenticatedRedditFeed && (activeRedditFeedState.inProgress || !storedFeedRead) ->
-                                                    "Loading from Reddit…"
-                                                authenticatedRedditFeed -> "No cached Reddit posts"
-                                                else -> "No local posts yet"
+                                                    stringResource(R.string.all_loading_from_reddit)
+                                                authenticatedRedditFeed -> stringResource(R.string.all_no_cached_reddit_posts)
+                                                else -> stringResource(R.string.all_no_local_posts_yet)
                                             },
                                             style = MaterialTheme.typography.titleMedium,
                                         )
                                         Text(
                                             when {
                                                 hiddenPostsHideAllPosts ->
-                                                    "Posts you hide stay out of your feeds. Your profile's Hidden tab lists them."
+                                                    stringResource(R.string.all_posts_you_hide_stay_out_of_your)
                                                 contentFiltersHideAllPosts ->
-                                                    "Your content filters hide every post here. Change them in Settings."
+                                                    stringResource(R.string.all_your_content_filters_hide_every_post_here)
                                                 nsfwPreferenceHidesAllPosts ->
-                                                    "Use the quick switch in the navigation menu to show them."
+                                                    stringResource(R.string.all_use_the_quick_switch_in_the_navigation)
                                                 authenticatedRedditFeed && (activeRedditFeedState.inProgress || !storedFeedRead) ->
-                                                    "The first page is on its way."
+                                                    stringResource(R.string.all_the_first_page_is_on_its_way)
                                                 authenticatedRedditFeed ->
-                                                    "Pull to refresh, or reconnect the account if the session needs attention."
+                                                    stringResource(R.string.all_pull_to_refresh_or_reconnect_the_account)
                                                 else ->
-                                                    "This community is ready for a fixture when its interaction matters."
+                                                    stringResource(R.string.all_this_community_is_ready_for_a_fixture)
                                             },
                                             modifier = Modifier.padding(top = 6.dp),
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1680,6 +1679,9 @@ fun CommunityScreen(
             actionUiState = moderationActionState,
             onSelectList = { list ->
                 onSelectRedditModQueueList(state.activeAccountId, community.name, list)
+            },
+            itemThumbnail = { item, thumbnailModifier ->
+                ModeratorQueueItemThumbnail(item, state, thumbnailModifier)
             },
         )
     }

@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.data.cache
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.account.PostSaveFailureKind
 import io.github.brealorg.subshell.data.account.PostSaveUiState
 import io.github.brealorg.subshell.model.Comment
@@ -15,6 +19,9 @@ import org.junit.Test
  * payload from before comment saves reads as not saved and keeps its vote;
  * and a failed save names a comment as a comment and a post as a post.
  */
+// TRANSLATE03: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Step3CommentSavedCacheTest {
     private val comment = Comment(
         id = "t1_c1", author = "someone", age = "1h", body = "Body", score = 3, depth = 0, accent = 0L,
@@ -64,10 +71,10 @@ class Step3CommentSavedCacheTest {
         val configuration = postSaveErrorPresentation(PostSaveUiState(postFullname = "t1_abc", failureKind = PostSaveFailureKind.CONFIGURATION))
         val post = postSaveErrorPresentation(PostSaveUiState(postFullname = "t3_abc", failureKind = PostSaveFailureKind.VALIDATION))
 
-        assertEquals("Couldn't update saved comment", comment.title)
-        assertEquals("This comment can't be saved.", comment.message)
-        assertEquals("Saving comments isn't configured for this account.", configuration.message)
-        assertEquals("Couldn't update saved post", post.title)
-        assertEquals("This post can't be saved.", post.message)
+        assertEquals("Couldn't update saved comment", comment.title.s)
+        assertEquals("This comment can't be saved.", comment.message.s)
+        assertEquals("Saving comments isn't configured for this account.", configuration.message.s)
+        assertEquals("Couldn't update saved post", post.title.s)
+        assertEquals("This post can't be saved.", post.message.s)
     }
 }

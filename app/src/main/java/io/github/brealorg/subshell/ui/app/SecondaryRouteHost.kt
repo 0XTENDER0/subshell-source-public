@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -159,7 +161,7 @@ internal fun SecondaryRouteHost(
                 }
                 ExpandedListDetailSurface(
                     scaffoldPadding = padding,
-                    listTitle = "Settings",
+                    listTitle = stringResource(R.string.all_settings),
                     listSubtitle = null,
                     showListHeader = false,
                     listContent = { listModifier ->

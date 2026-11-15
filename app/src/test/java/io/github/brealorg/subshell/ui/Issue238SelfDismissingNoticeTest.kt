@@ -56,7 +56,7 @@ class Issue238SelfDismissingNoticeTest {
         showTray(host)
 
         advance(3_500)
-        assertEquals("Muted r/android", host.currentRequest?.presentation?.title)
+        assertEquals("Muted r/android", host.currentRequest?.presentation?.title?.s)
         advance(1_000)
         assertNull(host.currentRequest)
     }
@@ -68,7 +68,7 @@ class Issue238SelfDismissingNoticeTest {
         showTray(host)
 
         advance(30_000)
-        assertEquals("Couldn't share this post", host.currentRequest?.presentation?.title)
+        assertEquals("Couldn't share this post", host.currentRequest?.presentation?.title?.s)
     }
 
     @Test
@@ -84,7 +84,7 @@ class Issue238SelfDismissingNoticeTest {
         composeRule.waitForIdle()
         composeRule.mainClock.advanceTimeByFrame()
         advance(3_500)
-        assertEquals("Muted r/android", host.currentRequest?.presentation?.title)
+        assertEquals("Muted r/android", host.currentRequest?.presentation?.title?.s)
         advance(1_000)
         assertNull(host.currentRequest)
     }
@@ -104,7 +104,7 @@ class Issue238SelfDismissingNoticeTest {
         showTray(host, talkBack)
 
         advance(10_000)
-        assertEquals("Muted r/android", host.currentRequest?.presentation?.title)
+        assertEquals("Muted r/android", host.currentRequest?.presentation?.title?.s)
         advance(2_500)
         assertNull(host.currentRequest)
     }

@@ -78,7 +78,7 @@ class Issue33ShareIntoSubshellComposeTest {
 
         val host = runEffect(state, ShareIntoSubshellLaunch(2L, link))
 
-        assertEquals("Sign in to Reddit to post", host.currentRequest?.presentation?.title)
+        assertEquals("Sign in to Reddit to post", host.currentRequest?.presentation?.title?.s)
         assertTrue(state.currentNavigationRoute !is SubshellRoute.PostComposer)
     }
 
@@ -89,7 +89,7 @@ class Issue33ShareIntoSubshellComposeTest {
             initialActiveAccountId = "reddit:me",
             initialInteractionSideConfigured = true,
         )
-        assertEquals("Nothing to post", runEffect(state, ShareIntoSubshellLaunch(3L, null)).currentRequest?.presentation?.title)
+        assertEquals("Nothing to post", runEffect(state, ShareIntoSubshellLaunch(3L, null)).currentRequest?.presentation?.title?.s)
     }
 
     @Test

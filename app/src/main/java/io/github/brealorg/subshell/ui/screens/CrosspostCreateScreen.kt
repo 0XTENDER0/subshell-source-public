@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.semantics.Role
@@ -185,16 +187,16 @@ internal fun CrosspostCreateScreen(
         topBar = {
             RouteTopBar(
                 scrollBehavior = routeTopBarScroll,
-                title = { Text("Crosspost") },
+                title = { Text(stringResource(R.string.scr_crosspost)) },
                 navigationIcon = {
                     IconButton(onClick = ::close) {
-                        Icon(Symbols.ArrowBack, contentDescription = "Save crosspost draft and close")
+                        Icon(Symbols.ArrowBack, contentDescription = stringResource(R.string.scr_save_crosspost_draft_and_close))
                     }
                 },
                 actions = {
                     ComposerDiscardAction(enabled = !editingBlocked, onClick = { confirmDiscard = true })
                     ComposerPrimaryAction(
-                        text = if (reviewState.busy) "Checking…" else "Review",
+                        text = if (reviewState.busy) stringResource(R.string.all_checking) else stringResource(R.string.all_review),
                         enabled = canReview,
                         onClick = { onReview(state.postComposerDraft) },
                     )
@@ -210,7 +212,7 @@ internal fun CrosspostCreateScreen(
         ) {
             item("source") {
                 source?.let { CrosspostSourceCard(it) } ?: Text(
-                    "This crosspost draft has no valid original post. Discard it and start from a post.",
+                    stringResource(R.string.all_this_crosspost_draft_has_no_valid_original),
                     color = MaterialTheme.colorScheme.error,
                 )
             }
@@ -232,7 +234,7 @@ internal fun CrosspostCreateScreen(
                             onInvalidateReview()
                         }
                     },
-                    sendingMessage = "Publishing your crosspost to Reddit…",
+                    sendingMessage = stringResource(R.string.all_publishing_your_crosspost_to_reddit),
                 )
                 // M3225_TITLE_COUNTER_AND_ERRORS_ON_THE_FIELD_V1: a title issue
                 // is shown on the title field; the rest stay here.
@@ -250,16 +252,16 @@ internal fun CrosspostCreateScreen(
                         onClick = { if (!editingBlocked) communitySheet = true },
                     )
                     if (draft.community.isNotBlank()) {
-                        TextButton(enabled = !editingBlocked, onClick = ::refreshPolicy) { Text("Refresh posting requirements") }
+                        TextButton(enabled = !editingBlocked, onClick = ::refreshPolicy) { Text(stringResource(R.string.scr_refresh_posting_requirements)) }
                     }
                     if (snapshot?.status == ComposerPolicyStatus.LOADING) Text("Checking destination requirements…")
-                    issue?.let { Text(it.message, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    issue?.let { Text(it.message.asString(), color = MaterialTheme.colorScheme.onSurfaceVariant) }
                     if (
                         issue == null &&
                         policy.crosspostDestination?.allowCrossposts == null
                     ) {
                         Text(
-                            "Reddit did not expose a destination crosspost flag. Support will be confirmed when you publish.",
+                            stringResource(R.string.all_reddit_did_not_expose_a_destination_crosspost),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -272,7 +274,7 @@ internal fun CrosspostCreateScreen(
                         )
                     ) {
                         Text(
-                            "Reddit's detailed posting requirements could not be loaded. They will be validated when you publish.",
+                            stringResource(R.string.all_reddit_s_detailed_posting_requirements_could_not),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -281,7 +283,7 @@ internal fun CrosspostCreateScreen(
                         TextButton(onClick = {
                             onInvalidateReview()
                             onAuthorizeRequirements(state.activeAccountId)
-                        }) { Text("Grant access to posting requirements") }
+                        }) { Text(stringResource(R.string.scr_grant_access_to_posting_requirements)) }
                     }
                 }
             }
@@ -297,8 +299,8 @@ internal fun CrosspostCreateScreen(
                         ?.message
                     OutlinedTextField(
                         value = draft.title, onValueChange = { update(draft.copy(title = it)) },
-                        enabled = !editingBlocked, label = { Text("Title") },
-                        placeholder = { Text("Add a clear, interesting title") },
+                        enabled = !editingBlocked, label = { Text(stringResource(R.string.scr_title)) },
+                        placeholder = { Text(stringResource(R.string.scr_add_a_clear_interesting_title)) },
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 2, maxLines = 5,
                         isError = titleIssue != null || draft.title.length > policy.titleMaxLength,
@@ -312,19 +314,19 @@ internal fun CrosspostCreateScreen(
             }
             item("flair") {
                 Column(Modifier.widthIn(max = 760.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(if (policy.flairRequired) "Post flair · required" else "Post flair", style = MaterialTheme.typography.titleSmall)
+                    Text(if (policy.flairRequired) stringResource(R.string.all_post_flair_required) else stringResource(R.string.all_post_flair), style = MaterialTheme.typography.titleSmall)
                     draft.flair?.let { V4FlairPreview(it) }
                     when {
                         policy.flairAuthorizationRequired -> TextButton(
                             enabled = ownerMatches && !editingBlocked,
                             onClick = { onInvalidateReview(); onAuthorizeFlair(state.activeAccountId) },
-                        ) { Text("Grant post-flair access") }
+                        ) { Text(stringResource(R.string.scr_grant_post_flair_access)) }
                         policy.flairOptionsLoaded && (policy.flairOptions.isNotEmpty() || draft.flair != null) ->
                             TextButton(enabled = !editingBlocked, onClick = { flairSheet = true }) {
                                 Text(if (draft.flair == null) "Choose post flair" else "Change post flair")
                             }
-                        draft.community.isBlank() -> Text("Choose a destination first")
-                        else -> Text("No selectable post flair loaded")
+                        draft.community.isBlank() -> Text(stringResource(R.string.scr_choose_a_destination_first))
+                        else -> Text(stringResource(R.string.scr_no_selectable_post_flair_loaded))
                     }
                 }
             }
@@ -336,7 +338,7 @@ internal fun CrosspostCreateScreen(
                     CrosspostFlag("Spoiler", draft.spoiler, !editingBlocked && source?.spoiler != true) {
                         update(draft.copy(spoiler = it))
                     }
-                    CrosspostFlag("Send reply notifications", draft.sendReplies, !editingBlocked) {
+                    CrosspostFlag(stringResource(R.string.all_send_reply_notifications), draft.sendReplies, !editingBlocked) {
                         update(draft.copy(sendReplies = it))
                     }
                 }
@@ -344,13 +346,13 @@ internal fun CrosspostCreateScreen(
             item("review-message") {
                 Column(Modifier.widthIn(max = 760.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     reviewState.message?.takeIf { reviewState.matches(draft) }?.let {
-                        Text(it, color = MaterialTheme.colorScheme.error)
+                        Text(it.asString(), color = MaterialTheme.colorScheme.error)
                     }
                     Text(
-                        "The original post stays linked. Review checks the source and destination; only Publish sends a crosspost.",
+                        stringResource(R.string.all_the_original_post_stays_linked_review_checks),
                         style = MaterialTheme.typography.bodySmall,
                     )
-                    Text("Saved crosspost drafts are not included in portable backup.", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.scr_saved_crosspost_drafts_are_not_included_in), style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
@@ -391,40 +393,39 @@ internal fun CrosspostCreateScreen(
         val verifying = reviewState.phase == CrosspostReviewPhase.VERIFYING
         AlertDialog(
             onDismissRequest = { if (!verifying) onInvalidateReview() },
-            title = { Text("Publish crosspost?") },
+            title = { Text(stringResource(R.string.scr_publish_crosspost)) },
             text = {
                 Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Posting as u/${state.activeAccountUsername} to ${composerDestinationLabel(draft.community)}")
+                    Text(stringResource(R.string.scr_posting_as_u_to, state.activeAccountUsername, composerDestinationLabel(draft.community)))
                     Text(draft.title, style = MaterialTheme.typography.titleMedium)
                     source?.let { CrosspostSourceCard(it) }
                     draft.flair?.let { V4FlairPreview(it) }
                     // LOWUX3_CROSSPOST_SUMMARY_SAYS_ON_OR_OFF_V1 (OCB-210)
                     Text(
-                        "NSFW: ${if (draft.nsfw) "on" else "off"} · " +
-                            "Spoiler: ${if (draft.spoiler) "on" else "off"}",
+                        "NSFW: ${if (draft.nsfw) "on" else "off"} · Spoiler: ${if (draft.spoiler) "on" else "off"}",
                     )
                     Text("Reply notifications: ${if (draft.sendReplies) "on" else "off"}")
-                    Text(if (verifying) "Rechecking source and destination…" else "Publish creates a new Reddit post linked to this original.")
+                    Text(if (verifying) stringResource(R.string.all_rechecking_source_and_destination) else stringResource(R.string.all_publish_creates_a_new_reddit_post_linked))
                 }
             },
             confirmButton = {
                 Button(enabled = ownerMatches && !verifying && !writeBlocked, onClick = {
                     onPublish(state.postComposerDraft, reviewState.revision)
-                }) { Text(if (verifying) "Checking…" else "Publish") }
+                }) { Text(if (verifying) stringResource(R.string.all_checking) else stringResource(R.string.all_publish)) }
             },
-            dismissButton = { TextButton(enabled = !verifying, onClick = onInvalidateReview) { Text("Back to editing") } },
+            dismissButton = { TextButton(enabled = !verifying, onClick = onInvalidateReview) { Text(stringResource(R.string.scr_back_to_editing)) } },
         )
     }
     if (confirmDiscard) {
         AlertDialog(
-            onDismissRequest = { confirmDiscard = false }, title = { Text("Discard crosspost draft?") },
-            text = { Text("The original Reddit post is not changed.") },
+            onDismissRequest = { confirmDiscard = false }, title = { Text(stringResource(R.string.scr_discard_crosspost_draft)) },
+            text = { Text(stringResource(R.string.scr_the_original_reddit_post_is_not_changed)) },
             // ISSUE222_DESTRUCTIVE_CONFIRMS_ARE_RED_V1
             confirmButton = { TextButton(
                 onClick = { onInvalidateReview(); state.discardPostComposerDraft(); confirmDiscard = false },
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
-            ) { Text("Discard") } },
-            dismissButton = { TextButton(onClick = { confirmDiscard = false }) { Text("Keep editing") } },
+            ) { Text(stringResource(R.string.scr_discard)) } },
+            dismissButton = { TextButton(onClick = { confirmDiscard = false }) { Text(stringResource(R.string.scr_keep_editing)) } },
         )
     }
 }
@@ -436,10 +437,10 @@ private fun CrosspostSourceCard(source: ComposerCrosspostSource) {
         shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text("Original post · source locked", style = MaterialTheme.typography.labelLarge)
-            Text("r/${source.community} · u/${source.author}", style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.scr_original_post_source_locked), style = MaterialTheme.typography.labelLarge)
+            Text(stringResource(R.string.scr_r_u, source.community, source.author), style = MaterialTheme.typography.bodySmall)
             Text(source.title, style = MaterialTheme.typography.titleMedium)
-            Text("Source access is checked again before publishing", style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.scr_source_access_is_checked_again_before_publishing), style = MaterialTheme.typography.bodySmall)
         }
     }
 }

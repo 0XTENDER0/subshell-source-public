@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -120,7 +122,7 @@ internal fun RouteTopBar(
                 navigationIcon()
             } else if (onBack != null) {
                 IconButton(onClick = onBack) {
-                    Icon(Symbols.ArrowBack, contentDescription = "Back")
+                    Icon(Symbols.ArrowBack, contentDescription = stringResource(R.string.comp_back))
                 }
             }
         },

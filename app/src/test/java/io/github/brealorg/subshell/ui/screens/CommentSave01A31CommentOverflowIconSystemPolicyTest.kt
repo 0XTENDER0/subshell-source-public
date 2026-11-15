@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertFalse
@@ -22,7 +23,7 @@ class CommentSave01A31CommentOverflowIconSystemPolicyTest {
     private fun source(path: String): String {
         val file = File(repositoryRoot, path)
         assertTrue("Expected source file: ${file.path}", file.isFile)
-        return file.readText()
+        return file.readSourceText()
     }
 
     private fun commentActionRowSource(): String {
@@ -43,6 +44,7 @@ class CommentSave01A31CommentOverflowIconSystemPolicyTest {
         assertTrue(row.contains("COMMENTSAVE01A31_COMMENT_OVERFLOW_ICON_SYSTEM_V1"))
         // ISSUE295_YOUR_COMMENT_ACTIONS_IN_ONE_SHEET_V1: Edit and Delete moved
         // into the "Your comment…" sheet; the entry and the sheet rows keep icons.
+        // TRANSLATE04: the source is read with its string resources expanded (readSourceText).
         assertTrue(row.contains("text = { Text(\"Your comment…\") }"))
         assertTrue(row.contains("imageVector = Symbols.Edit"))
         assertTrue(row.contains("SheetAction(\"Edit comment\", Symbols.Edit)"))
@@ -53,7 +55,8 @@ class CommentSave01A31CommentOverflowIconSystemPolicyTest {
         assertTrue(row.contains("Symbols.Bookmark"))
         assertTrue(row.contains("text = { Text(\"Share comment\") }"))
         assertTrue(row.contains("imageVector = Symbols.Share"))
-        assertTrue(row.contains("text = { Text(\"Copy text\") }"))
+        // ISSUE300_ONE_COPY_ENTRY_OPENS_A_SHEET_V1: "Copy text" became "Copy…" (a sheet).
+        assertTrue(row.contains("text = { Text(COPY_MENU_ENTRY_LABEL) }"))
         assertTrue(row.contains("imageVector = Symbols.ContentCopy"))
         // ISSUE295_MENU_OFFERS_ONLY_WHAT_THE_CARD_DOES_NOT_V1: a tap on the
         // comment collapses it; the menu no longer repeats it.

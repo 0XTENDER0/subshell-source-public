@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,7 +45,7 @@ internal fun OpenSourceLicencesDialog(onDismissRequest: () -> Unit) {
         LicenceTextDialog(licence, onBack = { shown = null })
         return
     }
-    AdaptiveFullScreenDialog(title = "Open-source licences", onDismissRequest = onDismissRequest) {
+    AdaptiveFullScreenDialog(title = stringResource(R.string.scr_open_source_licences), onDismissRequest = onDismissRequest) {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             item("subshell") {
                 LicenceRow(
@@ -89,7 +91,7 @@ private fun LicenceTextDialog(licence: OpenSourceLicence, onBack: () -> Unit) {
         title = licence.title,
         onDismissRequest = onBack,
         navigationIcon = {
-            IconButton(onClick = onBack) { Icon(Symbols.ArrowBack, contentDescription = "Back") }
+            IconButton(onClick = onBack) { Icon(Symbols.ArrowBack, contentDescription = stringResource(R.string.scr_back)) }
         },
     ) {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {

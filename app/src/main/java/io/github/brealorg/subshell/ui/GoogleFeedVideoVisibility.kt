@@ -170,15 +170,7 @@ internal fun GoogleFeedVideoFrame(
                 event = event,
                 mediaId = mediaId,
                 transitionId = state.activeVideoTransitionId,
-                details = "signal=$signal native_fraction=${fraction ?: "unknown"} " +
-                    "threshold=0.8 dwell_ms=500 " +
-                    "frame_px=${frame?.left},${frame?.top},${frame?.right},${frame?.bottom} " +
-                    "viewport_px=${view?.left},${view?.top},${view?.right},${view?.bottom} " +
-                    "bounds_sample_age_ms=${if (bounds == null) -1L else MediaPerformanceTrace.nowMs() - trace.measuredAtMs} " +
-                    "selected=${state.activeAnimatedMediaId ?: "none"} " +
-                    "player_media=${playback.mediaId ?: "none"} phase=${playback.phase} " +
-                    "play_when_ready=${playback.playWhenReady} is_playing=${playback.isPlaying} " +
-                    "muted=${state.feedVideoMuted} manual_pause=${state.isVideoManuallyPaused(mediaId)}",
+                details = "signal=$signal native_fraction=${fraction ?: "unknown"} threshold=0.8 dwell_ms=500 frame_px=${frame?.left},${frame?.top},${frame?.right},${frame?.bottom} viewport_px=${view?.left},${view?.top},${view?.right},${view?.bottom} bounds_sample_age_ms=${if (bounds == null) -1L else MediaPerformanceTrace.nowMs() - trace.measuredAtMs} selected=${state.activeAnimatedMediaId ?: "none"} player_media=${playback.mediaId ?: "none"} phase=${playback.phase} play_when_ready=${playback.playWhenReady} is_playing=${playback.isPlaying} muted=${state.feedVideoMuted} manual_pause=${state.isVideoManuallyPaused(mediaId)}",
             )
         }
         fun pauseIfReleased() {

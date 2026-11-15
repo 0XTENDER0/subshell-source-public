@@ -24,10 +24,10 @@ sealed interface InboxTarget {
     ) : InboxTarget
 }
 
-internal enum class InboxActivitySection(val label: String) {
-    TODAY("Today"),
-    YESTERDAY("Yesterday"),
-    EARLIER("Earlier"),
+internal enum class InboxActivitySection(@androidx.annotation.StringRes val labelRes: Int) {
+    TODAY( io.github.brealorg.subshell.R.string.inbox_activity_section_today),
+    YESTERDAY( io.github.brealorg.subshell.R.string.inbox_activity_section_yesterday),
+    EARLIER( io.github.brealorg.subshell.R.string.inbox_activity_section_earlier),
 }
 
 internal fun canonicalRedditCommentFullname(value: String?): String? {

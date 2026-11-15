@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.state
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.mutableStateMapOf
 import io.github.brealorg.subshell.data.IdentityMetadataRepository
 import io.github.brealorg.subshell.data.RepositoryResult

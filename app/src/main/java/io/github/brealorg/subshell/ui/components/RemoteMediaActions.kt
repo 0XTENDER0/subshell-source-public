@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -84,13 +86,13 @@ internal fun RemoteMediaActionsSheet(
             MediaDownloadPanel(downloadState)
         } else {
             Text(
-                "Media actions",
+                stringResource(R.string.all_media_actions),
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
                 style = MaterialTheme.typography.titleMedium,
             )
             ListItem(
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                content = { Text("Share media") },
+                content = { Text(stringResource(R.string.comp_share_media)) },
                 leadingContent = { Icon(Symbols.Share, contentDescription = null) },
                 modifier = Modifier.clickable {
                     onDismiss()
@@ -107,7 +109,7 @@ internal fun RemoteMediaActionsSheet(
             )
             ListItem(
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                content = { Text("Download") },
+                content = { Text(stringResource(R.string.comp_download)) },
                 leadingContent = { Icon(Symbols.Download, contentDescription = null) },
                 modifier = Modifier.clickable {
                     download = MediaDownloadUiState.Saving(done = 0, total = 1)

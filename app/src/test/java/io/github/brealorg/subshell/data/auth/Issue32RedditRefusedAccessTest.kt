@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.data.auth
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import io.github.brealorg.subshell.data.account.AccountSessionState
@@ -178,7 +179,7 @@ class Issue32RedditRefusedAccessTest {
             showingPartialContent = false,
         )
         assertEquals(ErrorPresentationKind.BLOCKING, empty.kind)
-        assertEquals(REDDIT_READ_ACCESS_REFUSED_REASON, empty.message)
+        assertEquals(REDDIT_READ_ACCESS_REFUSED_REASON.s, empty.message.s)
         assertNull(empty.primaryAction)
         // The reason is the message; no provider-code line under it.
         assertNull(empty.technicalDetail)

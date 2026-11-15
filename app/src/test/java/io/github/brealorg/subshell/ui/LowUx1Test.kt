@@ -54,8 +54,8 @@ class LowUx1Test {
     fun aFailedFeedDeleteSaysDelete() {
         val failed = CustomFeedsUiState(manageFailureKind = CustomFeedManageFailureKind.HTTP)
 
-        assertEquals("Couldn't delete custom feed", customFeedManageErrorPresentation(failed, deleting = true).title)
-        assertEquals("Couldn't update custom feed", customFeedManageErrorPresentation(failed).title)
+        assertEquals("Couldn't delete custom feed", customFeedManageErrorPresentation(failed, deleting = true).title.s)
+        assertEquals("Couldn't update custom feed", customFeedManageErrorPresentation(failed).title.s)
     }
 
     @Test

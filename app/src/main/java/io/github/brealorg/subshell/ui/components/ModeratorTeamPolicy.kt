@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.data.account.RedditCommunityInfoSection
 import io.github.brealorg.subshell.data.account.RedditCommunityInfoUiState
 import io.github.brealorg.subshell.data.account.RedditModeratorPermission

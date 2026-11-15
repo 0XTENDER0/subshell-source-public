@@ -30,6 +30,10 @@ internal val settingsSearchEntries: List<SettingsSearchEntry> = listOf(
     setting("online-visibility", "Account privacy", "online status visibility show presence Reddit account privacy"),
 
     // ISSUE234_FEED_POST_LAYOUTS_V1: the Thumbnail row shows only with List, so its words lead here.
+    // ISSUE302_START_FEED_V1 / ISSUE300_DEFAULT_FEED_SORT_V1
+    setting("start-feed", "Feed", "start feed default feed open on launch home popular all r/all startup first screen"),
+    setting("default-feed-sort", "Feed", "feed sort default sorting home popular all best hot new rising top controversial"),
+    setting("default-community-sort", "Feed", "community sort default sorting subreddit hot new rising top controversial remember"),
     setting("post-layout", "Feed", "post layout large compact list grid density cards size small dense columns view thumbnail left right"),
     setting("unread-marker", "Feed", "show unread marker post age dot read unread"),
     setting("show-nsfw-posts", "Feed", "show NSFW posts 18+ sensitive content"),

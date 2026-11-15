@@ -165,6 +165,27 @@ class Recreate01ConfigurationChangeTest {
     }
 
     // Private messages and direct chat share this draft (ConversationRouteHost).
+    // ISSUE304_MODMAIL_DRAFT_SURVIVES_CLOSING_V1: a modmail reply rides in the
+    // process snapshot like a message draft, with its mode and identity.
+    @Test
+    fun anUnsentModmailNoteSurvivesWithItsMode() {
+        val harness = harness()
+        val draft = io.github.brealorg.subshell.data.account.RedditModmailDraft(
+            text = "half a note",
+            internalNote = true,
+            replyAsSubreddit = false,
+        )
+        composeRule.runOnIdle {
+            harness.state.updateModmailDraft(account.stableId, "2abcd", draft)
+        }
+
+        val rebuilt = harness.recreate()
+
+        composeRule.runOnIdle {
+            assertEquals(draft, rebuilt.modmailDraft(account.stableId, "2abcd"))
+        }
+    }
+
     @Test
     fun anUnsentMessageInAConversationSurvives() {
         val harness = harness()

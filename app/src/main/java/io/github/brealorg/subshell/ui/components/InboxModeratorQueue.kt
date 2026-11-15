@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.ui.error.redditModQueueFailureMessage
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
@@ -60,6 +62,8 @@ internal fun InboxModeratorQueueItemCard(
     item: RedditModeratorQueueItem,
     actionUiState: RedditModeratorActionUiState,
     onOpen: () -> Unit,
+    // ISSUE301_QUEUE_CARD_SHOWS_WHY_AND_WHAT_V1
+    thumbnail: (@Composable (Modifier) -> Unit)? = null,
 ) {
     val itemInProgress = actionUiState.inProgressFor(item.fullname)
     Surface(
@@ -72,6 +76,7 @@ internal fun InboxModeratorQueueItemCard(
                 item = item,
                 inProgress = itemInProgress,
                 modifier = Modifier.clickable(enabled = !itemInProgress, onClick = onOpen),
+                thumbnail = thumbnail,
             )
             // ISSUE295_QUEUE_USES_THE_SHEET_V1
             ModeratorQueueItemActions(item, inProgress = actionUiState.inProgress)
@@ -88,11 +93,11 @@ internal fun InboxModeratorQueueFailure(
     // BLOCKPAGE02_SMALLER_READ_SURFACES_NAME_THE_BLOCK_PAGE_V1
     details: io.github.brealorg.subshell.data.error.FailureDetails? = null,
 ) {
-    val message = redditModQueueFailureMessage(failureKind, httpStatusCode, details)
+    val message = redditModQueueFailureMessage(failureKind, httpStatusCode, details).asString()
     InboxModerationNotice(
-        title = "Couldn't load mod queue",
+        title = stringResource(R.string.comp_couldn_t_load_mod_queue),
         message = message,
-        actionLabel = "Retry".takeIf { retryable },
+        actionLabel = stringResource(R.string.all_retry).takeIf { retryable },
         onAction = onRetry,
     )
 }

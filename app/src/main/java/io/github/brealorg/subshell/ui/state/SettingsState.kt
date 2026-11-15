@@ -103,6 +103,9 @@ internal class SettingsState(
         io.github.brealorg.subshell.ui.FeedPositionAge.TWELVE_HOURS,
     initialResumeFeedPositionStart: io.github.brealorg.subshell.ui.FeedPositionStart =
         io.github.brealorg.subshell.ui.FeedPositionStart.SHOW_STORED,
+    initialStartFeed: io.github.brealorg.subshell.ui.StartFeed = io.github.brealorg.subshell.ui.StartFeed.HOME,
+    initialDefaultFeedSort: io.github.brealorg.subshell.ui.FeedSort = io.github.brealorg.subshell.ui.FeedSort.BEST,
+    initialDefaultCommunitySort: io.github.brealorg.subshell.ui.CommunitySort = io.github.brealorg.subshell.ui.CommunitySort.HOT,
     initialPostLayout: io.github.brealorg.subshell.ui.PostLayout = io.github.brealorg.subshell.ui.PostLayout.LARGE,
     initialListThumbnailSide: io.github.brealorg.subshell.ui.ListThumbnailSide =
         io.github.brealorg.subshell.ui.ListThumbnailSide.RIGHT,
@@ -220,6 +223,13 @@ internal class SettingsState(
     var resumeFeedPositionAge by mutableStateOf(initialResumeFeedPositionAge)
         internal set
     var resumeFeedPositionStart by mutableStateOf(initialResumeFeedPositionStart)
+        internal set
+    // ISSUE302_START_FEED_V1 / ISSUE300_DEFAULT_FEED_SORT_V1
+    var startFeed by mutableStateOf(initialStartFeed)
+        internal set
+    var defaultFeedSort by mutableStateOf(initialDefaultFeedSort)
+        internal set
+    var defaultCommunitySort by mutableStateOf(initialDefaultCommunitySort)
         internal set
     var postLayout by mutableStateOf(initialPostLayout)
         internal set
@@ -530,6 +540,21 @@ internal class SettingsState(
     fun updateResumeFeedPositionStart(start: io.github.brealorg.subshell.ui.FeedPositionStart) {
         resumeFeedPositionStart = start
         persistPreference(SubshellSettings.RESUME_FEED_POSITION_START, start.name)
+    }
+
+    fun updateStartFeed(feed: io.github.brealorg.subshell.ui.StartFeed) {
+        startFeed = feed
+        persistPreference(SubshellSettings.START_FEED, feed.name)
+    }
+
+    fun updateDefaultFeedSort(sort: io.github.brealorg.subshell.ui.FeedSort) {
+        defaultFeedSort = sort
+        persistPreference(SubshellSettings.DEFAULT_FEED_SORT, sort.name)
+    }
+
+    fun updateDefaultCommunitySort(sort: io.github.brealorg.subshell.ui.CommunitySort) {
+        defaultCommunitySort = sort
+        persistPreference(SubshellSettings.DEFAULT_COMMUNITY_SORT, sort.name)
     }
 
     fun updatePostLayout(layout: io.github.brealorg.subshell.ui.PostLayout) {

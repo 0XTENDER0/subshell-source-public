@@ -52,6 +52,52 @@ internal class RedditCommentNetworkDataSource(
         focusedCommentId: String? = null,
         context: Int = 0,
     ): NetworkResult<RedditCommentPage> {
+        val first = commentsOnce(postId, sort, limit, depth, focusedCommentId, context)
+        if (focusedCommentId == null || context == 0 || first !is NetworkResult.Success) return first
+        return NetworkResult.Success(
+            reachTheTopComment(postId, sort, limit, depth, first.value),
+            first.metadata,
+        )
+    }
+
+    /**
+     * ISSUE307_A_DEEP_LINKED_COMMENT_REACHES_THE_TOP_COMMENT_V1 (#307, owner's
+     * Pixel 11): Reddit sends at most 8 parents above a linked comment, so a
+     * reply deeper than that came back as a line starting halfway down the
+     * thread, which the thread took for a new top comment (a duplicate, and
+     * "Couldn't find this comment"). While the line starts below a comment,
+     * the parent's own line is read (at most [FOCUSED_PARENT_READS] times) and
+     * the two are joined. A failed read keeps the line as it is.
+     */
+    private suspend fun reachTheTopComment(
+        postId: String,
+        sort: RedditCommentSort,
+        limit: Int,
+        depth: Int,
+        page: RedditCommentPage,
+    ): RedditCommentPage {
+        var comments = page.comments
+        val authorFullnames = LinkedHashMap(page.authorFullnames)
+        for (read in 0 until FOCUSED_PARENT_READS) {
+            val top = comments.singleOrNull() ?: break
+            val parentId = top.parentId?.trim()?.takeIf { id -> id.startsWith("t1_") } ?: break
+            val above = commentsOnce(postId, sort, limit, depth, focusedCommentId = parentId, context = 8)
+            val abovePage = (above as? NetworkResult.Success)?.value ?: break
+            val joined = joinedUnderParent(abovePage.comments, parentId, top) ?: break
+            comments = joined
+            abovePage.authorFullnames.forEach { (name, fullname) -> authorFullnames.putIfAbsent(name, fullname) }
+        }
+        return page.copy(comments = comments, authorFullnames = authorFullnames)
+    }
+
+    private suspend fun commentsOnce(
+        postId: String,
+        sort: RedditCommentSort,
+        limit: Int,
+        depth: Int,
+        focusedCommentId: String?,
+        context: Int,
+    ): NetworkResult<RedditCommentPage> {
         require(limit in 1..REDDIT_MAX_COMMENT_LIMIT) {
             "Reddit comment limit must be between 1 and $REDDIT_MAX_COMMENT_LIMIT"
         }
@@ -170,6 +216,9 @@ internal class RedditCommentNetworkDataSource(
     companion object {
         const val REDDIT_MAX_COMMENT_LIMIT = 100
         const val REDDIT_MAX_COMMENT_DEPTH = 10
+
+        // ISSUE307: 4 reads above the first line reach 8 + 4 x 9 = 44 levels.
+        const val FOCUSED_PARENT_READS = 4
     }
 }
 
@@ -269,6 +318,69 @@ internal fun mergeFocusedCommentContext(
     // AUDIT298B_FOCUSED_PARENTS_LOAD_THEIR_OTHER_REPLIES_V1: the linked comment;
     // null keeps the comments added from [focused] as they are.
     focusedCommentId: String? = null,
+): List<io.github.brealorg.subshell.model.Comment> =
+    rehomedUnderTheirParents(
+        mergeFocusedCommentContextLevels(current, focused, preferFocusedFields, focusedCommentId),
+    )
+
+/**
+ * ISSUE307_A_LINE_FROM_HALFWAY_DOWN_GOES_UNDER_ITS_PARENT_V1 (#307): a top-level
+ * row whose parent is a comment is a line that started halfway down the
+ * thread (Reddit's 8 parents, or a thread stored that way before the fix).
+ * When its parent is in the tree it moves under it, at the parent's depth
+ * + 1, merged with what is there; otherwise it stays where it is.
+ */
+internal fun rehomedUnderTheirParents(
+    comments: List<io.github.brealorg.subshell.model.Comment>,
+): List<io.github.brealorg.subshell.model.Comment> {
+    var roots = comments
+    repeat(comments.size) {
+        val detached = roots.firstOrNull { root ->
+            val parent = root.parentId?.trim()?.takeIf { id -> id.startsWith("t1_") }
+            parent != null && roots.any { other -> other !== root && other.holds(parent) }
+        } ?: return roots
+        val parentId = detached.parentId!!.trim()
+        roots = roots.filter { root -> root !== detached }.map { root ->
+            if (root.holds(parentId)) joinedUnderParent(listOf(root), parentId, detached)!!.single() else root
+        }
+    }
+    return roots
+}
+
+private fun Comment.holds(id: String): Boolean =
+    this.id == id || children.any { child -> child.holds(id) }
+
+/**
+ * [above] holds [parentId]: the line down to it, with [lower] (a line that
+ * starts at one of its replies) merged into its replies at the right depth.
+ * Null when [above] does not hold [parentId].
+ */
+internal fun joinedUnderParent(
+    above: List<Comment>,
+    parentId: String,
+    lower: Comment,
+): List<Comment>? {
+    if (above.none { root -> root.holds(parentId) }) return null
+    fun graft(comment: Comment): Comment = when {
+        comment.id == parentId -> comment.copy(
+            children = mergeFocusedCommentContextLevels(
+                current = comment.children,
+                focused = listOf(lower.rebasedTo(comment.depth + 1)),
+                preferFocusedFields = true,
+                focusedCommentId = null,
+            ),
+        )
+        comment.holds(parentId) -> comment.copy(children = comment.children.map(::graft))
+        else -> comment
+    }
+    return above.map(::graft)
+}
+
+private fun mergeFocusedCommentContextLevels(
+    current: List<io.github.brealorg.subshell.model.Comment>,
+    focused: List<io.github.brealorg.subshell.model.Comment>,
+    preferFocusedFields: Boolean,
+    focusedCommentId: String?,
 ): List<io.github.brealorg.subshell.model.Comment> {
     if (current.isEmpty()) return focused.map { comment -> withRepliesStillToLoad(comment, focusedCommentId) }
     if (focused.isEmpty()) return current

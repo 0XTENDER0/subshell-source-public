@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.data.auth.reddit
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.account.CommentWriteFailureKind
 import io.github.brealorg.subshell.data.account.CommentWritePhase
 import io.github.brealorg.subshell.data.account.CommentWriteUiState
@@ -16,6 +20,9 @@ import org.junit.Test
  * allow this media in comments) is its own failure with a plain message,
  * not "Reddit rejected the comment" plus the raw provider code.
  */
+// TRANSLATE03: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Composer09CommentMediaNotAllowedTest {
     @Test
     fun redditsMediaTypeRefusalIsRecognised() {
@@ -41,7 +48,7 @@ class Composer09CommentMediaNotAllowedTest {
         )
         assertEquals(
             "This community doesn't allow this kind of image in comments. Remove it to send the text.",
-            presentation.message,
+            presentation.message.s,
         )
         assertEquals(null, presentation.primaryAction)
     }

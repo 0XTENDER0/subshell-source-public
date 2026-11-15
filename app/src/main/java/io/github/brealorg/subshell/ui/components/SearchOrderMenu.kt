@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenu
@@ -75,7 +77,7 @@ private fun <S> PostOrderMenuButton(
     var expanded by remember { mutableStateOf(false) }
     Box(modifier) {
         IconButton(onClick = { expanded = true }) {
-            Icon(Symbols.Sort, contentDescription = "Sort posts: ${sortLabel(sort)}")
+            Icon(Symbols.Sort, contentDescription = stringResource(R.string.comp_sort_posts, sortLabel(sort)))
         }
         DropdownMenu(
             expanded = expanded,
@@ -101,7 +103,7 @@ private fun <S> PostOrderMenuButton(
                 HorizontalDivider()
                 RedditListingTimePeriod.entries.forEach { period ->
                     DropdownMenuItem(
-                        text = { Text(period.label) },
+                        text = { Text(stringResource(period.labelRes)) },
                         modifier = Modifier.semantics { selected = period == timePeriod },
                         trailingIcon = if (period == timePeriod) {
                             { Icon(Symbols.Check, contentDescription = null) }

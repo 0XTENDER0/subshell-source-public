@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.platform.LocalContext
@@ -238,7 +240,7 @@ internal fun CommentComposerScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        "This draft was written with another account. Switch back to it to send, or discard it.",
+                        stringResource(R.string.all_this_draft_was_written_with_another_account),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.weight(1f),
@@ -249,7 +251,7 @@ internal fun CommentComposerScreen(
                             onClose()
                         },
                     ) {
-                        Text("Discard")
+                        Text(stringResource(R.string.scr_discard))
                     }
                 }
             }
@@ -269,7 +271,7 @@ internal fun CommentComposerScreen(
             CompactReplyComposer(
                 state = reply,
                 media = media,
-                placeholder = if (target.isPostTarget) "Add a comment" else "Reply",
+                placeholder = if (target.isPostTarget) stringResource(R.string.all_add_a_comment) else stringResource(R.string.all_reply),
                 sendEnabled = if (authenticated) remotePostEnabled else localPostEnabled,
                 onSend = {
                     updateDraft { current -> current.copy(body = reply.text.toString()) }
@@ -297,7 +299,7 @@ internal fun CommentComposerScreen(
                 onDismissContext = onClose,
                 focusRequester = focusRequester,
                 maxCharacters = 10_000,
-                sendContentDescription = if (target.isPostTarget) "Post comment" else "Post reply",
+                sendContentDescription = if (target.isPostTarget) stringResource(R.string.all_post_comment) else stringResource(R.string.all_post_reply),
                 mentions = mentions,
                 longReplyTitle = if (target.isPostTarget) {
                     "Comment on r/${post.community}"
@@ -309,7 +311,7 @@ internal fun CommentComposerScreen(
                 } else {
                     threadComments.findComment(target.parentCommentId)?.body
                 },
-                sendLabel = "Post",
+                sendLabel = stringResource(R.string.all_post),
             )
         }
     }
@@ -354,7 +356,7 @@ internal fun CommentComposerLauncher(
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
         ) {
             Text(
-                text = "Add a comment",
+                text = stringResource(R.string.scr_add_a_comment),
                 modifier = Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge,
@@ -411,7 +413,7 @@ private fun CommentWriteStatus(
         mediaBlocked -> mediaBlockedMessage
         requestUnbuildable -> COMMENT_REQUEST_UNBUILDABLE_MESSAGE
         targetUnavailable ->
-            "This comment target is unavailable."
+            stringResource(R.string.all_this_comment_target_is_unavailable)
         else -> commentWriteStatusMessage(writeState)
     } ?: return
 
@@ -438,29 +440,29 @@ private fun CommentWriteStatus(
             when (writeState.phase) {
                 CommentWritePhase.AUTHORIZATION_REQUIRED -> {
                     TextButton(onClick = onGrantAccess) {
-                        Text("Grant comment access")
+                        Text(stringResource(R.string.scr_grant_comment_access))
                     }
                     TextButton(onClick = onDismiss) {
-                        Text("Not now")
+                        Text(stringResource(R.string.scr_not_now))
                     }
                 }
                 CommentWritePhase.AUTHORIZING,
                 CommentWritePhase.AWAITING_CALLBACK,
                 -> TextButton(onClick = onCancelAuthorization) {
-                    Text("Cancel authorization")
+                    Text(stringResource(R.string.scr_cancel_authorization))
                 }
                 CommentWritePhase.FAILED -> {
                     if (writeState.retryable) {
                         TextButton(onClick = onRetry) {
-                            Text("Try again")
+                            Text(stringResource(R.string.scr_try_again))
                         }
                     }
                     TextButton(onClick = onDismiss) {
-                        Text("Dismiss")
+                        Text(stringResource(R.string.scr_dismiss))
                     }
                 }
                 CommentWritePhase.OUTCOME_UNKNOWN -> TextButton(onClick = onDismiss) {
-                    Text("Dismiss")
+                    Text(stringResource(R.string.scr_dismiss))
                 }
                 else -> Unit
             }

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.s
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -145,8 +146,8 @@ class Step3ModeratorQueueSheetComposeTest {
         composeRule.waitForIdle()
     }
 
-    private fun trayTitle() = notices.currentRequest?.presentation?.title
-    private fun trayMessage() = notices.currentRequest?.presentation?.message
+    private fun trayTitle() = notices.currentRequest?.presentation?.title?.s
+    private fun trayMessage() = notices.currentRequest?.presentation?.message?.s
 
     private fun count(text: String) = composeRule.onAllNodesWithText(text).fetchSemanticsNodes().size
 
@@ -343,13 +344,16 @@ class Step3ModeratorQueueSheetComposeTest {
         composeRule.onAllNodes(hasSetTextAction() and hasText("Mod note (optional)")).onFirst()
             .performTextInput("spam ring")
         composeRule.waitForIdle()
-        composeRule.onAllNodes(hasText("Remove") and hasClickAction())
-            .let { it[it.fetchSemanticsNodes().size - 1] }
+        // MODRESPONSE02_PICKING_A_REASON_TURNS_THE_MESSAGE_ON_V1: a reason with a
+        // message switches the removal message on, so the confirm says so.
+        composeRule.onAllNodes(hasText("Remove and send") and hasClickAction())
+            .onFirst()
             .performSemanticsAction(SemanticsActions.OnClick)
         composeRule.waitForIdle()
 
         assertEquals("reason-a", moderated.single().removalReasonId)
         assertEquals("spam ring", moderated.single().modNote)
+        assertEquals("First", moderated.single().removalMessage?.body)
     }
 
     @Test

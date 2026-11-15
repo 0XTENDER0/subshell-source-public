@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertFalse
@@ -11,11 +12,11 @@ class Mute01A31IntegratedFeedsPreviewPolicyTest {
     fun selectedMuteModeFlowsIntoExistingFeedsLivePreview() {
         val settings = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/SettingsScreen.kt",
-        ).readText()
+        ).readSourceText()
         val feedsPreview = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/" +
                 "Settings03FeedsPreview.kt",
-        ).readText()
+        ).readSourceText()
 
         assertTrue(
             settings.contains(
@@ -39,7 +40,7 @@ class Mute01A31IntegratedFeedsPreviewPolicyTest {
         val muteUi = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/" +
                 "MutedCommunityDirectView.kt",
-        ).readText()
+        ).readSourceText()
 
         assertTrue(muteUi.contains("MutedCommunityDirectViewSetting("))
         assertTrue(muteUi.contains("MutedCommunityDirectViewLivePreview("))

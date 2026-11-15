@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -47,12 +49,12 @@ fun NotificationTypesSettingsScreen(
     val routeTopBarScroll = rememberRouteTopBarScrollBehavior()
     Column(modifier.fillMaxSize().nestedScroll(routeTopBarScroll.nestedScrollConnection)) {
         RouteTopBar(
-            title = { Text("Notification types") },
+            title = { Text(stringResource(R.string.sw_notification_types)) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
                     Icon(
                         Symbols.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(R.string.sw_back),
                     )
                 }
             },
@@ -71,7 +73,7 @@ fun NotificationTypesSettingsScreen(
         ) {
             item("notification-types-supporting") {
                 Text(
-                    text = "Choose what you want to be notified about.",
+                    text = stringResource(R.string.sw_choose_what_you_want_to_be_notified),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 4.dp),
@@ -86,8 +88,8 @@ fun NotificationTypesSettingsScreen(
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         NotificationTypeRow(
-                            title = "Replies",
-                            description = "Post and comment replies",
+                            title = stringResource(R.string.sw_replies),
+                            description = stringResource(R.string.sw_post_and_comment_replies),
                             checked = state.notifyReplies,
                             enabled = enabled,
                             onCheckedChange = state::updateNotifyReplies,
@@ -96,8 +98,8 @@ fun NotificationTypesSettingsScreen(
                         NotificationTypeDivider()
 
                         NotificationTypeRow(
-                            title = "Mentions",
-                            description = "Username mentions",
+                            title = stringResource(R.string.sw_mentions),
+                            description = stringResource(R.string.sw_username_mentions),
                             checked = state.notifyMentions,
                             enabled = enabled,
                             onCheckedChange = state::updateNotifyMentions,
@@ -106,8 +108,8 @@ fun NotificationTypesSettingsScreen(
                         NotificationTypeDivider()
 
                         NotificationTypeRow(
-                            title = "Private messages",
-                            description = "Reddit messages",
+                            title = stringResource(R.string.sw_private_messages),
+                            description = stringResource(R.string.sw_reddit_messages),
                             checked = state.notifyPrivateMessages,
                             enabled = enabled,
                             onCheckedChange =
@@ -117,8 +119,8 @@ fun NotificationTypesSettingsScreen(
                         NotificationTypeDivider()
 
                         NotificationTypeRow(
-                            title = "Reddit notices",
-                            description = "System messages",
+                            title = stringResource(R.string.sw_reddit_notices),
+                            description = stringResource(R.string.sw_system_messages),
                             checked = state.notifyRedditNotices,
                             enabled = enabled,
                             onCheckedChange =
@@ -128,8 +130,8 @@ fun NotificationTypesSettingsScreen(
                         NotificationTypeDivider()
 
                         NotificationTypeRow(
-                            title = "Modmail",
-                            description = "Moderator conversations",
+                            title = stringResource(R.string.sw_modmail),
+                            description = stringResource(R.string.sw_moderator_conversations),
                             checked = state.notifyModmail,
                             enabled = enabled,
                             onCheckedChange = state::updateNotifyModmail,

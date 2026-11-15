@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.error
 
+import io.github.brealorg.subshell.ui.s
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
@@ -57,7 +58,7 @@ class Issue32TrayMessageInFullTest {
     @Test
     fun aLongMessageOffersMoreAndLess() {
         val presentation = redditAccessRefusedPresentation()
-        assertTrue(presentation.message.length > 300)
+        assertTrue(presentation.message.s.length > 300)
         host.present(scopeKey = "refused", presentation = presentation, failureDetails = null, onRetry = {})
         showTray()
 

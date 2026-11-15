@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
 import android.content.SharedPreferences
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -131,23 +133,23 @@ internal const val RedditFavoriteNoticeScope = "reddit-favorite"
 internal fun redditFavoriteFailurePresentation(
     failure: RedditFavoriteUiFailure,
 ): ErrorPresentation {
-    val community = if (failure.customFeed) failure.communityName else "r/${failure.communityName}"
+    val community = if (failure.customFeed) failure.communityName else UiText.Resource(R.string.notice_redditfavori_r, failure.communityName)
     return ErrorPresentation(
         kind = ErrorPresentationKind.DEGRADED,
         title = if (failure.makeFavorite) {
-            "Couldn't add $community to your Reddit favorites"
+            UiText.Resource(R.string.notice_redditfavori_couldn_t_add_to_your_reddit_favorites, community)
         } else {
-            "Couldn't remove $community from your Reddit favorites"
+            UiText.Resource(R.string.notice_redditfavori_couldn_t_remove_from_your_reddit_favorites, community)
         },
         message = when (failure.kind) {
             RedditFavoriteUiFailureKind.FAILED ->
-                "Reddit didn't accept the change, or the connection failed"
+                UiText.Resource(R.string.notice_redditfavori_reddit_didn_t_accept_the_change_or)
             RedditFavoriteUiFailureKind.AUTHORIZATION ->
-                "subshell needs your permission to manage your communities on Reddit"
+                UiText.Resource(R.string.notice_redditfavori_subshell_needs_your_permission_to_manage_your)
             RedditFavoriteUiFailureKind.NOT_CONFIRMED ->
-                "Reddit's list didn't show the change when subshell checked"
+                UiText.Resource(R.string.notice_redditfavori_reddit_s_list_didn_t_show_the)
         },
-        primaryAction = ErrorAction(ErrorActionKind.RETRY, "Authorize")
+        primaryAction = ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.notice_redditfavori_authorize))
             .takeIf { failure.kind == RedditFavoriteUiFailureKind.AUTHORIZATION },
     )
 }

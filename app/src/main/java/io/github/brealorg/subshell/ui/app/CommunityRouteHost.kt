@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -119,7 +121,7 @@ internal fun CommunityRouteHost(
             // NEXT01A5_SUBSCRIPTIONS_COMMUNITY_ROUTE_TWO_PANE_V1
             ExpandedListDetailSurface(
                 scaffoldPadding = padding,
-                listTitle = "Communities",
+                listTitle = stringResource(R.string.all_communities),
                 listSubtitle = null,
                 listContent = { listModifier ->
                     CommunitiesScreen(

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.update
 
+import androidx.compose.ui.res.stringResource
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager

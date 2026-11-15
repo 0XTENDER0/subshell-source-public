@@ -90,6 +90,8 @@ internal fun conversationReplyParentFullname(itemId: String, conversation: List<
 internal fun conversationNotificationContent(
     event: InboxNotificationEvent,
     nowEpochMillis: Long,
+    // The production caller passes the translated text; the default is for tests.
+    newMessageText: String = "New message",
 ): ConversationNotificationContent {
     val messages = event.conversation
         .filter { message -> message.body.isNotBlank() }
@@ -105,7 +107,7 @@ internal fun conversationNotificationContent(
             listOf(
                 ConversationNotificationMessage(
                     sender = event.sender,
-                    text = event.preview.ifBlank { "New message" },
+                    text = event.preview.ifBlank { newMessageText },
                     epochMillis = nowEpochMillis,
                 ),
             )
@@ -143,7 +145,7 @@ internal fun pushConversationShortcut(context: Context, accountStableId: String,
             context,
             ShortcutInfoCompat.Builder(context, conversationShortcutId(accountStableId, sender))
                 .setShortLabel(sender)
-                .setLongLabel("Messages with $sender")
+                .setLongLabel(context.getString(R.string.notif_messages_with, sender))
                 .setIcon(IconCompat.createWithResource(context, R.mipmap.ic_shortcut_inbox))
                 .setIntent(
                     launcherShortcutTargetIntent(LauncherShortcutTarget.Inbox(accountStableId, requestId = 0L))
@@ -160,6 +162,10 @@ internal fun conversationReplyAction(context: Context, target: ConversationReply
     val intent = Intent(context, InboxReplyReceiver::class.java)
         .setAction(INBOX_REPLY_ACTION)
         .putExtra(INBOX_REPLY_EVENT_EXTRA, target.eventKey)
+        // ISSUE305_A_LOST_REPLY_TARGET_SAYS_SO_V1: where to say a reply was not
+        // sent when its stored target is gone (the tag is the notification's own).
+        .putExtra(INBOX_REPLY_NOTIFICATION_TAG_EXTRA, notificationAccountTag(target.accountStableId))
+        .putExtra(INBOX_REPLY_NOTIFICATION_ID_EXTRA, target.notificationId)
         .putExtra(NOTIFICATION_LAUNCH_KEY_EXTRA, NotificationLaunchKey.value(context))
     // RemoteInput fills the typed text in, so the intent must be mutable; it
     // names Subshell's own receiver and carries no routing that is trusted.
@@ -169,8 +175,12 @@ internal fun conversationReplyAction(context: Context, target: ConversationReply
         intent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
     )
-    return NotificationCompat.Action.Builder(R.drawable.ic_notification_subshell, "Reply", pendingIntent)
-        .addRemoteInput(RemoteInput.Builder(INBOX_REPLY_TEXT_KEY).setLabel("Reply").build())
+    return NotificationCompat.Action.Builder(
+        R.drawable.ic_notification_subshell,
+        context.getString(R.string.notif_reply),
+        pendingIntent,
+    )
+        .addRemoteInput(RemoteInput.Builder(INBOX_REPLY_TEXT_KEY).setLabel(context.getString(R.string.notif_reply)).build())
         .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY)
         .setShowsUserInterface(false)
         .setAllowGeneratedReplies(false)
@@ -182,6 +192,8 @@ internal object ConversationReplyTargets {
     private const val PREFERENCES = "subshell_conversation_replies"
     private const val ORDER_KEY = "order"
     private const val KEPT = 64
+    private const val TEXT_ORDER_KEY = "text_order"
+    private const val KEPT_TEXTS = 16
 
     fun put(context: Context, target: ConversationReplyTarget) = synchronized(this) {
         val preferences = SealedKeysPreferences.named(context, PREFERENCES)
@@ -203,6 +215,37 @@ internal object ConversationReplyTargets {
             )
             .putString(ORDER_KEY, order.takeLast(KEPT).joinToString("\n"))
             .apply()
+    }
+
+    /**
+     * ISSUE305_A_NOTIFICATION_REPLY_IS_SEALED_V1 (#305): the typed reply went
+     * into WorkManager's input data, which WorkManager keeps in plain text in
+     * its own database; it waits here sealed, under its request id, and the
+     * worker takes it out. False when it could not be stored (no seal).
+     */
+    fun putText(context: Context, requestId: String, text: String): Boolean = synchronized(this) {
+        runCatching {
+            val preferences = SealedKeysPreferences.named(context, PREFERENCES)
+            val order = preferences.getString(TEXT_ORDER_KEY, "").orEmpty()
+                .split('\n')
+                .filter { key -> key.isNotEmpty() && key != requestId } + requestId
+            preferences.edit()
+                .apply { order.dropLast(KEPT_TEXTS).forEach { key -> remove("text:$key") } }
+                .putString("text:$requestId", text)
+                .putString(TEXT_ORDER_KEY, order.takeLast(KEPT_TEXTS).joinToString("\n"))
+                .commit()
+        }.getOrDefault(false) &&
+            runCatching { SealedKeysPreferences.named(context, PREFERENCES).getString("text:$requestId", null) == text }
+                .getOrDefault(false)
+    }
+
+    fun takeText(context: Context, requestId: String): String? = synchronized(this) {
+        runCatching {
+            val preferences = SealedKeysPreferences.named(context, PREFERENCES)
+            val text = preferences.getString("text:$requestId", null)
+            preferences.edit().remove("text:$requestId").apply()
+            text
+        }.getOrNull()
     }
 
     fun get(context: Context, eventKey: String): ConversationReplyTarget? = synchronized(this) {
@@ -232,12 +275,25 @@ internal fun appendToConversationNotification(
     target: ConversationReplyTarget,
     text: String,
     fromSubshell: Boolean,
+) = appendToShownConversationNotification(
+    context,
+    notificationAccountTag(target.accountStableId),
+    target.notificationId,
+    text,
+    fromSubshell,
+)
+
+internal fun appendToShownConversationNotification(
+    context: Context,
+    tag: String,
+    notificationId: Int,
+    text: String,
+    fromSubshell: Boolean,
 ) {
     val appContext = context.applicationContext
-    val tag = notificationAccountTag(target.accountStableId)
     val shown = appContext.getSystemService(NotificationManager::class.java)
         ?.activeNotifications
-        ?.firstOrNull { notification -> notification.tag == tag && notification.id == target.notificationId }
+        ?.firstOrNull { notification -> notification.tag == tag && notification.id == notificationId }
         ?.notification
         ?: return
     val style = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(shown) ?: return
@@ -249,7 +305,7 @@ internal fun appendToConversationNotification(
     runCatching {
         NotificationManagerCompat.from(appContext).notify(
             tag,
-            target.notificationId,
+            notificationId,
             NotificationCompat.Builder(appContext, shown)
                 .setStyle(style)
                 .setOnlyAlertOnce(true)
@@ -264,21 +320,51 @@ class InboxReplyReceiver : BroadcastReceiver() {
         if (intent.action != INBOX_REPLY_ACTION) return
         if (!NotificationLaunchKey.matches(context, intent.getStringExtra(NOTIFICATION_LAUNCH_KEY_EXTRA))) return
         val eventKey = intent.getStringExtra(INBOX_REPLY_EVENT_EXTRA)?.trim()?.takeIf(String::isNotEmpty) ?: return
-        val target = ConversationReplyTargets.get(context, eventKey) ?: return
         val text = RemoteInput.getResultsFromIntent(intent)
             ?.getCharSequence(INBOX_REPLY_TEXT_KEY)
             ?.toString()
             ?.trim()
             ?.takeIf(String::isNotEmpty)
             ?: return
+        val target = ConversationReplyTargets.get(context, eventKey)
+        // ISSUE305_A_LOST_REPLY_TARGET_SAYS_SO_V1 (#305): a reply whose target
+        // is gone (more than 64 newer ones, or never stored without the seal)
+        // was dropped with the system's "sending" spinner left running.
+        if (target == null) {
+            sayReplyNotSent(context, intent, text)
+            return
+        }
+        val requestId = UUID.randomUUID().toString()
+        if (!ConversationReplyTargets.putText(context, requestId, text)) {
+            appendToConversationNotification(context, target, text, fromSubshell = false)
+            appendToConversationNotification(
+                context,
+                target,
+                context.getString(R.string.notif_reply_not_sent),
+                fromSubshell = true,
+            )
+            return
+        }
         appendToConversationNotification(context, target, text, fromSubshell = false)
         InboxReplyWork.enqueue(
             context.applicationContext,
             workDataOf(
                 INBOX_REPLY_EVENT_EXTRA to eventKey,
-                INBOX_REPLY_TEXT_KEY to text,
-                INBOX_REPLY_REQUEST_INPUT to UUID.randomUUID().toString(),
+                INBOX_REPLY_REQUEST_INPUT to requestId,
             ),
+        )
+    }
+
+    private fun sayReplyNotSent(context: Context, intent: Intent, text: String) {
+        val tag = intent.getStringExtra(INBOX_REPLY_NOTIFICATION_TAG_EXTRA) ?: return
+        val id = intent.getIntExtra(INBOX_REPLY_NOTIFICATION_ID_EXTRA, 0).takeIf { it != 0 } ?: return
+        appendToShownConversationNotification(context, tag, id, text, fromSubshell = false)
+        appendToShownConversationNotification(
+            context,
+            tag,
+            id,
+            context.getString(R.string.notif_reply_not_sent),
+            fromSubshell = true,
         )
     }
 }
@@ -299,9 +385,16 @@ internal class InboxReplyWorker(
 ) : CoroutineWorker(appContext, workerParameters) {
     override suspend fun doWork(): Result {
         val eventKey = inputData.getString(INBOX_REPLY_EVENT_EXTRA) ?: return Result.success()
-        val text = inputData.getString(INBOX_REPLY_TEXT_KEY) ?: return Result.success()
         val requestId = inputData.getString(INBOX_REPLY_REQUEST_INPUT) ?: return Result.success()
         val target = ConversationReplyTargets.get(applicationContext, eventKey) ?: return Result.success()
+        // ISSUE305_A_NOTIFICATION_REPLY_IS_SEALED_V1: the text is in sealed storage;
+        // a job queued by an older version still carries it in its input.
+        val text = ConversationReplyTargets.takeText(applicationContext, requestId)
+            ?: inputData.getString(INBOX_REPLY_TEXT_KEY)
+        if (text == null) {
+            report(target, InboxReplyOutcome.NOT_SENT)
+            return Result.success()
+        }
         // A worker run again after the process died may already have sent it.
         if (!InboxReplyAttempts.claim(applicationContext, requestId)) {
             report(target, InboxReplyOutcome.UNKNOWN)
@@ -341,8 +434,8 @@ internal class InboxReplyWorker(
     private fun report(target: ConversationReplyTarget, outcome: InboxReplyOutcome) {
         val message = when (outcome) {
             InboxReplyOutcome.SENT -> return
-            InboxReplyOutcome.NOT_SENT -> "Your reply was not sent. Open the conversation to try again."
-            InboxReplyOutcome.UNKNOWN -> "Your reply may not have been sent. Open the conversation to check."
+            InboxReplyOutcome.NOT_SENT -> applicationContext.getString(R.string.notif_reply_not_sent)
+            InboxReplyOutcome.UNKNOWN -> applicationContext.getString(R.string.notif_reply_unknown)
         }
         appendToConversationNotification(applicationContext, target, message, fromSubshell = true)
     }
@@ -379,5 +472,7 @@ internal object InboxReplyAttempts {
 internal const val INBOX_REPLY_ACTION = "io.github.brealorg.subshell.action.INBOX_NOTIFICATION_REPLY"
 internal const val INBOX_REPLY_EVENT_EXTRA = "inbox_reply_event"
 internal const val INBOX_REPLY_TEXT_KEY = "inbox_reply_text"
-private const val INBOX_REPLY_REQUEST_INPUT = "inbox_reply_request"
+internal const val INBOX_REPLY_REQUEST_INPUT = "inbox_reply_request"
+internal const val INBOX_REPLY_NOTIFICATION_TAG_EXTRA = "inbox_reply_notification_tag"
+internal const val INBOX_REPLY_NOTIFICATION_ID_EXTRA = "inbox_reply_notification_id"
 private const val INBOX_REPLY_LOG_TAG = "SubshellInboxReply"

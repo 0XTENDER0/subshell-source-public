@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.language.SELECTABLE_LANGUAGES
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.brealorg.subshell.ui.app.onDisk
@@ -551,10 +554,10 @@ fun SettingsScreen(
             )
         }
         "appearance-theme" -> SettingsSingleChoiceDialog(
-            title = "Theme",
+            title = stringResource(R.string.set_theme),
             options = ThemeChoice.entries,
             selected = state.themeChoice,
-            label = ThemeChoice::label,
+            label = { it.label },
             onSelect = { choice ->
                 state.updateThemeChoice(choice)
                 choiceDialogKey = null
@@ -562,10 +565,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "appearance-ui-size" -> SettingsSingleChoiceDialog(
-            title = "UI size",
+            title = stringResource(R.string.set_ui_size),
             options = AppUiScale.entries,
             selected = state.appUiScale,
-            label = AppUiScale::label,
+            label = { stringResource(it.labelRes) },
             onSelect = { scale ->
                 state.updateAppUiScale(scale)
                 choiceDialogKey = null
@@ -573,10 +576,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "appearance-text-size" -> SettingsSingleChoiceDialog(
-            title = "Text size",
+            title = stringResource(R.string.set_text_size),
             options = AppTextScale.entries,
             selected = state.appTextScale,
-            label = AppTextScale::label,
+            label = { it.label },
             onSelect = { scale ->
                 state.updateAppTextScale(scale)
                 choiceDialogKey = null
@@ -584,10 +587,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "video-cache-limit" -> SettingsSingleChoiceDialog(
-            title = "Video cache size",
+            title = stringResource(R.string.set_video_cache_size),
             options = VideoMediaCacheLimit.entries,
             selected = videoCacheLimit ?: VideoMediaCacheLimit.DEFAULT,
-            label = VideoMediaCacheLimit::label,
+            label = { stringResource(it.labelRes) },
             onSelect = { limit ->
                 VideoMediaCacheLimitStore.write(appContext, limit)
                 videoCacheLimit = limit
@@ -611,10 +614,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "appearance-vote-controls" -> SettingsSingleChoiceDialog(
-            title = "Vote controls",
+            title = stringResource(R.string.set_vote_controls),
             options = VoteControlMode.entries,
             selected = state.voteControlMode,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { mode ->
                 state.updateVoteControlMode(mode)
                 choiceDialogKey = null
@@ -622,10 +625,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "appearance-vote-colours" -> SettingsSingleChoiceDialog(
-            title = "Vote colours",
+            title = stringResource(R.string.set_vote_colours),
             options = VoteColorPalette.entries,
             selected = state.voteColorPalette,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { palette ->
                 state.updateVoteColorPalette(palette)
                 choiceDialogKey = null
@@ -641,10 +644,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "media-sensitive-previews" -> SettingsSingleChoiceDialog(
-            title = "Sensitive media previews",
+            title = stringResource(R.string.set_sensitive_media_previews),
             options = SensitiveMediaPreviewMode.entries,
             selected = state.sensitiveMediaPreviewMode,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { mode ->
                 state.updateSensitiveMediaPreviewMode(mode)
                 choiceDialogKey = null
@@ -652,10 +655,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "media-autoplay" -> SettingsSingleChoiceDialog(
-            title = "Autoplay videos and GIFs",
+            title = stringResource(R.string.set_autoplay_videos_and_gifs),
             options = VideoAutoplay.entries,
             selected = state.videoAutoplay,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { autoplay ->
                 state.updateVideoAutoplay(autoplay)
                 choiceDialogKey = null
@@ -663,10 +666,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "media-quality-wifi" -> SettingsSingleChoiceDialog(
-            title = "Video quality on Wi-Fi",
+            title = stringResource(R.string.set_video_quality_on_wi_fi),
             options = VideoQuality.entries,
             selected = state.wifiVideoQuality,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { quality ->
                 state.updateWifiVideoQuality(quality)
                 choiceDialogKey = null
@@ -674,10 +677,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "media-quality-mobile" -> SettingsSingleChoiceDialog(
-            title = "Video quality on mobile data",
+            title = stringResource(R.string.set_video_quality_on_mobile_data),
             options = VideoQuality.entries,
             selected = state.mobileVideoQuality,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { quality ->
                 state.updateMobileVideoQuality(quality)
                 choiceDialogKey = null
@@ -685,10 +688,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "media-subtitle-default" -> SettingsSingleChoiceDialog(
-            title = "Subtitles",
+            title = stringResource(R.string.set_subtitles),
             options = VideoSubtitleDefault.entries,
             selected = state.videoSubtitleDefault,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { value ->
                 state.updateVideoSubtitleDefault(value)
                 choiceDialogKey = null
@@ -696,10 +699,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "media-audio-default" -> SettingsSingleChoiceDialog(
-            title = "Audio language",
+            title = stringResource(R.string.set_audio_language),
             options = VideoAudioDefault.entries,
             selected = state.videoAudioDefault,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { value ->
                 state.updateVideoAudioDefault(value)
                 choiceDialogKey = null
@@ -707,10 +710,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "media-playback-options" -> SettingsSingleChoiceDialog(
-            title = "Playback options button",
+            title = stringResource(R.string.set_playback_options_button),
             options = PlaybackOptionsPlacement.entries,
             selected = state.playbackOptionsPlacement,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { placement ->
                 state.updatePlaybackOptionsPlacement(placement)
                 choiceDialogKey = null
@@ -718,10 +721,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "media-timeline-size" -> SettingsSingleChoiceDialog(
-            title = "Video timeline size",
+            title = stringResource(R.string.set_video_timeline_size),
             options = VideoTimelineSize.entries,
             selected = state.videoTimelineSize,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { size ->
                 state.updateVideoTimelineSize(size)
                 choiceDialogKey = null
@@ -731,10 +734,10 @@ fun SettingsScreen(
         // M3225_LONG_SINGLE_CHOICE_IS_A_VALUE_ROW_V1 (#225, owner): long or many
         // options are a value row with this radio dialog, not chips.
         "random-nsfw-community" -> SettingsSingleChoiceDialog(
-            title = "Random NSFW community",
+            title = stringResource(R.string.set_random_nsfw_community),
             options = io.github.brealorg.subshell.ui.RandomNsfwCommunityPlacement.entries,
             selected = state.randomNsfwCommunityPlacement,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { placement ->
                 state.updateRandomNsfwCommunityPlacement(placement)
                 choiceDialogKey = null
@@ -743,10 +746,10 @@ fun SettingsScreen(
         )
         // ISSUE234_FEED_POST_LAYOUTS_V1
         "post-layout" -> SettingsSingleChoiceDialog(
-            title = "Post layout",
+            title = stringResource(R.string.set_post_layout),
             options = io.github.brealorg.subshell.ui.PostLayout.entries,
             selected = state.postLayout,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { layout ->
                 state.updatePostLayout(layout)
                 choiceDialogKey = null
@@ -754,22 +757,56 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "list-thumbnail-side" -> SettingsSingleChoiceDialog(
-            title = "Thumbnail",
+            title = stringResource(R.string.set_thumbnail),
             options = io.github.brealorg.subshell.ui.ListThumbnailSide.entries,
             selected = state.listThumbnailSide,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { side ->
                 state.updateListThumbnailSide(side)
                 choiceDialogKey = null
             },
             onDismiss = { choiceDialogKey = null },
         )
+        // ISSUE302_START_FEED_V1 / ISSUE300_DEFAULT_FEED_SORT_V1
+        "start-feed" -> SettingsSingleChoiceDialog(
+            title = stringResource(R.string.set_start_feed),
+            options = io.github.brealorg.subshell.ui.StartFeed.entries,
+            selected = state.startFeed,
+            label = { stringResource(it.labelRes) },
+            onSelect = { feed ->
+                state.updateStartFeed(feed)
+                choiceDialogKey = null
+            },
+            onDismiss = { choiceDialogKey = null },
+        )
+        "default-feed-sort" -> SettingsSingleChoiceDialog(
+            title = stringResource(R.string.set_feed_sort),
+            options = io.github.brealorg.subshell.ui.FeedSort.entries,
+            selected = state.defaultFeedSort,
+            label = { stringResource(it.labelRes) },
+            onSelect = { sort ->
+                state.updateDefaultFeedSort(sort)
+                choiceDialogKey = null
+            },
+            onDismiss = { choiceDialogKey = null },
+        )
+        "default-community-sort" -> SettingsSingleChoiceDialog(
+            title = stringResource(R.string.set_community_sort),
+            options = io.github.brealorg.subshell.ui.CommunitySort.entries,
+            selected = state.defaultCommunitySort,
+            label = { stringResource(it.labelRes) },
+            onSelect = { sort ->
+                state.updateDefaultCommunitySort(sort)
+                choiceDialogKey = null
+            },
+            onDismiss = { choiceDialogKey = null },
+        )
         // ISSUE290_FEEDS_RESUME_WHERE_YOU_LEFT_OFF_V1
         "resume-feed-position-age" -> SettingsSingleChoiceDialog(
-            title = "Keep my place for",
+            title = stringResource(R.string.set_keep_my_place_for),
             options = io.github.brealorg.subshell.ui.FeedPositionAge.entries,
             selected = state.resumeFeedPositionAge,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { age ->
                 state.updateResumeFeedPositionAge(age)
                 choiceDialogKey = null
@@ -777,10 +814,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "resume-feed-position-start" -> SettingsSingleChoiceDialog(
-            title = "When the app starts",
+            title = stringResource(R.string.set_when_the_app_starts),
             options = io.github.brealorg.subshell.ui.FeedPositionStart.entries,
             selected = state.resumeFeedPositionStart,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { start ->
                 state.updateResumeFeedPositionStart(start)
                 choiceDialogKey = null
@@ -789,10 +826,10 @@ fun SettingsScreen(
         )
         // ISSUE230_PINNED_POSTS_FIRST_V1
         "pinned-posts" -> SettingsSingleChoiceDialog(
-            title = "Pinned posts",
+            title = stringResource(R.string.set_pinned_posts),
             options = io.github.brealorg.subshell.ui.PinnedPostsPresentation.entries,
             selected = state.pinnedPostsPresentation,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { presentation ->
                 state.updatePinnedPostsPresentation(presentation)
                 choiceDialogKey = null
@@ -800,10 +837,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "feed-state" -> SettingsSingleChoiceDialog(
-            title = "Feed preview",
+            title = stringResource(R.string.set_feed_preview),
             options = FeedPreviewState.entries,
             selected = state.feedPreviewState,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { preview ->
                 state.updateFeedPreviewState(preview)
                 choiceDialogKey = null
@@ -811,10 +848,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "media-captions" -> SettingsSingleChoiceDialog(
-            title = "Gallery captions",
+            title = stringResource(R.string.set_gallery_captions),
             options = MediaCaptionMode.entries,
             selected = state.mediaCaptionMode,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { mode ->
                 state.updateMediaCaptionMode(mode)
                 choiceDialogKey = null
@@ -822,10 +859,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "fullscreen-captions" -> SettingsSingleChoiceDialog(
-            title = "Fullscreen gallery captions",
+            title = stringResource(R.string.set_fullscreen_gallery_captions),
             options = FullscreenCaptionMode.entries,
             selected = state.fullscreenCaptionMode,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { mode ->
                 state.updateFullscreenCaptionMode(mode)
                 choiceDialogKey = null
@@ -833,10 +870,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "comment-hierarchy-style" -> SettingsSingleChoiceDialog(
-            title = "Comment hierarchy",
+            title = stringResource(R.string.set_comment_hierarchy),
             options = CommentHierarchyStyle.entries,
             selected = state.commentHierarchyStyle,
-            label = CommentHierarchyStyle::label,
+            label = { stringResource(it.labelRes) },
             onSelect = { style ->
                 state.updateCommentHierarchyStyle(style)
                 choiceDialogKey = null
@@ -844,10 +881,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "comment-thread-colours" -> SettingsSingleChoiceDialog(
-            title = "Thread colours",
+            title = stringResource(R.string.set_thread_colours),
             options = CommentThreadColours.entries,
             selected = state.commentThreadColours,
-            label = CommentThreadColours::label,
+            label = { stringResource(it.labelRes) },
             onSelect = { colours ->
                 state.updateCommentThreadColours(colours)
                 choiceDialogKey = null
@@ -855,10 +892,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "comment-indent-size" -> SettingsSingleChoiceDialog(
-            title = "Reply indent",
+            title = stringResource(R.string.set_reply_indent),
             options = CommentIndentSize.entries,
             selected = state.commentIndentSize,
-            label = CommentIndentSize::label,
+            label = { stringResource(it.labelRes) },
             onSelect = { size ->
                 state.updateCommentIndentSize(size)
                 choiceDialogKey = null
@@ -874,14 +911,14 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "comment-actions" -> SettingsSingleChoiceDialog(
-            title = "Action placement",
+            title = stringResource(R.string.set_action_placement),
             options = CommentActionPreference.entries,
             selected = state.commentActionPreference,
             label = { preference ->
                 if (preference == CommentActionPreference.FOLLOW) {
-                    state.interactionSide.followLabel()
+                    state.interactionSide.followLabel().asString()
                 } else {
-                    preference.label
+                    stringResource(preference.labelRes)
                 }
             },
             onSelect = { preference ->
@@ -891,10 +928,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "comment-time-format" -> SettingsSingleChoiceDialog(
-            title = "Comment time",
+            title = stringResource(R.string.set_comment_time),
             options = CommentTimeFormat.entries,
             selected = state.commentTimeFormat,
-            label = { format -> "${format.label} · ${format.example}" },
+            label = { format -> "${stringResource(format.labelRes)} · ${format.example}" },
             onSelect = { format ->
                 state.updateCommentTimeFormat(format)
                 choiceDialogKey = null
@@ -902,10 +939,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "top-bar-behavior" -> SettingsSingleChoiceDialog(
-            title = "Top bar",
+            title = stringResource(R.string.set_top_bar),
             options = ChromeBehavior.entries,
             selected = state.topBarBehavior,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { behavior ->
                 state.updateTopBarBehavior(behavior)
                 choiceDialogKey = null
@@ -913,10 +950,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "bottom-navigation-behavior" -> SettingsSingleChoiceDialog(
-            title = "Bottom navigation",
+            title = stringResource(R.string.set_bottom_navigation),
             options = ChromeBehavior.entries,
             selected = state.bottomBarBehavior,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { behavior ->
                 state.updateBottomBarBehavior(behavior)
                 choiceDialogKey = null
@@ -924,10 +961,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "drawer-communities" -> SettingsSingleChoiceDialog(
-            title = "Communities in drawer",
+            title = stringResource(R.string.set_communities_in_drawer),
             options = DrawerCommunitiesMode.entries,
             selected = state.drawerCommunitiesMode,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { mode ->
                 state.updateDrawerCommunitiesMode(mode)
                 choiceDialogKey = null
@@ -935,10 +972,10 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "navigation-labels" -> SettingsSingleChoiceDialog(
-            title = "Navigation labels",
+            title = stringResource(R.string.set_navigation_labels),
             options = NavigationLabelMode.entries,
             selected = state.navigationLabelMode,
-            label = { it.label },
+            label = { stringResource(it.labelRes) },
             onSelect = { mode ->
                 state.updateNavigationLabelMode(mode)
                 choiceDialogKey = null
@@ -946,7 +983,7 @@ fun SettingsScreen(
             onDismiss = { choiceDialogKey = null },
         )
         "subreddit-labels" -> SettingsSingleChoiceDialog(
-            title = "Communities labels",
+            title = stringResource(R.string.set_communities_labels),
             options = SubredditLabelStyle.entries,
             selected = state.subredditLabelStyle,
             label = { it.example },
@@ -966,12 +1003,11 @@ fun SettingsScreen(
                     accountLogoutFailed = false
                 }
             },
-            title = { Text("Log out of u/${activeProductAccount.username}?") },
+            title = { Text(stringResource(R.string.set_log_out_of_u, activeProductAccount.username)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        "This removes this Reddit account from subshell on this device. " +
-                            "You can connect it again later.",
+                        stringResource(R.string.all2_this_removes_this_reddit_account_from_subshell),
                     )
                     // LOWUX1_FAILED_LOGOUT_IS_SAID_V1 (OCB-268): the dialog only
                     // re-enabled after a failed logout.
@@ -997,7 +1033,7 @@ fun SettingsScreen(
                         }
                     },
                 ) {
-                    Text("Log out", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.set_log_out), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
@@ -1008,7 +1044,7 @@ fun SettingsScreen(
                         accountLogoutFailed = false
                     },
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.set_cancel))
                 }
             },
         )
@@ -1039,15 +1075,14 @@ fun SettingsScreen(
                     redReaderClientIdDraft = ""
                 }
             },
-            title = { Text("RedReader compatibility") },
+            title = { Text(stringResource(R.string.set_redreader_compatibility)) },
             text = {
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     Text(
-                        "This explicit compatibility mode uses a locally supplied OAuth client ID. " +
-                            "The value is encrypted in no-backup storage and is never added to saved setups.",
+                        "This explicit compatibility mode uses a locally supplied OAuth client ID. The value is encrypted in no-backup storage and is never added to saved setups.",
                     )
                     OutlinedTextField(
                         value = redReaderClientIdDraft,
@@ -1058,9 +1093,9 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !redReaderConfigurationBusy,
                         singleLine = true,
-                        label = { Text("OAuth client ID") },
+                        label = { Text(stringResource(R.string.set_oauth_client_id)) },
                         supportingText = if (redReaderCompatibilityConfigured) {
-                            { Text("Leave empty to keep the current one") }
+                            { Text(stringResource(R.string.set_leave_empty_to_keep_the_current_one)) }
                         } else {
                             null
                         },
@@ -1121,8 +1156,7 @@ fun SettingsScreen(
                         )
                     }
                     Text(
-                        "Changes are applied automatically. " +
-                            "If RedReader is still installed, Android may ask which app should open the callback; choose subshell.",
+                        stringResource(R.string.all2_changes_are_applied_automatically_if_redreader_is),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -1156,7 +1190,7 @@ fun SettingsScreen(
                                 }
                             },
                         ) {
-                            Text("Use native configuration")
+                            Text(stringResource(R.string.set_use_native_configuration))
                         }
                     }
                 }
@@ -1211,9 +1245,9 @@ fun SettingsScreen(
                 ) {
                     Text(
                         if (redReaderCompatibilityConfigured && redReaderClientIdDraft.isNotBlank()) {
-                            "Replace"
+                            stringResource(R.string.all_replace)
                         } else {
-                            "Save"
+                            stringResource(R.string.all_save)
                         },
                     )
                 }
@@ -1226,7 +1260,7 @@ fun SettingsScreen(
                         redReaderClientIdDraft = ""
                     },
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.set_cancel))
                 }
             },
         )
@@ -1235,11 +1269,10 @@ fun SettingsScreen(
     if (cacheClearConfirmationVisible) {
         AlertDialog(
             onDismissRequest = { cacheClearConfirmationVisible = false },
-            title = { Text("Clear media cache?") },
+            title = { Text(stringResource(R.string.set_clear_media_cache)) },
             text = {
                 Text(
-                    "Cached media will be removed. Settings and saved setups are not affected. " +
-                        "Media can be streamed and cached again when needed.",
+                    stringResource(R.string.all2_cached_media_will_be_removed_settings_and),
                 )
             },
             confirmButton = {
@@ -1270,12 +1303,12 @@ fun SettingsScreen(
                     // ISSUE222_DESTRUCTIVE_CONFIRMS_ARE_RED_V1: as Log out and the composers.
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
                 ) {
-                    Text("Clear")
+                    Text(stringResource(R.string.set_clear))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { cacheClearConfirmationVisible = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.set_cancel))
                 }
             },
         )
@@ -1284,12 +1317,11 @@ fun SettingsScreen(
     if (downloadDeleteConfirmationVisible) {
         AlertDialog(
             onDismissRequest = { downloadDeleteConfirmationVisible = false },
-            title = { Text("Delete all downloaded videos?") },
+            title = { Text(stringResource(R.string.set_delete_all_downloaded_videos)) },
             text = {
                 Text(
-                    (legacyDownloadStatus?.let(::legacyVideoDownloadSummary)?.let { "$it. " }.orEmpty()) +
-                        "Downloaded files and temporary files will be removed. " +
-                        "The playback cache is separate and will not be cleared.",
+                    (legacyDownloadStatus?.let { legacyVideoDownloadSummary(it).asString() }?.let { "$it. " }.orEmpty()) +
+                        "Downloaded files and temporary files will be removed. The playback cache is separate and will not be cleared.",
                 )
             },
             confirmButton = {
@@ -1318,12 +1350,12 @@ fun SettingsScreen(
                     // ISSUE222_DESTRUCTIVE_CONFIRMS_ARE_RED_V1: as Log out and the composers.
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
                 ) {
-                    Text("Delete all")
+                    Text(stringResource(R.string.set_delete_all))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { downloadDeleteConfirmationVisible = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.set_cancel))
                 }
             },
         )
@@ -1334,7 +1366,7 @@ fun SettingsScreen(
     val routeTopBarScroll = rememberRouteTopBarScrollBehavior()
     Column(pageModifier.fillMaxSize().nestedScroll(routeTopBarScroll.nestedScrollConnection)) {
         RouteTopBar(
-            title = { Text(destination.title) },
+            title = { Text(stringResource(destination.titleRes)) },
             navigationIcon = {
                 IconButton(
                     onClick = {
@@ -1345,7 +1377,7 @@ fun SettingsScreen(
                         }
                     },
                 ) {
-                    Icon(Symbols.ArrowBack, contentDescription = "Back")
+                    Icon(Symbols.ArrowBack, contentDescription = stringResource(R.string.set_back))
                 }
             },
             scrollBehavior = routeTopBarScroll,
@@ -1361,7 +1393,7 @@ fun SettingsScreen(
                     SubshellSearchField(
                         query = state.settingsQuery,
                         onQueryChange = { state.settingsQuery = it },
-                        placeholder = "Search settings",
+                        placeholder = stringResource(R.string.set_search_settings),
                         modifier = Modifier.padding(bottom = 8.dp),
                     )
                 }
@@ -1380,16 +1412,16 @@ fun SettingsScreen(
                     ) {
                         Column(Modifier.padding(16.dp)) {
                             Text(
-                                "No settings found",
+                                stringResource(R.string.all_no_settings_found),
                                 style = MaterialTheme.typography.titleMedium,
                             )
                             Text(
-                                "Try another word or clear the search.",
+                                stringResource(R.string.all_try_another_word_or_clear_the_search),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             TextButton(onClick = { state.settingsQuery = "" }) {
-                                Text("Clear search")
+                                Text(stringResource(R.string.set_clear_search))
                             }
                         }
                     }
@@ -1399,7 +1431,7 @@ fun SettingsScreen(
             if (destination == SettingsDestination.ROOT && query.isBlank()) {
                 item("settings-root-label") {
                     Text(
-                        "Browse by area",
+                        stringResource(R.string.all_browse_by_area),
                         modifier = Modifier.padding(top = 5.dp, bottom = 1.dp),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1409,8 +1441,8 @@ fun SettingsScreen(
                     item("settings-destination-${target.name}") {
                         SettingsDestinationRow(
                             icon = settingsDestinationIcon(target),
-                            title = target.title,
-                            description = target.description,
+                            title = stringResource(target.titleRes),
+                            description = target.descriptionRes?.let { stringResource(it) } ?: "",
                             selected = paneRole == SettingsPaneRole.LIST &&
                                 selectedDestinationName == target.name,
                             onClick = {
@@ -1434,7 +1466,7 @@ fun SettingsScreen(
                 )
             ) {
                 item("accounts-title") {
-                    SettingsSection(settingsSectionTitle(destination, "Accounts"))
+                    SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_accounts)))
                 }
                 if (searchResult.isItemVisible("accounts")) {
                     productAccounts.forEach { account ->
@@ -1455,7 +1487,7 @@ fun SettingsScreen(
                             AccountNavigationRow(
                                 username = account.username,
                                 avatarImageUri = accountAvatarUri,
-                                description = accountSwitcherSessionLabel(account, selected),
+                                description = accountSwitcherSessionLabel(account, selected).asString(),
                                 selected = selected,
                                 signInAgain = signInAgain,
                                 onClick = {
@@ -1474,17 +1506,17 @@ fun SettingsScreen(
                             title = if (
                                 accountConnectPresentation.action == AccountConnectAction.RESET
                             ) {
-                                "Add Reddit account"
+                                stringResource(R.string.all_add_reddit_account)
                             } else {
-                                accountConnectPresentation.headline
+                                accountConnectPresentation.headline.asString()
                             },
                             description = if (
                                 accountConnectPresentation.action == AccountConnectAction.CONNECT ||
                                 accountConnectPresentation.action == AccountConnectAction.RESET
                             ) {
-                                "Sign in with another account"
+                                stringResource(R.string.all_sign_in_with_another_account)
                             } else {
-                                accountConnectPresentation.supporting
+                                accountConnectPresentation.supporting.asString()
                             },
                             onClick = {
                                 when (accountConnectPresentation.action) {
@@ -1523,11 +1555,11 @@ fun SettingsScreen(
                             DestructiveNavigationRow(
                                 icon = Symbols.ExitToApp,
                                 title = if (accountLogoutInProgress) {
-                                    "Logging out…"
+                                    stringResource(R.string.all_logging_out)
                                 } else {
-                                    "Log out"
+                                    stringResource(R.string.all_log_out)
                                 },
-                                description = "u/${activeProductAccount.username}",
+                                description = stringResource(R.string.set_u, activeProductAccount.username),
                                 onClick = {
                                     if (!accountLogoutInProgress) {
                                         accountLogoutConfirmationVisible = true
@@ -1550,7 +1582,7 @@ fun SettingsScreen(
                 )
             ) {
                 item("account-privacy-title") {
-                    SettingsSection(settingsSectionTitle(destination, "Account privacy"))
+                    SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_account_privacy)))
                 }
                 if (searchResult.isItemVisible("online-visibility")) {
                     item("online-visibility") {
@@ -1603,19 +1635,48 @@ fun SettingsScreen(
                 item("feed-title") {
                     SettingsSection(
                         if (destination == SettingsDestination.FEEDS && query.isBlank()) {
-                            "Feed appearance"
+                            stringResource(R.string.all_feeds)
                         } else {
-                            settingsSectionTitle(destination, "Feed")
+                            settingsSectionTitle(destination, stringResource(R.string.all_feed))
                         },
+                    )
+                }
+                // ISSUE302_START_FEED_V1 / ISSUE300_DEFAULT_FEED_SORT_V1 (owner 2026-11-13):
+                // the defaults are today's behaviour (Home, Best, Hot).
+                if (searchResult.isItemVisible("start-feed")) item("start-feed") {
+                    ValueSettingRow(
+                        icon = Symbols.Home,
+                        title = stringResource(R.string.set_start_feed),
+                        description = stringResource(R.string.set_the_feed_the_app_opens_on),
+                        value = stringResource(state.startFeed.labelRes),
+                        onClick = { choiceDialogKey = "start-feed" },
+                    )
+                }
+                if (searchResult.isItemVisible("default-feed-sort")) item("default-feed-sort") {
+                    ValueSettingRow(
+                        icon = Symbols.Sort,
+                        title = stringResource(R.string.set_feed_sort),
+                        description = stringResource(R.string.set_how_home_popular_and_all_are_sorted),
+                        value = stringResource(state.defaultFeedSort.labelRes),
+                        onClick = { choiceDialogKey = "default-feed-sort" },
+                    )
+                }
+                if (searchResult.isItemVisible("default-community-sort")) item("default-community-sort") {
+                    ValueSettingRow(
+                        icon = Symbols.Sort,
+                        title = stringResource(R.string.set_community_sort),
+                        description = stringResource(R.string.set_how_a_community_is_sorted_until_you),
+                        value = stringResource(state.defaultCommunitySort.labelRes),
+                        onClick = { choiceDialogKey = "default-community-sort" },
                     )
                 }
                 // ISSUE234_FEED_POST_LAYOUTS_V1
                 if (searchResult.isItemVisible("post-layout")) item("post-layout") {
                     ValueSettingRow(
                         icon = Symbols.ViewAgenda,
-                        title = "Post layout",
-                        description = "Large cards, compact cards, a list or a grid",
-                        value = state.postLayout.label,
+                        title = stringResource(R.string.set_post_layout),
+                        description = stringResource(R.string.set_large_cards_compact_cards_a_list_or),
+                        value = stringResource(state.postLayout.labelRes),
                         onClick = { choiceDialogKey = "post-layout" },
                     )
                 }
@@ -1625,17 +1686,17 @@ fun SettingsScreen(
                 ) item("list-thumbnail-side") {
                     ValueSettingRow(
                         icon = Symbols.Image,
-                        title = "Thumbnail",
-                        description = "Which side of a list row shows the picture",
-                        value = state.listThumbnailSide.label,
+                        title = stringResource(R.string.set_thumbnail),
+                        description = stringResource(R.string.set_which_side_of_a_list_row_shows),
+                        value = stringResource(state.listThumbnailSide.labelRes),
                         onClick = { choiceDialogKey = "list-thumbnail-side" },
                     )
                 }
                 if (searchResult.isItemVisible("unread-marker")) item("unread-marker") {
                     ToggleRow(
                         icon = Symbols.Visibility,
-                        title = "Show unread marker",
-                        description = "Show a small dot after a post’s age until you open it",
+                        title = stringResource(R.string.set_show_unread_marker),
+                        description = stringResource(R.string.set_show_a_small_dot_after_a_post),
                         checked = state.showUnreadMarker,
                         onCheckedChange = state::updateShowUnreadMarker,
                     )
@@ -1643,8 +1704,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("show-nsfw-posts")) item("show-nsfw-posts") {
                     ToggleRow(
                         icon = Symbols.Visibility,
-                        title = "Show NSFW posts",
-                        description = "Show NSFW posts Reddit provides; also available in the navigation menu",
+                        title = stringResource(R.string.set_show_nsfw_posts),
+                        description = stringResource(R.string.set_show_nsfw_posts_reddit_provides_also_available),
                         checked = state.showNsfwPosts,
                         onCheckedChange = state::updateShowNsfwPosts,
                     )
@@ -1653,9 +1714,9 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("pinned-posts")) item("pinned-posts") {
                     ValueSettingRow(
                         icon = Symbols.PushPin,
-                        title = "Pinned posts",
-                        description = "How a community's pinned posts show at the top of its feed",
-                        value = state.pinnedPostsPresentation.label,
+                        title = stringResource(R.string.set_pinned_posts),
+                        description = stringResource(R.string.set_how_a_community_s_pinned_posts_show),
+                        value = stringResource(state.pinnedPostsPresentation.labelRes),
                         onClick = { choiceDialogKey = "pinned-posts" },
                     )
                 }
@@ -1664,8 +1725,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("resume-feed-position")) item("resume-feed-position") {
                     ToggleRow(
                         icon = Symbols.History,
-                        title = "Resume where you left off",
-                        description = "Home and community feeds open where you were, also after the app was closed",
+                        title = stringResource(R.string.set_resume_where_you_left_off),
+                        description = stringResource(R.string.set_home_and_community_feeds_open_where_you),
                         checked = state.resumeFeedPosition,
                         onCheckedChange = state::updateResumeFeedPosition,
                     )
@@ -1673,18 +1734,18 @@ fun SettingsScreen(
                 if (state.resumeFeedPosition && searchResult.isItemVisible("resume-feed-position-age")) item("resume-feed-position-age") {
                     ValueSettingRow(
                         icon = Symbols.Schedule,
-                        title = "Keep my place for",
-                        description = "After this long a feed starts at the top again",
-                        value = state.resumeFeedPositionAge.label,
+                        title = stringResource(R.string.set_keep_my_place_for),
+                        description = stringResource(R.string.set_after_this_long_a_feed_starts_at),
+                        value = stringResource(state.resumeFeedPositionAge.labelRes),
                         onClick = { choiceDialogKey = "resume-feed-position-age" },
                     )
                 }
                 if (state.resumeFeedPosition && searchResult.isItemVisible("resume-feed-position-start")) item("resume-feed-position-start") {
                     ValueSettingRow(
                         icon = Symbols.Refresh,
-                        title = "When the app starts",
-                        description = "Show the posts you were reading, or load new ones and look for your place in the first four pages",
-                        value = state.resumeFeedPositionStart.label,
+                        title = stringResource(R.string.set_when_the_app_starts),
+                        description = stringResource(R.string.set_show_the_posts_you_were_reading_or),
+                        value = stringResource(state.resumeFeedPositionStart.labelRes),
                         onClick = { choiceDialogKey = "resume-feed-position-start" },
                     )
                 }
@@ -1692,9 +1753,9 @@ fun SettingsScreen(
                 if (state.showNsfwPosts && searchResult.isItemVisible("random-nsfw-community")) item("random-nsfw-community") {
                     ValueSettingRow(
                         icon = Symbols.Shuffle,
-                        title = "Random NSFW community",
-                        description = "Where a button opens a random NSFW community from Reddit's own listings",
-                        value = state.randomNsfwCommunityPlacement.label,
+                        title = stringResource(R.string.set_random_nsfw_community),
+                        description = stringResource(R.string.set_where_a_button_opens_a_random_nsfw),
+                        value = stringResource(state.randomNsfwCommunityPlacement.labelRes),
                         onClick = { choiceDialogKey = "random-nsfw-community" },
                     )
                 }
@@ -1703,14 +1764,14 @@ fun SettingsScreen(
                     query.isBlank() &&
                     searchResult.isItemVisible("content-filters")
                 ) {
-                    item("feed-filtering-title") { SettingsSection("Filtering") }
+                    item("feed-filtering-title") { SettingsSection(stringResource(R.string.all_filtering)) }
                 }
                 if (searchResult.isItemVisible("filtered-posts-summary")) item("filtered-posts-summary") {
                     // CONTENTFILTER04_FILTERED_SUMMARY_V1
                     ToggleRow(
                         icon = Symbols.FilterAlt,
-                        title = "Show filtered post count",
-                        description = "A row at the top of a feed says how many posts your filters hide, with a way to show them",
+                        title = stringResource(R.string.set_show_filtered_post_count),
+                        description = stringResource(R.string.set_a_row_at_the_top_of_a),
                         checked = state.filteredPostsSummary,
                         onCheckedChange = state::updateFilteredPostsSummary,
                     )
@@ -1719,8 +1780,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("scroll-position-indicator")) item("scroll-position-indicator") {
                     ToggleRow(
                         icon = Symbols.UnfoldMore,
-                        title = "Scroll position indicator",
-                        description = "A thin bar on the edge of feeds and comment threads shows where you are while you scroll",
+                        title = stringResource(R.string.set_scroll_position_indicator),
+                        description = stringResource(R.string.set_a_thin_bar_on_the_edge_of),
                         checked = state.scrollPositionIndicator,
                         onCheckedChange = state::updateScrollPositionIndicator,
                     )
@@ -1728,7 +1789,7 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("content-filters")) item("content-filters") {
                     NavigationRow(
                         icon = Symbols.FilterAlt,
-                        title = "Content filters",
+                        title = stringResource(R.string.set_content_filters),
                         description = contentFilterSummary(state.contentFilters),
                         onClick = {
                             openSettingsDestination(SettingsDestination.CONTENT_FILTERS)
@@ -1810,30 +1871,28 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("appearance-title") { SettingsSection(settingsSectionTitle(destination, "Appearance")) }
+                item("appearance-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_appearance))) }
                 if (listOf("ui-size", "text-size", "vote-controls").any(searchResult::isItemVisible)) {
-                    item("size-title") { SettingsSection("Size") }
+                    item("size-title") { SettingsSection(stringResource(R.string.all_size)) }
                 }
                 // ISSUE278_UI_SIZE_SCALES_THE_WHOLE_APP_V1 (owner): one size for the
                 // whole interface, grouped with the other size choices.
                 if (searchResult.isItemVisible("ui-size")) item("ui-size") {
                     ValueSettingRow(
                         icon = Symbols.ZoomIn,
-                        title = "UI size",
+                        title = stringResource(R.string.set_ui_size),
                         // ISSUE278 (owner chose A): below 100 % small buttons in dialogs, sheets
                         // and menus get a smaller tap area, as with Android's Display size.
-                        description = "Makes bars, buttons, rows and text in subshell smaller or larger; " +
-                            "smaller sizes also make some tap areas smaller. " +
-                            "Android's Display size does this for every app.",
-                        value = state.appUiScale.label,
+                        description = stringResource(R.string.all2_makes_bars_buttons_rows_and_text_in),
+                        value = stringResource(state.appUiScale.labelRes),
                         onClick = { choiceDialogKey = "appearance-ui-size" },
                     )
                 }
                 if (searchResult.isItemVisible("text-size")) item("text-size") {
                     ValueSettingRow(
                         icon = Symbols.FormatSize,
-                        title = "Text size",
-                        description = "Scales all text in subshell, on top of the system font size",
+                        title = stringResource(R.string.set_text_size),
+                        description = stringResource(R.string.set_scales_all_text_in_subshell_on_top),
                         value = state.appTextScale.label,
                         onClick = { choiceDialogKey = "appearance-text-size" },
                     )
@@ -1841,20 +1900,20 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("vote-controls")) item("vote-controls") {
                     ValueSettingRow(
                         icon = Symbols.ThumbUp,
-                        title = "Vote controls",
-                        description = "Thumbs with the score between them, or smaller arrows",
-                        value = state.voteControlMode.label,
+                        title = stringResource(R.string.set_vote_controls),
+                        description = stringResource(R.string.set_thumbs_with_the_score_between_them_or),
+                        value = stringResource(state.voteControlMode.labelRes),
                         onClick = { choiceDialogKey = "appearance-vote-controls" },
                     )
                 }
                 if (listOf("theme", "dynamic", "vote-colours", "code-font").any(searchResult::isItemVisible)) {
-                    item("colours-title") { SettingsSection("Colours & fonts") }
+                    item("colours-title") { SettingsSection(stringResource(R.string.all_colours_fonts)) }
                 }
                 if (searchResult.isItemVisible("theme")) item("theme") {
                     ValueSettingRow(
                         icon = Symbols.Palette,
-                        title = "Theme",
-                        description = "Follow the system, or use light, dark or pure black",
+                        title = stringResource(R.string.set_theme),
+                        description = stringResource(R.string.set_follow_the_system_or_use_light_dark),
                         value = state.themeChoice.label,
                         onClick = { choiceDialogKey = "appearance-theme" },
                     )
@@ -1862,13 +1921,13 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("dynamic")) item("dynamic") {
                     ToggleRow(
                         icon = Symbols.Palette,
-                        title = "Dynamic colour",
+                        title = stringResource(R.string.set_dynamic_colour),
                         // SETTINGSREVIEW01_DYNAMIC_COLOUR_ON_BY_DEFAULT_V1: the
                         // device palette exists from Android 12.
                         description = if (dynamicColorSupported()) {
-                            "Use the device palette instead of subshell orange"
+                            stringResource(R.string.all_use_the_device_palette_instead_of_subshell)
                         } else {
-                            "Needs Android 12 or later"
+                            stringResource(R.string.all_needs_android_12_or_later)
                         },
                         checked = state.dynamicColor && dynamicColorSupported(),
                         onCheckedChange = state::updateDynamicColor,
@@ -1878,17 +1937,17 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("vote-colours")) item("vote-colours") {
                     ValueSettingRow(
                         icon = Symbols.Palette,
-                        title = "Vote colours",
-                        description = "Theme accent, or red upvotes and blue downvotes",
-                        value = state.voteColorPalette.label,
+                        title = stringResource(R.string.set_vote_colours),
+                        description = stringResource(R.string.set_theme_accent_or_red_upvotes_and_blue),
+                        value = stringResource(state.voteColorPalette.labelRes),
                         onClick = { choiceDialogKey = "appearance-vote-colours" },
                     )
                 }
                 if (searchResult.isItemVisible("code-font")) item("code-font") {
                     ValueSettingRow(
                         icon = Symbols.Code,
-                        title = "Code font",
-                        description = "Used by inline code and fenced code blocks",
+                        title = stringResource(R.string.set_code_font),
+                        description = stringResource(R.string.set_used_by_inline_code_and_fenced_code),
                         value = state.codeFont.typefaceName,
                         onClick = { choiceDialogKey = "appearance-code-font" },
                     )
@@ -1935,13 +1994,13 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("home-title") { SettingsSection(settingsSectionTitle(destination, "Home & feeds")) }
+                item("home-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_home_feeds))) }
                 if (searchResult.isItemVisible("top-bar-behavior")) item("top-bar-behavior") {
                     ValueSettingRow(
                         icon = Symbols.Home,
-                        title = "Top bar",
-                        description = "Behaviour while scrolling",
-                        value = state.topBarBehavior.label,
+                        title = stringResource(R.string.set_top_bar),
+                        description = stringResource(R.string.set_behaviour_while_scrolling),
+                        value = stringResource(state.topBarBehavior.labelRes),
                         onClick = {
                             navigationPreviewContextName =
                                 NavigationPreviewContext.NAVIGATION.name
@@ -1952,9 +2011,9 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("bottom-navigation-behavior")) item("bottom-navigation-behavior") {
                     ValueSettingRow(
                         icon = Symbols.Swipe,
-                        title = "Bottom navigation",
-                        description = "Behaviour while scrolling",
-                        value = state.bottomBarBehavior.label,
+                        title = stringResource(R.string.set_bottom_navigation),
+                        description = stringResource(R.string.set_behaviour_while_scrolling),
+                        value = stringResource(state.bottomBarBehavior.labelRes),
                         onClick = {
                             navigationPreviewContextName =
                                 NavigationPreviewContext.NAVIGATION.name
@@ -1973,16 +2032,16 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("navigation-title") { SettingsSection(settingsSectionTitle(destination, "Navigation")) }
+                item("navigation-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_navigation))) }
                 if (query.isBlank() || searchResult.isItemVisible("tablet-layout-mode")) {
                     item("tablet-layout-mode") {
                         SettingsSegmentedChoice(
                             icon = Symbols.Swipe,
-                            title = "Tablet mode",
-                            description = "Choose how content is shown on wider screens",
+                            title = stringResource(R.string.set_tablet_mode),
+                            description = stringResource(R.string.set_choose_how_content_is_shown_on_wider),
                             options = TabletLayoutMode.entries,
                             selected = state.tabletLayoutMode,
-                            label = { it.label },
+                            label = { stringResource(it.labelRes) },
                             onSelect = { mode ->
                                 navigationPreviewContextName =
                                     NavigationPreviewContext.TABLET_MODE.name
@@ -1995,11 +2054,11 @@ fun SettingsScreen(
                     item("community-discovery-layout") {
                         SettingsSegmentedChoice(
                             icon = Symbols.Groups,
-                            title = "Community discovery",
-                            description = "Choose how popular communities are shown",
+                            title = stringResource(R.string.set_community_discovery),
+                            description = stringResource(R.string.set_choose_how_popular_communities_are_shown),
                             options = CommunityDiscoveryLayout.entries,
                             selected = state.communityDiscoveryLayout,
-                            label = { it.label },
+                            label = { stringResource(it.labelRes) },
                             onSelect = { layout ->
                                 navigationPreviewContextName =
                                     NavigationPreviewContext.COMMUNITY_DISCOVERY.name
@@ -2011,11 +2070,11 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("interaction-side")) item("interaction-side") {
                     SettingsSegmentedChoice(
                         icon = Symbols.TouchApp,
-                        title = "Interaction side",
-                        description = "Preferred side for thumb controls and floating actions",
+                        title = stringResource(R.string.set_interaction_side),
+                        description = stringResource(R.string.set_preferred_side_for_thumb_controls_and_floating),
                         options = InteractionSide.entries,
                         selected = state.interactionSide,
-                        label = { it.label },
+                        label = { stringResource(it.labelRes) },
                         onSelect = { side ->
                             navigationPreviewContextName =
                                 NavigationPreviewContext.NAVIGATION.name
@@ -2055,17 +2114,17 @@ fun SettingsScreen(
                 }
 
                 if (destination == SettingsDestination.NAVIGATION && query.isBlank()) {
-                    item("side-menu-title") { SettingsSection("Side menu") }
+                    item("side-menu-title") { SettingsSection(stringResource(R.string.all_side_menu)) }
                 }
 
                 if (searchResult.isItemVisible("drawer-side")) item("drawer-side") {
                     SettingsSegmentedChoice(
                         icon = Symbols.Swipe,
-                        title = "Side menu position",
-                        description = "Choose which edge the side menu opens from",
+                        title = stringResource(R.string.set_side_menu_position),
+                        description = stringResource(R.string.set_choose_which_edge_the_side_menu_opens),
                         options = selectableDrawerSidePreferences,
                         selected = state.drawerSidePreference,
-                        label = { it.label },
+                        label = { stringResource(it.labelRes) },
                         onSelect = { preference ->
                             navigationPreviewContextName =
                                 NavigationPreviewContext.NAVIGATION.name
@@ -2077,8 +2136,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("subreddit-labels")) item("subreddit-labels") {
                     ValueSettingRow(
                         icon = Symbols.Label,
-                        title = "Communities labels",
-                        description = "How community names are written",
+                        title = stringResource(R.string.set_communities_labels),
+                        description = stringResource(R.string.set_how_community_names_are_written),
                         value = state.subredditLabelStyle.example,
                         onClick = {
                             navigationPreviewContextName =
@@ -2090,9 +2149,9 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("drawer-communities")) item("drawer-communities") {
                     ValueSettingRow(
                         icon = Symbols.Groups,
-                        title = "Communities in drawer",
-                        description = "Simple shortcut, dropdown, or full list",
-                        value = state.drawerCommunitiesMode.label,
+                        title = stringResource(R.string.set_communities_in_drawer),
+                        description = stringResource(R.string.set_simple_shortcut_dropdown_or_full_list),
+                        value = stringResource(state.drawerCommunitiesMode.labelRes),
                         onClick = {
                             navigationPreviewContextName =
                                 NavigationPreviewContext.NAVIGATION.name
@@ -2103,8 +2162,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("drawer-recent-communities")) item("drawer-recent-communities") {
                     ToggleRow(
                         icon = Symbols.History,
-                        title = "Recent communities in drawer",
-                        description = "Show up to five recently visited communities",
+                        title = stringResource(R.string.set_recent_communities_in_drawer),
+                        description = stringResource(R.string.set_show_up_to_five_recently_visited_communities),
                         checked = state.drawerRecentCommunities,
                         onCheckedChange = { enabled ->
                             navigationPreviewContextName =
@@ -2116,8 +2175,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("back-twice-to-exit")) item("back-twice-to-exit") {
                     ToggleRow(
                         icon = Symbols.ExitToApp,
-                        title = "Press Back twice to exit",
-                        description = "Ask for a second Back before leaving the app",
+                        title = stringResource(R.string.set_press_back_twice_to_exit),
+                        description = stringResource(R.string.set_ask_for_a_second_back_before_leaving),
                         checked = state.backTwiceToExit,
                         onCheckedChange = state::updateBackTwiceToExit,
                     )
@@ -2126,8 +2185,8 @@ fun SettingsScreen(
                     // ISSUE37_LAUNCHER_SHORTCUTS_V1: device-local, off by default.
                     ToggleRow(
                         icon = Symbols.AddToHomeScreen,
-                        title = "Launcher shortcuts",
-                        description = "Favorite communities on the app icon, and Add to home screen for a community",
+                        title = stringResource(R.string.set_launcher_shortcuts),
+                        description = stringResource(R.string.set_favorite_communities_on_the_app_icon_and),
                         checked = launcherShortcutsEnabled,
                         onCheckedChange = { enabled ->
                             LauncherShortcutsEnabledStore.write(appContext, enabled)
@@ -2138,8 +2197,8 @@ fun SettingsScreen(
                     // REDDITFAV01_SHOW_REDDIT_FAVORITES_V1: device-local, off by default.
                     ToggleRow(
                         icon = Symbols.Star,
-                        title = "Sync favorites with Reddit",
-                        description = "Show your Reddit favorites, and star joined communities and your custom feeds on Reddit too",
+                        title = stringResource(R.string.set_sync_favorites_with_reddit),
+                        description = stringResource(R.string.set_show_your_reddit_favorites_and_star_joined),
                         checked = redditFavoriteSyncEnabled,
                         onCheckedChange = { enabled ->
                             RedditFavoriteSyncSettingStore.write(appContext, enabled)
@@ -2159,8 +2218,8 @@ fun SettingsScreen(
                     }
                     ToggleRow(
                         icon = Symbols.Share,
-                        title = "Share into subshell",
-                        description = "Show subshell in Android's share menu to start a post from a link, text or images",
+                        title = stringResource(R.string.set_share_into_subshell),
+                        description = stringResource(R.string.set_show_subshell_in_android_s_share_menu),
                         checked = shareIntoSubshellEnabled == true,
                         onCheckedChange = { enabled ->
                             shareIntoSubshellEnabled = null
@@ -2177,9 +2236,9 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("navigation-labels")) item("navigation-labels") {
                     ValueSettingRow(
                         icon = Symbols.Swipe,
-                        title = "Navigation labels",
-                        description = "All labels, selected only, or icons only",
-                        value = state.navigationLabelMode.label,
+                        title = stringResource(R.string.set_navigation_labels),
+                        description = stringResource(R.string.set_all_labels_selected_only_or_icons_only),
+                        value = stringResource(state.navigationLabelMode.labelRes),
                         onClick = {
                             navigationPreviewContextName =
                                 NavigationPreviewContext.NAVIGATION.name
@@ -2200,16 +2259,16 @@ fun SettingsScreen(
                 item("privacy-title") {
                     SettingsSection(
                         if (destination == SettingsDestination.FEEDS && query.isBlank()) {
-                            "Privacy"
+                            stringResource(R.string.all_privacy)
                         } else {
-                            settingsSectionTitle(destination, "Privacy")
+                            settingsSectionTitle(destination, stringResource(R.string.all_privacy))
                         },
                     )
                 }
                 if (searchResult.isItemVisible("hidden-subscriptions-device-unlock")) item("hidden-subscriptions-device-unlock") {
                     ToggleRow(
                         icon = Symbols.Lock,
-                        title = "Require device unlock to view hidden communities",
+                        title = stringResource(R.string.set_require_device_unlock_to_view_hidden_communities),
                         // LOWUI8_HIDDEN_UNLOCK_NEEDS_A_SCREEN_LOCK_V1 (OCB-273): like
                         // Lock Subshell, it can be turned on only where there is a
                         // device unlock to ask for (otherwise the list could not open).
@@ -2218,9 +2277,9 @@ fun SettingsScreen(
                             appLock.deviceUnlockAvailable ||
                             state.requireDeviceUnlockForHiddenSubscriptions
                         ) {
-                            "Ask for biometrics or your device screen lock before revealing hidden community names"
+                            stringResource(R.string.all_ask_for_biometrics_or_your_device_screen)
                         } else {
-                            "Set a screen lock on this device first"
+                            stringResource(R.string.all_set_a_screen_lock_on_this_device)
                         },
                         checked = state.requireDeviceUnlockForHiddenSubscriptions,
                         onCheckedChange = { required ->
@@ -2245,11 +2304,11 @@ fun SettingsScreen(
                 if (appLock != null && searchResult.isItemVisible("app-lock")) item("app-lock") {
                     ToggleRow(
                         icon = Symbols.Lock,
-                        title = "Lock subshell",
+                        title = stringResource(R.string.set_lock_subshell),
                         description = if (appLock.deviceUnlockAvailable || appLock.settings.enabled) {
-                            "Ask for biometrics or your device screen lock when you open subshell"
+                            stringResource(R.string.all_ask_for_biometrics_or_your_device_screen_2)
                         } else {
-                            "Set a screen lock on this device first"
+                            stringResource(R.string.all_set_a_screen_lock_on_this_device)
                         },
                         checked = appLock.settings.enabled,
                         onCheckedChange = { enabled ->
@@ -2277,9 +2336,9 @@ fun SettingsScreen(
                 ) item("app-lock-delay") {
                     ValueSettingRow(
                         icon = Symbols.Schedule,
-                        title = "Lock after",
-                        description = "How long subshell can be in the background before it locks",
-                        value = appLockDelayLabel(appLock.settings.delayMinutes),
+                        title = stringResource(R.string.set_lock_after),
+                        description = stringResource(R.string.set_how_long_subshell_can_be_in_the),
+                        value = appLockDelayLabel(appLock.settings.delayMinutes).asString(),
                         onClick = { choiceDialogKey = "app-lock-delay" },
                     )
                 }
@@ -2290,8 +2349,8 @@ fun SettingsScreen(
                 ) item("app-lock-notifications") {
                     ToggleRow(
                         icon = Symbols.Lock,
-                        title = "Hide notification content",
-                        description = "While the lock is on, notifications only say there is new activity",
+                        title = stringResource(R.string.set_hide_notification_content),
+                        description = stringResource(R.string.set_while_the_lock_is_on_notifications_only),
                         checked = appLock.settings.hideNotificationContent,
                         onCheckedChange = { hide ->
                             appLock.onChange(appLock.settings.copy(hideNotificationContent = hide))
@@ -2303,8 +2362,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("your-reading")) item("your-reading") {
                     ToggleRow(
                         icon = Symbols.Schedule,
-                        title = "Your reading",
-                        description = "Count opens and time per community on this device only, shown in You › Library. Turning it off deletes the counts",
+                        title = stringResource(R.string.set_your_reading),
+                        description = stringResource(R.string.set_count_opens_and_time_per_community_on),
                         checked = readingStatsEnabled == true,
                         onCheckedChange = { enabled -> readingStatsStore.onDisk { setEnabled(enabled) } },
                     )
@@ -2320,12 +2379,12 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("search-title") { SettingsSection(settingsSectionTitle(destination, "Search")) }
+                item("search-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_search))) }
                 if (searchResult.isItemVisible("search-keyboard")) item("search-keyboard") {
                     ToggleRow(
                         icon = Symbols.Keyboard,
-                        title = "Open keyboard when entering Search",
-                        description = "Explicit Search taps focus the field immediately",
+                        title = stringResource(R.string.set_open_keyboard_when_entering_search),
+                        description = stringResource(R.string.set_explicit_search_taps_focus_the_field_immediately),
                         checked = state.openKeyboardOnSearch,
                         onCheckedChange = state::updateOpenKeyboardOnSearch,
                     )
@@ -2334,8 +2393,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("saved-searches")) item("saved-searches") {
                     ToggleRow(
                         icon = Symbols.Bookmark,
-                        title = "Saved searches",
-                        description = "Save a search to run it again from the Search screen; included in backups",
+                        title = stringResource(R.string.set_saved_searches),
+                        description = stringResource(R.string.set_save_a_search_to_run_it_again),
                         checked = state.savedSearchesEnabled,
                         onCheckedChange = state::updateSavedSearchesEnabled,
                     )
@@ -2344,9 +2403,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("shown-languages")) item("shown-languages") {
                     ValueSettingRow(
                         icon = Symbols.Public,
-                        title = "Languages",
-                        description = "Hide communities and search results in other languages, " +
-                            "when the device is sure of the language",
+                        title = stringResource(R.string.set_languages),
+                        description = stringResource(R.string.all2_hide_communities_and_search_results_in_other),
                         value = shownLanguagesSummary(state.shownLanguages),
                         onClick = {
                             choiceDialogKey = "shown-languages"
@@ -2371,16 +2429,16 @@ fun SettingsScreen(
                     searchResult.isItemVisible("sensitive-media-reddit-lab") ||
                     searchResult.isItemVisible("media-autoplay")
                 ) {
-                    item("media-preview-playback-title") { SettingsSection("Preview & playback") }
+                    item("media-preview-playback-title") { SettingsSection(stringResource(R.string.all_preview_playback)) }
                 }
                 if (searchResult.isItemVisible("sensitive-media-previews")) item("sensitive-media-previews") {
                     ValueSettingRow(
                         icon = Symbols.Visibility,
-                        title = "Sensitive media previews",
+                        title = stringResource(R.string.set_sensitive_media_previews),
                         // SETTINGSREVIEW01_ROWS_USE_THE_DIALOG_WORDS_V1: Blurred
                         // also loads the image, so the row says so.
-                        description = "Blurred (loaded in the background), load on tap, or hide",
-                        value = state.sensitiveMediaPreviewMode.label,
+                        description = stringResource(R.string.set_blurred_loaded_in_the_background_load_on),
+                        value = stringResource(state.sensitiveMediaPreviewMode.labelRes),
                         onClick = { choiceDialogKey = "media-sensitive-previews" },
                     )
                 }
@@ -2388,8 +2446,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("show-nsfw-media")) item("show-nsfw-media") {
                     ToggleRow(
                         icon = Symbols.Visibility,
-                        title = "Show NSFW media",
-                        description = "NSFW images, GIFs and videos show and play without a tap; spoilers stay covered",
+                        title = stringResource(R.string.set_show_nsfw_media),
+                        description = stringResource(R.string.set_nsfw_images_gifs_and_videos_show_and),
                         checked = state.showNsfwMedia,
                         onCheckedChange = state::updateShowNsfwMedia,
                     )
@@ -2398,8 +2456,8 @@ fun SettingsScreen(
                     if (searchResult.isItemVisible("sensitive-media-reddit-lab")) item("sensitive-media-reddit-lab") {
                         NavigationRow(
                             icon = Symbols.Visibility,
-                            title = "Sensitive media Reddit lab",
-                            description = "DEV2 only · raw Reddit JSON through the production mapper and media UI",
+                            title = stringResource(R.string.set_sensitive_media_reddit_lab),
+                            description = stringResource(R.string.set_dev2_only_raw_reddit_json_through_the),
                             onClick = {
                                 openSettingsDestination(SettingsDestination.SENSITIVE_MEDIA_LAB)
                             },
@@ -2409,9 +2467,9 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("media-autoplay")) item("media-autoplay") {
                     ValueSettingRow(
                         icon = Symbols.Image,
-                        title = "Autoplay videos and GIFs",
-                        description = "Always, Wi-Fi only, or never",
-                        value = state.videoAutoplay.label,
+                        title = stringResource(R.string.set_autoplay_videos_and_gifs),
+                        description = stringResource(R.string.set_always_wi_fi_only_or_never),
+                        value = stringResource(state.videoAutoplay.labelRes),
                         onClick = { choiceDialogKey = "media-autoplay" },
                     )
                 }
@@ -2432,13 +2490,13 @@ fun SettingsScreen(
                     searchResult.isItemVisible("video-rotate-fullscreen") ||
                     searchResult.isItemVisible("video-technical-details")
                 ) {
-                    item("media-video-title") { SettingsSection("Video") }
+                    item("media-video-title") { SettingsSection(stringResource(R.string.all_video)) }
                 }
                 if (searchResult.isItemVisible("media-muted")) item("media-muted") {
                     ToggleRow(
                         icon = Symbols.VolumeOff,
-                        title = "Start videos muted",
-                        description = "Begin playback without audio",
+                        title = stringResource(R.string.set_start_videos_muted),
+                        description = stringResource(R.string.set_begin_playback_without_audio),
                         checked = state.startVideosMuted,
                         onCheckedChange = state::updateStartVideosMuted,
                     )
@@ -2446,8 +2504,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("media-loop")) item("media-loop") {
                     ToggleRow(
                         icon = Symbols.History,
-                        title = "Loop videos",
-                        description = "Restart videos automatically after they finish",
+                        title = stringResource(R.string.set_loop_videos),
+                        description = stringResource(R.string.set_restart_videos_automatically_after_they_finish),
                         checked = state.loopVideos,
                         onCheckedChange = state::updateLoopVideos,
                     )
@@ -2455,8 +2513,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("video-subtitle-default")) item("video-subtitle-default") {
                     ValueSettingRow(
                         icon = Symbols.ClosedCaption,
-                        title = "Subtitles",
-                        description = "Default for new videos",
+                        title = stringResource(R.string.set_subtitles),
+                        description = stringResource(R.string.set_default_for_new_videos),
                         value = state.videoSubtitleDefault.rowLabel,
                         onClick = { choiceDialogKey = "media-subtitle-default" },
                     )
@@ -2464,8 +2522,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("video-audio-default")) item("video-audio-default") {
                     ValueSettingRow(
                         icon = Symbols.VolumeUp,
-                        title = "Audio language",
-                        description = "When a video has several",
+                        title = stringResource(R.string.set_audio_language),
+                        description = stringResource(R.string.set_when_a_video_has_several),
                         value = state.videoAudioDefault.rowLabel,
                         onClick = { choiceDialogKey = "media-audio-default" },
                     )
@@ -2473,8 +2531,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("playback-options-placement")) item("playback-options-placement") {
                     ValueSettingRow(
                         icon = Symbols.Tune,
-                        title = "Playback options button",
-                        description = "Quality, audio and subtitles",
+                        title = stringResource(R.string.set_playback_options_button),
+                        description = stringResource(R.string.set_quality_audio_and_subtitles),
                         value = state.playbackOptionsPlacement.rowLabel,
                         onClick = { choiceDialogKey = "media-playback-options" },
                     )
@@ -2482,27 +2540,27 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("video-timeline-size")) item("video-timeline-size") {
                     ValueSettingRow(
                         icon = Symbols.Tune,
-                        title = "Video timeline size",
-                        description = "Compact, standard, or large",
-                        value = state.videoTimelineSize.label,
+                        title = stringResource(R.string.set_video_timeline_size),
+                        description = stringResource(R.string.set_compact_standard_or_large),
+                        value = stringResource(state.videoTimelineSize.labelRes),
                         onClick = { choiceDialogKey = "media-timeline-size" },
                     )
                 }
                 if (searchResult.isItemVisible("video-quality-wifi")) item("video-quality-wifi") {
                     ValueSettingRow(
                         icon = Symbols.Wifi,
-                        title = "Video quality on Wi-Fi",
-                        description = "Adaptive quality ceiling",
-                        value = state.wifiVideoQuality.label,
+                        title = stringResource(R.string.set_video_quality_on_wi_fi),
+                        description = stringResource(R.string.set_adaptive_quality_ceiling),
+                        value = stringResource(state.wifiVideoQuality.labelRes),
                         onClick = { choiceDialogKey = "media-quality-wifi" },
                     )
                 }
                 if (searchResult.isItemVisible("video-quality-mobile")) item("video-quality-mobile") {
                     ValueSettingRow(
                         icon = Symbols.SignalCellularAlt,
-                        title = "Video quality on mobile data",
-                        description = "Adaptive quality ceiling",
-                        value = state.mobileVideoQuality.label,
+                        title = stringResource(R.string.set_video_quality_on_mobile_data),
+                        description = stringResource(R.string.set_adaptive_quality_ceiling),
+                        value = stringResource(state.mobileVideoQuality.labelRes),
                         onClick = { choiceDialogKey = "media-quality-mobile" },
                     )
                 }
@@ -2510,8 +2568,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("video-speed-controls")) item("video-speed-controls") {
                     ToggleRow(
                         icon = Symbols.Speed,
-                        title = "Playback speed",
-                        description = "Full screen speed button, 0.25× to 2×",
+                        title = stringResource(R.string.set_playback_speed),
+                        description = stringResource(R.string.set_full_screen_speed_button_0_25_to),
                         checked = state.videoSpeedControls,
                         onCheckedChange = state::updateVideoSpeedControls,
                     )
@@ -2519,8 +2577,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("video-double-tap-seek")) item("video-double-tap-seek") {
                     ToggleRow(
                         icon = Symbols.Forward10,
-                        title = "Double-tap to skip",
-                        description = "Full screen · left side back 10 s, right side forward",
+                        title = stringResource(R.string.set_double_tap_to_skip),
+                        description = stringResource(R.string.set_full_screen_left_side_back_10_s),
                         checked = state.videoDoubleTapSeek,
                         onCheckedChange = state::updateVideoDoubleTapSeek,
                     )
@@ -2528,8 +2586,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("video-hold-double-speed")) item("video-hold-double-speed") {
                     ToggleRow(
                         icon = Symbols.FastForward,
-                        title = "Hold for 2× speed",
-                        description = "Full screen · press and hold the picture",
+                        title = stringResource(R.string.set_hold_for_2_speed),
+                        description = stringResource(R.string.set_full_screen_press_and_hold_the_picture),
                         checked = state.videoHoldForDoubleSpeed,
                         onCheckedChange = state::updateVideoHoldForDoubleSpeed,
                     )
@@ -2538,8 +2596,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("video-pinch-to-zoom")) item("video-pinch-to-zoom") {
                     ToggleRow(
                         icon = Symbols.ZoomIn,
-                        title = "Pinch to zoom videos",
-                        description = "Full screen · pinch to zoom in, drag to look around",
+                        title = stringResource(R.string.set_pinch_to_zoom_videos),
+                        description = stringResource(R.string.set_full_screen_pinch_to_zoom_in_drag),
                         checked = state.videoPinchToZoom,
                         onCheckedChange = state::updateVideoPinchToZoom,
                     )
@@ -2547,8 +2605,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("video-picture-in-picture")) item("video-picture-in-picture") {
                     ToggleRow(
                         icon = Symbols.PictureInPicture,
-                        title = "Picture-in-picture",
-                        description = "A full-screen video keeps playing in a small window when you leave",
+                        title = stringResource(R.string.set_picture_in_picture),
+                        description = stringResource(R.string.set_a_full_screen_video_keeps_playing_in),
                         checked = state.videoPictureInPicture,
                         onCheckedChange = state::updateVideoPictureInPicture,
                     )
@@ -2556,8 +2614,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("video-rotate-fullscreen")) item("video-rotate-fullscreen") {
                     ToggleRow(
                         icon = Symbols.ScreenRotation,
-                        title = "Rotate for wide videos",
-                        description = "Full screen turns a wide video to landscape",
+                        title = stringResource(R.string.set_rotate_for_wide_videos),
+                        description = stringResource(R.string.set_full_screen_turns_a_wide_video_to),
                         checked = state.videoRotateFullscreen,
                         onCheckedChange = state::updateVideoRotateFullscreen,
                     )
@@ -2565,8 +2623,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("video-technical-details")) item("video-technical-details") {
                     ToggleRow(
                         icon = Symbols.Tune,
-                        title = "Technical details",
-                        description = "Codecs, decoders and dropped frames in playback options",
+                        title = stringResource(R.string.set_technical_details),
+                        description = stringResource(R.string.set_codecs_decoders_and_dropped_frames_in_playback),
                         checked = state.videoTechnicalDetails,
                         onCheckedChange = state::updateVideoTechnicalDetails,
                     )
@@ -2578,13 +2636,13 @@ fun SettingsScreen(
                     searchResult.isItemVisible("landscape-brightness-gesture") ||
                     searchResult.isItemVisible("landscape-volume-gesture")
                 ) {
-                    item("media-landscape-gestures-title") { SettingsSection("Fullscreen gestures") }
+                    item("media-landscape-gestures-title") { SettingsSection(stringResource(R.string.all_fullscreen_gestures)) }
                     if (query.isBlank() || searchResult.isItemVisible("landscape-video-gestures")) {
                         item("landscape-video-gestures") {
                             ToggleRow(
                                 icon = Symbols.Tune,
-                                title = "Landscape swipe controls",
-                                description = "Swipe vertically while a video is fullscreen in landscape",
+                                title = stringResource(R.string.set_landscape_swipe_controls),
+                                description = stringResource(R.string.set_swipe_vertically_while_a_video_is_fullscreen),
                                 checked = state.landscapeVideoGesturesEnabled,
                                 onCheckedChange = state::updateLandscapeVideoGesturesEnabled,
                             )
@@ -2594,8 +2652,8 @@ fun SettingsScreen(
                         item("landscape-brightness-gesture") {
                             ToggleRow(
                                 icon = Symbols.Brightness6,
-                                title = "Brightness gesture",
-                                description = "Left side · changes brightness for this window only",
+                                title = stringResource(R.string.set_brightness_gesture),
+                                description = stringResource(R.string.set_left_side_changes_brightness_for_this_window),
                                 checked = state.landscapeBrightnessGestureEnabled,
                                 onCheckedChange = state::updateLandscapeBrightnessGestureEnabled,
                                 enabled = state.landscapeVideoGesturesEnabled,
@@ -2606,8 +2664,8 @@ fun SettingsScreen(
                         item("landscape-volume-gesture") {
                             ToggleRow(
                                 icon = Symbols.VolumeUp,
-                                title = "Volume gesture",
-                                description = "Right side · changes media volume",
+                                title = stringResource(R.string.set_volume_gesture),
+                                description = stringResource(R.string.set_right_side_changes_media_volume),
                                 checked = state.landscapeVolumeGestureEnabled,
                                 onCheckedChange = state::updateLandscapeVolumeGestureEnabled,
                                 enabled = state.landscapeVideoGesturesEnabled,
@@ -2621,31 +2679,31 @@ fun SettingsScreen(
                     searchResult.isItemVisible("fullscreen-captions") ||
                     searchResult.isItemVisible("media-labels")
                 ) {
-                    item("media-captions-title") { SettingsSection("Gallery captions & labels") }
+                    item("media-captions-title") { SettingsSection(stringResource(R.string.all_gallery_captions_labels)) }
                 }
                 if (searchResult.isItemVisible("media-captions")) item("media-captions") {
                     ValueSettingRow(
                         icon = Symbols.Image,
-                        title = "Gallery captions",
-                        description = "Overlay, below media, or hidden",
-                        value = state.mediaCaptionMode.label,
+                        title = stringResource(R.string.set_gallery_captions),
+                        description = stringResource(R.string.set_overlay_below_media_or_hidden),
+                        value = stringResource(state.mediaCaptionMode.labelRes),
                         onClick = { choiceDialogKey = "media-captions" },
                     )
                 }
                 if (searchResult.isItemVisible("fullscreen-captions")) item("fullscreen-captions") {
                     ValueSettingRow(
                         icon = Symbols.Image,
-                        title = "Fullscreen gallery captions",
-                        description = "With controls or always visible",
-                        value = state.fullscreenCaptionMode.label,
+                        title = stringResource(R.string.set_fullscreen_gallery_captions),
+                        description = stringResource(R.string.set_with_controls_or_always_visible),
+                        value = stringResource(state.fullscreenCaptionMode.labelRes),
                         onClick = { choiceDialogKey = "fullscreen-captions" },
                     )
                 }
                 if (searchResult.isItemVisible("media-labels")) item("media-labels") {
                     ToggleRow(
                         icon = Symbols.Image,
-                        title = "Media labels",
-                        description = "Show short labels over images, GIFs and videos",
+                        title = stringResource(R.string.set_media_labels),
+                        description = stringResource(R.string.set_show_short_labels_over_images_gifs_and),
                         checked = state.mediaLabelsVisible,
                         onCheckedChange = state::updateMediaLabelsVisible,
                     )
@@ -2655,20 +2713,20 @@ fun SettingsScreen(
                     redditLinkHandlingState.supported &&
                     searchResult.isItemVisible("reddit-link-handling")
                 ) {
-                    item("media-links-title") { SettingsSection("Links") }
+                    item("media-links-title") { SettingsSection(stringResource(R.string.all_links)) }
                     item("reddit-link-handling") {
                         NavigationRow(
                             icon = Symbols.Link,
-                            title = "Open Reddit links",
+                            title = stringResource(R.string.set_open_reddit_links),
                             description = when (redditLinkHandlingState.status) {
                                 RedditLinkHandlingStatus.ENABLED ->
-                                    "Enabled · supported Reddit links open in subshell"
+                                    stringResource(R.string.all_enabled_supported_reddit_links_open_in_subshell)
                                 RedditLinkHandlingStatus.PARTIAL ->
                                     "Partial · ${redditLinkHandlingState.selectedHostCount} of ${redditLinkHandlingState.supportedHostCount} domains selected"
                                 RedditLinkHandlingStatus.DISABLED ->
-                                    "Off · choose subshell for supported Reddit links in Android"
+                                    stringResource(R.string.all_off_choose_subshell_for_supported_reddit_links)
                                 RedditLinkHandlingStatus.UNSUPPORTED ->
-                                    "Managed by Android"
+                                    stringResource(R.string.all_managed_by_android)
                             },
                             onClick = onOpenRedditLinkSettings,
                         )
@@ -2678,8 +2736,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("clean-links")) item("clean-links") {
                     ToggleRow(
                         icon = Symbols.Link,
-                        title = "Clean links",
-                        description = "Remove tracking parameters (utm_, fbclid and similar) from links you open, copy or share",
+                        title = stringResource(R.string.set_clean_links),
+                        description = stringResource(R.string.set_remove_tracking_parameters_utm_fbclid_and_similar),
                         checked = state.cleanLinks,
                         onCheckedChange = state::updateCleanLinks,
                     )
@@ -2691,26 +2749,26 @@ fun SettingsScreen(
                     searchResult.isItemVisible("video-cache-limit") ||
                     searchResult.isItemVisible("download-storage")
                 ) {
-                    item("media-storage-title") { SettingsSection("Storage") }
+                    item("media-storage-title") { SettingsSection(stringResource(R.string.all_storage)) }
                 }
                 if (searchResult.isItemVisible("media-cache")) item("media-cache") {
                     SettingSurface(
                         icon = Symbols.Storage,
-                        title = "Media cache",
+                        title = stringResource(R.string.set_media_cache),
                         description = when {
-                            cacheClearInProgress -> "Clearing cached media…"
+                            cacheClearInProgress -> stringResource(R.string.all_clearing_cached_media)
                             mediaCacheStatus != null && cacheOperationMessage != null ->
                                 "${cacheOperationMessage} · ${videoMediaCacheSummary(requireNotNull(mediaCacheStatus))}"
                             mediaCacheStatus != null -> videoMediaCacheSummary(requireNotNull(mediaCacheStatus))
-                            mediaCacheReadFailed -> "Media cache size is unavailable"
-                            else -> "Checking media cache…"
+                            mediaCacheReadFailed -> stringResource(R.string.all_media_cache_size_is_unavailable)
+                            else -> stringResource(R.string.all_checking_media_cache)
                         },
                     ) {
                         TextButton(
                             enabled = !cacheClearInProgress && mediaCacheStatus?.bytesUsed?.let { it > 0L } == true,
                             onClick = { cacheClearConfirmationVisible = true },
                         ) {
-                            Text("Clear")
+                            Text(stringResource(R.string.set_clear))
                         }
                     }
                 }
@@ -2721,13 +2779,13 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("video-cache-limit")) item("video-cache-limit") {
                     ValueSettingRow(
                         icon = Symbols.Storage,
-                        title = "Video cache size",
+                        title = stringResource(R.string.set_video_cache_size),
                         description = if (videoCacheLimitPending) {
-                            "Applies the next time subshell starts"
+                            stringResource(R.string.all_applies_the_next_time_subshell_starts)
                         } else {
-                            "How much watched video to keep on this device"
+                            stringResource(R.string.all_how_much_watched_video_to_keep_on)
                         },
-                        value = videoCacheLimit?.label.orEmpty(),
+                        value = videoCacheLimit?.let { stringResource(it.labelRes) }.orEmpty(),
                         onClick = {
                             if (videoCacheLimit != null) choiceDialogKey = "video-cache-limit"
                         },
@@ -2741,18 +2799,18 @@ fun SettingsScreen(
                 ) item("download-storage") {
                     SettingSurface(
                         icon = Symbols.Storage,
-                        title = "Downloaded videos",
+                        title = stringResource(R.string.set_downloaded_videos),
                         description = when {
-                            downloadDeleteInProgress -> "Deleting downloaded videos…"
+                            downloadDeleteInProgress -> stringResource(R.string.all_deleting_downloaded_videos)
                             downloadOperationMessage != null -> downloadOperationMessage.orEmpty()
-                            else -> legacyDownloadStatus?.let(::legacyVideoDownloadSummary).orEmpty()
+                            else -> legacyDownloadStatus?.let { legacyVideoDownloadSummary(it).asString() }.orEmpty()
                         },
                     ) {
                         TextButton(
                             enabled = !downloadDeleteInProgress && legacyDownloadStatus?.hasDownloads == true,
                             onClick = { downloadDeleteConfirmationVisible = true },
                         ) {
-                            Text("Delete all")
+                            Text(stringResource(R.string.set_delete_all))
                         }
                     }
                 }
@@ -2769,16 +2827,16 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("accessibility-title") { SettingsSection(settingsSectionTitle(destination, "Accessibility")) }
+                item("accessibility-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_accessibility))) }
                 if (searchResult.isItemVisible("reduced-motion")) item("reduced-motion") {
                     ToggleRow(
                         icon = Symbols.AccessibilityNew,
-                        title = "Reduce motion",
+                        title = stringResource(R.string.set_reduce_motion),
                         // SETTINGSREVIEW01_REDUCE_MOTION_FOLLOWS_ANDROID_V1
                         description = if (state.systemRemovesAnimations) {
-                            "On because Android's Remove animations is on"
+                            stringResource(R.string.all_on_because_android_s_remove_animations_is)
                         } else {
-                            "Prefer immediate state changes over decorative movement"
+                            stringResource(R.string.all_prefer_immediate_state_changes_over_decorative_movement)
                         },
                         checked = state.motionReduced,
                         onCheckedChange = state::updateReduceMotion,
@@ -2796,13 +2854,13 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("developer-title") { SettingsSection(settingsSectionTitle(destination, "Developer states")) }
+                item("developer-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_developer_states))) }
                 if (searchResult.isItemVisible("feed-state")) item("feed-state") {
                     ValueSettingRow(
                         icon = Symbols.CloudOff,
-                        title = "Feed preview",
-                        description = "Inspect loading, offline, error and empty layouts",
-                        value = state.feedPreviewState.label,
+                        title = stringResource(R.string.set_feed_preview),
+                        description = stringResource(R.string.set_inspect_loading_offline_error_and_empty_layouts),
+                        value = stringResource(state.feedPreviewState.labelRes),
                         onClick = { choiceDialogKey = "feed-state" },
                     )
                 }
@@ -2847,9 +2905,9 @@ fun SettingsScreen(
                 item("comments-title") {
                     SettingsSection(
                         if (destination == SettingsDestination.COMMENTS && query.isBlank()) {
-                            "Comment presentation"
+                            stringResource(R.string.all_comment_presentation)
                         } else {
-                            settingsSectionTitle(destination, "Comments")
+                            settingsSectionTitle(destination, stringResource(R.string.all_comments))
                         },
                     )
                 }
@@ -2859,10 +2917,10 @@ fun SettingsScreen(
                     item("comment-hierarchy-style") {
                         ValueSettingRow(
                             icon = Symbols.Forum,
-                            title = "Comment hierarchy",
-                            description = "How replies connect to parent comments",
+                            title = stringResource(R.string.set_comment_hierarchy),
+                            description = stringResource(R.string.set_how_replies_connect_to_parent_comments),
                             // SETTINGSREVIEW01_ROWS_USE_THE_DIALOG_WORDS_V1
-                            value = state.commentHierarchyStyle.label,
+                            value = stringResource(state.commentHierarchyStyle.labelRes),
                             onClick = {
                                 choiceDialogKey = "comment-hierarchy-style"
                             },
@@ -2872,18 +2930,18 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("comment-thread-colours")) item("comment-thread-colours") {
                     ValueSettingRow(
                         icon = Symbols.Forum,
-                        title = "Thread colours",
+                        title = stringResource(R.string.set_thread_colours),
                         // ISSUE285_THREAD_COLOURS_ONLY_WITH_GUIDE_LINES_V1: the colours belong to Guide lines;
                         // with Parent connectors the row says so and does nothing, as Android's settings do.
                         description = if (state.commentHierarchyStyle == CommentHierarchyStyle.GUIDE_LINES) {
                             "Colour the thread lines and give each top-level comment its own card"
                         } else {
-                            "Needs the Guide lines comment hierarchy"
+                            stringResource(R.string.all_needs_the_guide_lines_comment_hierarchy)
                         },
                         value = if (state.commentHierarchyStyle == CommentHierarchyStyle.GUIDE_LINES) {
-                            state.commentThreadColours.label
+                            stringResource(state.commentThreadColours.labelRes)
                         } else {
-                            CommentThreadColours.OFF.label
+                            stringResource(CommentThreadColours.OFF.labelRes)
                         },
                         enabled = state.commentHierarchyStyle == CommentHierarchyStyle.GUIDE_LINES,
                         onClick = {
@@ -2895,13 +2953,13 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("comment-indent-size")) item("comment-indent-size") {
                     ValueSettingRow(
                         icon = Symbols.Forum,
-                        title = "Reply indent",
+                        title = stringResource(R.string.set_reply_indent),
                         description = if (state.commentHierarchyStyle == CommentHierarchyStyle.GUIDE_LINES) {
-                            "How far each reply level steps to the right"
+                            stringResource(R.string.all_how_far_each_reply_level_steps_to)
                         } else {
-                            "Needs the Guide lines comment hierarchy"
+                            stringResource(R.string.all_needs_the_guide_lines_comment_hierarchy)
                         },
-                        value = state.commentIndentSize.label,
+                        value = stringResource(state.commentIndentSize.labelRes),
                         enabled = state.commentHierarchyStyle == CommentHierarchyStyle.GUIDE_LINES,
                         onClick = {
                             choiceDialogKey = "comment-indent-size"
@@ -2912,11 +2970,11 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("comment-rail-from-parent")) item("comment-rail-from-parent") {
                     ToggleRow(
                         icon = Symbols.Forum,
-                        title = "Reply lines start in the parent",
+                        title = stringResource(R.string.set_reply_lines_start_in_the_parent),
                         description = if (state.commentHierarchyStyle == CommentHierarchyStyle.GUIDE_LINES) {
-                            "The line a reply starts leaves the middle of the comment it answers"
+                            stringResource(R.string.all_the_line_a_reply_starts_leaves_the)
                         } else {
-                            "Needs the Guide lines comment hierarchy"
+                            stringResource(R.string.all_needs_the_guide_lines_comment_hierarchy)
                         },
                         checked = state.commentRailFromParent,
                         onCheckedChange = state::updateCommentRailFromParent,
@@ -2926,8 +2984,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("highlight-new-comments")) item("highlight-new-comments") {
                     ToggleRow(
                         icon = Symbols.Forum,
-                        title = "Highlight new comments",
-                        description = "Mark replies added since your previous visit and reveal their parent path",
+                        title = stringResource(R.string.set_highlight_new_comments),
+                        description = stringResource(R.string.set_mark_replies_added_since_your_previous_visit),
                         checked = state.highlightNewComments,
                         onCheckedChange = state::updateHighlightNewComments,
                     )
@@ -2936,8 +2994,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("show-comment-avatars")) item("show-comment-avatars") {
                     ToggleRow(
                         icon = Symbols.AccountCircle,
-                        title = "Show author avatars",
-                        description = "Show each commenter's Reddit avatar instead of a letter",
+                        title = stringResource(R.string.set_show_author_avatars),
+                        description = stringResource(R.string.set_show_each_commenter_s_reddit_avatar_instead),
                         checked = state.showCommentAvatars,
                         onCheckedChange = state::updateShowCommentAvatars,
                     )
@@ -2945,8 +3003,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("top-level-comment-jump")) item("top-level-comment-jump") {
                     ToggleRow(
                         icon = Symbols.KeyboardArrowDown,
-                        title = "Top-level comment jump button",
-                        description = "Tap to jump to the next top-level comment, hold for the previous",
+                        title = stringResource(R.string.set_top_level_comment_jump_button),
+                        description = stringResource(R.string.set_tap_to_jump_to_the_next_top),
                         checked = state.topLevelCommentJumpButton,
                         onCheckedChange = state::updateTopLevelCommentJumpButton,
                     )
@@ -2954,12 +3012,12 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("comment-actions")) item("comment-actions") {
                     ValueSettingRow(
                         icon = Symbols.Forum,
-                        title = "Action placement",
-                        description = "Place comment actions on the preferred side or balance them",
+                        title = stringResource(R.string.set_action_placement),
+                        description = stringResource(R.string.set_place_comment_actions_on_the_preferred_side),
                         value = if (state.commentActionPreference == CommentActionPreference.FOLLOW) {
-                            state.interactionSide.followLabel()
+                            state.interactionSide.followLabel().asString()
                         } else {
-                            state.commentActionPreference.label
+                            stringResource(state.commentActionPreference.labelRes)
                         },
                         onClick = { choiceDialogKey = "comment-actions" },
                     )
@@ -2967,9 +3025,9 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("comment-time-format")) item("comment-time-format") {
                     ValueSettingRow(
                         icon = Symbols.Schedule,
-                        title = "Comment time",
-                        description = "Relative age or a compact local timestamp",
-                        value = state.commentTimeFormat.label,
+                        title = stringResource(R.string.set_comment_time),
+                        description = stringResource(R.string.set_relative_age_or_a_compact_local_timestamp),
+                        value = stringResource(state.commentTimeFormat.labelRes),
                         onClick = { choiceDialogKey = "comment-time-format" },
                     )
                 }
@@ -2977,11 +3035,11 @@ fun SettingsScreen(
                     item("comment-collapse-mode") {
                         SettingsSegmentedChoice(
                             icon = Symbols.TouchApp,
-                            title = "Collapse comments",
-                            description = "Choose the tap target used to collapse a comment",
+                            title = stringResource(R.string.set_collapse_comments),
+                            description = stringResource(R.string.set_choose_the_tap_target_used_to_collapse),
                             options = CommentCollapseMode.entries,
                             selected = state.commentCollapseMode,
-                            label = { it.label },
+                            label = { stringResource(it.labelRes) },
                             onSelect = state::updateCommentCollapseMode,
                         )
                     }
@@ -2990,8 +3048,8 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("collapsible-post-text")) item("collapsible-post-text") {
                     ToggleRow(
                         icon = Symbols.TouchApp,
-                        title = "Collapse post text",
-                        description = "Tap a post's title to hide its text, like a comment",
+                        title = stringResource(R.string.set_collapse_post_text),
+                        description = stringResource(R.string.set_tap_a_post_s_title_to_hide),
                         checked = state.collapsiblePostText,
                         onCheckedChange = state::updateCollapsiblePostText,
                     )
@@ -3001,13 +3059,13 @@ fun SettingsScreen(
                     query.isBlank() &&
                     searchResult.isItemVisible("use-suggested-comment-sort")
                 ) {
-                    item("comment-behaviour-title") { SettingsSection("Behaviour") }
+                    item("comment-behaviour-title") { SettingsSection(stringResource(R.string.all_behaviour)) }
                 }
                 if (searchResult.isItemVisible("use-suggested-comment-sort")) item("use-suggested-comment-sort") {
                     ToggleRow(
                         icon = Symbols.Sort,
-                        title = "Follow suggested comment sort",
-                        description = "Use Reddit's suggested order when opening a post",
+                        title = stringResource(R.string.set_follow_suggested_comment_sort),
+                        description = stringResource(R.string.set_use_reddit_s_suggested_order_when_opening),
                         checked = state.useSuggestedCommentSort,
                         onCheckedChange = state::updateUseSuggestedCommentSort,
                     )
@@ -3063,7 +3121,7 @@ fun SettingsScreen(
                     SettingsSection(
                         settingsSectionTitle(
                             destination,
-                            "Notifications",
+                            stringResource(R.string.all_notifications),
                         ),
                     )
                 }
@@ -3073,8 +3131,8 @@ fun SettingsScreen(
                         // ISSUE219_INBOX_NOTIFICATIONS_ROW_IS_THE_SWITCH_V1: as ToggleRow (LOWUI7).
                         SettingsSwitchItem(
                             icon = Symbols.Notifications,
-                            title = "Inbox notifications",
-                            description = "Check Reddit every 15 minutes for new notifications",
+                            title = stringResource(R.string.set_inbox_notifications),
+                            description = stringResource(R.string.set_check_reddit_every_15_minutes_for_new),
                             checked = state.inboxNotificationsEnabled,
                             onCheckedChange = ::setInboxNotificationsEnabled,
                             enabled = state.activeAccountIsAuthenticated,
@@ -3087,7 +3145,7 @@ fun SettingsScreen(
                     item("new-post-notifications") {
                         NavigationRow(
                             icon = Symbols.NotificationsActive,
-                            title = "New posts",
+                            title = stringResource(R.string.set_new_posts),
                             description = newPostNotificationsSummary(state.watchedCommunityNames.size),
                             onClick = {
                                 openSettingsDestination(
@@ -3102,7 +3160,7 @@ fun SettingsScreen(
                     item("notification-types") {
                         NavigationRow(
                             icon = Symbols.Tune,
-                            title = "Notification types",
+                            title = stringResource(R.string.set_notification_types),
                             description = notificationTypeSummary,
                             onClick = {
                                 openSettingsDestination(
@@ -3123,13 +3181,13 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("reddit-connection-title") { SettingsSection(settingsSectionTitle(destination, "Reddit connection")) }
+                item("reddit-connection-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_reddit_connection))) }
                 if (searchResult.isItemVisible("redreader-compatibility")) item("redreader-compatibility") {
                     NavigationRow(
                         icon = Symbols.VpnKey,
-                        title = "RedReader compatibility",
+                        title = stringResource(R.string.set_redreader_compatibility),
                         description = redReaderOperationMessage ?: if (redReaderCompatibilityConfigured) {
-                            "Configured locally · changes apply automatically"
+                            stringResource(R.string.all_configured_locally_changes_apply_automatically)
                         } else {
                             "Add a user-supplied OAuth client ID in encrypted no-backup storage"
                         },
@@ -3154,13 +3212,13 @@ fun SettingsScreen(
                 )
             ) {
                 item("diagnostics-title") {
-                    SettingsSection(settingsSectionTitle(destination, "Diagnostics"))
+                    SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_diagnostics)))
                 }
                 if (searchResult.isItemVisible("diagnostics")) item("diagnostics") {
                     NavigationRow(
                         icon = Symbols.Info,
-                        title = "Diagnostics",
-                        description = "Inspect local app events and create a privacy-safe report",
+                        title = stringResource(R.string.set_diagnostics),
+                        description = stringResource(R.string.set_inspect_local_app_events_and_create_a),
                         onClick = {
                             openSettingsDestination(SettingsDestination.DIAGNOSTICS)
                         },
@@ -3177,16 +3235,16 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("backup-title") { SettingsSection(settingsSectionTitle(destination, "Backup & restore")) }
+                item("backup-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_backup_restore))) }
                 if (searchResult.isItemVisible("backup")) item("backup") {
                     NavigationRow(
                         icon = Symbols.Backup,
                         // ISSUE270_BACKUP_SCREEN_SAYS_WHAT_IS_BACKED_UP_V1: one word, backup.
-                        title = "Backups",
+                        title = stringResource(R.string.set_backups),
                         description = when (backupRepository.status().protection) {
-                            BackupProtection.PROTECTED -> "Copied to your backup folder"
-                            BackupProtection.WAITING -> "Backup folder isn't reachable"
-                            BackupProtection.INTERNAL_ONLY -> "Only on this device"
+                            BackupProtection.PROTECTED -> stringResource(R.string.all_copied_to_your_backup_folder)
+                            BackupProtection.WAITING -> stringResource(R.string.all_backup_folder_isn_t_reachable)
+                            BackupProtection.INTERNAL_ONLY -> stringResource(R.string.all_only_on_this_device)
                         },
                         onClick = {
                             openSettingsDestination(
@@ -3207,12 +3265,12 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("about-title") { SettingsSection(settingsSectionTitle(destination, "About")) }
+                item("about-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_about))) }
                 if (searchResult.isItemVisible("updates")) item("updates") {
                     NavigationRow(
                         icon = Symbols.Download,
-                        title = "Updates",
-                        description = SettingsDestination.UPDATES.description,
+                        title = stringResource(R.string.set_updates),
+                        description = SettingsDestination.UPDATES.descriptionRes?.let { stringResource(it) } ?: "",
                         onClick = {
                             openSettingsDestination(
                                 target = SettingsDestination.UPDATES,
@@ -3224,7 +3282,7 @@ fun SettingsScreen(
                 if (searchResult.isItemVisible("about")) item("about") {
                     NavigationRow(
                         icon = Symbols.Info,
-                        title = "Help & about",
+                        title = stringResource(R.string.set_help_about),
                         description = BuildConfig.VERSION_NAME,
                         onClick = {
                             openSettingsDestination(
@@ -3367,7 +3425,7 @@ private fun SettingsCodeFontDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Code font") },
+        title = { Text(stringResource(R.string.set_code_font)) },
         text = {
             // ISSUE219_CODE_FONT_DIALOG_IS_ONE_RADIO_GROUP_V1: one selectable row per
             // font (as SettingsSingleChoiceDialog, OCB-277), not row + radio.
@@ -3419,7 +3477,7 @@ private fun SettingsCodeFontDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.set_cancel)) }
         },
     )
 }
@@ -3444,13 +3502,11 @@ private fun ShownLanguagesDialog(
     var chosen by rememberSaveable { mutableStateOf(selected.toList()) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Languages") },
+        title = { Text(stringResource(R.string.set_languages)) },
         text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Text(
-                    "Show only these languages. Communities and search results the device is sure " +
-                        "are in another language are hidden; anything it is unsure of stays. " +
-                        "None chosen is off.",
+                    stringResource(R.string.all2_show_only_these_languages_communities_and_search),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -3476,10 +3532,10 @@ private fun ShownLanguagesDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onDone(chosen.toSet()) }) { Text("Done") }
+            TextButton(onClick = { onDone(chosen.toSet()) }) { Text(stringResource(R.string.set_done)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.set_cancel)) }
         },
     )
 }
@@ -3489,7 +3545,7 @@ private fun <T> SettingsSingleChoiceDialog(
     title: String,
     options: List<T>,
     selected: T,
-    label: (T) -> String,
+    label: @Composable (T) -> String,
     onSelect: (T) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -3537,7 +3593,7 @@ private fun <T> SettingsSingleChoiceDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.set_cancel))
             }
         },
     )
@@ -3585,7 +3641,7 @@ private fun AccountNavigationRow(
             ) {
                 io.github.brealorg.subshell.ui.components.RemoteIdentityImage(
                     uri = avatarImageUri,
-                    contentDescription = "Avatar for u/$username",
+                    contentDescription = stringResource(R.string.set_avatar_for_u, username),
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     io.github.brealorg.subshell.ui.components.RedditDefaultProfileAvatar(
@@ -3628,10 +3684,10 @@ internal fun RedditDataExportRow(
 ) {
     NavigationRow(
         icon = Symbols.Download,
-        title = "Export your Reddit data",
+        title = stringResource(R.string.set_export_your_reddit_data),
         description = when (status) {
-            null -> "Saved, votes, your posts and comments, communities and messages, as a ZIP in Downloads"
-            RedditDataExportStatus.Waiting -> "Waiting for a connection…"
+            null -> stringResource(R.string.all_saved_votes_your_posts_and_comments_communities)
+            RedditDataExportStatus.Waiting -> stringResource(R.string.all_waiting_for_a_connection)
             is RedditDataExportStatus.Running -> "Exporting… ${status.done} of ${status.total} lists"
             is RedditDataExportStatus.Saved -> exportSavedText(status.location, status.items, status.incompleteLists)
             is RedditDataExportStatus.Failed -> status.message
@@ -3679,14 +3735,14 @@ private const val INBOX_NOTIFICATIONS_NOTICE_SCOPE = "inbox-notifications"
 
 internal fun inboxNotificationsNotTurnedOnNotice(): ErrorPresentation = ErrorPresentation(
     kind = ErrorPresentationKind.DEGRADED,
-    title = "Notifications are still off",
-    message = "subshell couldn't save the notification state on this device. Try again",
+    title = UiText.Resource(R.string.ep_notifications_are_still_off),
+    message = UiText.Resource(R.string.ep_subshell_couldn_t_save_the_notification_state),
 )
 
 internal fun videoCacheLimitRestartNotice(limit: VideoMediaCacheLimit): ErrorPresentation = ErrorPresentation(
     kind = ErrorPresentationKind.DEGRADED,
-    title = "Restart to apply",
-    message = "The ${limit.label} video cache is used the next time subshell starts",
+    title = UiText.Resource(R.string.video_cache_restart_notice_title),
+    message = UiText.Resource(R.string.video_cache_restart_notice_message, UiText.Resource(limit.labelRes)),
 )
 
 // ISSUE115_TURNING_PROTECTION_OFF_NEEDS_UNLOCK_V1: someone handed the unlocked
@@ -3724,10 +3780,10 @@ private fun OfflineImagesRow() {
     }
     SettingSurface(
         icon = Symbols.Storage,
-        title = "Saved for offline",
+        title = stringResource(R.string.set_saved_for_offline),
         description = when (val used = bytes) {
-            null -> "Checking saved images…"
-            0L -> "No images saved. Use Save for offline in the Home menu."
+            null -> stringResource(R.string.all_checking_saved_images)
+            0L -> stringResource(R.string.all_no_images_saved_use_save_for_offline)
             else -> "${android.text.format.Formatter.formatShortFileSize(context, used)} of images saved for offline reading"
         },
     ) {
@@ -3742,7 +3798,7 @@ private fun OfflineImagesRow() {
                 }
             },
         ) {
-            Text("Clear")
+            Text(stringResource(R.string.set_clear))
         }
     }
 }

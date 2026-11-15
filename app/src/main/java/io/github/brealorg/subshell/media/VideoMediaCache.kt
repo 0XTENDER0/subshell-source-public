@@ -24,11 +24,11 @@ internal const val VIDEO_MEDIA_CACHE_DIRECTORY = "media3-playback"
 // evictor whose limit the user picks (default 1 GB). The choice is
 // device-local (its own preferences file, outside the portable settings map)
 // and is read when the cache is created, so a change applies on next start.
-internal enum class VideoMediaCacheLimit(val bytes: Long, val label: String) {
-    MB_256(256L * 1024L * 1024L, "256 MB"),
-    MB_512(512L * 1024L * 1024L, "512 MB"),
-    GB_1(1024L * 1024L * 1024L, "1 GB"),
-    GB_2(2048L * 1024L * 1024L, "2 GB"),
+internal enum class VideoMediaCacheLimit(val bytes: Long, @androidx.annotation.StringRes val labelRes: Int) {
+    MB_256(256L * 1024L * 1024L, io.github.brealorg.subshell.R.string.video_media_cache_limit_mb_256),
+    MB_512(512L * 1024L * 1024L, io.github.brealorg.subshell.R.string.video_media_cache_limit_mb_512),
+    GB_1(1024L * 1024L * 1024L, io.github.brealorg.subshell.R.string.video_media_cache_limit_gb_1),
+    GB_2(2048L * 1024L * 1024L, io.github.brealorg.subshell.R.string.video_media_cache_limit_gb_2),
     ;
 
     companion object {

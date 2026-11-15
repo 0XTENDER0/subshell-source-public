@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.ModalBottomSheetProperties
@@ -228,15 +230,15 @@ fun CommunityAboutSheet(
                                     Symbols.ArrowBack,
                                 contentDescription =
                                     if (selectedWikiPagePath == null) {
-                                        "Back to Community info"
+                                        stringResource(R.string.all_back_to_community_info)
                                     } else {
-                                        "Back to Wiki"
+                                        stringResource(R.string.all_back_to_wiki)
                                     },
                             )
                         }
                         Column {
                             Text(
-                                text = "Wiki",
+                                text = stringResource(R.string.comp_wiki),
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.SemiBold,
                             )
@@ -249,7 +251,7 @@ fun CommunityAboutSheet(
                     }
                 } else {
                     Text(
-                        text = "About $communityLabel",
+                        text = stringResource(R.string.comp_about, communityLabel),
                         style = MaterialTheme.typography.headlineSmall,
                     )
                 }
@@ -264,14 +266,14 @@ fun CommunityAboutSheet(
                         PrimaryTabRow(selectedTabIndex = selectedTab, containerColor = Color.Transparent) {
                             CommunityAboutTab(
                                 selected = selectedTab == COMMUNITY_ABOUT_TAB,
-                                title = "About",
+                                title = stringResource(R.string.comp_about_2),
                                 onClick = {
                                     selectedTab = COMMUNITY_ABOUT_TAB
                                 },
                             )
                             CommunityAboutTab(
                                 selected = selectedTab == COMMUNITY_RULES_TAB,
-                                title = "Rules",
+                                title = stringResource(R.string.comp_rules),
                                 onClick = {
                                     selectedTab = COMMUNITY_RULES_TAB
                                 },
@@ -279,7 +281,7 @@ fun CommunityAboutSheet(
                             CommunityAboutTab(
                                 selected =
                                     selectedTab == COMMUNITY_MODERATORS_TAB,
-                                title = "Moderators",
+                                title = stringResource(R.string.comp_moderators),
                                 onClick = {
                                     selectedTab = COMMUNITY_MODERATORS_TAB
                                 },
@@ -297,7 +299,7 @@ fun CommunityAboutSheet(
                         detailsExpanded = false,
                         onDetailsExpandedChange = {},
                         emptyCopy =
-                            "Connect a Reddit account to load community details.",
+                            stringResource(R.string.all_connect_a_reddit_account_to_load_community),
                     )
                 }
             } else {
@@ -317,7 +319,7 @@ fun CommunityAboutSheet(
                             InlineProgressIndicator()
                             Spacer(Modifier.width(10.dp))
                             Text(
-                                text = "Loading community info…",
+                                text = stringResource(R.string.comp_loading_community_info),
                                 color =
                                     MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -361,12 +363,12 @@ fun CommunityAboutSheet(
                             ListItem(
                                 content = {
                                     Text(
-                                        text = "Wiki",
+                                        text = stringResource(R.string.comp_wiki),
                                         fontWeight = FontWeight.SemiBold,
                                     )
                                 },
                                 supportingContent = {
-                                    Text("Community documentation")
+                                    Text(stringResource(R.string.comp_community_documentation))
                                 },
                                 leadingContent = {
                                     Icon(
@@ -377,7 +379,7 @@ fun CommunityAboutSheet(
                                 trailingContent = {
                                     Icon(
                                         imageVector = Symbols.ChevronRight,
-                                        contentDescription = "Open Wiki",
+                                        contentDescription = stringResource(R.string.comp_open_wiki),
                                     )
                                 },
                                 colors = ListItemDefaults.colors(
@@ -455,12 +457,12 @@ fun CommunityAboutSheet(
                                             expandedCommunityDetails = it
                                         },
                                         emptyCopy =
-                                            "No community description is published.",
+                                            stringResource(R.string.all_no_community_description_is_published),
                                     )
                                     if (sidebarUnavailable) {
                                         CommunitySectionUnavailable(
                                             label =
-                                                "Additional community information",
+                                                stringResource(R.string.all_additional_community_information),
                                             onRetry = onRetry,
                                         )
                                     }
@@ -475,14 +477,14 @@ fun CommunityAboutSheet(
                             ) {
                                 item("rules-unavailable") {
                                     CommunitySectionUnavailable(
-                                        label = "Community rules",
+                                        label = stringResource(R.string.comp_community_rules),
                                         onRetry = onRetry,
                                     )
                                 }
                             } else if (snapshot.rules.isEmpty()) {
                                 item("rules-empty") {
                                     CommunitySectionEmpty(
-                                        "No community rules were returned by Reddit.",
+                                        stringResource(R.string.all_no_community_rules_were_returned_by_reddit),
                                     )
                                 }
                             } else {
@@ -518,7 +520,7 @@ fun CommunityAboutSheet(
                                             },
                                             leadingContent = {
                                                 Text(
-                                                    text = "${index + 1}.",
+                                                    text = stringResource(R.string.comp_text, index + 1),
                                                     style =
                                                         MaterialTheme.typography
                                                             .labelLarge,
@@ -540,9 +542,9 @@ fun CommunityAboutSheet(
                                                                 },
                                                             contentDescription =
                                                                 if (expanded) {
-                                                                    "Collapse rule"
+                                                                    stringResource(R.string.all_collapse_rule)
                                                                 } else {
-                                                                    "Expand rule"
+                                                                    stringResource(R.string.all_expand_rule)
                                                                 },
                                                         )
                                                     }
@@ -604,14 +606,14 @@ fun CommunityAboutSheet(
                             ) {
                                 item("moderators-unavailable") {
                                     CommunitySectionUnavailable(
-                                        label = "Moderator list",
+                                        label = stringResource(R.string.comp_moderator_list),
                                         onRetry = onRetry,
                                     )
                                 }
                             } else if (snapshot.moderators.isEmpty()) {
                                 item("moderators-empty") {
                                     CommunitySectionEmpty(
-                                        "No moderators were returned by Reddit.",
+                                        stringResource(R.string.all_no_moderators_were_returned_by_reddit),
                                     )
                                 }
                             } else {
@@ -726,16 +728,16 @@ private fun CommunityAboutOverview(
                     ListItem(
                         content = {
                             Text(
-                                text = "Community details",
+                                text = stringResource(R.string.comp_community_details),
                                 fontWeight = FontWeight.SemiBold,
                             )
                         },
                         supportingContent = {
                             Text(
                                 text = if (detailsExpanded) {
-                                    "Hide links, resources and additional information."
+                                    stringResource(R.string.all_hide_links_resources_and_additional_information)
                                 } else {
-                                    "Show links, resources and additional information."
+                                    stringResource(R.string.all_show_links_resources_and_additional_information)
                                 },
                             )
                         },
@@ -750,7 +752,7 @@ private fun CommunityAboutOverview(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
-                                    text = if (detailsExpanded) "Hide" else "Show",
+                                    text = if (detailsExpanded) stringResource(R.string.all_hide) else stringResource(R.string.all_show),
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.primary,
                                 )
@@ -762,9 +764,9 @@ private fun CommunityAboutOverview(
                                         Symbols.ExpandMore
                                     },
                                     contentDescription = if (detailsExpanded) {
-                                        "Collapse community details"
+                                        stringResource(R.string.all_collapse_community_details)
                                     } else {
-                                        "Expand community details"
+                                        stringResource(R.string.all_expand_community_details)
                                     },
                                 )
                             }
@@ -815,7 +817,7 @@ private fun CompactModeratorUserResult(
             it.isEmpty() ||
                 it == "Public profile preview."
         }
-        ?: "Moderator"
+        ?: stringResource(R.string.all_moderator)
     val permissionSummary = moderator.permissions
         .asSequence()
         .filterNot { permission ->
@@ -825,7 +827,7 @@ private fun CompactModeratorUserResult(
         .joinToString(" · ")
 
     ListCard(
-        headline = "u/${moderator.username}",
+        headline = stringResource(R.string.comp_u, moderator.username),
         supporting = profileDescription,
         onClick = onClick,
         leading = {
@@ -854,7 +856,7 @@ private fun CommunitySectionUnavailable(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "$label unavailable.",
+            text = stringResource(R.string.comp_unavailable, label),
             modifier = Modifier.weight(1f),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -865,7 +867,7 @@ private fun CommunitySectionUnavailable(
                 modifier = Modifier.size(17.dp),
             )
             Spacer(Modifier.width(4.dp))
-            Text("Retry")
+            Text(stringResource(R.string.comp_retry))
         }
     }
 }

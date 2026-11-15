@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,7 +41,7 @@ internal fun CommunityHighlightsRow(
 ) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
-            "Community highlights",
+            stringResource(R.string.all_community_highlights),
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(horizontal = ScreenMargin),
         )

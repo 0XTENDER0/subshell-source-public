@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.ui.ProfileActivityEvidence
 import io.github.brealorg.subshell.ui.isUnavailablePublicProfileHttpStatus
 import org.junit.Assert.assertEquals

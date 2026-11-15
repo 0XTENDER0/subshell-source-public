@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AssistChip
@@ -76,11 +79,9 @@ internal fun rememberRandomNsfwCommunityAction(
                             scopeKey = RANDOM_NSFW_COMMUNITY_SCOPE,
                             presentation = ErrorPresentation(
                                 kind = ErrorPresentationKind.DEGRADED,
-                                title = "Reddit offered no NSFW communities",
+                                title = UiText.Resource(R.string.notice_randomnsfwco_reddit_offered_no_nsfw_communities),
                                 // ISSUE263_NSFW_SEARCH_PREFERENCE_NOTICE_V1: the usual cause.
-                                message = "Reddit returned none for this account; trying again won't change " +
-                                    "that. Check that \"Include mature content in search results\" is on " +
-                                    "at old.reddit.com/prefs.",
+                                message = UiText.Resource(R.string.notice_randomnsfwco_reddit_returned_none_for_this_account_trying),
                             ),
                             failureDetails = null,
                             onRetry = null,
@@ -89,9 +90,8 @@ internal fun rememberRandomNsfwCommunityAction(
                             scopeKey = RANDOM_NSFW_COMMUNITY_SCOPE,
                             presentation = ErrorPresentation(
                                 kind = ErrorPresentationKind.DEGRADED,
-                                title = "No NSFW community in your languages",
-                                message = "Every NSFW community Reddit offered is in a language left out in " +
-                                    "Settings › Navigation & gestures › Languages.",
+                                title = UiText.Resource(R.string.notice_randomnsfwco_no_nsfw_community_in_your_languages),
+                                message = UiText.Resource(R.string.notice_randomnsfwco_every_nsfw_community_reddit_offered_is_in),
                             ),
                             failureDetails = null,
                             onRetry = null,
@@ -100,8 +100,8 @@ internal fun rememberRandomNsfwCommunityAction(
                             scopeKey = RANDOM_NSFW_COMMUNITY_SCOPE,
                             presentation = ErrorPresentation(
                                 kind = ErrorPresentationKind.DEGRADED,
-                                title = "Couldn't find an NSFW community",
-                                message = "Couldn't reach Reddit. Try again in a moment.",
+                                title = UiText.Resource(R.string.notice_randomnsfwco_couldn_t_find_an_nsfw_community),
+                                message = UiText.Resource(R.string.notice_randomnsfwco_couldn_t_reach_reddit_try_again_in),
                             ),
                             failureDetails = null,
                             onRetry = null,
@@ -129,7 +129,7 @@ internal fun RandomNsfwCommunityButton(
         modifier = modifier,
         onClick = action::start,
         enabled = !action.inProgress,
-        label = { Text(if (action.inProgress) "Finding a community…" else "Random NSFW community") },
+        label = { Text((if (action.inProgress) UiText.Resource(R.string.notice_randomnsfwco_finding_a_community) else UiText.Resource(R.string.notice_randomnsfwco_random_nsfw_community)).asString()) },
         leadingIcon = {
             Row {
                 if (action.inProgress) {

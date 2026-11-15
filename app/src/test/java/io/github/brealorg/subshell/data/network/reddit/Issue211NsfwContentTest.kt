@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.data.network.reddit
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.auth.pickRandomNsfwCommunity
 import io.github.brealorg.subshell.data.account.NsfwAccountPreferences
 import io.github.brealorg.subshell.data.account.NsfwPreferencesResult
@@ -43,6 +47,9 @@ import org.junit.Test
  * a random NSFW community is picked from Reddit's listings
  * (ISSUE211_RANDOM_NSFW_COMMUNITY_V1).
  */
+// TRANSLATE03: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue211NsfwContentTest {
     private fun param(request: JsonGetRequest, name: String): String? =
         request.queryParameters.firstOrNull { (key, _) -> key == name }?.second
@@ -106,10 +113,10 @@ class Issue211NsfwContentTest {
     @Test
     fun aForbiddenCommunitySaysWhyAndOnlyQuarantineOffersAnAction() {
         val privateNotice = communityForbiddenPresentation(CommunityForbiddenReason.PRIVATE, "r/x", showingCachedContent = false)
-        assertEquals("r/x is private", privateNotice.title)
+        assertEquals("r/x is private", privateNotice.title.s)
         assertNull(privateNotice.primaryAction)
         val quarantine = communityForbiddenPresentation(CommunityForbiddenReason.QUARANTINED, "r/x", showingCachedContent = false)
-        assertEquals("View anyway", quarantine.primaryAction?.label)
+        assertEquals("View anyway", quarantine.primaryAction?.label?.s)
         assertEquals(ErrorActionKind.RETRY, quarantine.primaryAction?.kind)
         assertNull(communityForbiddenReason(null))
         // A banned community answers 404 with reason banned.
@@ -120,7 +127,7 @@ class Issue211NsfwContentTest {
         assertEquals(CommunityForbiddenReason.BANNED, communityForbiddenReason(banned))
         assertEquals(
             "r/x is banned",
-            communityForbiddenPresentation(CommunityForbiddenReason.BANNED, "r/x", showingCachedContent = false).title,
+            communityForbiddenPresentation(CommunityForbiddenReason.BANNED, "r/x", showingCachedContent = false).title.s,
         )
     }
 

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -151,7 +152,7 @@ class Audit298cRetryLandingComposeTest {
             answer(loading = false, withTarget = false, failure = RedditCommentUiFailureKind.TRANSPORT)
         }
         waitMs(6_000)
-        assertEquals("Couldn't find this comment", noticeHost.currentRequest?.presentation?.title)
+        assertEquals("Couldn't find this comment", noticeHost.currentRequest?.presentation?.title?.s)
         assertEquals(listOf(targetId), locatorRequests)
 
         composeRule.runOnIdle { noticeHost.retryCurrent() }

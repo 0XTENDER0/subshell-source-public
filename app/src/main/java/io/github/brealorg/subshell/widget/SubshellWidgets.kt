@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.widget
 
+import io.github.brealorg.subshell.R
+import androidx.glance.LocalContext
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -171,29 +173,30 @@ internal fun InboxWidgetBody(
     nowEpochSeconds: Long,
     actions: InboxWidgetActions,
 ) {
+    val context = LocalContext.current
     when (content) {
         InboxWidgetContent.SignedOut -> WidgetMessage(
-            title = "Inbox",
-            message = "Sign in to Reddit in subshell to see your inbox here.",
+            title = context.getString(R.string.widget_inbox_title),
+            message = context.getString(R.string.widget_inbox_signed_out),
             onClick = actionStartActivity(actions.openApp()),
         )
         InboxWidgetContent.Locked -> WidgetMessage(
-            title = "subshell",
-            message = "subshell is locked. Open it to see your inbox.",
+            title = context.getString(R.string.app_name),
+            message = context.getString(R.string.widget_inbox_locked),
             onClick = actionStartActivity(actions.openApp()),
         )
         is InboxWidgetContent.NotStored -> WidgetMessage(
-            title = "Inbox",
-            message = "Open the Inbox in subshell once to fill this widget.",
+            title = context.getString(R.string.widget_inbox_title),
+            message = context.getString(R.string.widget_inbox_not_stored),
             onClick = actionStartActivity(actions.openInbox(content.accountStableId)),
         )
         is InboxWidgetContent.Shown -> WidgetFrame(
-            title = "Inbox",
-            badge = content.unreadCount.takeIf { count -> count > 0 }?.let { count -> "$count unread" },
+            title = context.getString(R.string.widget_inbox_title),
+            badge = content.unreadCount.takeIf { count -> count > 0 }?.let { count -> context.getString(R.string.widget_inbox_unread_count, count) },
             onHeaderClick = actionStartActivity(actions.openInbox(content.accountStableId)),
         ) {
             if (content.rows.isEmpty()) {
-                WidgetHint("Nothing in your inbox.")
+                WidgetHint(context.getString(R.string.widget_inbox_empty))
             } else {
                 LazyColumn(GlanceModifier.fillMaxSize()) {
                     items(content.rows, itemId = { row -> row.id.hashCode().toLong() }) { row ->
@@ -214,20 +217,21 @@ internal fun PostsWidgetBody(
     content: PostsWidgetContent,
     actions: PostsWidgetActions,
 ) {
+    val context = LocalContext.current
     when (content) {
         PostsWidgetContent.SignedOut -> WidgetMessage(
-            title = "Posts",
-            message = "Sign in to Reddit in subshell to see posts here.",
+            title = context.getString(R.string.widget_posts_title),
+            message = context.getString(R.string.widget_posts_signed_out),
             onClick = actionStartActivity(actions.openApp()),
         )
         PostsWidgetContent.Locked -> WidgetMessage(
-            title = "subshell",
-            message = "subshell is locked. Open it to see posts.",
+            title = context.getString(R.string.app_name),
+            message = context.getString(R.string.widget_posts_locked),
             onClick = actionStartActivity(actions.openApp()),
         )
         is PostsWidgetContent.NotStored -> WidgetMessage(
             title = content.source.label,
-            message = "Open ${content.source.label} in subshell once to fill this widget.",
+            message = context.getString(R.string.widget_posts_not_stored, content.source.label),
             onClick = actionStartActivity(actions.openSource(content.source)),
         )
         is PostsWidgetContent.Shown -> WidgetFrame(
@@ -236,7 +240,7 @@ internal fun PostsWidgetBody(
             onHeaderClick = actionStartActivity(actions.openSource(content.source)),
         ) {
             if (content.rows.isEmpty()) {
-                WidgetHint("No posts to show.")
+                WidgetHint(context.getString(R.string.widget_posts_empty))
             } else {
                 LazyColumn(GlanceModifier.fillMaxSize()) {
                     items(content.rows, itemId = { row -> row.id.hashCode().toLong() }) { row ->
@@ -338,6 +342,7 @@ private fun WidgetHint(text: String) {
 
 @Composable
 private fun InboxWidgetRowView(row: InboxWidgetRow, age: String?, onClick: Action) {
+    val unreadPrefix = LocalContext.current.getString(R.string.widget_inbox_unread_prefix)
     Column(GlanceModifier.fillMaxWidth().padding(bottom = 4.dp)) {
         Column(
             GlanceModifier
@@ -348,7 +353,7 @@ private fun InboxWidgetRowView(row: InboxWidgetRow, age: String?, onClick: Actio
                 .clickable(onClick)
                 .semantics {
                     contentDescription = buildString {
-                        if (row.unread) append("Unread. ")
+                        if (row.unread) append(unreadPrefix)
                         append(row.sender).append(". ").append(row.title).append(". ").append(row.preview)
                     }
                 },
@@ -404,10 +409,12 @@ private fun InboxWidgetRowView(row: InboxWidgetRow, age: String?, onClick: Actio
 
 @Composable
 private fun PostsWidgetRowView(row: PostsWidgetRow, showCommunity: Boolean, onClick: Action) {
+    val resources = LocalContext.current.resources
     val meta = buildString {
         if (showCommunity) append("r/").append(row.community).append(" · ")
-        append(widgetCount(row.score)).append(" points · ")
-        append(widgetCount(row.comments)).append(if (row.comments == 1) " comment" else " comments")
+        append(resources.getQuantityString(R.plurals.points_compact, row.score, widgetCount(row.score)))
+        append(" · ")
+        append(resources.getQuantityString(R.plurals.comments_compact, row.comments, widgetCount(row.comments)))
     }
     Column(GlanceModifier.fillMaxWidth().padding(bottom = 4.dp)) {
         Column(

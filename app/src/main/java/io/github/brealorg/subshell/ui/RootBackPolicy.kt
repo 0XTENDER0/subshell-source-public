@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.data.account.RedditSubscriptionsUiState
 import io.github.brealorg.subshell.ui.error.ErrorPresentation
 import io.github.brealorg.subshell.ui.error.ErrorPresentationKind
@@ -21,8 +23,8 @@ internal const val BackTwiceToExitNoticeScope = "back-twice-to-exit"
 
 internal val BackTwiceToExitNotice = ErrorPresentation(
     kind = ErrorPresentationKind.DEGRADED,
-    title = "Press Back again to exit",
-    message = "Back once more leaves subshell",
+    title = UiText.Resource(R.string.backpol_press_back_again_to_exit),
+    message = UiText.Resource(R.string.backpol_back_once_more_leaves_subshell),
 )
 
 /** The feed source Back should select at Home, or null to let Back through. */
@@ -37,20 +39,20 @@ internal fun rootBackFeedSource(
 
 /**
  * The feed source an account lands on, as the authenticated landing decides
- * it: Popular only for an account with authoritatively zero subscriptions,
- * Home otherwise (anonymous accounts, and while the decision is unknown).
+ * it: the chosen start feed when it is Popular or All (ISSUE302_START_FEED_V1,
+ * signed in or not); with Home, Popular only for an account with
+ * authoritatively zero subscriptions, Home otherwise (anonymous accounts, and
+ * while the decision is unknown).
  */
 internal fun rootBackLandingSource(
     accountStableId: String,
     authenticated: Boolean,
     subscriptions: RedditSubscriptionsUiState,
-): FeedSource =
-    if (
-        authenticated &&
+    startFeed: StartFeed = StartFeed.HOME,
+): FeedSource = when {
+    startFeed != StartFeed.HOME -> startFeed.source
+    authenticated &&
         resolveAuthenticatedLandingFeed(accountStableId, subscriptions) ==
-        AuthenticatedMainFeedLandingDecision.POPULAR
-    ) {
-        FeedSource.POPULAR
-    } else {
-        FeedSource.HOME
-    }
+        AuthenticatedMainFeedLandingDecision.POPULAR -> FeedSource.POPULAR
+    else -> FeedSource.HOME
+}

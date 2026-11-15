@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import io.github.brealorg.subshell.data.account.COMMENT_EDIT_TEXT_MAX_CHARS
 import androidx.activity.compose.BackHandler
@@ -176,24 +178,24 @@ internal fun CommentEditScreen(
         topBar = {
             RouteTopBar(
                 scrollBehavior = routeTopBarScroll,
-                title = { Text("Edit comment") },
+                title = { Text(stringResource(R.string.scr_edit_comment)) },
                 navigationIcon = {
                     IconButton(onClick = ::requestClose) {
                         Icon(
                             Symbols.ArrowBack,
-                            contentDescription = "Close comment editor",
+                            contentDescription = stringResource(R.string.scr_close_comment_editor),
                         )
                     }
                 },
                 actions = {
                     ComposerPrimaryAction(
                         text = when (relevantState.phase) {
-                            CommentEditPhase.SENDING -> "Saving…"
-                            CommentEditPhase.CHECKING -> "Checking…"
+                            CommentEditPhase.SENDING -> stringResource(R.string.all_saving_2)
+                            CommentEditPhase.CHECKING -> stringResource(R.string.all_checking)
                             CommentEditPhase.AUTHORIZING,
                             CommentEditPhase.AWAITING_CALLBACK,
-                            -> "Authorizing…"
-                            else -> "Save"
+                            -> stringResource(R.string.all_authorizing)
+                            else -> stringResource(R.string.all_save)
                         },
                         enabled = saveEnabled,
                         onClick = ::submit,
@@ -213,7 +215,7 @@ internal fun CommentEditScreen(
                 .fitInside(WindowInsetsRulers.Ime.current),
         ) {
             ComposerContextNote(
-                text = "Editing your comment in r/${post.community}",
+                text = stringResource(R.string.scr_editing_your_comment_in_r, post.community),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 10.dp),
@@ -229,7 +231,7 @@ internal fun CommentEditScreen(
             )
 
             ComposerBodyHeader(
-                title = "Comment",
+                title = stringResource(R.string.scr_comment),
                 length = body.length,
                 maxLength = 10_000,
                 previewVisible = previewVisible,
@@ -247,7 +249,7 @@ internal fun CommentEditScreen(
             } else {
                 PostStyleComposerEditor(
                     state = editor,
-                    placeholder = "Add a comment",
+                    placeholder = stringResource(R.string.scr_add_a_comment),
                     focusRequester = focusRequester,
                     onFormat = ::formatUnlessLocked,
                     onMediaReceived = {},
@@ -314,16 +316,16 @@ private fun CommentEditStatus(
             when (state.phase) {
                 CommentEditPhase.AUTHORIZATION_REQUIRED -> {
                     TextButton(onClick = onGrantAccess) {
-                        Text("Grant edit access")
+                        Text(stringResource(R.string.scr_grant_edit_access))
                     }
                     TextButton(onClick = onDismiss) {
-                        Text("Not now")
+                        Text(stringResource(R.string.scr_not_now))
                     }
                 }
                 CommentEditPhase.AUTHORIZING,
                 CommentEditPhase.AWAITING_CALLBACK,
                 -> TextButton(onClick = onCancelAuthorization) {
-                    Text("Cancel authorization")
+                    Text(stringResource(R.string.scr_cancel_authorization))
                 }
                 // LOWUI4_UNREACHABLE_FAILED_ROW_REMOVED_V1 (OCB-179): FAILED is
                 // shown by the ErrorNotice above, which returns first.

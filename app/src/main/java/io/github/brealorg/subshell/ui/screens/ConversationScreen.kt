@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.text.format.DateFormat
 import androidx.compose.ui.layout.WindowInsetsRulers
 import androidx.compose.foundation.layout.fitInside
@@ -68,7 +70,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.platform.LocalContext
+import io.github.brealorg.subshell.ui.components.pastedImageKeptInApp
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextRange
@@ -89,7 +94,13 @@ import io.github.brealorg.subshell.ui.components.ComposerMediaReplacementDialog
 import io.github.brealorg.subshell.ui.components.ErrorNotice
 import io.github.brealorg.subshell.ui.components.RouteTopBar
 import io.github.brealorg.subshell.ui.components.rememberRouteTopBarScrollBehavior
+import io.github.brealorg.subshell.data.account.DirectChatLiveFailureKind
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.ui.error.ErrorAction
 import io.github.brealorg.subshell.ui.error.ErrorActionKind
+import io.github.brealorg.subshell.ui.error.ErrorPresentation
+import io.github.brealorg.subshell.ui.error.ErrorPresentationKind
+import io.github.brealorg.subshell.ui.error.ReportViewportError
 import io.github.brealorg.subshell.ui.error.LocalViewportErrorHostState
 import io.github.brealorg.subshell.ui.error.TrayTone
 import io.github.brealorg.subshell.ui.error.messageReplyErrorPresentation
@@ -255,6 +266,10 @@ fun ConversationScreen(
     onResetDirectChatDeleteFailure: () -> Unit = {},
     onSendPrivateMessageReply: (String, ComposerMediaAttachment?) -> Unit = { _, _ -> },
     onReconnectInbox: () -> Unit = {},
+    // ISSUE303B_AN_EXPIRED_WEB_SIGN_IN_OFFERS_SIGN_IN_AGAIN_V1: reconnects the
+    // account in the app's login window, which renews Reddit's web sign-in
+    // (the inbox authorization only refreshes when the OAuth grant is valid).
+    onSignInAgain: () -> Unit = {},
     onAuthorizeMediaReply: () -> Unit = {},
     interactionActionsAtStart: Boolean = false,
     onResetMessageReplyState: () -> Unit = {},
@@ -533,6 +548,17 @@ fun ConversationScreen(
             val sent = scopedReplyState.sentDraftText ?: scopedReplyState.sentText
             if (sent != null && replyText.trim() == sent.trim()) onReplyTextChange("")
             onResetMessageReplyState()
+        } else if (
+            // ISSUE303_AN_UNKNOWN_IMAGE_SEND_KEEPS_ITS_MEDIA_ID_V1: an image whose
+            // send answer was unclear counts as sent once Reddit lists an image
+            // with its media id; the text in the composer was never sent and stays.
+            scopedReplyState.phase == MessageReplyPhase.OUTCOME_UNKNOWN &&
+            scopedReplyState.sentHadMedia &&
+            scopedReplyState.sentMatrixEventId.isNullOrBlank() &&
+            !scopedReplyState.sentMatrixMediaId.isNullOrBlank() &&
+            confirmedReplyVisible
+        ) {
+            onResetMessageReplyState()
         }
     }
 
@@ -707,12 +733,26 @@ fun ConversationScreen(
         val failureKind = reactionFailureKind ?: return@LaunchedEffect
         reactionNoticeHost?.presentNotice(
             scopeKey = DIRECT_CHAT_REACTION_NOTICE_SCOPE,
-            title = "Reaction not confirmed",
-            message = directChatReactionFailureMessage(failureKind),
+            title = UiText.Resource(R.string.ep_reaction_not_confirmed),
+            message = UiText.Plain(directChatReactionFailureMessage(failureKind)),
             tone = TrayTone.ERROR,
         )
         onResetDirectChatReactionFailure()
     }
+
+    // ISSUE303B_AN_EXPIRED_WEB_SIGN_IN_OFFERS_SIGN_IN_AGAIN_V1: when opening the
+    // chat finds Reddit's web sign-in expired (a 401 on a just-minted token),
+    // the tray says so once, with Sign in again; it goes when the chat leaves
+    // the screen or live chat starts again.
+    ReportViewportError(
+        scopeKey = DIRECT_CHAT_WEB_SIGN_IN_SCOPE,
+        presentation = directChatWebSignInExpiredPresentation(
+            directChat = detailKind == ConversationDetailKind.DIRECT_CHAT,
+            failureKind = scopedDirectChatLiveState.failureKind,
+        ),
+        failureDetails = null,
+        onRetry = onSignInAgain,
+    )
 
     directChatDeleteCandidateEventId?.let { eventId ->
         DirectChatDeleteDialog(
@@ -752,7 +792,7 @@ fun ConversationScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         Symbols.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(R.string.scr_back),
                     )
                 }
             },
@@ -862,6 +902,7 @@ fun ConversationScreen(
                         onSendPrivateMessageReply(text, media)
                     },
                     onReconnectInbox = onReconnectInbox,
+                    onSignInAgain = onSignInAgain,
                     onAuthorizeMediaReply = onAuthorizeMediaReply,
                     onRefresh = onRefresh,
                     onResetState = onResetMessageReplyState,
@@ -939,6 +980,7 @@ private fun MessageConversationComposer(
     onMediaChange: (ComposerMediaAttachment?) -> Unit,
     onSend: (String, ComposerMediaAttachment?) -> Unit,
     onReconnectInbox: () -> Unit,
+    onSignInAgain: () -> Unit,
     onAuthorizeMediaReply: () -> Unit,
     onRefresh: (() -> Unit)?,
     onResetState: () -> Unit,
@@ -957,6 +999,14 @@ private fun MessageConversationComposer(
     val latestOnMediaChange by rememberUpdatedState(onMediaChange)
     LaunchedEffect(media) { latestOnMediaChange(media) }
     var pendingMediaReplacement by remember(kind) {
+        mutableStateOf<ComposerMediaAttachment?>(null)
+    }
+    // ISSUE303_CHECKED_GIVES_AN_UNCLEAR_IMAGE_BACK_V1 (Pixel 11, 2026-11-14): an
+    // image whose own send answer was unclear left the field, and "Checked"
+    // (the reader looked and it is not there) gave nothing back. It is held
+    // while the answer is unclear and comes back on Checked; when Reddit lists
+    // it instead, it is dropped.
+    var mediaHeldWhileUnclear by remember(kind) {
         mutableStateOf<ComposerMediaAttachment?>(null)
     }
     val latestOnTextChange by rememberUpdatedState(onTextChange)
@@ -991,16 +1041,16 @@ private fun MessageConversationComposer(
     val status = when {
         !replyTargetAvailable ->
             if (directChat) {
-                "This chat does not expose a reply target."
+                stringResource(R.string.all_this_chat_does_not_expose_a_reply)
             } else {
-                "This message thread does not expose a reply target."
+                stringResource(R.string.all_this_message_thread_does_not_expose_a)
             }
         blockedElsewhereMessage != null -> blockedElsewhereMessage
         state.phase == MessageReplyPhase.SENDING ->
             when {
                 directChat && media != null -> null
                 media != null -> "Uploading and sending…"
-                else -> "Sending…"
+                else -> stringResource(R.string.all_sending)
             }
         else -> null
     }
@@ -1062,8 +1112,14 @@ private fun MessageConversationComposer(
                 latestOnTextChange(value)
             }
     }
+    // ISSUE306_AN_OLD_SEND_LEAVES_A_NEW_DRAFT_ALONE_V1 (#306): a send that ended
+    // before this composer appeared (the reply state still SUCCEEDED from it)
+    // cleared the attachment of the draft the reader came back to.
+    val completionSeenAtStart = remember(kind) { state.completionRevision }
+    val pasteContext = LocalContext.current
     LaunchedEffect(state.phase, state.completionRevision, state.sentHadMedia) {
-        val mediaCommitted =
+        val endedHere = state.completionRevision > completionSeenAtStart
+        val mediaCommitted = endedHere && (
             state.phase == MessageReplyPhase.SUCCEEDED ||
                 (
                     state.sentHadMedia &&
@@ -1073,7 +1129,13 @@ private fun MessageConversationComposer(
                                 state.phase == MessageReplyPhase.OUTCOME_UNKNOWN
                             )
                     )
+            )
+        val imageUnclear = state.phase == MessageReplyPhase.OUTCOME_UNKNOWN &&
+            state.sentHadMedia &&
+            state.sentMatrixEventId.isNullOrBlank()
+        if (!imageUnclear) mediaHeldWhileUnclear = null
         if (mediaCommitted) {
+            if (imageUnclear && media != null) mediaHeldWhileUnclear = media
             // SUBSHELL_MESSAGES02E2A2_REDDIT_PARITY_DUAL_WRITE_V1
             // On partial success only the text stays in the composer; the media is already remote.
             media = null
@@ -1098,12 +1160,18 @@ private fun MessageConversationComposer(
                             ErrorActionKind.SIGN_IN -> {
                                 if (state.failureKind == io.github.brealorg.subshell.data.account.MessageReplyFailureKind.MEDIA_AUTHORIZATION_REQUIRED) {
                                     onAuthorizeMediaReply()
+                                } else if (state.failureKind == io.github.brealorg.subshell.data.account.MessageReplyFailureKind.CHAT_WEB_SIGN_IN_EXPIRED) {
+                                    onSignInAgain()
                                 } else {
                                     onReconnectInbox()
                                 }
                                 onResetState()
                             }
-                            ErrorActionKind.DISMISS -> onResetState()
+                            ErrorActionKind.DISMISS -> {
+                                mediaHeldWhileUnclear?.let { held -> media = held }
+                                mediaHeldWhileUnclear = null
+                                onResetState()
+                            }
                             else -> Unit
                         }
                     },
@@ -1113,10 +1181,13 @@ private fun MessageConversationComposer(
             CompactReplyComposer(
                 state = editor,
                 media = composerVisibleMedia,
-                placeholder = if (directChat) "Message" else "Reply",
+                placeholder = if (directChat) stringResource(R.string.all_message) else stringResource(R.string.all_reply),
                 sendEnabled = sendEnabled,
                 onSend = { onSend(editor.text.toString(), media) },
-                onMediaReceived = ::requestMedia,
+                // ISSUE306_A_PASTED_IMAGE_IS_KEPT_IN_THE_APP_V1 (#306): as in the comment
+                // and post composers (COMPOSER16), a pasted image is copied in at once:
+                // the paste's read grant ends, and HEIC/AVIF are made JPEG.
+                onMediaReceived = { pasted -> requestMedia(pastedImageKeptInApp(pasteContext, pasted)) },
                 onMediaRemoved = { updateMedia(null) },
                 onPickImage = mediaPicker.pickImage,
                 onPickGif = mediaPicker.pickGif,
@@ -1125,10 +1196,10 @@ private fun MessageConversationComposer(
                 interactionActionsAtStart = interactionActionsAtStart,
                 maxCharacters = io.github.brealorg.subshell.data.account.MESSAGE_REPLY_TEXT_MAX_LENGTH,
                 sendContentDescription = when {
-                    state.inProgress && directChat -> "Sending message"
-                    state.inProgress -> "Sending reply"
-                    directChat -> "Send message"
-                    else -> "Send reply"
+                    state.inProgress && directChat -> stringResource(R.string.all_sending_message)
+                    state.inProgress -> stringResource(R.string.all_sending_reply_2)
+                    directChat -> stringResource(R.string.all_send_message)
+                    else -> stringResource(R.string.all_send_reply)
                 },
                 longReplyTitle = longReplyTitle,
                 quote = quote,
@@ -1173,7 +1244,7 @@ private fun ConversationHeaderIdentity(
     Row(
         modifier = if (profileUsername != null && openUser != null) {
             Modifier.clickable(
-                onClickLabel = "Open u/$profileUsername profile",
+                onClickLabel = stringResource(R.string.scr_open_u_profile, profileUsername),
                 role = Role.Button,
             ) { openUser(profileUsername) }
         } else {
@@ -1193,7 +1264,7 @@ private fun ConversationHeaderIdentity(
                     ConversationDetailKind.DIRECT_CHAT ->
                         conversationParticipantDisplayName(item.sender)
                     ConversationDetailKind.PRIVATE_MESSAGE_THREAD ->
-                        item.title.ifBlank { "Message" }
+                        item.title.ifBlank { stringResource(R.string.all_message) }
                 },
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
@@ -1201,7 +1272,7 @@ private fun ConversationHeaderIdentity(
             )
             Text(
                 text = when (kind) {
-                    ConversationDetailKind.DIRECT_CHAT -> "Direct chat"
+                    ConversationDetailKind.DIRECT_CHAT -> stringResource(R.string.all_direct_chat)
                     ConversationDetailKind.PRIVATE_MESSAGE_THREAD -> participant
                 },
                 style = MaterialTheme.typography.labelMedium,
@@ -1222,26 +1293,26 @@ private fun DirectChatDeleteDialog(
 ) {
     AlertDialog(
         onDismissRequest = { if (!deleting) onDismiss() },
-        title = { Text("Delete message?") },
+        title = { Text(stringResource(R.string.scr_delete_message)) },
         text = {
             Text(
                 when (failureKind) {
                     DirectChatDeleteFailureKind.SESSION ->
-                        "Your Reddit chat session needs attention. Reopen the chat and try again."
+                        stringResource(R.string.all_your_reddit_chat_session_needs_attention_reopen)
                     DirectChatDeleteFailureKind.ROOM ->
                         "subshell no longer has a verified room for this chat. Reopen the chat and try again."
                     DirectChatDeleteFailureKind.HTTP ->
-                        "Reddit rejected the delete request."
+                        stringResource(R.string.all_reddit_rejected_the_delete_request)
                     DirectChatDeleteFailureKind.OUTCOME_UNKNOWN ->
-                        "Deletion wasn't confirmed. Check the chat in another Reddit client before trying again."
+                        stringResource(R.string.all_deletion_wasn_t_confirmed_check_the_chat)
                     DirectChatDeleteFailureKind.PROTOCOL ->
-                        "Reddit returned a response subshell couldn't verify."
+                        stringResource(R.string.all_reddit_returned_a_response_subshell_couldn_t)
                     DirectChatDeleteFailureKind.NOT_OWNER ->
-                        "Only your own live Direct Chat messages can be deleted."
+                        stringResource(R.string.all_only_your_own_live_direct_chat_messages)
                     DirectChatDeleteFailureKind.UNAVAILABLE ->
-                        "Direct Chat deletion isn't available for this session."
+                        stringResource(R.string.all_direct_chat_deletion_isn_t_available_for)
                     null ->
-                        "This will delete the message for everyone in this chat. This can't be undone."
+                        stringResource(R.string.all_this_will_delete_the_message_for_everyone)
                 },
             )
         },
@@ -1250,17 +1321,17 @@ private fun DirectChatDeleteDialog(
                 TextButton(onClick = {}, enabled = false) {
                     InlineProgressIndicator()
                     Spacer(Modifier.width(8.dp))
-                    Text("Deleting…")
+                    Text(stringResource(R.string.scr_deleting))
                 }
             } else if (failureKind == null) {
                 TextButton(onClick = onConfirm) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.scr_delete_2), color = MaterialTheme.colorScheme.error)
                 }
             }
         },
         dismissButton = {
             if (!deleting) {
-                TextButton(onClick = onDismiss) { Text("Cancel") }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.scr_cancel)) }
             }
         },
     )
@@ -1333,7 +1404,7 @@ private fun DirectChatMessageGroup(
                         )
                         Spacer(Modifier.width(7.dp))
                         Text(
-                            text = "You",
+                            text = stringResource(R.string.scr_you),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary,
                         )
@@ -1403,7 +1474,7 @@ private fun DirectChatMessageGroup(
                         deliveryLabel = if (
                             localEchoSending && localEchoId == message.id
                         ) {
-                            "Sending…"
+                            stringResource(R.string.all_sending)
                         } else {
                             null
                         },
@@ -1505,17 +1576,35 @@ private fun DirectChatMessage(
                     renderMarkdown = true,
                     localMedia = localMedia,
                     selectable = true, // ISSUE235_LONG_PRESS_SELECTS_TEXT_V1
+                    // ISSUE306_THE_MESSAGE_MENU_IS_A_FULL_TOUCH_TARGET_V1 (#306): the ⋮ was a
+                    // 24 dp target beside selectable text, so a tap just off it started a
+                    // selection. It is a 40 dp button in the icon's old 24 dp place and the
+                    // text keeps clear of it.
                     modifier = if (hasActions) {
-                        Modifier.padding(end = 24.dp)
+                        Modifier.padding(end = 32.dp)
                     } else {
                         Modifier
                     },
                 )
 
                 if (hasActions) {
-                    Box(modifier = Modifier.align(Alignment.TopEnd)) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            // Takes the 24 dp the icon always took (a one-line
+                            // message keeps its height); the 40 dp button around
+                            // it reaches 8 dp past every side.
+                            .layout { measurable, _ ->
+                                val target = 40.dp.roundToPx()
+                                val slot = 24.dp.roundToPx()
+                                val button = measurable.measure(Constraints.fixed(target, target))
+                                layout(slot, slot) {
+                                    button.place((slot - target) / 2, (slot - target) / 2)
+                                }
+                            },
+                    ) {
                         IconButton(
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(40.dp),
                             enabled = !deleteInProgress && !reactInProgress,
                             onClick = { actionMenuExpanded = true },
                         ) {
@@ -1524,7 +1613,7 @@ private fun DirectChatMessage(
                             } else {
                                 Icon(
                                     imageVector = Symbols.MoreVert,
-                                    contentDescription = "Message actions",
+                                    contentDescription = stringResource(R.string.scr_message_actions),
                                     modifier = Modifier.size(16.dp),
                                 )
                             }
@@ -1536,7 +1625,7 @@ private fun DirectChatMessage(
                             if (onReact != null) {
                                 DropdownMenuItem(
                                     text = {
-                                        Text(if (reactInProgress) "Reacting…" else "React")
+                                        Text(if (reactInProgress) stringResource(R.string.all_reacting) else stringResource(R.string.all_react))
                                     },
                                     enabled = !reactInProgress,
                                     onClick = {
@@ -1549,7 +1638,7 @@ private fun DirectChatMessage(
                                 DropdownMenuItem(
                                     text = {
                                         Text(
-                                            text = "Delete message",
+                                            text = stringResource(R.string.scr_delete_message_2),
                                             color = MaterialTheme.colorScheme.error,
                                         )
                                     },
@@ -1593,7 +1682,7 @@ private fun DirectChatReactionStrip(
         reactions.forEach { reaction ->
             // LOWUI7_REACTIONS_SAY_WHICH_AND_HOW_MANY_V1 (OCB-198): the chip is
             // read as one item, named as in the picker, with its count.
-            val chipLabel = directChatReactionChipLabel(reaction)
+            val chipLabel = directChatReactionChipLabel(reaction).asString()
             Surface(
                 modifier = Modifier.clearAndSetSemantics { contentDescription = chipLabel },
                 shape = MaterialTheme.shapes.extraLarge,
@@ -1612,7 +1701,7 @@ private fun DirectChatReactionStrip(
                     if (asset != null) {
                         DirectChatReactionAssetMedia(
                             asset = asset,
-                            label = "Reddit reaction",
+                            label = stringResource(R.string.scr_reddit_reaction),
                             playing = true,
                             modifier = Modifier.size(24.dp),
                         )
@@ -1655,7 +1744,7 @@ private fun DirectChatReactionPickerSheet(
     ) {
         Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 24.dp)) {
             Text(
-                "React to message",
+                stringResource(R.string.all_react_to_message),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(bottom = 12.dp),
             )
@@ -1683,7 +1772,7 @@ private fun DirectChatReactionPickerSheet(
                             ) {
                                 DirectChatReactionAssetMedia(
                                     asset = asset,
-                                    label = "Reddit reaction $catalogIndex",
+                                    label = stringResource(R.string.scr_reddit_reaction_2, catalogIndex),
                                     playing = true,
                                     modifier = Modifier.size(54.dp),
                                 )
@@ -1727,6 +1816,26 @@ private fun DirectChatReactionAssetMedia(
 }
 
 internal const val DIRECT_CHAT_REACTION_NOTICE_SCOPE = "direct-chat-reaction"
+internal const val DIRECT_CHAT_WEB_SIGN_IN_SCOPE = "direct-chat-web-sign-in"
+
+/** ISSUE303B_AN_EXPIRED_WEB_SIGN_IN_OFFERS_SIGN_IN_AGAIN_V1 */
+internal fun directChatWebSignInExpiredPresentation(
+    directChat: Boolean,
+    failureKind: DirectChatLiveFailureKind?,
+): ErrorPresentation? =
+    if (directChat && failureKind == DirectChatLiveFailureKind.WEB_SIGN_IN_EXPIRED) {
+        ErrorPresentation(
+            kind = ErrorPresentationKind.DEGRADED,
+            title = UiText.Resource(R.string.chat_web_sign_in_expired_title),
+            message = UiText.Resource(R.string.chat_web_sign_in_expired_live),
+            primaryAction = ErrorAction(
+                ErrorActionKind.SIGN_IN,
+                UiText.Resource(R.string.chat_web_sign_in_again),
+            ),
+        )
+    } else {
+        null
+    }
 
 internal fun directChatReactionFailureMessage(failureKind: DirectChatReactionFailureKind): String =
     when (failureKind) {
@@ -1803,7 +1912,7 @@ private fun PrivateMessageThreadGroup(
                         )
                         Spacer(Modifier.width(7.dp))
                         Text(
-                            text = "You",
+                            text = stringResource(R.string.scr_you),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary,
                         )
@@ -1901,9 +2010,9 @@ private fun ConversationMessageBody(
                     contentDescription = if (
                         localMedia.mimeType.equals("image/gif", ignoreCase = true)
                     ) {
-                        "Sending GIF"
+                        stringResource(R.string.all_sending_gif)
                     } else {
-                        "Sending image"
+                        stringResource(R.string.all_sending_image)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1928,7 +2037,7 @@ private fun ConversationMessageBody(
                 when (media.kind) {
                     RemoteCommentMediaKind.GIF -> RemoteGifMedia(
                         uri = media.uri,
-                        label = "Message GIF ${index + 1}",
+                        label = stringResource(R.string.scr_message_gif, index + 1),
                         playing = true,
                         contentScale = ContentScale.Fit,
                         adaptToSourceAspectRatio = true,
@@ -1939,7 +2048,7 @@ private fun ConversationMessageBody(
                     )
                     RemoteCommentMediaKind.IMAGE -> RemoteImage(
                         uri = media.uri,
-                        label = "Message image ${index + 1}",
+                        label = stringResource(R.string.scr_message_image, index + 1),
                         contentScale = ContentScale.Fit,
                         aspectRatio = null,
                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -2015,7 +2124,7 @@ private fun ConversationParticipantAvatar(
         .firstOrNull()
         ?.uppercase()
         ?: "?"
-    val label = "Avatar for ${conversationParticipantLabel(sender)}"
+    val label = stringResource(R.string.scr_avatar_for, conversationParticipantLabel(sender))
     val tappable = profileUsername != null && openUser != null
     // ISSUE219_PARTICIPANT_AVATAR_HAS_A_48_DP_TARGET_V1: the avatar keeps its
     // size in the layout; the tap target over it is 48 dp (centred overflow),
@@ -2048,7 +2157,7 @@ private fun ConversationParticipantAvatar(
                     .requiredSize(maxOf(size, 48).dp)
                     .clip(CircleShape)
                     .clickable(
-                        onClickLabel = "Open u/$profileUsername profile",
+                        onClickLabel = stringResource(R.string.scr_open_u_profile, profileUsername),
                         role = Role.Button,
                     ) { openUser(profileUsername) }
                     .semantics { contentDescription = label },
@@ -2355,9 +2464,13 @@ internal fun conversationProfileUsername(sender: String): String? =
 
 internal val LocalConversationOpenUser = staticCompositionLocalOf<((String) -> Unit)?> { null }
 
-internal fun directChatReactionChipLabel(reaction: DirectChatReactionSummary): String {
+internal fun directChatReactionChipLabel(reaction: DirectChatReactionSummary): UiText {
     val catalogIndex = redditDirectChatReactionCatalog.indexOfFirst { it.key == reaction.key }
-    val name = if (catalogIndex >= 0) "Reddit reaction ${catalogIndex + 1}" else reaction.key
-    val count = if (reaction.count == 1) "1 reaction" else "${reaction.count} reactions"
-    return if (reaction.self) "$name, $count, including yours" else "$name, $count"
+    val name: UiText = if (catalogIndex >= 0) {
+        UiText.Resource(R.string.reaction_described, catalogIndex + 1)
+    } else {
+        UiText.Plain(reaction.key)
+    }
+    val count = UiText.Plural(R.plurals.reaction_count, reaction.count, reaction.count)
+    return UiText.Resource(if (reaction.self) R.string.reaction_with_count_self else R.string.reaction_with_count, name, count)
 }

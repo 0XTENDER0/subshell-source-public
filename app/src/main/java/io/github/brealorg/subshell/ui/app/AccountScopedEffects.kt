@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -93,6 +95,7 @@ internal fun AccountScopedEffects(
                 accountStableId = pendingAccountId,
                 subscriptions = redditSubscriptionsState,
                 coldStart = pendingAccountId == coldStartAccountId,
+                startFeed = state.startFeed,
             )
         ) {
             AuthenticatedMainFeedLandingDecision.WAIT -> Unit
@@ -109,6 +112,12 @@ internal fun AccountScopedEffects(
                 pendingAuthenticatedLandingAccountId = null
                 state.applyAuthenticatedMainFeedLanding(
                     FeedSource.POPULAR,
+                )
+            }
+            AuthenticatedMainFeedLandingDecision.ALL -> {
+                pendingAuthenticatedLandingAccountId = null
+                state.applyAuthenticatedMainFeedLanding(
+                    FeedSource.ALL,
                 )
             }
         }

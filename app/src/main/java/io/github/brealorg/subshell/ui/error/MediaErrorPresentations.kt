@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.error
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
 import io.github.brealorg.subshell.data.error.FailureDetails
 import io.github.brealorg.subshell.data.error.LocalFailureKind
 import io.github.brealorg.subshell.media.isRemoteMediaGone
@@ -15,8 +17,8 @@ internal fun remoteMediaErrorPresentation(
     sourceUri: String? = null,
 ): ErrorPresentation {
     val noun = when (kind) {
-        RemoteMediaKind.IMAGE -> "image"
-        RemoteMediaKind.GIF -> "GIF"
+        RemoteMediaKind.IMAGE -> UiText.Resource(R.string.error_media_noun_image)
+        RemoteMediaKind.GIF -> UiText.Resource(R.string.error_media_noun_gif)
     }
     // MEDIAGONE01_A_GONE_SOURCE_READS_REMOVED_V1 (owner 2026-10-18): a 404/410
     // from the source means the media was removed; it is shown as such, without
@@ -24,37 +26,37 @@ internal fun remoteMediaErrorPresentation(
     if (details.isRemoteMediaGone()) {
         return ErrorPresentation(
             kind = ErrorPresentationKind.INLINE,
-            title = if (kind == RemoteMediaKind.IMAGE) "Image removed" else "GIF removed",
-            message = "It is no longer available where it was posted.",
+            title = if (kind == RemoteMediaKind.IMAGE) UiText.Resource(R.string.error_media_image_removed) else UiText.Resource(R.string.error_media_gif_removed),
+            message = UiText.Resource(R.string.error_media_it_is_no_longer_available_where_it),
         ).withFailureDetails(details)
     }
     val message = when {
-        details.transportKind != null -> "subshell couldn't reach the $noun source."
+        details.transportKind != null -> UiText.Resource(R.string.error_media_subshell_couldn_t_reach_the_source, noun)
         details.httpStatusCode != null &&
             details.httpStatusCode in 300..399 &&
             details.localKind == LocalFailureKind.SECURITY ->
-            "The $noun source redirected to a location blocked by subshell's secure media policy."
+            UiText.Resource(R.string.error_media_the_source_redirected_to_a_location_blocked, noun)
         details.httpStatusCode != null && details.httpStatusCode in 300..399 ->
-            "The $noun source redirected the request."
-        details.httpStatusCode != null -> "The $noun source rejected the request."
-        details.protocolKind != null -> "The $noun source returned data subshell couldn't use."
-        details.localKind == LocalFailureKind.DECODING -> "subshell couldn't decode this $noun."
-        details.localKind == LocalFailureKind.SECURITY -> "This $noun source isn't allowed by subshell's secure media policy."
-        details.localKind == LocalFailureKind.VALIDATION -> "This $noun has an invalid source address."
-        else -> "subshell couldn't load this $noun."
+            UiText.Resource(R.string.error_media_the_source_redirected_the_request, noun)
+        details.httpStatusCode != null -> UiText.Resource(R.string.error_media_the_source_rejected_the_request, noun)
+        details.protocolKind != null -> UiText.Resource(R.string.error_media_the_source_returned_data_subshell_couldn_t, noun)
+        details.localKind == LocalFailureKind.DECODING -> UiText.Resource(R.string.error_media_subshell_couldn_t_decode_this, noun)
+        details.localKind == LocalFailureKind.SECURITY -> UiText.Resource(R.string.error_media_this_source_isn_t_allowed_by_subshell, noun)
+        details.localKind == LocalFailureKind.VALIDATION -> UiText.Resource(R.string.error_media_this_has_an_invalid_source_address, noun)
+        else -> UiText.Resource(R.string.error_media_subshell_couldn_t_load_this, noun)
     }
     // ISSUE228_RETRY_ONLY_WHEN_IT_CAN_HELP_V1 (owner, #228): Retry only for a
     // failure that can pass (connection, a server that may answer later). A
     // blocked, invalid or undecodable source offers the browser instead
     // (ISSUE228_BLOCKED_MEDIA_OPENS_IN_THE_BROWSER_V1).
     val action = when {
-        details.retryable != false -> ErrorAction(ErrorActionKind.RETRY, "Retry")
-        mediaSourceHost(sourceUri) != null -> ErrorAction(ErrorActionKind.OPEN_IN_BROWSER, "Open in browser")
+        details.retryable != false -> ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.error_media_retry))
+        mediaSourceHost(sourceUri) != null -> ErrorAction(ErrorActionKind.OPEN_IN_BROWSER, UiText.Resource(R.string.error_media_open_in_browser))
         else -> null
     }
     return ErrorPresentation(
         kind = ErrorPresentationKind.INLINE,
-        title = "Couldn't load $noun",
+        title = UiText.Resource(R.string.error_media_couldn_t_load, noun),
         message = message,
         primaryAction = action,
     ).withFailureDetails(details)
@@ -126,7 +128,7 @@ internal fun videoPlaybackErrorPresentation(
         title = copy.title,
         message = copy.message,
         technicalDetail = null,
-        primaryAction = ErrorAction(ErrorActionKind.RETRY, "Retry"),
+        primaryAction = ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.error_media_retry)),
         failureDetails = details,
     )
 }

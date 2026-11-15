@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.data.normalizeRedditCommunityName
 import io.github.brealorg.subshell.model.Post
 
@@ -139,16 +141,16 @@ internal const val MUTED_COMMUNITY_DIRECT_VIEW_MODE_KEY =
     "muted_community_direct_view_mode"
 
 enum class MutedCommunityDirectViewMode(
-    val label: String,
-    val description: String,
+    @androidx.annotation.StringRes val labelRes: Int,
+    @androidx.annotation.StringRes val descriptionRes: Int,
 ) {
     SHOW_POSTS(
-        label = "Show posts",
-        description = "Direct visits can still show posts while the community is muted",
+        labelRes = R.string.muted_direct_view_show_posts_label,
+        descriptionRes = R.string.muted_direct_view_show_posts_description,
     ),
     ABOUT_ONLY(
-        label = "About only",
-        description = "Direct visits show community information without any posts",
+        labelRes = R.string.muted_direct_view_about_only_label,
+        descriptionRes = R.string.muted_direct_view_about_only_description,
     ),
 }
 

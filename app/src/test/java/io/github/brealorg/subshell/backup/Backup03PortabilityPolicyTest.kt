@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.backup
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertFalse
@@ -21,7 +22,7 @@ class Backup03PortabilityPolicyTest {
 
     @Test
     fun portabilityMatrixIsExplicitAndSchemaV4HasNotStarted() {
-        val policy = repository("docs/backup/subshell-backup03-portability-policy-v1.md").readText()
+        val policy = repository("docs/backup/subshell-backup03-portability-policy-v1.md").readSourceText()
         val model = source("backup/SettingsBackup.kt")
 
         assertTrue(policy.contains("BACKUP03A1_PORTABILITY_POLICY_V1"))
@@ -174,7 +175,7 @@ class Backup03PortabilityPolicyTest {
         val backupSources = repository("app/src/main/java/${SUBSHELL_PACKAGE_DIR}/backup")
             .walkTopDown()
             .filter { it.isFile && it.extension == "kt" }
-            .joinToString("\n") { it.readText() }
+            .joinToString("\n") { it.readSourceText() }
 
         listOf(
             "StoredOAuthSession",
@@ -196,11 +197,11 @@ class Backup03PortabilityPolicyTest {
 
     @Test
     fun androidSystemBackupBoundaryRemainsSuccessorAware() {
-        val policy = repository("docs/backup/subshell-backup03-portability-policy-v1.md").readText()
-        val legacyRules = repository("app/src/main/res/xml/backup_rules.xml").readText()
+        val policy = repository("docs/backup/subshell-backup03-portability-policy-v1.md").readSourceText()
+        val legacyRules = repository("app/src/main/res/xml/backup_rules.xml").readSourceText()
         val extractionRules =
-            repository("app/src/main/res/xml/data_extraction_rules.xml").readText()
-        val manifest = repository("app/src/main/AndroidManifest.xml").readText()
+            repository("app/src/main/res/xml/data_extraction_rules.xml").readSourceText()
+        val manifest = repository("app/src/main/AndroidManifest.xml").readSourceText()
 
         val backup03bResolved =
             policy.contains("BACKUP03B_ANDROID_SYSTEM_BACKUP_DENY_ALL_V1")
@@ -225,7 +226,7 @@ class Backup03PortabilityPolicyTest {
 
     @Test
     fun schemaV4CandidateIsNarrowAndPreservesAbsentVsExplicitEmptySemantics() {
-        val policy = repository("docs/backup/subshell-backup03-portability-policy-v1.md").readText()
+        val policy = repository("docs/backup/subshell-backup03-portability-policy-v1.md").readSourceText()
 
         assertTrue(policy.contains("favorite communities, account-scoped by stable account ID"))
         assertTrue(policy.contains("favorite custom feeds, account-scoped by stable account ID"))
@@ -245,5 +246,5 @@ class Backup03PortabilityPolicyTest {
         }
 
     private fun source(relative: String): String =
-        repository("app/src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative").readText()
+        repository("app/src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative").readSourceText()
 }

@@ -1,11 +1,18 @@
 package io.github.brealorg.subshell.applock
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /** Issue #38: when the app lock engages. */
+// TRANSLATE15: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class AppLockControllerTest {
     private val minute = 60_000L
 
@@ -149,12 +156,12 @@ class AppLockControllerTest {
 
     @Test
     fun delayLabels() {
-        assertEquals("Immediately", appLockDelayLabel(0))
-        assertEquals("1 minute", appLockDelayLabel(1))
-        assertEquals("15 minutes", appLockDelayLabel(15))
-        assertEquals("1 hour", appLockDelayLabel(60))
-        assertEquals("24 hours", appLockDelayLabel(APP_LOCK_MAX_DELAY_MINUTES))
-        assertEquals("2 h 30 min", appLockDelayLabel(150))
+        assertEquals("Immediately", appLockDelayLabel(0).s)
+        assertEquals("1 minute", appLockDelayLabel(1).s)
+        assertEquals("15 minutes", appLockDelayLabel(15).s)
+        assertEquals("1 hour", appLockDelayLabel(60).s)
+        assertEquals("24 hours", appLockDelayLabel(APP_LOCK_MAX_DELAY_MINUTES).s)
+        assertEquals("2 h 30 min", appLockDelayLabel(150).s)
     }
 
     @Test

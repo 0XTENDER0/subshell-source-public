@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import io.github.brealorg.subshell.ui.screens.profileDestinationScrollSeedOrNull
 import java.io.File
@@ -262,7 +263,7 @@ class Next01A6PublicUserContentWorkspacePolicyTest {
             .listFiles { file -> file.extension == "kt" }
             .orEmpty()
             .sortedBy { file -> file.name }
-            .joinToString("") { file -> file.readText() }
+            .joinToString("") { file -> file.readSourceText() }
         return source("ui/SubshellApp.kt") + extracted
     }
 
@@ -274,6 +275,6 @@ class Next01A6PublicUserContentWorkspacePolicyTest {
             "Missing source fixture: ${path.path}"
         }
 
-        return path.readText()
+        return path.readSourceText()
     }
 }

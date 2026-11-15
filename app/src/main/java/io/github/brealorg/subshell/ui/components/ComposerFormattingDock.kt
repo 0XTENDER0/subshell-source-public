@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -75,7 +77,7 @@ internal fun AppBarRowScope.composerFormattingItems(
             onReturnToEditor()
             state.undoState.undo()
         },
-        icon = { Icon(Symbols.Undo, contentDescription = "Undo") },
+        icon = { Icon(Symbols.Undo, contentDescription = stringResource(R.string.comp_undo)) },
         label = "Undo",
         enabled = enabled && state.undoState.canUndo,
     )
@@ -84,7 +86,7 @@ internal fun AppBarRowScope.composerFormattingItems(
             onReturnToEditor()
             state.undoState.redo()
         },
-        icon = { Icon(Symbols.Redo, contentDescription = "Redo") },
+        icon = { Icon(Symbols.Redo, contentDescription = stringResource(R.string.comp_redo)) },
         label = "Redo",
         enabled = enabled && state.undoState.canRedo,
     )
@@ -104,7 +106,7 @@ internal fun AppBarRowScope.composerFormattingItems(
 @Composable
 internal fun ComposerFormattingOverflow(menuState: AppBarMenuState, enabled: Boolean = true) {
     IconButton(enabled = enabled, onClick = { menuState.show() }) {
-        Icon(Symbols.MoreHoriz, contentDescription = "More formatting")
+        Icon(Symbols.MoreHoriz, contentDescription = stringResource(R.string.comp_more_formatting))
     }
 }
 

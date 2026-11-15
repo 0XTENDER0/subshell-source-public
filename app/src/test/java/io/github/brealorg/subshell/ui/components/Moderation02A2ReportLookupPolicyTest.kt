@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.ui.components
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.account.ModeratorReportTarget
 import io.github.brealorg.subshell.data.account.ModeratorReportsUiState
 import io.github.brealorg.subshell.data.account.RedditModerationUiFailureKind
@@ -9,6 +13,9 @@ import io.github.brealorg.subshell.data.account.RedditModeratorQueueKind
 import org.junit.Assert.*
 import org.junit.Test
 
+// TRANSLATE15: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Moderation02A2ReportLookupPolicyTest {
     private val owner = "moderator-account"
     private fun row(id: String, community: String = "subshell") = RedditModeratorQueueItem(
@@ -117,9 +124,9 @@ class Moderation02A2ReportLookupPolicyTest {
         assertEquals(listOf(good), result.queueItems)
     }
     @Test fun reportQuantityHasSingularAndPluralForms() {
-        assertEquals("0 reports", moderatorReportQuantity(0))
-        assertEquals("1 report", moderatorReportQuantity(1))
-        assertEquals("2 reports", moderatorReportQuantity(2))
-        assertEquals("100 reports", moderatorReportQuantity(100))
+        assertEquals("0 reports", moderatorReportQuantity(0).s)
+        assertEquals("1 report", moderatorReportQuantity(1).s)
+        assertEquals("2 reports", moderatorReportQuantity(2).s)
+        assertEquals("100 reports", moderatorReportQuantity(100).s)
     }
 }

@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.data.error
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.account.RedditCommentUiFailureKind
 import io.github.brealorg.subshell.data.account.RedditCommunityDiscoveryUiFailureKind
 import io.github.brealorg.subshell.data.account.RedditFeedUiFailureKind
@@ -25,6 +29,9 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// TRANSLATE03: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Error01a2CoreRedditReadErrorPolicyTest {
     @Test
     fun cachedCommentsRetainHttpCauseRetryDelayAndDegradedState() {
@@ -40,8 +47,8 @@ class Error01a2CoreRedditReadErrorPolicyTest {
         )
 
         assertEquals(ErrorPresentationKind.DEGRADED, presentation.kind)
-        assertEquals("Couldn't refresh comments", presentation.title)
-        assertTrue(presentation.message.contains("Saved comments remain visible."))
+        assertEquals("Couldn't refresh comments", presentation.title.s)
+        assertTrue(presentation.message.s.contains("Saved comments remain visible."))
         assertEquals("HTTP 429 · Retry after 18 s", presentation.technicalDetail)
         assertEquals(ErrorActionKind.RETRY, presentation.primaryAction?.kind)
     }
@@ -58,8 +65,8 @@ class Error01a2CoreRedditReadErrorPolicyTest {
         )
 
         assertEquals(ErrorPresentationKind.DEGRADED, presentation.kind)
-        assertEquals("Couldn't load more posts", presentation.title)
-        assertTrue(presentation.message.contains("Posts already loaded remain visible."))
+        assertEquals("Couldn't load more posts", presentation.title.s)
+        assertTrue(presentation.message.s.contains("Posts already loaded remain visible."))
         assertEquals("Network: DNS", presentation.technicalDetail)
         assertEquals(ErrorActionKind.RETRY, presentation.primaryAction?.kind)
     }
@@ -77,7 +84,7 @@ class Error01a2CoreRedditReadErrorPolicyTest {
         )
 
         assertEquals(ErrorPresentationKind.BLOCKING, presentation.kind)
-        assertTrue(presentation.message.contains("couldn't reach Reddit"))
+        assertTrue(presentation.message.s.contains("couldn't reach Reddit"))
         assertEquals("Network: Timeout", presentation.technicalDetail)
         assertEquals(ErrorActionKind.RETRY, presentation.primaryAction?.kind)
     }
@@ -96,8 +103,8 @@ class Error01a2CoreRedditReadErrorPolicyTest {
         )
 
         assertEquals(ErrorPresentationKind.DEGRADED, presentation.kind)
-        assertTrue(presentation.message.contains("request limit was reached"))
-        assertTrue(presentation.message.contains("Saved Explore results remain visible."))
+        assertTrue(presentation.message.s.contains("request limit was reached"))
+        assertTrue(presentation.message.s.contains("Saved Explore results remain visible."))
         assertEquals("HTTP 429 · Retry after 2 min", presentation.technicalDetail)
     }
 
@@ -123,7 +130,7 @@ class Error01a2CoreRedditReadErrorPolicyTest {
         assertEquals(ErrorPresentationKind.INLINE, inline.kind)
         assertEquals(ErrorPresentationKind.DEGRADED, fallback.kind)
         assertEquals("Response: Malformed response", inline.technicalDetail)
-        assertTrue(fallback.message.contains("Quick suggestions remain visible."))
+        assertTrue(fallback.message.s.contains("Quick suggestions remain visible."))
         assertNull(fallback.primaryAction)
     }
 
@@ -142,9 +149,9 @@ class Error01a2CoreRedditReadErrorPolicyTest {
             showingCachedContent = false,
         )
 
-        assertTrue(session.message.contains("sign-in"))
-        assertFalse(session.message.contains("permission", ignoreCase = true))
-        assertTrue(configuration.message.contains("isn't configured"))
+        assertTrue(session.message.s.contains("sign-in"))
+        assertFalse(session.message.s.contains("permission", ignoreCase = true))
+        assertTrue(configuration.message.s.contains("isn't configured"))
         assertEquals("Local: Configuration", configuration.technicalDetail)
     }
 
@@ -193,11 +200,11 @@ class Error01a2CoreRedditReadErrorPolicyTest {
     }
 
     private fun assertUsefulPresentation(presentation: ErrorPresentation) {
-        assertTrue(presentation.title.isNotBlank())
-        assertTrue(presentation.message.isNotBlank())
-        assertFalse(presentation.title.contains("Something went wrong", ignoreCase = true))
-        assertFalse(presentation.message.contains("Something went wrong", ignoreCase = true))
-        assertFalse(presentation.title.equals("Error", ignoreCase = true))
-        assertFalse(presentation.message.equals("Failed", ignoreCase = true))
+        assertTrue(presentation.title.s.isNotBlank())
+        assertTrue(presentation.message.s.isNotBlank())
+        assertFalse(presentation.title.s.contains("Something went wrong", ignoreCase = true))
+        assertFalse(presentation.message.s.contains("Something went wrong", ignoreCase = true))
+        assertFalse(presentation.title.s.equals("Error", ignoreCase = true))
+        assertFalse(presentation.message.s.equals("Failed", ignoreCase = true))
     }
 }

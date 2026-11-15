@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertFalse
@@ -12,7 +13,7 @@ class Mute01A34R1FeedsPreviewPolishPolicyTest {
         val source = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/" +
                 "MutedCommunityDirectView.kt",
-        ).readText()
+        ).readSourceText()
 
         assertTrue(source.contains("\"Community post\""))
         assertFalse(source.contains("\"Another community post\""))
@@ -23,7 +24,7 @@ class Mute01A34R1FeedsPreviewPolishPolicyTest {
         val source = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/" +
                 "Settings03FeedsPreview.kt",
-        ).readText()
+        ).readSourceText()
 
         assertTrue(source.contains(".height(176.dp)"))
         assertTrue(
@@ -43,7 +44,7 @@ class Mute01A34R1FeedsPreviewPolishPolicyTest {
         val source = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/" +
                 "Settings03FeedsPreview.kt",
-        ).readText()
+        ).readSourceText()
 
         assertTrue(
             source.contains(

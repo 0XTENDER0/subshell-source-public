@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -61,15 +63,16 @@ private data class FeedsSettingsPreviewSnapshot(
     val mutedCommunityDirectViewMode: MutedCommunityDirectViewMode,
 )
 
+@Composable
 private fun feedsSettingsPreviewStatusLabel(
     snapshot: FeedsSettingsPreviewSnapshot,
 ): String = when (snapshot.focus) {
     FeedsSettingsPreviewFocus.UNREAD ->
-        if (snapshot.showUnreadMarker) "Unread on" else "Unread off"
+        if (snapshot.showUnreadMarker) stringResource(R.string.all_unread_on) else stringResource(R.string.all_unread_off)
     FeedsSettingsPreviewFocus.NSFW ->
         if (snapshot.showNsfwPosts) "NSFW shown" else "NSFW hidden"
     FeedsSettingsPreviewFocus.MUTED_COMMUNITY ->
-        snapshot.mutedCommunityDirectViewMode.label
+        stringResource(snapshot.mutedCommunityDirectViewMode.labelRes)
 }
 
 @Composable
@@ -143,11 +146,11 @@ internal fun FeedsSettingsPreview(
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     Text(
-                        "Live preview",
+                        stringResource(R.string.all_live_preview),
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        "Feed and community behaviour.",
+                        stringResource(R.string.all_feed_and_community_behaviour),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -252,7 +255,7 @@ private fun FeedsPreviewHomeCanvas(
                     style = MaterialTheme.typography.labelLarge,
                 )
                 Text(
-                    if (nsfwMode) "NSFW visibility" else "Unread marker",
+                    if (nsfwMode) "NSFW visibility" else stringResource(R.string.all_unread_marker),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -263,7 +266,7 @@ private fun FeedsPreviewHomeCanvas(
                     FeedPreviewCanvasPost(
                         community = "r/pics",
                         age = "2h",
-                        title = "Behind-the-scenes photo from the set",
+                        title = stringResource(R.string.set_behind_the_scenes_photo_from_the_set),
                         unread = false,
                         nsfw = true,
                     )
@@ -274,7 +277,7 @@ private fun FeedsPreviewHomeCanvas(
                 FeedPreviewCanvasPost(
                     community = "r/gaming",
                     age = "5h",
-                    title = "Screenshot Saturday",
+                    title = stringResource(R.string.set_screenshot_saturday),
                     unread = false,
                     nsfw = false,
                 )
@@ -282,14 +285,14 @@ private fun FeedsPreviewHomeCanvas(
                 FeedPreviewCanvasPost(
                     community = "r/android",
                     age = "2h",
-                    title = "A new Android release lands this week",
+                    title = stringResource(R.string.set_a_new_android_release_lands_this_week),
                     unread = showUnreadMarker,
                     nsfw = false,
                 )
                 FeedPreviewCanvasPost(
                     community = "r/space",
                     age = "4h",
-                    title = "NASA shares new images from deep space",
+                    title = stringResource(R.string.set_nasa_shares_new_images_from_deep_space),
                     unread = false,
                     nsfw = false,
                 )
@@ -389,7 +392,7 @@ private fun FeedPreviewSuppressedPost() {
                 ),
             )
             Text(
-                "Hidden posts are removed from the feed.",
+                stringResource(R.string.all_hidden_posts_are_removed_from_the_feed),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

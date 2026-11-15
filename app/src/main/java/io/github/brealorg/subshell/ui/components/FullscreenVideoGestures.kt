@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -120,8 +122,8 @@ internal fun FullscreenVideoGestureLevelOverlay(
                     FullscreenVideoGesture.VOLUME -> if (percent == 0) Symbols.VolumeOff else Symbols.VolumeUp
                 },
                 contentDescription = when (overlay.gesture) {
-                    FullscreenVideoGesture.BRIGHTNESS -> "Brightness"
-                    FullscreenVideoGesture.VOLUME -> "Media volume"
+                    FullscreenVideoGesture.BRIGHTNESS -> stringResource(R.string.all_brightness)
+                    FullscreenVideoGesture.VOLUME -> stringResource(R.string.all_media_volume)
                 },
                 modifier = Modifier.size(30.dp),
             )

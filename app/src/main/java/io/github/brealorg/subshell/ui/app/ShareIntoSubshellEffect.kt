@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,21 +51,21 @@ internal fun ShareIntoSubshellEffect(
         when {
             content == null -> presentShareNotice(
                 noticeHost,
-                title = "Nothing to post",
-                message = "subshell can post links, text and images",
+                title = UiText.Resource(R.string.notice_shareintosub_nothing_to_post),
+                message = UiText.Resource(R.string.notice_shareintosub_subshell_can_post_links_text_and_images),
             )
             !state.activeAccountIsAuthenticated -> presentShareNotice(
                 noticeHost,
-                title = "Sign in to Reddit to post",
-                message = "Connect an account, then share again",
+                title = UiText.Resource(R.string.notice_shareintosub_sign_in_to_reddit_to_post),
+                message = UiText.Resource(R.string.notice_shareintosub_connect_an_account_then_share_again),
             )
             else -> {
                 state.openSharedPostComposer(content)
                 if (content.skippedCount > 0) {
                     presentShareNotice(
                         noticeHost,
-                        title = if (content.skippedCount == 1) "1 item left out" else "${content.skippedCount} items left out",
-                        message = "Only JPEG, PNG, WebP and GIF images, up to 20, can be posted",
+                        title = if (content.skippedCount == 1) UiText.Resource(R.string.notice_shareintosub_1_item_left_out) else UiText.Resource(R.string.notice_shareintosub_items_left_out, content.skippedCount),
+                        message = UiText.Resource(R.string.notice_shareintosub_only_jpeg_png_webp_and_gif_images),
                     )
                 }
             }
@@ -73,7 +76,7 @@ internal fun ShareIntoSubshellEffect(
 
 internal const val ShareIntoSubshellNoticeScope = "share-into-subshell"
 
-private fun presentShareNotice(noticeHost: ViewportErrorHostState, title: String, message: String) {
+private fun presentShareNotice(noticeHost: ViewportErrorHostState, title: UiText, message: UiText) {
     noticeHost.clear(ShareIntoSubshellNoticeScope)
     noticeHost.present(
         scopeKey = ShareIntoSubshellNoticeScope,

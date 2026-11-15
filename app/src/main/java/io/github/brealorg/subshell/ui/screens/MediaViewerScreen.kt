@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.pm.ActivityInfo
 import io.github.brealorg.subshell.media.findActivity
 import androidx.compose.ui.semantics.onClick
@@ -318,7 +320,7 @@ private fun MediaViewerActionButtons(
     val errorHost = LocalViewportErrorHostState.current
     FullscreenChromeAction(
         icon = Symbols.Share,
-        contentDescription = "Share media",
+        contentDescription = stringResource(R.string.scr_share_media),
         busy = state.sharing,
         enabled = !state.busy,
         onClick = {
@@ -338,7 +340,7 @@ private fun MediaViewerActionButtons(
     val saved = state.download is MediaDownloadUiState.Saved
     FullscreenChromeAction(
         icon = if (saved) Symbols.Check else Symbols.Download,
-        contentDescription = if (saved) "Saved" else "Download",
+        contentDescription = if (saved) stringResource(R.string.all_saved) else stringResource(R.string.all_download),
         busy = state.download is MediaDownloadUiState.Saving,
         enabled = !state.busy,
         onClick = {
@@ -440,7 +442,7 @@ fun CommentMediaViewerScreen(
             ) {
                 RemoteImage(
                     uri = uri,
-                    label = "Comment image",
+                    label = stringResource(R.string.scr_comment_image),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Fit,
                     aspectRatio = null,
@@ -452,7 +454,7 @@ fun CommentMediaViewerScreen(
 
         FullscreenMediaTopChrome(
             visible = controlsVisible && !viewerBackInProgress,
-            title = "Comment image",
+            title = stringResource(R.string.scr_comment_image),
             supportingText = null,
             onBack = onBack,
             modifier = Modifier.align(Alignment.TopCenter),
@@ -516,7 +518,7 @@ private fun FullscreenMediaTopChrome(
                 ) {
                     Icon(
                         Symbols.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(R.string.scr_back),
                     )
                 }
                 Column(

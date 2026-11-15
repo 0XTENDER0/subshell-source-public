@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertEquals
@@ -10,7 +11,7 @@ import org.junit.Test
 /** Source-policy checks. These do not replace rendered Compose/UI tests. */
 class Moderation02A3ContentControlsPresentationPolicyTest {
     private fun source(name: String) =
-        File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/$name.kt").readText()
+        File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/$name.kt").readSourceText()
 
     @Test
     fun bothModerationQueuesExposeTheSameControlEntryWithoutReplacingA2Review() {
@@ -34,7 +35,7 @@ class Moderation02A3ContentControlsPresentationPolicyTest {
     @Test
     fun postsAndCommentsCanReopenControlsOutsideTheQueue() {
         val common = source("Common")
-        val post = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/PostScreen.kt").readText()
+        val post = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/PostScreen.kt").readSourceText()
         // ISSUE295_ONE_MODERATE_ENTRY_OPENS_A_SHEET_V1: the ⋮ menus open the
         // moderator sheet, whose "Lock or distinguish…" reopens the controls.
         val sheet = source("ModeratorQuickActions")

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -141,6 +142,6 @@ class Ocb581RefusedLoadComposeTest {
         composeRule.waitForIdle()
 
         assertEquals(listOf("more_m581"), loadMoreRequests)
-        assertEquals("Couldn't find this comment", noticeHost.currentRequest?.presentation?.title)
+        assertEquals("Couldn't find this comment", noticeHost.currentRequest?.presentation?.title?.s)
     }
 }

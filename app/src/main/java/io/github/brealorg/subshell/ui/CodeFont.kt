@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily

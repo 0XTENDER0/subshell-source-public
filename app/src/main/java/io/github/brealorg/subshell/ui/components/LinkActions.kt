@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -224,7 +227,7 @@ internal fun LinkActionsSheet(
         )
         ListItem(
             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-            content = { Text("Share link") },
+            content = { Text(stringResource(R.string.comp_share_link)) },
             leadingContent = { Icon(Symbols.Share, contentDescription = null) },
             modifier = Modifier.clickable {
                 onDismiss()
@@ -233,7 +236,7 @@ internal fun LinkActionsSheet(
         )
         ListItem(
             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-            content = { Text("Copy link") },
+            content = { Text(stringResource(R.string.comp_copy_link)) },
             leadingContent = { Icon(Symbols.ContentCopy, contentDescription = null) },
             modifier = Modifier.clickable {
                 onDismiss()
@@ -242,20 +245,20 @@ internal fun LinkActionsSheet(
         )
         ListItem(
             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-            content = { Text("Open in browser") },
+            content = { Text(stringResource(R.string.comp_open_in_browser)) },
             leadingContent = { Icon(Symbols.OpenInNew, contentDescription = null) },
             modifier = Modifier.clickable {
                 onDismiss()
                 runCatching { uriHandler.openUri(target.link) }.onFailure {
-                    notices.noticeFailure("Couldn't open the link", "No app on this device can open it")
+                    notices.noticeFailure(UiText.Resource(R.string.nt_couldn_t_open_the_link), UiText.Resource(R.string.nt_no_app_on_this_device_can_open))
                 }
             },
         )
         if (target.hasCleanedLink) {
             ListItem(
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                content = { Text("Copy original link") },
-                supportingContent = { Text("As written, with tracking parameters") },
+                content = { Text(stringResource(R.string.comp_copy_original_link)) },
+                supportingContent = { Text(stringResource(R.string.comp_as_written_with_tracking_parameters)) },
                 leadingContent = { Icon(Symbols.Link, contentDescription = null) },
                 modifier = Modifier.clickable {
                     onDismiss()
@@ -274,14 +277,14 @@ internal fun shareLinkAddress(context: Context, link: String, notices: io.github
     runCatching {
         context.startActivity(Intent.createChooser(send, "Share link"))
     }.onFailure {
-        notices.noticeFailure("Couldn't share the link", "No app on this device can share it")
+        notices.noticeFailure(UiText.Resource(R.string.nt_couldn_t_share_the_link), UiText.Resource(R.string.nt_no_app_on_this_device_can_share))
     }
 }
 
 internal fun copyLinkAddress(context: Context, link: String, notices: io.github.brealorg.subshell.ui.error.ViewportErrorHostState?) {
     val clipboard = context.getSystemService(ClipboardManager::class.java)
     if (clipboard == null) {
-        notices.noticeFailure("Couldn't copy the link", "The clipboard is unavailable")
+        notices.noticeFailure(UiText.Resource(R.string.nt_couldn_t_copy_the_link), UiText.Resource(R.string.nt_the_clipboard_is_unavailable))
         return
     }
     clipboard.setPrimaryClip(ClipData.newPlainText("Link", link))

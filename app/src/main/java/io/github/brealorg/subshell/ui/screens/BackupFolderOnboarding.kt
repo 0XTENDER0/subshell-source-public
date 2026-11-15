@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
+import io.github.brealorg.subshell.ui.UiText
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -75,17 +78,15 @@ fun BackupFolderOnboarding(
             repository.dismissFolderOnboarding()
             visible = false
         },
-        title = { Text(failurePresentation?.title ?: "Protect your settings") },
+        title = { Text(failurePresentation?.title?.asString() ?: stringResource(R.string.all_protect_your_settings)) },
         text = {
             if (failurePresentation == null) {
                 Text(
-                    "subshell already keeps automatic settings history on this device. " +
-                        "Choose a folder outside the app so it survives uninstalling or clearing app data. " +
-                        "We recommend creating a folder named subshell Backups in Documents.",
+                    "subshell already keeps automatic settings history on this device. Choose a folder outside the app so it survives uninstalling or clearing app data. We recommend creating a folder named subshell Backups in Documents.",
                 )
             } else {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(failurePresentation.message)
+                    Text(failurePresentation.message.asString())
                     failurePresentation.technicalDetail?.let { Text(it) }
                 }
             }
@@ -101,7 +102,7 @@ fun BackupFolderOnboarding(
                     repository.dismissFolderOnboarding()
                     visible = false
                 },
-            ) { Text("Later") }
+            ) { Text(stringResource(R.string.scr_later)) }
         },
     )
 }

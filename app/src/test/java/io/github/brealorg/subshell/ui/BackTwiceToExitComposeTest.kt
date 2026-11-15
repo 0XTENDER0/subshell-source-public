@@ -67,7 +67,7 @@ class BackTwiceToExitComposeTest {
     }
 
     private fun promptCount(): Int =
-        composeRule.onAllNodesWithText(BackTwiceToExitNotice.title).fetchSemanticsNodes().size
+        composeRule.onAllNodesWithText(BackTwiceToExitNotice.title.s).fetchSemanticsNodes().size
 
     private fun pressBack(dispatcher: OnBackPressedDispatcher) {
         composeRule.runOnUiThread { dispatcher.onBackPressed() }

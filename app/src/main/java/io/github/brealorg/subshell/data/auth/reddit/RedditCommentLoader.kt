@@ -39,6 +39,7 @@ import io.github.brealorg.subshell.data.network.reddit.RedditAccountCommentHisto
 import io.github.brealorg.subshell.data.network.reddit.readRedditAccountRecentComments
 import io.github.brealorg.subshell.data.network.reddit.readRedditCommentResolvedBody
 import io.github.brealorg.subshell.data.network.reddit.findComment
+import io.github.brealorg.subshell.data.network.reddit.rehomedUnderTheirParents
 import io.github.brealorg.subshell.data.network.reddit.mergeMoreChildrenPage
 import io.github.brealorg.subshell.data.network.reddit.mergeExpandedCommentsFromEnd
 import io.github.brealorg.subshell.data.network.reddit.mergeExpandedComments
@@ -50,6 +51,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -76,6 +78,16 @@ internal class RedditCommentLoader(
     AuthenticatedRedditFocusedCommentContinuityLoader {
     private val loadMutex = Mutex()
 
+    /**
+     * ISSUE307_A_LINE_FROM_HALFWAY_DOWN_GOES_UNDER_ITS_PARENT_V1: every read of a
+     * stored thread, the observed one included, is mended: 1.0.2 stored a deep
+     * linked comment's line as a second top comment, and the observed thread
+     * reached the screen unmended (Pixel 11: a duplicate row, the landing failed
+     * when it came first).
+     */
+    private fun storedThread(cacheKey: String): List<Comment> =
+        rehomedUnderTheirParents(cacheStore.allComments(postId = cacheKey))
+
     override suspend fun cached(
         accountStableId: String,
         postId: String,
@@ -86,9 +98,7 @@ internal class RedditCommentLoader(
         }
         try {
             AuthenticatedRedditCommentResult.Loaded(
-                comments = cacheStore.allComments(
-                    postId = live03CommentCacheKey(accountStableId, postId, sort),
-                ),
+                comments = storedThread(live03CommentCacheKey(accountStableId, postId, sort)),
                 fromCache = true,
             )
         } catch (cancelled: CancellationException) {
@@ -104,6 +114,7 @@ internal class RedditCommentLoader(
         sort: RedditCommentSort,
     ): Flow<List<Comment>> =
         cacheStore.observeComments(live03CommentCacheKey(accountStableId, postId, sort))
+            .map(::rehomedUnderTheirParents)
             .flowOn(ioDispatcher)
 
     override suspend fun updateStoredThread(
@@ -208,9 +219,7 @@ internal class RedditCommentLoader(
         context: Int,
     ): AuthenticatedRedditCommentResult = withContext(ioDispatcher) {
             val fullThreadComments = try {
-                cacheStore.allComments(
-                    postId = live03CommentCacheKey(accountStableId, postId, sort),
-                )
+                storedThread(live03CommentCacheKey(accountStableId, postId, sort))
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Exception) {
@@ -322,9 +331,7 @@ internal class RedditCommentLoader(
         val cachedFocusedContext = if (currentFocusedContext.isEmpty()) {
             try {
                 focusedCommentContextForTarget(
-                    comments = cacheStore.allComments(
-                        postId = live03CommentCacheKey(accountStableId, postId, sort),
-                    ),
+                    comments = storedThread(live03CommentCacheKey(accountStableId, postId, sort)),
                     focusedCommentId = targetId,
                 )
             } catch (cancelled: CancellationException) {
@@ -585,9 +592,7 @@ internal class RedditCommentLoader(
             val cacheKey = live03CommentCacheKey(accountStableId, postId, sort)
             val mergeBaseComments = try {
                 redditHydrationMergeBase(currentComments) {
-                    cacheStore.allComments(
-                        postId = cacheKey,
-                    )
+                    storedThread(cacheKey)
                 }
             } catch (cancelled: CancellationException) {
                 throw cancelled
@@ -1015,9 +1020,7 @@ internal class RedditCommentLoader(
             val cacheKey = live03CommentCacheKey(accountStableId, postId, sort)
             val cachedComments = try {
                 redditHydrationMergeBase(currentComments) {
-                    cacheStore.allComments(
-                        postId = cacheKey,
-                    )
+                    storedThread(cacheKey)
                 }
             } catch (cancelled: CancellationException) {
                 throw cancelled

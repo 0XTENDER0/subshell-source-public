@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.auth
 
+import io.github.brealorg.subshell.R
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.data.account.TextPostWriteRequest
 import io.github.brealorg.subshell.data.auth.reddit.AuthenticatedComposerPolicyLoader
 import io.github.brealorg.subshell.data.auth.reddit.AuthenticatedComposerPolicyResult
@@ -56,11 +58,11 @@ internal class CrosspostCreateCoordinator(
         val reviewed = mutableState.value
         if (reviewed.phase != CrosspostReviewPhase.READY || reviewed.revision != reviewedRevision) return
         if (!reviewed.matches(draft) || activeAccountId() != draft.accountStableId || !writeAvailable(draft)) {
-            fail(reviewedRevision, "The draft or account changed. Review the crosspost again")
+            fail(reviewedRevision, UiText.Resource(R.string.xcoord_the_draft_or_account_changed_review_the))
             return
         }
         if (nowMs() - reviewedAtMs !in 0L..60_000L) {
-            fail(reviewedRevision, "The review expired. Check the original post and destination again")
+            fail(reviewedRevision, UiText.Resource(R.string.xcoord_the_review_expired_check_the_original_post))
             return
         }
         // Consume before suspending: double-tap and delayed callbacks cannot reuse the review.
@@ -69,7 +71,7 @@ internal class CrosspostCreateCoordinator(
         val verified = verify(draft, token) ?: return
         if (!stillCurrent(draft, token)) return
         if (verified.request.requestKey != reviewed.request?.requestKey) {
-            fail(token, "Posting details changed. Review the crosspost again")
+            fail(token, UiText.Resource(R.string.xcoord_posting_details_changed_review_the_crosspost_again))
             return
         }
         // CROSSPOST01A1E_ONLY_EXPLICIT_CONFIRM_DISPATCHES_V1
@@ -83,13 +85,13 @@ internal class CrosspostCreateCoordinator(
     private fun stillCurrent(draft: PostComposerDraft, token: Long): Boolean {
         if (revision != token) return false
         if (activeAccountId() != draft.accountStableId || !writeAvailable(draft)) {
-            fail(token, "The active account or publishing state changed. Review again")
+            fail(token, UiText.Resource(R.string.xcoord_the_active_account_or_publishing_state_changed))
             return false
         }
         return true
     }
 
-    private fun fail(token: Long, message: String, policy: ComposerCommunityPolicy? = null) {
+    private fun fail(token: Long, message: UiText, policy: ComposerCommunityPolicy? = null) {
         if (revision != token) return
         mutableState.value = mutableState.value.copy(
             phase = CrosspostReviewPhase.FAILED, request = null, policy = policy, message = message,
@@ -99,7 +101,7 @@ internal class CrosspostCreateCoordinator(
     private suspend fun verify(draft: PostComposerDraft, token: Long): Verified? {
         if (!stillCurrent(draft, token)) return null
         if (!draft.isValidSourceBoundCrosspostDraft()) {
-            fail(token, "The source-bound crosspost draft is invalid")
+            fail(token, UiText.Resource(R.string.xcoord_the_source_bound_crosspost_draft_is_invalid))
             return null
         }
         val account = requireNotNull(draft.accountStableId)
@@ -107,7 +109,7 @@ internal class CrosspostCreateCoordinator(
         val sources = sourceLoader
         val policies = policyLoader
         if (sources == null || policies == null) {
-            fail(token, "Crosspost verification is not configured for this account")
+            fail(token, UiText.Resource(R.string.xcoord_crosspost_verification_is_not_configured_for_this))
             return null
         }
         return try {
@@ -118,11 +120,11 @@ internal class CrosspostCreateCoordinator(
             val evidence = when (sourceResult) {
                 is CrosspostSourceLoadResult.Available -> sourceResult.evidence
                 CrosspostSourceLoadResult.AuthorizationRequired -> {
-                    fail(token, "Reconnect the account to verify the original post")
+                    fail(token, UiText.Resource(R.string.xcoord_reconnect_the_account_to_verify_the_original))
                     return null
                 }
                 CrosspostSourceLoadResult.Unavailable -> {
-                    fail(token, "Reddit did not confirm that the original post is available for crossposting")
+                    fail(token, UiText.Resource(R.string.xcoord_reddit_did_not_confirm_that_the_original))
                     return null
                 }
             }
@@ -134,7 +136,7 @@ internal class CrosspostCreateCoordinator(
             if (!stillCurrent(draft, token)) return null
             val policy = (policyResult as? AuthenticatedComposerPolicyResult.Loaded)?.policy
             if (policy == null) {
-                fail(token, "The destination's posting requirements could not be verified")
+                fail(token, UiText.Resource(R.string.xcoord_the_destination_s_posting_requirements_could_not))
                 return null
             }
             val issue = validateCrosspostComposerDraftIssue(draft, account, true, policy)
@@ -144,14 +146,14 @@ internal class CrosspostCreateCoordinator(
             }
             val request = draft.toCrosspostWriteRequest(account, true, policy)
             if (request == null) {
-                fail(token, "Review the crosspost details before publishing", policy)
+                fail(token, UiText.Resource(R.string.xcoord_review_the_crosspost_details_before_publishing), policy)
                 null
             } else Verified(request, policy)
         } catch (cancelled: CancellationException) {
             if (revision == token) invalidateReview()
             throw cancelled
         } catch (_: Exception) {
-            fail(token, "Crosspost verification failed. Nothing was published")
+            fail(token, UiText.Resource(R.string.xcoord_crosspost_verification_failed_nothing_was_published))
             null
         }
     }

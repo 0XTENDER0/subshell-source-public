@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.util.Log
 import androidx.activity.compose.ReportDrawnWhen
 import androidx.compose.foundation.background
@@ -153,12 +155,12 @@ fun HomeScreen(
         activeRedditFeedState.failureKind == null &&
         !activeRedditFeedState.inProgress
     val activeRedditListingLabel = buildString {
-        append(state.feedSource.label)
+        append(stringResource(state.feedSource.labelRes))
         append(" · ")
-        append(state.feedSort.label)
+        append(stringResource(state.feedSort.labelRes))
         if (state.feedSort.supportsTimePeriod) {
             append(" · ")
-            append(state.listingTimePeriod.label)
+            append(stringResource(state.listingTimePeriod.labelRes))
         }
     }
     LaunchedEffect(
@@ -191,10 +193,7 @@ fun HomeScreen(
                 )
                 uiDebugLog(
                     "subshell-issue17",
-                    "entry-refresh surface=home source=${state.feedSource.name.lowercase()} sort=${state.feedSort.name.lowercase()}" +
-                        " query=${pagingKey.value} " +
-                        "decision=${decision.logToken} " +
-                        "cached=${state.postPagingSnapshot(pagingKey).items.size}",
+                    "entry-refresh surface=home source=${state.feedSource.name.lowercase()} sort=${state.feedSort.name.lowercase()} query=${pagingKey.value} decision=${decision.logToken} cached=${state.postPagingSnapshot(pagingKey).items.size}",
                 )
                 if (decision.execute) {
                     onRefreshRedditFeed(
@@ -298,12 +297,7 @@ fun HomeScreen(
                 .ifBlank { "none" }
             uiDebugLog(
                 "SubshellMute",
-                "phase=projection account=${state.activeAccountId} " +
-                    "source=${state.feedSource.name} " +
-                    "active=${mutedKeys.sorted().joinToString(",")} " +
-                    "input=${visiblePostsWithoutContentFilters.size} " +
-                    "suppressed=${visiblePostsWithoutContentFilters.size - postsAfterCommunityMutes.size} " +
-                    "matches=$matchCounts",
+                "phase=projection account=${state.activeAccountId} source=${state.feedSource.name} active=${mutedKeys.sorted().joinToString(",")} input=${visiblePostsWithoutContentFilters.size} suppressed=${visiblePostsWithoutContentFilters.size - postsAfterCommunityMutes.size} matches=$matchCounts",
             )
         }
     }
@@ -740,14 +734,14 @@ fun HomeScreen(
                     StatusBanner(
                         icon = { Icon(Symbols.CloudOff, contentDescription = null) },
                         title = if (authenticated) {
-                            "Offline · showing the cached Reddit page"
+                            stringResource(R.string.all_offline_showing_the_cached_reddit_page)
                         } else {
-                            "Offline · showing cached local fixtures"
+                            stringResource(R.string.all_offline_showing_cached_local_fixtures)
                         },
                         description = if (authenticated) {
-                            "Showing cached Reddit data. No network request was made."
+                            stringResource(R.string.all_showing_cached_reddit_data_no_network_request)
                         } else {
-                            "Nothing on this screen is presented as live Reddit data."
+                            stringResource(R.string.all_nothing_on_this_screen_is_presented_as)
                         },
                     )
                 }
@@ -805,18 +799,18 @@ fun HomeScreen(
                 FeedPreviewState.LOADING -> items(4, key = { "skeleton-$it" }) { SkeletonPost() }
                 FeedPreviewState.ERROR -> item(key = "error") {
                     EmptyState(
-                        title = "Could not load the feed",
-                        description = "A deterministic error state for retry and spacing checks.",
+                        title = stringResource(R.string.feed_could_not_load_the_feed),
+                        description = stringResource(R.string.feed_a_deterministic_error_state_for_retry_and),
                         action = {
                             Button(onClick = { state.feedPreviewState = FeedPreviewState.CONTENT }) {
                                 Icon(Symbols.Refresh, contentDescription = null)
-                                Text("Retry", modifier = Modifier.padding(start = 8.dp))
+                                Text(stringResource(R.string.feed_retry), modifier = Modifier.padding(start = 8.dp))
                             }
                         },
                     )
                 }
                 FeedPreviewState.EMPTY -> item(key = "empty-preview") {
-                    EmptyState("This feed is empty", "Join a community or choose another feed.")
+                    EmptyState(stringResource(R.string.all_this_feed_is_empty), stringResource(R.string.all_join_a_community_or_choose_another_feed))
                 }
                 else -> {
                     if (filteredSummaryVisible) {
@@ -832,61 +826,60 @@ fun HomeScreen(
                         item(key = "empty-results") {
                             EmptyState(
                                 if (authenticatedLandingPending) {
-                                    "Preparing your feed"
+                                    stringResource(R.string.all_preparing_your_feed)
                                 } else if (authenticatedHomeWithoutSubscriptions) {
-                                    "Your Home feed is empty"
+                                    stringResource(R.string.all_your_home_feed_is_empty)
                                 } else if (nsfwPreferenceHidesAllPosts) {
                                     "NSFW posts are hidden"
                                 } else if (communityMutesHideAllPosts) {
-                                    "Muted communities fill this page"
+                                    stringResource(R.string.all_muted_communities_fill_this_page)
                                 } else if (contentFiltersHideAllPosts) {
-                                    "All posts are filtered"
+                                    stringResource(R.string.all_all_posts_are_filtered)
                                 } else if (state.hideReadPosts && allPosts.any { it.id in state.readPostIds }) {
-                                    "All posts are read"
+                                    stringResource(R.string.all_all_posts_are_read)
                                 } else if (hiddenPostsHideAllPosts) {
-                                    "All posts are hidden"
+                                    stringResource(R.string.all_all_posts_are_hidden)
                                 } else if (authenticated && state.feedSource == FeedSource.SAVED) {
-                                    "Nothing saved yet"
+                                    stringResource(R.string.all_nothing_saved_yet)
                                 } else if (successfulEmptyRedditListing) {
-                                    "Reddit returned no posts"
+                                    stringResource(R.string.all_reddit_returned_no_posts)
                                 } else if (authenticatedRedditFeed && (activeRedditFeedState.inProgress || !storedFeedRead)) {
                                     // LOWUX3_FIRST_LOAD_SAYS_LOADING_V1 (OCB-218): a first page
                                     // on its way read "No cached Reddit posts / reconnect".
-                                    "Loading from Reddit…"
+                                    stringResource(R.string.all_loading_from_reddit)
                                 } else if (authenticated) {
-                                    "No cached Reddit posts"
+                                    stringResource(R.string.all_no_cached_reddit_posts)
                                 } else if (state.feedSource == FeedSource.SAVED) {
-                                    "Nothing saved yet"
+                                    stringResource(R.string.all_nothing_saved_yet)
                                 } else {
-                                    "No local results"
+                                    stringResource(R.string.all_no_local_results)
                                 },
                                 if (authenticatedLandingPending) {
-                                    "Checking your joined communities."
+                                    stringResource(R.string.all_checking_your_joined_communities)
                                 } else if (authenticatedHomeWithoutSubscriptions) {
-                                    "Join a community to build your Home feed, or browse Popular instead."
+                                    stringResource(R.string.all_join_a_community_to_build_your_home)
                                 } else if (nsfwPreferenceHidesAllPosts) {
-                                    "Use the quick switch in the navigation menu to show them."
+                                    stringResource(R.string.all_use_the_quick_switch_in_the_navigation)
                                 } else if (communityMutesHideAllPosts) {
-                                    "Muted posts stay out of mixed feeds until their timer ends."
+                                    stringResource(R.string.all_muted_posts_stay_out_of_mixed_feeds)
                                 } else if (contentFiltersHideAllPosts) {
-                                    "Manage content filters in Settings."
+                                    stringResource(R.string.all_manage_content_filters_in_settings)
                                 } else if (state.hideReadPosts && allPosts.any { it.id in state.readPostIds }) {
-                                    "Show read posts from the Home sort menu."
+                                    stringResource(R.string.all_show_read_posts_from_the_home_sort)
                                 } else if (hiddenPostsHideAllPosts) {
-                                    "Posts you hide stay out of your feeds. Your profile's Hidden tab lists them."
+                                    stringResource(R.string.all_posts_you_hide_stay_out_of_your)
                                 } else if (authenticated && state.feedSource == FeedSource.SAVED) {
-                                    "Save a post and it will appear here."
+                                    stringResource(R.string.all_save_a_post_and_it_will_appear)
                                 } else if (successfulEmptyRedditListing) {
-                                    "$activeRedditListingLabel returned an empty listing. " +
-                                        "Try another sort or time period."
+                                    "$activeRedditListingLabel returned an empty listing. Try another sort or time period."
                                 } else if (authenticatedRedditFeed && (activeRedditFeedState.inProgress || !storedFeedRead)) {
-                                    "The first page is on its way."
+                                    stringResource(R.string.all_the_first_page_is_on_its_way)
                                 } else if (authenticated) {
-                                    "Pull to refresh, or reconnect the account if the session needs attention."
+                                    stringResource(R.string.all_pull_to_refresh_or_reconnect_the_account)
                                 } else if (state.feedSource == FeedSource.SAVED) {
-                                    "Save a post and it will appear here."
+                                    stringResource(R.string.all_save_a_post_and_it_will_appear)
                                 } else {
-                                    "Try another search."
+                                    stringResource(R.string.all_try_another_search)
                                 },
                                 action = if (
                                     authenticatedHomeWithoutSubscriptions
@@ -901,12 +894,12 @@ fun HomeScreen(
                                             Button(
                                                 onClick = onBrowsePopular,
                                             ) {
-                                                Text("Browse Popular")
+                                                Text(stringResource(R.string.feed_browse_popular))
                                             }
                                             TextButton(
                                                 onClick = onFindCommunities,
                                             ) {
-                                                Text("Find communities")
+                                                Text(stringResource(R.string.feed_find_communities))
                                             }
                                         }
                                     }
@@ -1006,28 +999,28 @@ internal fun RedditPagingControl(
                         InlineProgressIndicator()
                         Text(
                             if (state.refreshing) {
-                                "Refreshing from Reddit…"
+                                stringResource(R.string.all_refreshing_from_reddit)
                             } else {
-                                "Loading 25 more…"
+                                stringResource(R.string.all_loading_25_more)
                             },
                         )
                     }
                 }
                 canAppend && !endReached -> {
                     Text(
-                        text = "More posts load automatically as you scroll",
+                        text = stringResource(R.string.feed_more_posts_load_automatically_as_you_scroll),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 !hasPosts && !endReached -> {
                     Button(onClick = onRefresh) {
-                        Text("Refresh from Reddit")
+                        Text(stringResource(R.string.feed_refresh_from_reddit))
                     }
                 }
                 else -> {
                     Text(
-                        text = "No more posts in this listing",
+                        text = stringResource(R.string.feed_no_more_posts_in_this_listing),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }

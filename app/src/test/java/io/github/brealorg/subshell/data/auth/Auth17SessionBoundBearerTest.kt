@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.data.auth
 
+import io.github.brealorg.subshell.harness.readSourceText
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import io.github.brealorg.subshell.data.account.PostVoteRequest
@@ -163,7 +164,7 @@ class Auth17SessionBoundBearerTest {
             // Sign-in steps that run before or inside the account coordinator.
             .filter { file -> file.name !in setOf("RedditAccountIdentityClient.kt", "RedditBootstrapper.kt") }
             // A plain lambda provider; `object : NetworkBearerTokenProvider {` wraps one.
-            .filter { file -> Regex("""(?<!: )NetworkBearerTokenProvider \{""").containsMatchIn(file.readText()) }
+            .filter { file -> Regex("""(?<!: )NetworkBearerTokenProvider \{""").containsMatchIn(file.readSourceText()) }
             .map(File::getName)
 
         assertEquals(emptyList<String>(), plain)

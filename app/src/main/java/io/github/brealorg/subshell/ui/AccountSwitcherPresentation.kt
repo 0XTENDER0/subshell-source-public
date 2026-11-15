@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.data.account.AccountSessionSource
 import io.github.brealorg.subshell.data.account.AccountSessionState
 import io.github.brealorg.subshell.data.account.AccountSessionSummary
@@ -15,10 +17,10 @@ internal enum class AccountConnectAction {
 }
 
 internal data class AccountConnectPresentation(
-    val headline: String,
-    val supporting: String,
+    val headline: UiText,
+    val supporting: UiText,
     val action: AccountConnectAction,
-    val actionLabel: String? = null,
+    val actionLabel: UiText? = null,
 )
 
 internal fun accountSwitcherSessions(
@@ -31,18 +33,18 @@ internal fun accountSwitcherSessions(
 internal fun accountSwitcherSessionLabel(
     account: AccountSessionSummary,
     selected: Boolean,
-): String = when {
+): UiText = when {
     account.state != AccountSessionState.CONNECTED && selected ->
-        "Current account · Sign in again"
+        UiText.Resource(R.string.acct_current_account_sign_in_again)
 
     account.state != AccountSessionState.CONNECTED ->
-        "Sign in again"
+        UiText.Resource(R.string.acct_sign_in_again)
 
     selected ->
-        "Current account"
+        UiText.Resource(R.string.acct_current_account)
 
     else ->
-        "Connected"
+        UiText.Resource(R.string.acct_connected)
 }
 
 internal fun accountConnectPresentation(
@@ -54,14 +56,14 @@ internal fun accountConnectPresentation(
     ConnectAccountPhase.UNAVAILABLE ->
         AccountConnectPresentation(
             headline = if (hasAuthenticatedAccounts) {
-                "Add Reddit account unavailable"
+                UiText.Resource(R.string.acct_add_reddit_account_unavailable)
             } else {
-                "Reddit sign-in unavailable"
+                UiText.Resource(R.string.acct_reddit_sign_in_unavailable)
             },
             supporting = if (hasAuthenticatedAccounts) {
-                "Adding another Reddit account isn't available in this build."
+                UiText.Resource(R.string.acct_adding_another_reddit_account_isn_t_available)
             } else {
-                "Reddit sign-in isn't available in this build."
+                UiText.Resource(R.string.acct_reddit_sign_in_isn_t_available_in)
             },
             action = AccountConnectAction.NONE,
         )
@@ -70,66 +72,66 @@ internal fun accountConnectPresentation(
     ConnectAccountPhase.CONNECTED ->
         AccountConnectPresentation(
             headline = if (hasAuthenticatedAccounts) {
-                "Add Reddit account"
+                UiText.Resource(R.string.acct_add_reddit_account)
             } else {
-                "Connect Reddit account"
+                UiText.Resource(R.string.acct_connect_reddit_account)
             },
             supporting = if (hasAuthenticatedAccounts) {
-                "Sign in with another Reddit account."
+                UiText.Resource(R.string.acct_sign_in_with_another_reddit_account)
             } else {
-                "Sign in to use your Reddit account in subshell."
+                UiText.Resource(R.string.acct_sign_in_to_use_your_reddit_account)
             },
             action = AccountConnectAction.CONNECT,
             actionLabel = if (hasAuthenticatedAccounts) {
-                "Add"
+                UiText.Resource(R.string.acct_add)
             } else {
-                "Connect"
+                UiText.Resource(R.string.acct_connect)
             },
         )
 
     ConnectAccountPhase.LAUNCHING ->
         AccountConnectPresentation(
-            headline = "Opening Reddit sign-in",
-            supporting = "Starting Reddit authorization.",
+            headline = UiText.Resource(R.string.acct_opening_reddit_sign_in),
+            supporting = UiText.Resource(R.string.acct_starting_reddit_authorization),
             action = AccountConnectAction.NONE,
         )
 
     ConnectAccountPhase.AWAITING_CALLBACK ->
         AccountConnectPresentation(
-            headline = "Waiting for Reddit",
+            headline = UiText.Resource(R.string.acct_waiting_for_reddit),
             supporting =
-                "Finish sign-in in your browser, then return to subshell.",
+                UiText.Resource(R.string.acct_finish_sign_in_in_your_browser_then),
             action = AccountConnectAction.CANCEL,
-            actionLabel = "Cancel",
+            actionLabel = UiText.Resource(R.string.acct_cancel),
         )
 
     ConnectAccountPhase.EXCHANGING ->
         AccountConnectPresentation(
-            headline = "Completing sign-in",
-            supporting = "Finishing Reddit sign-in.",
+            headline = UiText.Resource(R.string.acct_completing_sign_in),
+            supporting = UiText.Resource(R.string.acct_finishing_reddit_sign_in),
             action = AccountConnectAction.NONE,
         )
 
     ConnectAccountPhase.RESOLVING_IDENTITY ->
         AccountConnectPresentation(
-            headline = "Loading Reddit account",
-            supporting = "Reading your Reddit account.",
+            headline = UiText.Resource(R.string.acct_loading_reddit_account),
+            supporting = UiText.Resource(R.string.acct_reading_your_reddit_account),
             action = AccountConnectAction.NONE,
         )
 
     ConnectAccountPhase.SYNCING_REDDIT_FEED ->
         AccountConnectPresentation(
-            headline = "Preparing Reddit account",
-            supporting = "Loading the first Reddit feed.",
+            headline = UiText.Resource(R.string.acct_preparing_reddit_account),
+            supporting = UiText.Resource(R.string.acct_loading_the_first_reddit_feed),
             action = AccountConnectAction.NONE,
         )
 
     ConnectAccountPhase.CANCELLED ->
         AccountConnectPresentation(
-            headline = "Reddit sign-in cancelled",
-            supporting = "No account was added.",
+            headline = UiText.Resource(R.string.acct_reddit_sign_in_cancelled),
+            supporting = UiText.Resource(R.string.acct_no_account_was_added),
             action = AccountConnectAction.RESET,
-            actionLabel = "Done",
+            actionLabel = UiText.Resource(R.string.acct_done),
         )
 
     ConnectAccountPhase.ERROR ->
@@ -138,11 +140,11 @@ internal fun accountConnectPresentation(
                 connectAccountState.failureKind ==
                 ConnectAccountFailureKind.REAUTHENTICATION_ACCOUNT_MISMATCH
             ) {
-                "Could not reconnect Reddit account"
+                UiText.Resource(R.string.acct_could_not_reconnect_reddit_account)
             } else if (hasAuthenticatedAccounts) {
-                "Could not add Reddit account"
+                UiText.Resource(R.string.acct_could_not_add_reddit_account)
             } else {
-                "Could not connect Reddit account"
+                UiText.Resource(R.string.acct_could_not_connect_reddit_account)
             },
             supporting =
                 connectAccountFailureLabel(
@@ -154,38 +156,37 @@ internal fun accountConnectPresentation(
                 AccountConnectAction.RESET
             },
             actionLabel = if (connectAccountState.retryable) {
-                "Retry"
+                UiText.Resource(R.string.acct_retry)
             } else {
-                "Dismiss"
+                UiText.Resource(R.string.acct_dismiss)
             },
         )
 }
 
 private fun connectAccountFailureLabel(
     failureKind: ConnectAccountFailureKind?,
-): String = when (failureKind) {
+): UiText = when (failureKind) {
     ConnectAccountFailureKind.CONFIGURATION_REQUIRED ->
-        "OAuth build configuration is incomplete."
+        UiText.Resource(R.string.acct_oauth_build_configuration_is_incomplete)
     ConnectAccountFailureKind.BROWSER_LAUNCH ->
-        "No compatible browser could open the authorization request."
+        UiText.Resource(R.string.acct_no_compatible_browser_could_open_the_authorization)
     ConnectAccountFailureKind.CALLBACK_REJECTED ->
-        "The callback did not match the pending authorization request."
+        UiText.Resource(R.string.acct_the_callback_did_not_match_the_pending)
     ConnectAccountFailureKind.CALLBACK_MISSING ->
-        "The callback could not be recovered. Start sign-in again."
+        UiText.Resource(R.string.acct_the_callback_could_not_be_recovered_start)
     ConnectAccountFailureKind.PROVIDER ->
-        "Reddit returned an authorization error."
+        UiText.Resource(R.string.acct_reddit_returned_an_authorization_error)
     ConnectAccountFailureKind.TOKEN_EXCHANGE ->
-        "The authorization response could not be exchanged."
+        UiText.Resource(R.string.acct_the_authorization_response_could_not_be_exchanged)
     ConnectAccountFailureKind.IDENTITY ->
-        "The authenticated account identity could not be resolved."
+        UiText.Resource(R.string.acct_the_authenticated_account_identity_could_not_be)
     ConnectAccountFailureKind.REDDIT_FEED ->
-        "The first Reddit feed could not be cached."
+        UiText.Resource(R.string.acct_the_first_reddit_feed_could_not_be)
     ConnectAccountFailureKind.ACCOUNT_CONFLICT ->
-        "That Reddit account conflicts with an account already known to subshell."
+        UiText.Resource(R.string.acct_that_reddit_account_conflicts_with_an_account)
     ConnectAccountFailureKind.REAUTHENTICATION_ACCOUNT_MISMATCH ->
-        "Reddit returned a different account than the one being reconnected. " +
-            "Sign in with the account shown in Accounts and try again."
+        UiText.Resource(R.string.acct_reddit_returned_a_different_account_than_the)
     ConnectAccountFailureKind.STORAGE ->
-        "The encrypted account session could not be updated."
-    null -> "The account connection could not be completed."
+        UiText.Resource(R.string.acct_the_encrypted_account_session_could_not_be)
+    null -> UiText.Resource(R.string.acct_the_account_connection_could_not_be_completed)
 }

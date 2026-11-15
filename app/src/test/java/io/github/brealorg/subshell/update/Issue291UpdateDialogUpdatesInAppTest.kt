@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.harness.readSourceText
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -106,7 +107,7 @@ class Issue291UpdateDialogUpdatesInAppTest {
 
     @Test
     fun theAppRoutesThatToSettingsUpdates() {
-        val sheets = java.io.File("src/main/java/io/github/brealorg/subshell/ui/app/AppSheetsHost.kt").readText()
+        val sheets = java.io.File("src/main/java/io/github/brealorg/subshell/ui/app/AppSheetsHost.kt").readSourceText()
         val call = sheets.substringAfter("UpdatePresentationHost(").substringBefore("\n            )\n")
         assertTrue(call.contains("SettingsDestination.UPDATES.name"))
         assertTrue(call.contains("state.openSecondary(SecondaryDestination.SETTINGS)"))

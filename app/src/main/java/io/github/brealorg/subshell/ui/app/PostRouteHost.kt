@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -391,9 +393,9 @@ internal fun PostRouteHost(
             when {
                 homeListDetail -> ExpandedListDetailSurface(
                     scaffoldPadding = padding,
-                    listTitle = "Home",
+                    listTitle = stringResource(R.string.all_home),
                     listSubtitle =
-                        "${state.feedSource.label} · ${state.feedSort.label}",
+                        "${stringResource(state.feedSource.labelRes)} · ${stringResource(state.feedSort.labelRes)}",
                     listContent = { listModifier ->
                         HomeScreen(
                             modifier = listModifier,
@@ -505,7 +507,7 @@ internal fun PostRouteHost(
                     // NEXT01A2_SEARCH_POST_TWO_PANE_V1
                     ExpandedListDetailSurface(
                         scaffoldPadding = padding,
-                        listTitle = "Search",
+                        listTitle = stringResource(R.string.all_search),
                         listSubtitle =
                             "“${searchOrigin.query}”",
                         listContent = { listModifier ->
@@ -619,8 +621,8 @@ internal fun PostRouteHost(
 
                 inboxListDetail -> ExpandedListDetailSurface(
                     scaffoldPadding = padding,
-                    listTitle = "Inbox",
-                    listSubtitle = "Activity, messages & moderation",
+                    listTitle = stringResource(R.string.all_inbox),
+                    listSubtitle = stringResource(R.string.all_activity_messages_moderation),
                     listContent = { listModifier ->
                         InboxScreen(
                             modmailThreadFillsTheScreen = false,

@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -140,7 +142,7 @@ internal fun CommentsSettingsPreview(
             verticalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             Text(
-                "Live preview",
+                stringResource(R.string.all_live_preview),
                 style = MaterialTheme.typography.titleMedium,
             )
 
@@ -261,7 +263,7 @@ private fun PreviewParentComment(
         )
 
         Text(
-            "This is the parent comment body.",
+            stringResource(R.string.all_this_is_the_parent_comment_body),
             modifier = Modifier.padding(start = 30.dp),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface,
@@ -344,7 +346,7 @@ private fun PreviewReplyComment(
 
         AnimatedVisibility(collapsed) {
             Text(
-                "Comment collapsed",
+                stringResource(R.string.all_comment_collapsed),
                 modifier = Modifier.padding(start = 30.dp),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -356,7 +358,7 @@ private fun PreviewReplyComment(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Text(
-                    "This is the reply body.",
+                    stringResource(R.string.all_this_is_the_reply_body),
                     modifier = Modifier.padding(start = 30.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface,

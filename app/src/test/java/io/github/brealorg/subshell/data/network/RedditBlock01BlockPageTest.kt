@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.data.network
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.account.RedditCommentUiFailureKind
 import io.github.brealorg.subshell.data.diagnostics.REDDIT_REFUSAL_API
 import io.github.brealorg.subshell.data.diagnostics.RedditRefusals
@@ -26,6 +30,9 @@ import org.junit.Test
  * /api/morechildren since 2026-10-30) is named in the diagnostic report and in
  * the error text, so it is not mistaken for an ordinary 403.
  */
+// TRANSLATE03: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class RedditBlock01BlockPageTest {
     private val reported = mutableListOf<Triple<String, Int, String?>>()
 
@@ -71,9 +78,9 @@ class RedditBlock01BlockPageTest {
             details = result.failureDetailsOrNull(),
             retryable = true,
             showingCachedContent = cached,
-        ).message
-        assertEquals(REDDIT_BLOCK_PAGE_MESSAGE, message(blocked, cached = false))
-        assertEquals("$REDDIT_BLOCK_PAGE_MESSAGE Saved comments remain visible.", message(blocked, cached = true))
+        ).message.s
+        assertEquals(REDDIT_BLOCK_PAGE_MESSAGE.s, message(blocked, cached = false))
+        assertEquals("${REDDIT_BLOCK_PAGE_MESSAGE.s} Saved comments remain visible.", message(blocked, cached = true))
         assertEquals("Reddit rejected the comments request.", message(ordinary, cached = false))
     }
 

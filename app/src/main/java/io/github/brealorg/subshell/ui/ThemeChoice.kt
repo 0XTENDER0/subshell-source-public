@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.ui.theme.ThemeMode
 
 // ISSUE31_PURE_BLACK_DARK_THEME_V1: the theme pickers offer pure black as a
@@ -11,11 +13,12 @@ internal enum class ThemeChoice(
     val shortLabel: String,
     val mode: ThemeMode,
     val pureBlack: Boolean,
+    @androidx.annotation.StringRes val shortLabelRes: Int,
 ) {
-    SYSTEM("System", "System", ThemeMode.SYSTEM, false),
-    LIGHT("Light", "Light", ThemeMode.LIGHT, false),
-    DARK("Dark", "Dark", ThemeMode.DARK, false),
-    PURE_BLACK("Pure black", "Black", ThemeMode.DARK, true),
+    SYSTEM("System", "System", ThemeMode.SYSTEM, false, io.github.brealorg.subshell.R.string.theme_system),
+    LIGHT("Light", "Light", ThemeMode.LIGHT, false, io.github.brealorg.subshell.R.string.theme_light),
+    DARK("Dark", "Dark", ThemeMode.DARK, false, io.github.brealorg.subshell.R.string.theme_dark),
+    PURE_BLACK("Pure black", "Black", ThemeMode.DARK, true, io.github.brealorg.subshell.R.string.theme_black),
 }
 
 /**

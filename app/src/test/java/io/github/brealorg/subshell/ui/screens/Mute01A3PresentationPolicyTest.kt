@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import io.github.brealorg.subshell.ui.symbols.Symbols
 import java.io.File
@@ -9,7 +10,7 @@ import org.junit.Test
 class Mute01A3PresentationPolicyTest {
     @Test
     fun joinedRowsExposeDedicatedMuteAction() {
-        val source = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/CommunitiesScreen.kt").readText()
+        val source = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/CommunitiesScreen.kt").readSourceText()
         assertTrue(source.contains("state.requestCommunityMuteEditor(community.name)"))
         assertTrue(source.contains("Symbols.VolumeOff"))
         assertTrue(source.contains("Symbols.VolumeUp"))
@@ -18,7 +19,7 @@ class Mute01A3PresentationPolicyTest {
 
     @Test
     fun appRoutesRequestIntoExistingA2Editor() {
-        val source = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/SubshellApp.kt").readText()
+        val source = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/SubshellApp.kt").readSourceText()
         assertTrue(source.contains("state.requestedCommunityMuteEditorName"))
         assertTrue(source.contains("communityMuteEditorName = requestedCommunityName"))
         assertTrue(source.contains("state.clearRequestedCommunityMuteEditor()"))
@@ -26,7 +27,7 @@ class Mute01A3PresentationPolicyTest {
 
     @Test
     fun aboutOnlyReplacesWholePostSection() {
-        val source = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/CommunityScreen.kt").readText()
+        val source = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/CommunityScreen.kt").readSourceText()
         assertTrue(source.contains("val mute01a3HidePosts"))
         assertTrue(source.contains("item(\"muted-community-about-only\")"))
         assertTrue(source.contains("MutedCommunityPostsHiddenCard("))
@@ -35,8 +36,8 @@ class Mute01A3PresentationPolicyTest {
 
     @Test
     fun settingsOwnDedicatedAnimatedPreview() {
-        val settings = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/SettingsScreen.kt").readText()
-        val preview = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/MutedCommunityDirectView.kt").readText()
+        val settings = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/SettingsScreen.kt").readSourceText()
+        val preview = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/MutedCommunityDirectView.kt").readSourceText()
         assertTrue(settings.contains("MutedCommunityDirectViewSetting("))
         assertTrue(preview.contains("When opening a muted community"))
         assertTrue(preview.contains("AnimatedContent("))

@@ -14,14 +14,50 @@ import org.junit.Test
 class ModResponse01A2RemovalResponseDraftTest {
     private val reason = RedditRemovalReason(id = "r1", title = "Rule 1", message = "Please read rule 1.")
 
+    // MODRESPONSE02_PICKING_A_REASON_TURNS_THE_MESSAGE_ON_V1 (successor of
+    // "a selected reason alone never sends")
     @Test
-    fun offByDefaultAndNothingIsSentUntilTheModeratorTurnsItOn() {
+    fun offWithoutAReasonAndOnOnceAReasonWithAMessageIsPicked() {
         val draft = RemovalResponseDraft()
         assertFalse(draft.enabled)
+        draft.prefillFrom(null)
+        assertFalse(draft.enabled)
+        assertNull(draft.toMessageOrNull(null))
+
         draft.prefillFrom(reason)
-        assertEquals("Please read rule 1.", draft.body)
-        assertNull("a selected reason alone never sends", draft.toMessageOrNull(reason))
+        assertTrue("a reason with a message switches the message on", draft.enabled)
+        assertEquals(
+            RedditRemovalMessage(RedditRemovalMessageType.PRIVATE, "Please read rule 1.", "Rule 1"),
+            draft.toMessageOrNull(reason),
+        )
         assertFalse(draft.blocksConfirm)
+
+        draft.prefillFrom(null)
+        assertFalse("No removal reason switches it off again", draft.enabled)
+        draft.prefillFrom(RedditRemovalReason(id = "r3", title = "Spam", message = "  "))
+        assertFalse("a reason without a message leaves it off", draft.enabled)
+    }
+
+    @Test
+    fun theModeratorsOwnChoiceIsNeverMovedByTheReason() {
+        val off = RemovalResponseDraft()
+        off.prefillFrom(reason)
+        off.setEnabledByModerator(false)
+        off.prefillFrom(RedditRemovalReason(id = "r2", title = "Rule 2", message = "Rule 2 text"))
+        assertFalse(off.enabled)
+        assertNull(off.toMessageOrNull(reason))
+
+        val on = RemovalResponseDraft()
+        on.setEnabledByModerator(true)
+        on.prefillFrom(reason)
+        on.prefillFrom(null)
+        assertTrue(on.enabled)
+
+        val written = RemovalResponseDraft()
+        written.prefillFrom(reason)
+        written.edit("My own words")
+        written.prefillFrom(null)
+        assertTrue("a written message stays on", written.enabled)
     }
 
     @Test
@@ -43,7 +79,7 @@ class ModResponse01A2RemovalResponseDraftTest {
     @Test
     fun enabledDraftBuildsTheMessageWithTheReasonTitleAndDefaultsToPrivate() {
         val draft = RemovalResponseDraft()
-        draft.enabled = true
+        draft.setEnabledByModerator(true)
         assertEquals(RedditRemovalMessageType.PRIVATE, draft.type)
         assertTrue("empty body blocks confirm", draft.blocksConfirm)
         assertNull(draft.toMessageOrNull(reason))

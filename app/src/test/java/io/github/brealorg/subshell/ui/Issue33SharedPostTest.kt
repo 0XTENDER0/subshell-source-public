@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.data.account.AccountSessionSource
 import io.github.brealorg.subshell.data.account.AccountSessionState
 import io.github.brealorg.subshell.data.account.AccountSessionSummary
@@ -100,7 +101,7 @@ class Issue33SharedPostTest {
 
     @Test
     fun theShareTargetShipsDisabledWithSendFilters() {
-        val manifest = File(repositoryRoot(), "app/src/main/AndroidManifest.xml").readText()
+        val manifest = File(repositoryRoot(), "app/src/main/AndroidManifest.xml").readSourceText()
         val alias = manifest.substringAfter("android:name=\"io.github.brealorg.subshell.ShareIntoSubshell\"")
             .substringBefore("</activity-alias>")
         assertTrue(alias.contains("android:enabled=\"false\""))

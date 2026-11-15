@@ -132,7 +132,7 @@ class SettingsAudit01Test {
         val request = requireNotNull(host.currentRequest)
         assertEquals(SETTINGS_REVIEW_NUDGE_SCOPE, request.scopeKey)
         assertEquals(TrayTone.INFO, request.tone)
-        assertEquals("Open Settings", request.presentation.primaryAction?.label)
+        assertEquals("Open Settings", request.presentation.primaryAction?.label?.s)
         composeRule.runOnIdle { requireNotNull(request.onRetry).invoke() }
         composeRule.waitForIdle()
 

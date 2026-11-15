@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextOverflow
@@ -229,13 +231,13 @@ internal fun ThreadFindBar(
                 )
             }
             IconButton(onClick = onPrevious) {
-                Icon(Symbols.KeyboardArrowUp, contentDescription = "Previous match")
+                Icon(Symbols.KeyboardArrowUp, contentDescription = stringResource(R.string.scr_previous_match))
             }
             IconButton(onClick = onNext) {
-                Icon(Symbols.KeyboardArrowDown, contentDescription = "Next match")
+                Icon(Symbols.KeyboardArrowDown, contentDescription = stringResource(R.string.scr_next_match))
             }
             IconButton(onClick = onClose) {
-                Icon(Symbols.Close, contentDescription = "Close find")
+                Icon(Symbols.Close, contentDescription = stringResource(R.string.scr_close_find))
             }
         }
         Row(

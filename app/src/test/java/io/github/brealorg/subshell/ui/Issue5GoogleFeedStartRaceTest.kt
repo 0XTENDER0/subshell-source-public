@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.data.SampleData
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
@@ -281,8 +282,8 @@ class Issue5GoogleFeedStartRaceTest {
 
     @Test
     fun productionFeedEffectDispatchesLiveAuthorityAndRetainedPauseIsOwnerScoped() {
-        val media = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/VideoPlayer.kt").readText()
-        val state = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/SubshellState.kt").readText()
+        val media = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/VideoPlayer.kt").readSourceText()
+        val state = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/SubshellState.kt").readSourceText()
         val effect = media.substringAfter("val requestFeedRoute = state.currentNavigationRoute")
             .substringBefore("// Feed visibility transitions are not surface lifetime transitions.")
         val feed = effect.substringAfter("if (feedPausePresentation) {")

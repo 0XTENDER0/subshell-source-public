@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -110,7 +113,7 @@ internal fun ModeratorMenuItem(
     val community = resolved.communityName ?: return
     if (!entries.canModerate(community)) return
     DropdownMenuItem(
-        text = { Text("Moderate…") },
+        text = { Text(stringResource(R.string.comp_moderate)) },
         leadingIcon = { Icon(Symbols.AdminPanelSettings, contentDescription = null) },
         onClick = {
             onDismissMenu()
@@ -139,21 +142,21 @@ internal fun ModeratorActionsSheet(
 ) {
     val isPost = target.fullname.startsWith("t3_")
     ItemActionsSheet(
-        title = (if (isPost) "Moderate post" else "Moderate comment") +
+        title = (if (isPost) stringResource(R.string.all_moderate_post) else stringResource(R.string.all_moderate_comment)) +
             (target.communityName?.let { " · r/$it" } ?: ""),
         groups = listOf(
             listOf(
-                SheetAction("Approve", Symbols.CheckCircle) { onModerate(RedditModeratorAction.APPROVE) },
-                SheetAction("Remove…", Symbols.Block) { onRemove() },
-                SheetAction("Spam", Symbols.Report) { onModerate(RedditModeratorAction.SPAM) },
+                SheetAction(stringResource(R.string.all_approve), Symbols.CheckCircle) { onModerate(RedditModeratorAction.APPROVE) },
+                SheetAction(stringResource(R.string.all_remove), Symbols.Block) { onRemove() },
+                SheetAction(stringResource(R.string.all_spam), Symbols.Report) { onModerate(RedditModeratorAction.SPAM) },
             ),
             listOfNotNull(
                 // ISSUE295_MODERATOR_SETS_POST_FLAIR_V1: flair, NSFW and spoiler.
                 onChangeFlair?.takeIf { isPost }?.let { change ->
-                    SheetAction("Change flair…", Symbols.Label) { change() }
+                    SheetAction(stringResource(R.string.all_change_flair), Symbols.Label) { change() }
                 },
-                SheetAction("Lock or distinguish…", Symbols.AdminPanelSettings) { onOpenContentControls() },
-                SheetAction("Reports…", Symbols.FactCheck) { onOpenReports() },
+                SheetAction(stringResource(R.string.all_lock_or_distinguish), Symbols.AdminPanelSettings) { onOpenContentControls() },
+                SheetAction(stringResource(R.string.all_reports), Symbols.FactCheck) { onOpenReports() },
             ),
         ),
         onDismiss = onDismiss,
@@ -314,9 +317,9 @@ internal fun ModeratorQuickActionsHost(
                     scopeKey = MODERATOR_ACTION_NOTICE_SCOPE,
                     presentation = ErrorPresentation(
                         kind = ErrorPresentationKind.DEGRADED,
-                        title = "Moderator action failed",
-                        message = moderatorActionFailureMessage(actionState),
-                        primaryAction = ErrorAction(ErrorActionKind.RETRY, "Retry").takeIf { retryable },
+                        title = UiText.Resource(R.string.ep_moderator_action_failed),
+                        message = UiText.Plain(moderatorActionFailureMessage(actionState)),
+                        primaryAction = ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.ep_retry)).takeIf { retryable },
                     ),
                     failureDetails = actionState.failureDetails,
                     onRetry = if (retryable) onRetry else null,
@@ -328,18 +331,17 @@ internal fun ModeratorQuickActionsHost(
     if (ours && actionState.phase == RedditModeratorActionPhase.AUTHORIZATION_REQUIRED) {
         AlertDialog(
             onDismissRequest = { quickActions.awaiting = null },
-            title = { Text("Allow moderation") },
+            title = { Text(stringResource(R.string.comp_allow_moderation)) },
             text = {
                 Text(
-                    "Reddit needs you to allow subshell to moderate for this account. " +
-                        "The action is sent once you have allowed it.",
+                    stringResource(R.string.all2_reddit_needs_you_to_allow_subshell_to),
                 )
             },
             confirmButton = {
-                TextButton(onClick = onAuthorize) { Text("Allow") }
+                TextButton(onClick = onAuthorize) { Text(stringResource(R.string.comp_allow)) }
             },
             dismissButton = {
-                TextButton(onClick = { quickActions.awaiting = null }) { Text("Cancel") }
+                TextButton(onClick = { quickActions.awaiting = null }) { Text(stringResource(R.string.comp_cancel)) }
             },
         )
     }
@@ -370,7 +372,7 @@ internal fun ModeratorQueueItemActions(
         ) {
             ModeratorActionIcon(Symbols.Check)
             Spacer(Modifier.width(6.dp))
-            Text("Approve")
+            Text(stringResource(R.string.comp_approve))
         }
         TextButton(
             modifier = Modifier.heightIn(min = 48.dp),
@@ -379,11 +381,11 @@ internal fun ModeratorQueueItemActions(
         ) {
             ModeratorActionIcon(Symbols.Block)
             Spacer(Modifier.width(6.dp))
-            Text("Remove")
+            Text(stringResource(R.string.comp_remove))
         }
         Spacer(Modifier.weight(1f))
         IconButton(onClick = { entries.openSheet(target, null) }) {
-            Icon(Symbols.MoreVert, contentDescription = "More moderator actions")
+            Icon(Symbols.MoreVert, contentDescription = stringResource(R.string.comp_more_moderator_actions))
         }
     }
 }

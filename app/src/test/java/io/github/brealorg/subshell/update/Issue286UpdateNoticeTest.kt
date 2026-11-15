@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -100,7 +101,7 @@ class Issue286UpdateNoticeTest {
         }
         composeRule.waitForIdle()
         assertEquals(UPDATE_AVAILABLE_NOTICE_SCOPE, host.currentRequest?.scopeKey)
-        assertEquals("subshell ${next.versionName} is ready", host.currentRequest?.presentation?.title)
+        assertEquals("subshell ${next.versionName} is ready", host.currentRequest?.presentation?.title?.s)
 
         host.dismissCurrent()
         assertEquals(next.versionCode, store.updateNoticeDismissedVersionCode())

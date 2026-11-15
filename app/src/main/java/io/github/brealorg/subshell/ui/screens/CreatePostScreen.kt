@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,7 +39,7 @@ internal fun TextPostWriteStatus(
     onReconcile: () -> Unit = {},
     onCancelAuthorization: () -> Unit,
     onDismiss: () -> Unit,
-    sendingMessage: String = "Posting to Reddit…",
+    sendingMessage: String = stringResource(R.string.all_posting_to_reddit),
 ) {
     if (!authenticated) return
     if (
@@ -93,16 +95,16 @@ internal fun TextPostWriteStatus(
                         enabled = grantEnabled,
                         onClick = onGrantAccess,
                     ) {
-                        Text("Grant post access")
+                        Text(stringResource(R.string.sw_grant_post_access))
                     }
                     TextButton(onClick = onDismiss) {
-                        Text("Not now")
+                        Text(stringResource(R.string.sw_not_now))
                     }
                 }
                 TextPostWritePhase.AUTHORIZING,
                 TextPostWritePhase.AWAITING_CALLBACK,
                 -> TextButton(onClick = onCancelAuthorization) {
-                    Text("Cancel authorization")
+                    Text(stringResource(R.string.sw_cancel_authorization))
                 }
                 // LOWUI4_UNREACHABLE_FAILED_ROW_REMOVED_V1 (OCB-202): FAILED and
                 // OUTCOME_UNKNOWN are shown by the ErrorNotice above (or not at

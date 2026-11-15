@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,13 +28,9 @@ internal const val REDDIT_ACCESS_REFUSED_SCOPE = "reddit-access-refused"
 
 internal fun redditAccessRefusedPresentation(): ErrorPresentation = ErrorPresentation(
     kind = ErrorPresentationKind.DEGRADED,
-    title = "Reddit has shut out this app's Client ID",
-    message = "Reddit refuses the Client ID subshell signs in with, so nothing new loads. " +
-        "This happens when Reddit stops accepting a Client ID, as it does from January 2027 for apps " +
-        "it hasn't registered. What's stored on this device stays readable: feeds, threads you've opened " +
-        "and your inbox. Your sign-in is kept. If you have another Client ID, set it under " +
-        "Settings › Reddit connection. Try again asks Reddit once more.",
-    primaryAction = ErrorAction(ErrorActionKind.RETRY, "Try again"),
+    title = UiText.Resource(R.string.notice_redditaccess_reddit_has_shut_out_this_app_s),
+    message = UiText.Resource(R.string.notice_redditaccess_reddit_refuses_the_client_id_subshell_signs),
+    primaryAction = ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.notice_redditaccess_try_again)),
 )
 
 @Composable

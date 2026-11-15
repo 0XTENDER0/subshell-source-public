@@ -49,8 +49,15 @@ internal class MessageReplyCoordinator(
         val normalized = runCatching { request.normalizedMessageReplyRequest() }
             .getOrNull()
         if (normalized == null) {
+            // ISSUE306_A_REFUSED_SEND_IS_SHOWN_IN_ITS_CONVERSATION_V1 (#306): without
+            // the account and item, the conversation's scoped state fell back to
+            // empty and the refused send showed nothing (a HEIC attachment: Send
+            // did nothing). The raw ids are kept (blank ones stay null).
             _messageReplyUiState.value = MessageReplyUiState(
                 phase = MessageReplyPhase.FAILED,
+                accountStableId = request.accountStableId.trim().takeIf(String::isNotEmpty),
+                inboxItemId = request.inboxItemId.trim().takeIf(String::isNotEmpty),
+                parentFullname = request.parentFullname.trim().takeIf(String::isNotEmpty),
                 failureKind = MessageReplyFailureKind.VALIDATION,
                 message = messageReplyFailureMessage(MessageReplyFailureKind.VALIDATION),
             )
@@ -149,6 +156,35 @@ internal class MessageReplyCoordinator(
                             sentMatrixMediaId = result.sentMatrixMediaId,
                             sentMatrixEventId = result.sentMatrixEventId,
                             completedAtEpochSeconds = System.currentTimeMillis() / 1_000L,
+                            completionRevision = current.completionRevision + 1L,
+                        )
+                        loadRedditInbox(normalized.accountStableId, true)
+                    } else if (
+                        phase == MessageReplyPhase.OUTCOME_UNKNOWN &&
+                        normalized.media != null &&
+                        !result.sentMatrixMediaId.isNullOrBlank()
+                    ) {
+                        // ISSUE303_AN_UNKNOWN_IMAGE_SEND_KEEPS_ITS_MEDIA_ID_V1: an image
+                        // whose send answer was unclear is read back the same way: Send
+                        // stays blocked, the inbox is reloaded, and the conversation
+                        // clears the warning once Reddit lists an image with this media
+                        // id. The text was not sent (it goes after the image), so it
+                        // stays in the composer.
+                        _messageReplyUiState.value = current.copy(
+                            phase = phase,
+                            failureKind = result.kind,
+                            message = messageReplyFailureMessage(result.kind),
+                            retryable = false,
+                            failureDetails = messageReplyFailureDetails(result),
+                            sentText = null,
+                            sentDraftText = normalized.text,
+                            sentHadMedia = true,
+                            sentMediaUri = result.sentMediaUri,
+                            optimisticMediaUri = current.optimisticMediaUri,
+                            optimisticMediaMimeType = current.optimisticMediaMimeType,
+                            sentMatrixMediaId = result.sentMatrixMediaId,
+                            sentMatrixEventId = null,
+                            completedAtEpochSeconds = dispatchedAtEpochSeconds,
                             completionRevision = current.completionRevision + 1L,
                         )
                         loadRedditInbox(normalized.accountStableId, true)

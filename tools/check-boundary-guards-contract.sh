@@ -323,7 +323,10 @@ pass COMMENT_COMPOSER_KEEPS_PASTED_IMAGES
 # From messages02c3/c5r2: an image or GIF pasted from the keyboard into a
 # conversation reaches the same attachment path as the picker; the editor
 # takes it through a content receiver no JVM test can drive.
-grep -Fq 'onMediaReceived = ::requestMedia,' "$M/ui/screens/ConversationScreen.kt" &&
+# ISSUE306_A_PASTED_IMAGE_IS_KEPT_IN_THE_APP_V1: the same path, with the pasted
+# image copied into the app first (COMPOSER16), is the successor spelling.
+{ grep -Fq 'onMediaReceived = ::requestMedia,' "$M/ui/screens/ConversationScreen.kt" ||
+  grep -Fq 'onMediaReceived = { pasted -> requestMedia(pastedImageKeptInApp(pasteContext, pasted)) },' "$M/ui/screens/ConversationScreen.kt"; } &&
 grep -Fq '.contentReceiver(receiveContentListener)' "$M/ui/components/PostStyleComposerEditor.kt" ||
     fail CONVERSATION_COMPOSER_TAKES_PASTED_MEDIA
 pass CONVERSATION_COMPOSER_TAKES_PASTED_MEDIA

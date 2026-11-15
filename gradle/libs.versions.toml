@@ -21,7 +21,7 @@ workManager = "2.12.0"
 # #267 (owner, 2026-10-31): Google's widget toolkit for the Inbox and Posts widgets.
 glance = "1.2.0"
 room = "2.8.5"
-ksp = "2.3.13"
+ksp = "2.3.14"
 okhttp = "5.5.1"
 kotlinxSerialization = "1.13.0"
 kotlinxCoroutines = "1.11.0"
@@ -32,7 +32,7 @@ uiautomator = "2.4.1"
 profileinstaller = "1.4.1"
 leakcanary = "2.14"
 # Robolectric: the newest release at fetch time; bump if resolution says it does not exist.
-robolectric = "4.17"
+robolectric = "4.18"
 
 [libraries]
 androidx-biometric = { module = "androidx.biometric:biometric", version = "1.1.0" }

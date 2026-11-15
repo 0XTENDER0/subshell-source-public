@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.share.copySharedImage
 import android.content.Context
 import android.content.Intent
@@ -54,22 +56,21 @@ fun ComposerMediaReplacementDialog(
     AlertDialog(
         onDismissRequest = onKeepExisting,
         title = {
-            Text("Replace existing ${currentMedia.kind.label.lowercase()}?")
+            Text(stringResource(R.string.comp_replace_existing, currentMedia.kind.label.lowercase()))
         },
         text = {
             Text(
-                "For now, this draft supports one inline image or GIF. " +
-                    "Replace it with the new ${replacementMedia.kind.label.lowercase()}?",
+                "For now, this draft supports one inline image or GIF. Replace it with the new ${replacementMedia.kind.label.lowercase()}?",
             )
         },
         confirmButton = {
             TextButton(onClick = onReplace) {
-                Text("Replace")
+                Text(stringResource(R.string.comp_replace))
             }
         },
         dismissButton = {
             TextButton(onClick = onKeepExisting) {
-                Text("Keep existing")
+                Text(stringResource(R.string.comp_keep_existing))
             }
         },
     )
@@ -168,7 +169,7 @@ internal fun ComposerInlineMedia(
                 IconButton(onClick = onRemove) {
                     Icon(
                         Symbols.Delete,
-                        contentDescription = "Remove inline media",
+                        contentDescription = stringResource(R.string.sw_remove_inline_media),
                     )
                 }
             }

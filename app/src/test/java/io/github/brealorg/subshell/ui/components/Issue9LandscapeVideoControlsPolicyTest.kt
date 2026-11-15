@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 
@@ -38,10 +39,10 @@ class Issue9LandscapeVideoControlsPolicyTest {
     fun settingsUsesSingleIntegratedMediaPreviewForLandscapeGestures() {
         val settingsScreen = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/SettingsScreen.kt",
-        ).readText()
+        ).readSourceText()
         val mediaPreview = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/Settings03MediaPreview.kt",
-        ).readText()
+        ).readSourceText()
 
         assertFalse(settingsScreen.contains("media-landscape-gesture-preview"))
         assertFalse(settingsScreen.contains("Landscape gesture preview"))

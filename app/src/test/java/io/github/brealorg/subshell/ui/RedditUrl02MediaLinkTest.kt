@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import io.github.brealorg.subshell.model.PostKind
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -11,6 +14,9 @@ import org.junit.Test
  * REDDITURL02: links to Reddit's media hosts open in the media viewer.
  * Every example URL here is made up.
  */
+// TRANSLATE07: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class RedditUrl02MediaLinkTest {
     @Test
     fun iReddItStillImagesAndGifsAreImageTargets() {
@@ -102,7 +108,7 @@ class RedditUrl02MediaLinkTest {
             authenticated = true,
         )
 
-        assertEquals("Open image", plan.directAction?.title)
-        assertEquals("i.redd.it", plan.directAction?.subtitle)
+        assertEquals("Open image", plan.directAction?.title?.s)
+        assertEquals("i.redd.it", plan.directAction?.subtitle?.s)
     }
 }

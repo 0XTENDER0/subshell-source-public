@@ -159,9 +159,19 @@ class PrivateCache01SealedRowsTest {
         stores.remove(older)
 
         val cache = store(realSeal(1))
-        // The start-up sweep runs on the store's own thread, ahead of anything asked of it.
+        // Plain rows still read while the sweep has not reached them.
         cache.inbox(page)
 
+        // The start-up sweep is timed and runs only while no other cache call is queued
+        // (PRIVATECACHE05), so a read can go first: wait for it instead of assuming it ran.
+        // A full run caught the old assumption twice (2026-11-14, 2026-11-15).
+        val deadline = System.nanoTime() + 10_000_000_000L
+        while (
+            payloads("cached_inbox").any { !it.startsWith(CachePayloadSeal.SEALED_PREFIX) } &&
+            System.nanoTime() < deadline
+        ) {
+            Thread.sleep(20)
+        }
         payloads("cached_inbox").forEach { assertTrue(it.startsWith(CachePayloadSeal.SEALED_PREFIX)) }
     }
 }

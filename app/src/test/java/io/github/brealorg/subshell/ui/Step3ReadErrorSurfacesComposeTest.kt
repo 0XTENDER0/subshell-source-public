@@ -144,7 +144,7 @@ class Step3ReadErrorSurfacesComposeTest {
         val request = requireNotNull(host.currentRequest)
 
         assertTrue(request.scopeKey, request.scopeKey.startsWith("home-feed:"))
-        assertEquals("Couldn't refresh the feed", request.presentation.title)
+        assertEquals("Couldn't refresh the feed", request.presentation.title.s)
         assertEquals(details, request.failureDetails)
         assertEquals(0, shownInTheScreen("Couldn't refresh the feed"))
 
@@ -158,7 +158,7 @@ class Step3ReadErrorSurfacesComposeTest {
         showHome(RepositoryLoadOperation.APPEND)
         val request = requireNotNull(host.currentRequest)
 
-        assertEquals("Couldn't load more posts", request.presentation.title)
+        assertEquals("Couldn't load more posts", request.presentation.title.s)
         assertEquals(0, shownInTheScreen("Couldn't load more posts"))
 
         calls.clear()
@@ -173,6 +173,6 @@ class Step3ReadErrorSurfacesComposeTest {
 
         assertTrue(request.scopeKey, request.scopeKey.startsWith("community-feed:${alice.stableId}:$communityName:"))
         assertEquals(details, request.failureDetails)
-        assertEquals(0, shownInTheScreen(request.presentation.title))
+        assertEquals(0, shownInTheScreen(request.presentation.title.s))
     }
 }

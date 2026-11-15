@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.os.Build
 import io.github.brealorg.subshell.ui.error.TrayTone
 import io.github.brealorg.subshell.ui.error.ViewportErrorHostState
@@ -10,13 +12,19 @@ import io.github.brealorg.subshell.ui.error.presentNotice
 // a confirmation uses the neutral tone (owner decision).
 internal const val USER_NOTICE_SCOPE = "user-notice"
 
-internal fun ViewportErrorHostState?.noticeFailure(title: String, message: String) {
+internal fun ViewportErrorHostState?.noticeFailure(title: String, message: String) =
+    noticeFailure(UiText.Plain(title), UiText.Plain(message))
+
+internal fun ViewportErrorHostState?.noticeFailure(title: UiText, message: UiText) {
     this?.presentNotice(USER_NOTICE_SCOPE, title, message, TrayTone.ERROR)
 }
 
 // ISSUE238_CONFIRMATIONS_DISMISS_THEMSELVES_V1 (#238, owner): a confirmation
 // ("Muted r/x") leaves the tray by itself; a failure stays until closed.
-internal fun ViewportErrorHostState?.noticeInfo(title: String, message: String) {
+internal fun ViewportErrorHostState?.noticeInfo(title: String, message: String) =
+    noticeInfo(UiText.Plain(title), UiText.Plain(message))
+
+internal fun ViewportErrorHostState?.noticeInfo(title: UiText, message: UiText) {
     this?.presentNotice(USER_NOTICE_SCOPE, title, message, TrayTone.INFO, dismissesItself = true)
 }
 
@@ -26,6 +34,6 @@ internal fun ViewportErrorHostState?.noticeInfo(title: String, message: String) 
  */
 internal fun ViewportErrorHostState?.noticeCopied(what: String, sdkInt: Int = Build.VERSION.SDK_INT) {
     if (sdkInt < Build.VERSION_CODES.TIRAMISU) {
-        noticeInfo("$what copied", "It's on the clipboard")
+        noticeInfo(UiText.Resource(R.string.nt_copied, what), UiText.Resource(R.string.nt_it_s_on_the_clipboard))
     }
 }

@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -96,15 +98,15 @@ fun ContentFiltersScreen(
             title = {
                 Text(
                     when {
-                        activeFiltersVisible -> "Active filters"
-                        selectedType != null -> selectedType?.label.orEmpty()
-                        else -> "Content filters"
+                        activeFiltersVisible -> stringResource(R.string.all_active_filters)
+                        selectedType != null -> selectedType?.let { stringResource(it.labelRes) }.orEmpty()
+                        else -> stringResource(R.string.all_content_filters)
                     },
                 )
             },
             navigationIcon = {
                 IconButton(onClick = ::navigateUp) {
-                    Icon(Symbols.ArrowBack, contentDescription = "Back")
+                    Icon(Symbols.ArrowBack, contentDescription = stringResource(R.string.scr_back))
                 }
             },
             scrollBehavior = routeTopBarScroll,
@@ -181,8 +183,7 @@ private fun ContentFilterOverview(
                         )
                         Text(
                             // LOWUX3_FILTER_OVERVIEW_NAMES_EVERY_PLACE_V1 (OCB-191)
-                            "Matching posts are hidden from your feeds, community pages and search on this device. " +
-                                "Nothing is changed on Reddit.",
+                            stringResource(R.string.all2_matching_posts_are_hidden_from_your_feeds),
                             style = MaterialTheme.typography.bodyMedium,
                             color = if (hasActiveFilters) {
                                 MaterialTheme.colorScheme.onPrimaryContainer
@@ -195,7 +196,7 @@ private fun ContentFilterOverview(
                         Spacer(Modifier.width(10.dp))
                         Icon(
                             Symbols.ArrowForward,
-                            contentDescription = "Show all active filters",
+                            contentDescription = stringResource(R.string.scr_show_all_active_filters),
                         )
                     }
                 }
@@ -204,7 +205,7 @@ private fun ContentFilterOverview(
 
         item("filter-by") {
             Text(
-                "Filter by",
+                stringResource(R.string.all_filter_by),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(top = 10.dp, bottom = 4.dp),
             )
@@ -231,8 +232,8 @@ private fun ContentFilterTypeRow(
 ) {
     // M3225_SETTINGS_ROWS_ARE_LIST_ITEMS_V1
     SettingsListItem(
-        title = type.label,
-        description = type.description,
+        title = stringResource(type.labelRes),
+        description = stringResource(type.descriptionRes),
         modifier = Modifier
             .settingsRowBleed()
             .clickable(onClick = onClick),
@@ -267,7 +268,7 @@ private fun ActiveFiltersContent(
     ) {
         item("active-explanation") {
             Text(
-                "Every local filter currently hiding posts from your feeds.",
+                stringResource(R.string.all_every_local_filter_currently_hiding_posts_from),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 3.dp),
@@ -282,9 +283,9 @@ private fun ActiveFiltersContent(
                     color = MaterialTheme.colorScheme.surfaceContainerLow,
                 ) {
                     Column(Modifier.padding(14.dp)) {
-                        Text("No active filters", style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(R.string.scr_no_active_filters), style = MaterialTheme.typography.titleMedium)
                         Text(
-                            "Nothing is currently being hidden by a content filter.",
+                            stringResource(R.string.all_nothing_is_currently_being_hidden_by_a),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -297,7 +298,7 @@ private fun ActiveFiltersContent(
             val entries = filterEntryViews(filters, type)
             item("active-title-${type.name}") {
                 Text(
-                    "${type.label} · ${entries.size}",
+                    "${stringResource(type.labelRes)} · ${entries.size}",
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
                 )
@@ -347,15 +348,15 @@ private fun ContentFilterEditor(
                 onValueChange = { value -> onDraftChange(contentFilterInputWithoutControlCharacters(value)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                label = { Text("Add ${type.singularLabel}") },
-                placeholder = { Text(type.placeholder) },
+                label = { Text(stringResource(R.string.scr_add, stringResource(type.singularLabelRes))) },
+                placeholder = { Text(stringResource(type.placeholderRes)) },
                 isError = draftError == ContentFilterDraftError.VALUE,
                 supportingText = {
                     Text(
                         if (draftError == ContentFilterDraftError.VALUE) {
                             contentFilterValueError(type)
                         } else {
-                            type.description
+                            stringResource(type.descriptionRes)
                         },
                     )
                 },
@@ -364,7 +365,7 @@ private fun ContentFilterEditor(
                         enabled = draft.isNotBlank() && draftError == null,
                         onClick = ::addDraft,
                     ) {
-                        Icon(Symbols.Add, contentDescription = "Add filter")
+                        Icon(Symbols.Add, contentDescription = stringResource(R.string.scr_add_filter))
                     }
                 },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -380,7 +381,7 @@ private fun ContentFilterEditor(
                     onValueChange = { value -> onDraftCommunityChange(contentFilterInputWithoutControlCharacters(value)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    label = { Text("Only in community (optional)") },
+                    label = { Text(stringResource(R.string.scr_only_in_community_optional)) },
                     placeholder = { Text("e.g. r/movies") },
                     isError = draftError == ContentFilterDraftError.COMMUNITY,
                     supportingText = {
@@ -388,7 +389,7 @@ private fun ContentFilterEditor(
                             if (draftError == ContentFilterDraftError.COMMUNITY) {
                                 COMMUNITY_NAME_ERROR
                             } else {
-                                "Leave empty to filter everywhere"
+                                stringResource(R.string.all_leave_empty_to_filter_everywhere)
                             },
                         )
                     },
@@ -401,9 +402,9 @@ private fun ContentFilterEditor(
         item("list-title") {
             Text(
                 if (entries.isEmpty()) {
-                    "No ${type.label.lowercase()} filtered"
+                    "No ${stringResource(type.labelRes).lowercase()} filtered"
                 } else {
-                    "${type.label} · ${entries.size}"
+                    "${stringResource(type.labelRes)} · ${entries.size}"
                 },
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
@@ -429,13 +430,13 @@ private fun ContentFilterEntryRow(
 ) {
     SettingsListItem(
         title = entry.value,
-        description = entry.community?.let { community -> "Only in r/$community" },
+        description = entry.community?.let { community -> stringResource(R.string.all_only_in_r, community) },
         modifier = Modifier.settingsRowBleed(),
         trailing = {
             IconButton(onClick = onRemove) {
                 Icon(
                     Symbols.Delete,
-                    contentDescription = "Remove ${entry.label}",
+                    contentDescription = stringResource(R.string.scr_remove, entry.label),
                 )
             }
         },

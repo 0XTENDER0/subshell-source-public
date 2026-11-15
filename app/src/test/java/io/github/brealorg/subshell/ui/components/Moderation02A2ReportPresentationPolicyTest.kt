@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import io.github.brealorg.subshell.ui.symbols.Symbols
 import java.io.File
@@ -7,7 +8,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class Moderation02A2ReportPresentationPolicyTest {
-    private fun source(name: String) = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$name").readText()
+    private fun source(name: String) = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$name").readSourceText()
 
     /** SubshellApp plus the hosts it was split into (ui/app/). */
     private fun appSource(): String =
@@ -17,7 +18,7 @@ class Moderation02A2ReportPresentationPolicyTest {
                 .orEmpty()
                 .filter { it.name.endsWith(".kt") }
                 .sortedBy { it.name }
-                .joinToString("") { it.readText() }
+                .joinToString("") { it.readSourceText() }
     @Test fun oneRootDialogOutlivesBothQueueRowsAndSupportsLookup() {
         assertTrue(appSource().contains("ModeratorReportsDialog("))
         assertTrue(source("ui/screens/InboxScreen.kt").contains("ModeratorReportLookupButton()"))

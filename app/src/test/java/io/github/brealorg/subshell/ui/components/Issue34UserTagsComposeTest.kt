@@ -103,8 +103,9 @@ class Issue34UserTagsComposeTest {
 
         composeRule.onNodeWithContentDescription("Post actions").performClick()
         // ISSUE295_MENU_OFFERS_ONLY_WHAT_THE_CARD_DOES_NOT_V1: the Large card opens the
-        // author itself, so "About u/alice" is not in its menu; Copy link always is.
-        composeRule.onNodeWithText("Copy link").assertIsDisplayed()
+        // author itself, so "About u/alice" is not in its menu; Copy… always is
+        // (ISSUE300_ONE_COPY_ENTRY_OPENS_A_SHEET_V1).
+        composeRule.onNodeWithText("Copy…").assertIsDisplayed()
         composeRule.onNodeWithText("Private note on u/alice").assertDoesNotExist()
         assertFalse(state.canTagUser("alice"))
     }

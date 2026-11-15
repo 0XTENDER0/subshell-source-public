@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
@@ -52,7 +54,7 @@ fun ComposerDiscardAction(
         modifier = modifier,
         colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
     ) {
-        Text("Discard")
+        Text(stringResource(R.string.comp_discard))
     }
 }
 
@@ -77,15 +79,15 @@ fun ComposerDiscardChangesDialog(
 ) {
     AlertDialog(
         onDismissRequest = onKeepEditing,
-        title = { Text("Discard changes?") },
-        text = { Text("Your edits to this $subject will be lost.") },
+        title = { Text(stringResource(R.string.comp_discard_changes)) },
+        text = { Text(stringResource(R.string.comp_your_edits_to_this_will_be_lost, subject)) },
         confirmButton = {
             TextButton(onClick = onDiscard) {
-                Text("Discard", color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.comp_discard), color = MaterialTheme.colorScheme.error)
             }
         },
         dismissButton = {
-            TextButton(onClick = onKeepEditing) { Text("Keep editing") }
+            TextButton(onClick = onKeepEditing) { Text(stringResource(R.string.comp_keep_editing)) }
         },
     )
 }

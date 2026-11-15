@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.HorizontalDivider
 import android.content.ClipData
@@ -211,7 +213,7 @@ fun MarkdownText(
                                 .fillMaxWidth()
                                 .clip(spoilerShape)
                                 .clickable(
-                                    onClickLabel = if (revealed) "Hide spoiler" else "Reveal spoiler",
+                                    onClickLabel = if (revealed) stringResource(R.string.all_hide_spoiler) else stringResource(R.string.all_reveal_spoiler),
                                     role = Role.Button,
                                 ) { revealed = !revealed }
                                 .semantics { stateDescription = if (revealed) "Revealed" else "Hidden" },
@@ -225,7 +227,7 @@ fun MarkdownText(
                                     text = if (revealed) {
                                         markdownAnnotatedString(block.text, linkColor, codeBackground, codeFontFamily, onLinkClick = onLinkClick, cleanLinks = cleanLinks)
                                     } else {
-                                        AnnotatedString("Spoiler · tap to reveal")
+                                        AnnotatedString(stringResource(R.string.all_spoiler_tap_to_reveal))
                                     },
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
                                     style = MaterialTheme.typography.bodyMedium,
@@ -346,7 +348,7 @@ private fun MarkdownCodeBlock(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = block.language?.replaceFirstChar(Char::uppercase) ?: "Code",
+                    text = block.language?.replaceFirstChar(Char::uppercase) ?: stringResource(R.string.all_code),
                     modifier = Modifier.padding(top = 12.dp),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -357,7 +359,7 @@ private fun MarkdownCodeBlock(
                             .setPrimaryClip(ClipData.newPlainText("Code", block.code))
                     },
                 ) {
-                    Text("Copy")
+                    Text(stringResource(R.string.comp_copy))
                 }
             }
             Row(

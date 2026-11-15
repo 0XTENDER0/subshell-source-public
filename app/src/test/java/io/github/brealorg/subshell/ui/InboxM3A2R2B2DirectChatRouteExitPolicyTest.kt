@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertFalse
@@ -27,8 +28,8 @@ class InboxM3A2R2B2DirectChatRouteExitPolicyTest {
             .listFiles { file -> file.extension == "kt" }
             .orEmpty()
             .sortedBy { file -> file.name }
-            .joinToString("") { file -> file.readText() }
-        val source = sourceFile.readText() + extracted
+            .joinToString("") { file -> file.readSourceText() }
+        val source = sourceFile.readSourceText() + extracted
 
         val marker =
             "SUBSHELL_INBOXM3A2R2B2_EXPLICIT_DIRECT_CHAT_ROUTE_EXIT_STOP_V1"

@@ -179,7 +179,7 @@ internal fun <T> SettingsSegmentedChoice(
     description: String?,
     options: List<T>,
     selected: T,
-    label: (T) -> String,
+    label: @androidx.compose.runtime.Composable (T) -> String,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
@@ -206,7 +206,7 @@ internal fun <T> SettingsSegmentedChoice(
 internal fun <T> SegmentedChoiceRow(
     options: List<T>,
     selected: T,
-    label: (T) -> String,
+    label: @androidx.compose.runtime.Composable (T) -> String,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,

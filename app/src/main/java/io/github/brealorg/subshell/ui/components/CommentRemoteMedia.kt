@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
@@ -100,10 +102,10 @@ private fun RemoteCommentMediaPreview(
     when (media.kind) {
         RemoteCommentMediaKind.IMAGE -> RemoteImage(
             uri = media.uri,
-            label = "Comment image",
+            label = stringResource(R.string.comp_comment_image),
             modifier = baseModifier.combinedClickable(
-                onClickLabel = "Open comment image fullscreen",
-                onLongClickLabel = "Media actions",
+                onClickLabel = stringResource(R.string.comp_open_comment_image_fullscreen),
+                onLongClickLabel = stringResource(R.string.all_media_actions),
                 onLongClick = onLongClick,
                 onClick = onImageClick,
             ),
@@ -112,9 +114,9 @@ private fun RemoteCommentMediaPreview(
         )
         RemoteCommentMediaKind.GIF -> RemoteGifMedia(
             uri = media.uri,
-            label = "Comment GIF",
+            label = stringResource(R.string.comp_comment_gif),
             playing = true,
-            modifier = baseModifier.longPressOnly(label = "Media actions", onLongPress = onLongClick),
+            modifier = baseModifier.longPressOnly(label = stringResource(R.string.comp_media_actions), onLongPress = onLongClick),
             contentScale = ContentScale.Fit,
             adaptToSourceAspectRatio = true,
         )

@@ -18,6 +18,9 @@ data class AccountConnectEntryPoints(
         onComplete(false)
     },
     val onReconnectAccount: (String) -> Unit = {},
+    // ISSUE303B_CHAT_SIGN_IN_AGAIN_REAUTHENTICATES_A_SIGNED_IN_ACCOUNT_V1:
+    // Direct Chat's "Sign in again" for an account that still reads as signed in.
+    val onWebSignInAgain: (String) -> Unit = {},
     val onlineVisibilityRuntime: io.github.brealorg.subshell.ui.components.OnlineVisibilityRuntime =
         io.github.brealorg.subshell.ui.components.OnlineVisibilityRuntime(),
     val connectAccountState: ConnectAccountUiState = ConnectAccountUiState.unavailable(),

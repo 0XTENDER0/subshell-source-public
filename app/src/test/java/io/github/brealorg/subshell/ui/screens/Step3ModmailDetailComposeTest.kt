@@ -199,6 +199,23 @@ class Step3ModmailDetailComposeTest {
         composeRule.onNode(hasClickAction() and hasAnyDescendant(hasText("Other question"))).assertIsNotSelected()
     }
 
+    // ISSUE304_A_FAILED_ACTION_SAYS_WHICH_V1 (#304): a refused reply showed in
+    // the two-pane list worded as a load failure; it shows in the thread.
+    @Test
+    @Config(sdk = [36], qualifiers = "en-w1280dp-h800dp")
+    fun aRefusedReplyShowsInTheThreadNotAsAListLoadFailure() {
+        twoPane(
+            modmailState().copy(
+                failureKind = io.github.brealorg.subshell.data.account.RedditModmailUiFailureKind.HTTP,
+                failedAction = io.github.brealorg.subshell.data.account.RedditModmailFailedAction.SEND,
+                failureHttpStatusCode = 503,
+            ),
+        )
+
+        assertEquals(1, composeRule.onAllNodes(hasText("Couldn’t send the reply")).fetchSemanticsNodes().size)
+        assertEquals(0, composeRule.onAllNodes(hasText("Reddit returned HTTP 503 while loading Modmail.")).fetchSemanticsNodes().size)
+    }
+
     // STEP3 (next01a3d): the two-pane detail says what to do before a
     // conversation is chosen and while it loads.
     private fun twoPane(modmail: RedditModmailUiState) {

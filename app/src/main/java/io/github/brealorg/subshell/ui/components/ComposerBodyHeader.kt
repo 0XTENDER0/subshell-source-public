@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,7 +43,7 @@ fun ComposerBodyHeader(
         Text(title, style = MaterialTheme.typography.titleMedium)
         if (required) {
             Text(
-                "Required",
+                stringResource(R.string.all_required),
                 modifier = Modifier.padding(start = 8.dp),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
@@ -64,7 +66,7 @@ fun ComposerBodyHeader(
                     modifier = Modifier.size(18.dp),
                 )
                 Spacer(Modifier.width(6.dp))
-                Text(if (previewVisible) "Edit" else "Preview")
+                Text(if (previewVisible) stringResource(R.string.all_edit) else stringResource(R.string.all_preview))
             }
         }
     }

@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.data.error
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.account.CommentDeleteFailureKind
 import io.github.brealorg.subshell.data.account.CommentDeletePhase
 import io.github.brealorg.subshell.data.account.CommentDeleteUiState
@@ -43,6 +47,9 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// TRANSLATE03: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Error01a4RedditWriteErrorPolicyTest {
     @Test
     fun commentTransportFailureKeepsNetworkCauseAndRetry() {
@@ -61,7 +68,7 @@ class Error01a4RedditWriteErrorPolicyTest {
             ),
         )
 
-        assertEquals("Couldn't post comment", presentation.title)
+        assertEquals("Couldn't post comment", presentation.title.s)
         assertEquals("Network: Timeout", presentation.technicalDetail)
         assertEquals(ErrorActionKind.RETRY, presentation.primaryAction?.kind)
     }
@@ -109,12 +116,12 @@ class Error01a4RedditWriteErrorPolicyTest {
             ),
         )
 
-        assertEquals("Comment may have been posted", presentation.title)
-        assertTrue(presentation.message.contains("Check the thread"))
+        assertEquals("Comment may have been posted", presentation.title.s)
+        assertTrue(presentation.message.s.contains("Check the thread"))
         // COMPOSER01_COMMENT_OUTCOME_READ_BACK_V1: the predecessor offered no
         // action because Retry re-sent the comment; the coordinator now reads
         // the thread back instead of sending the same comment twice.
-        assertEquals("Check again", presentation.primaryAction?.label)
+        assertEquals("Check again", presentation.primaryAction?.label?.s)
     }
 
     @Test
@@ -132,9 +139,9 @@ class Error01a4RedditWriteErrorPolicyTest {
             ),
         )
 
-        assertEquals("Post may have been published", presentation.title)
-        assertEquals("Check again", presentation.primaryAction?.label)
-        assertTrue(presentation.message.contains("Check your profile"))
+        assertEquals("Post may have been published", presentation.title.s)
+        assertEquals("Check again", presentation.primaryAction?.label?.s)
+        assertTrue(presentation.message.s.contains("Check your profile"))
     }
 
     @Test
@@ -178,8 +185,8 @@ class Error01a4RedditWriteErrorPolicyTest {
             ),
         )
 
-        assertEquals("Comment deletion not confirmed", presentation.title)
-        assertTrue(presentation.message.contains("Check the thread"))
+        assertEquals("Comment deletion not confirmed", presentation.title.s)
+        assertTrue(presentation.message.s.contains("Check the thread"))
         assertNull(presentation.primaryAction)
     }
 
@@ -196,8 +203,8 @@ class Error01a4RedditWriteErrorPolicyTest {
             ),
         )
 
-        assertEquals("Membership change not confirmed", presentation.title)
-        assertEquals(NOT_CONFIRMED_MEMBERSHIP_MESSAGE, presentation.message)
+        assertEquals("Membership change not confirmed", presentation.title.s)
+        assertEquals(NOT_CONFIRMED_MEMBERSHIP_MESSAGE, presentation.message.s)
         assertNull(presentation.primaryAction)
     }
 
@@ -214,7 +221,7 @@ class Error01a4RedditWriteErrorPolicyTest {
             ),
         )
 
-        assertEquals(NOT_CHECKED_MEMBERSHIP_MESSAGE, presentation.message)
+        assertEquals(NOT_CHECKED_MEMBERSHIP_MESSAGE, presentation.message.s)
         assertNull(presentation.primaryAction)
     }
 
@@ -237,7 +244,7 @@ class Error01a4RedditWriteErrorPolicyTest {
             ),
         )
 
-        assertFalse(presentation.message.contains("HTTP 429"))
+        assertFalse(presentation.message.s.contains("HTTP 429"))
         assertEquals("HTTP 429 · Retry after 12 s", presentation.technicalDetail)
         assertEquals(ErrorActionKind.RETRY, presentation.primaryAction?.kind)
     }
@@ -256,9 +263,9 @@ class Error01a4RedditWriteErrorPolicyTest {
             ),
         )
 
-        assertEquals("Feed creation not confirmed", presentation.title)
+        assertEquals("Feed creation not confirmed", presentation.title.s)
         assertNull(presentation.primaryAction)
-        assertTrue(presentation.message.contains("checking your feeds"))
+        assertTrue(presentation.message.s.contains("checking your feeds"))
     }
 
     @Test

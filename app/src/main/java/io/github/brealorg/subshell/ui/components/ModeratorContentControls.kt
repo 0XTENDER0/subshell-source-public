@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.ui.error.ReportFailureDiagnostic
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -116,9 +118,9 @@ internal fun ModeratorContentControlsDialog(
 
     // M3225_FORM_DIALOGS_ARE_FULL_SCREEN_ON_PHONES_V1
     AdaptiveFullScreenDialog(
-        title = "Moderation controls",
+        title = stringResource(R.string.comp_moderation_controls),
         onDismissRequest = onDismiss,
-        closeLabel = "Close moderation controls",
+        closeLabel = stringResource(R.string.all_close_moderation_controls),
         actions = {
             IconButton(
                 onClick = onRefresh,
@@ -126,7 +128,7 @@ internal fun ModeratorContentControlsDialog(
             ) {
                 Icon(
                     Symbols.Refresh,
-                    contentDescription = "Refresh moderation controls",
+                    contentDescription = stringResource(R.string.comp_refresh_moderation_controls),
                 )
             }
         },
@@ -149,7 +151,7 @@ internal fun ModeratorContentControlsDialog(
                     ) {
                         InlineProgressIndicator()
                         Spacer(Modifier.width(10.dp))
-                        Text("Checking current Reddit state…")
+                        Text(stringResource(R.string.comp_checking_current_reddit_state))
                     }
                 }
 
@@ -161,14 +163,14 @@ internal fun ModeratorContentControlsDialog(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         Text(
-                            "Conversation",
+                            stringResource(R.string.all_conversation),
                             style = MaterialTheme.typography.titleSmall,
                         )
                         ModeratorControlStateBadge(
                             label = when (item.contentState.locked) {
-                                true -> "Locked"
-                                false -> "Unlocked"
-                                null -> "Lock state unavailable"
+                                true -> stringResource(R.string.all_locked)
+                                false -> stringResource(R.string.all_unlocked)
+                                null -> stringResource(R.string.all_lock_state_unavailable)
                             },
                             known = item.contentState.locked != null,
                             iconLocked = item.contentState.locked == true,
@@ -192,15 +194,15 @@ internal fun ModeratorContentControlsDialog(
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 if (item.contentState.locked == true) {
-                                    "Unlock"
+                                    stringResource(R.string.all_unlock)
                                 } else {
-                                    "Lock"
+                                    stringResource(R.string.all_lock)
                                 },
                             )
                         }
 
                         Text(
-                            "Moderator identity",
+                            stringResource(R.string.all_moderator_identity),
                             style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier.padding(top = 4.dp),
                         )
@@ -224,9 +226,9 @@ internal fun ModeratorContentControlsDialog(
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 if (item.contentState.distinguished == true) {
-                                    "Undistinguish"
+                                    stringResource(R.string.all_undistinguish)
                                 } else {
-                                    "Distinguish as moderator"
+                                    stringResource(R.string.all_distinguish_as_moderator)
                                 },
                             )
                         }
@@ -237,7 +239,7 @@ internal fun ModeratorContentControlsDialog(
                             )
                         ) {
                             Text(
-                                "Only content authored by the active moderator can be distinguished here.",
+                                stringResource(R.string.all_only_content_authored_by_the_active_moderator),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -247,7 +249,7 @@ internal fun ModeratorContentControlsDialog(
 
                 else -> {
                     Text(
-                        "The exact target is not available. Refresh or reopen the item before changing moderator controls.",
+                        stringResource(R.string.all_the_exact_target_is_not_available_refresh),
                         modifier = Modifier.padding(horizontal = 20.dp),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -288,15 +290,15 @@ internal fun ModeratorContentControlsDialog(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Text(
-                            "Moderator authorization required",
+                            stringResource(R.string.all_moderator_authorization_required),
                             style = MaterialTheme.typography.titleSmall,
                         )
                         Text(
-                            "Authorize modposts, then refresh this target and confirm the action again.",
+                            stringResource(R.string.all_authorize_modposts_then_refresh_this_target_and),
                             style = MaterialTheme.typography.bodySmall,
                         )
                         TextButton(onClick = onAuthorize) {
-                            Text("Authorize")
+                            Text(stringResource(R.string.comp_authorize))
                         }
                     }
                 }
@@ -378,7 +380,7 @@ internal fun ModeratorContentControlsDialog(
             },
             dismissButton = {
                 TextButton(onClick = { pending = null }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.comp_cancel))
                 }
             },
         )
@@ -500,9 +502,9 @@ private fun ModeratorDistinguishStateBadge(
     distinguished: Boolean?,
 ) {
     val label = when (distinguished) {
-        true -> "Distinguished as moderator"
-        false -> "Not distinguished"
-        null -> "Distinguish state unavailable"
+        true -> stringResource(R.string.all_distinguished_as_moderator)
+        false -> stringResource(R.string.all_not_distinguished)
+        null -> stringResource(R.string.all_distinguish_state_unavailable)
     }
     Surface(
         shape = MaterialTheme.shapes.medium,

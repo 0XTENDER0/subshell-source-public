@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -72,6 +74,7 @@ internal fun ConversationRouteHost(
     expandedWindowLayout: Boolean,
     inboxPrimaryTabState: MutableState<InboxPrimaryTab>,
     inboxModSectionState: MutableState<InboxModSection>,
+    onWebSignInAgain: (String) -> Unit = {},
 ) {
     var inboxPrimaryTab by inboxPrimaryTabState
     var inboxModSection by inboxModSectionState
@@ -365,6 +368,9 @@ internal fun ConversationRouteHost(
                 onReconnectInbox = {
                     onAuthorizeRedditInbox(state.activeAccountId)
                 },
+                onSignInAgain = {
+                    onWebSignInAgain(state.activeAccountId)
+                },
                 onAuthorizeMediaReply = onAuthorizeCommentWrite,
                 interactionActionsAtStart =
                     state.interactionSide.composerActionsAtStart(),
@@ -386,8 +392,8 @@ internal fun ConversationRouteHost(
         // A11Y01A4_INBOX_CONVERSATION_TWO_PANE_V1
         ExpandedListDetailSurface(
             scaffoldPadding = padding,
-            listTitle = "Inbox",
-            listSubtitle = "Activity, messages & moderation",
+            listTitle = stringResource(R.string.all_inbox),
+            listSubtitle = stringResource(R.string.all_activity_messages_moderation),
             listContent = { listModifier ->
                 InboxScreen(
                     modmailThreadFillsTheScreen = false,

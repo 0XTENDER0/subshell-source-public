@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -128,7 +129,7 @@ class Issue124InboxTargetOpenComposeTest {
 
         answer(null)
 
-        assertEquals("Couldn't open this post", noticeHost.currentRequest?.presentation?.title)
+        assertEquals("Couldn't open this post", noticeHost.currentRequest?.presentation?.title?.s)
     }
 
     @Test

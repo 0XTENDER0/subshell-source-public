@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -78,22 +80,10 @@ internal fun sharePostLink(context: Context, post: Post, notices: ViewportErrorH
         putExtra(Intent.EXTRA_TEXT, url)
     }
     runCatching {
-        context.startActivity(Intent.createChooser(send, "Share post"))
+        context.startActivity(Intent.createChooser(send, context.getString(R.string.sysact_share_post)))
     }.onFailure {
-        notices.noticeFailure("Couldn't share this post", "No app on this device can share it")
+        notices.noticeFailure(UiText.Resource(R.string.sysact_couldn_t_share_this_post), UiText.Resource(R.string.sysact_no_app_on_this_device_can_share))
     }
-}
-
-internal fun copyPostLink(context: Context, post: Post, notices: ViewportErrorHostState?) {
-    val clipboard = context.getSystemService(ClipboardManager::class.java)
-    if (clipboard == null) {
-        notices.noticeFailure("Couldn't copy the link", "The clipboard is unavailable")
-        return
-    }
-    clipboard.setPrimaryClip(
-        ClipData.newPlainText("Reddit post link", canonicalRedditPostUrl(post)),
-    )
-    notices.noticeCopied("Link")
 }
 
 internal fun shareCommentLink(context: Context, post: Post, commentId: String, notices: ViewportErrorHostState?) {
@@ -103,9 +93,9 @@ internal fun shareCommentLink(context: Context, post: Post, commentId: String, n
         putExtra(Intent.EXTRA_TEXT, canonicalRedditCommentUrl(post, commentId))
     }
     runCatching {
-        context.startActivity(Intent.createChooser(send, "Share comment"))
+        context.startActivity(Intent.createChooser(send, context.getString(R.string.sysact_share_comment)))
     }.onFailure {
-        notices.noticeFailure("Couldn't share this comment", "No app on this device can share it")
+        notices.noticeFailure(UiText.Resource(R.string.sysact_couldn_t_share_this_comment), UiText.Resource(R.string.sysact_no_app_on_this_device_can_share))
     }
 }
 
@@ -128,9 +118,9 @@ internal fun shareCustomFeedLink(context: Context, feed: CustomFeedSummary, noti
         putExtra(Intent.EXTRA_TEXT, url)
     }
     runCatching {
-        context.startActivity(Intent.createChooser(send, "Share feed"))
+        context.startActivity(Intent.createChooser(send, context.getString(R.string.sysact_share_feed)))
     }.onFailure {
-        notices.noticeFailure("Couldn't share this feed", "No app on this device can share it")
+        notices.noticeFailure(UiText.Resource(R.string.sysact_couldn_t_share_this_feed), UiText.Resource(R.string.sysact_no_app_on_this_device_can_share))
     }
 }
 
@@ -138,7 +128,7 @@ internal fun copyCustomFeedLink(context: Context, feed: CustomFeedSummary, notic
     val url = canonicalRedditCustomFeedUrl(feed) ?: return
     val clipboard = context.getSystemService(ClipboardManager::class.java)
     if (clipboard == null) {
-        notices.noticeFailure("Couldn't copy the link", "The clipboard is unavailable")
+        notices.noticeFailure(UiText.Resource(R.string.sysact_couldn_t_copy_the_link), UiText.Resource(R.string.sysact_the_clipboard_is_unavailable))
         return
     }
     clipboard.setPrimaryClip(ClipData.newPlainText("Reddit custom feed link", url))

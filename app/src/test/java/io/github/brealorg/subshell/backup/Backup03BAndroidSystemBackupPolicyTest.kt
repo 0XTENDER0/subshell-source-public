@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.backup
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertEquals
@@ -22,7 +23,7 @@ class Backup03BAndroidSystemBackupPolicyTest {
 
     @Test
     fun manifestDisablesPlatformBackupButKeepsExplicitRuleResources() {
-        val manifest = repository("app/src/main/AndroidManifest.xml").readText()
+        val manifest = repository("app/src/main/AndroidManifest.xml").readSourceText()
 
         assertTrue(manifest.contains("""android:allowBackup="false""""))
         assertFalse(manifest.contains("""android:allowBackup="true""""))
@@ -32,7 +33,7 @@ class Backup03BAndroidSystemBackupPolicyTest {
 
     @Test
     fun legacyAutoBackupDeniesEverySupportedDomainRoot() {
-        val rules = repository("app/src/main/res/xml/backup_rules.xml").readText()
+        val rules = repository("app/src/main/res/xml/backup_rules.xml").readSourceText()
 
         assertTrue(rules.contains("BACKUP03B_ANDROID_SYSTEM_BACKUP_DENY_ALL_V1"))
         assertFalse(rules.contains("<include "))
@@ -52,7 +53,7 @@ class Backup03BAndroidSystemBackupPolicyTest {
 
     @Test
     fun android12PlusCloudAndDeviceTransferEachDenyEveryDomainRoot() {
-        val rules = repository("app/src/main/res/xml/data_extraction_rules.xml").readText()
+        val rules = repository("app/src/main/res/xml/data_extraction_rules.xml").readSourceText()
         val cloud = section(rules, "cloud-backup")
         val transfer = section(rules, "device-transfer")
 
@@ -75,9 +76,9 @@ class Backup03BAndroidSystemBackupPolicyTest {
 
     @Test
     fun portabilityPolicyClosesBackup03bAndAllowsSuccessorSchemaEvolution() {
-        val policy = repository("docs/backup/subshell-backup03-portability-policy-v1.md").readText()
+        val policy = repository("docs/backup/subshell-backup03-portability-policy-v1.md").readSourceText()
         val backupModel =
-            repository("app/src/main/java/${SUBSHELL_PACKAGE_DIR}/backup/SettingsBackup.kt").readText()
+            repository("app/src/main/java/${SUBSHELL_PACKAGE_DIR}/backup/SettingsBackup.kt").readSourceText()
 
         assertTrue(policy.contains("BACKUP03B_ANDROID_SYSTEM_BACKUP_DENY_ALL_V1"))
         assertTrue(policy.contains("SYSTEM_BACKUP_STATUS=RESOLVED_BACKUP03B"))

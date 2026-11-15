@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.language
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.model.Post
 import io.github.brealorg.subshell.model.PostKind
 import io.github.brealorg.subshell.ui.SubshellSettings
@@ -15,6 +19,9 @@ import org.junit.Before
 import org.junit.Test
 
 /** #293: hide communities and search results the device is sure are in a left-out language. ISSUE293_LANGUAGE_FILTER_V1. */
+// TRANSLATE15: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue293LanguageFilterTest {
     private val norwegian = "Et sted for mennesker som vil diskutere aksjer og fond i Norge"
     private val english = "A place for people who want to talk about stocks and funds"
@@ -79,8 +86,8 @@ class Issue293LanguageFilterTest {
         assertEquals("Only a name", communityLanguageText("Only a name", null))
         assertEquals("Title", postLanguageText(" Title ", ""))
         assertEquals("Title. " + "b".repeat(300), postLanguageText("Title", "b".repeat(400)))
-        assertEquals("3 results hidden by language", io.github.brealorg.subshell.ui.components.languageHiddenSummaryText(3, false))
-        assertEquals("Showing 1 result in other languages", io.github.brealorg.subshell.ui.components.languageHiddenSummaryText(1, true))
+        assertEquals("3 results hidden by language", io.github.brealorg.subshell.ui.components.languageHiddenSummaryText(3, false).s)
+        assertEquals("Showing 1 result in other languages", io.github.brealorg.subshell.ui.components.languageHiddenSummaryText(1, true).s)
     }
 
     @Test

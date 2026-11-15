@@ -327,8 +327,8 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
         onResult: (Boolean) -> Unit,
     ) {
         requestDeviceUnlock(
-            title = "Unlock hidden subscriptions",
-            subtitle = "Confirm your device unlock to reveal hidden community names",
+            title = this@MainActivity.getString(R.string.biometric_unlock_hidden_title),
+            subtitle = this@MainActivity.getString(R.string.biometric_unlock_hidden_subtitle),
             onResult = onResult,
         )
     }
@@ -358,8 +358,8 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
             return
         }
         requestDeviceUnlock(
-            title = "Unlock subshell",
-            subtitle = "Confirm your device unlock to open subshell",
+            title = this@MainActivity.getString(R.string.biometric_unlock_app_title),
+            subtitle = this@MainActivity.getString(R.string.biometric_unlock_app_subtitle),
         ) { unlocked ->
             appUnlockPromptGate.onPromptFinished(unlocked)
             if (unlocked) {
@@ -657,8 +657,8 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
                     onChange = ::changeAppLockSettings,
                     onRequestUnlock = { onResult ->
                         requestDeviceUnlock(
-                            title = "Turn on app lock",
-                            subtitle = "Confirm your device unlock to lock subshell",
+                            title = this@MainActivity.getString(R.string.biometric_turn_on_lock_title),
+                            subtitle = this@MainActivity.getString(R.string.biometric_turn_on_lock_subtitle),
                             onResult = onResult,
                         )
                     },
@@ -691,6 +691,7 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
                         checkRedditAccess = communitiesViewModel::checkRedditAccess,
                         onLogoutActiveAccount = authConnectViewModel::logoutActiveAccount,
                         onReconnectAccount = ::launchReconnectAccount,
+                        onWebSignInAgain = ::launchWebSignInAgain,
                         onlineVisibilityRuntime = io.github.brealorg.subshell.ui.components.OnlineVisibilityRuntime(
                             state = onlineVisibilityState,
                             onOpen = authConnectViewModel::openOnlineVisibility,
@@ -1236,6 +1237,17 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
     ) {
         launchAuthBrowser(
             { authConnectViewModel.beginReconnect(accountStableId) },
+            propagateFreshAccountSession = true,
+        ) {
+            authConnectViewModel.browserLaunchFailed()
+        }
+    }
+
+    private fun launchWebSignInAgain(
+        accountStableId: String,
+    ) {
+        launchAuthBrowser(
+            { authConnectViewModel.beginWebSignInAgain(accountStableId) },
             propagateFreshAccountSession = true,
         ) {
             authConnectViewModel.browserLaunchFailed()

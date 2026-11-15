@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import io.github.brealorg.subshell.ui.symbols.Symbols
 import java.io.File
@@ -11,10 +12,10 @@ class UserStatus01A1AccountIdentityPresentationPolicyTest {
     @Test
     fun accountSurfacesUseRedditIdentityAvatarWithStockFallback() {
         val app =
-            File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/app/AccountSwitcherSheet.kt").readText()
+            File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/app/AccountSwitcherSheet.kt").readSourceText()
         val settings =
             File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/SettingsScreen.kt")
-                .readText()
+                .readSourceText()
 
         val switcher =
             app.substringAfter("internal fun AccountSwitcherSheet(")
@@ -59,7 +60,7 @@ class UserStatus01A1AccountIdentityPresentationPolicyTest {
     fun settingsLogoutKeepsDestructiveMaterialRole() {
         val settings =
             File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/SettingsScreen.kt")
-                .readText()
+                .readSourceText()
 
         val logout =
             settings.substringAfter("item(\"account-logout\")")

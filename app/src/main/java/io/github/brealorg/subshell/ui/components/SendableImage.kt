@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -95,8 +98,8 @@ internal const val IMAGE_NOT_SENDABLE_NOTICE_SCOPE = "image-not-sendable"
 
 internal val imageNotSendablePresentation = ErrorPresentation(
     kind = ErrorPresentationKind.DEGRADED,
-    title = "Can't use this image",
-    message = "Choose a JPEG, PNG, WebP or GIF image",
+    title = UiText.Resource(R.string.ep_can_t_use_this_image),
+    message = UiText.Resource(R.string.ep_choose_a_jpeg_png_webp_or_gif),
 )
 
 internal fun ViewportErrorHostState.presentImageNotSendable() {

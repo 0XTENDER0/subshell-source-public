@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.data.auth
 
+import io.github.brealorg.subshell.harness.readSourceText
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
@@ -104,7 +105,7 @@ class DataLayer08OwnerBoundTokenTest {
         val root = java.io.File("src/main/java/${SUBSHELL_PACKAGE_DIR}/data/auth/reddit")
         val offenders = root.walkTopDown()
             .filter { file -> file.isFile && file.extension == "kt" }
-            .filter { file -> file.readText().contains("ensureActiveAccessToken(") }
+            .filter { file -> file.readSourceText().contains("ensureActiveAccessToken(") }
             .map { file -> file.name }
             .toList()
         assertEquals(true, root.isDirectory)

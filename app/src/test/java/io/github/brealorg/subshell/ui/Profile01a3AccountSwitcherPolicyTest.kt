@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import io.github.brealorg.subshell.data.account.AccountSessionSource
 import io.github.brealorg.subshell.data.account.AccountSessionState
 import io.github.brealorg.subshell.data.account.AccountSessionSummary
@@ -9,6 +12,9 @@ import io.github.brealorg.subshell.data.account.localFixtureAccountSummaries
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+// TRANSLATE14: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Profile01a3AccountSwitcherPolicyTest {
     @Test
     fun productSwitcherHidesLocalFixtures() {
@@ -40,11 +46,11 @@ class Profile01a3AccountSwitcherPolicyTest {
 
         assertEquals(
             "Add Reddit account",
-            presentation.headline,
+            presentation.headline.s,
         )
         assertEquals(
             "Sign in with another Reddit account.",
-            presentation.supporting,
+            presentation.supporting.s,
         )
         assertEquals(
             AccountConnectAction.CONNECT,
@@ -52,7 +58,7 @@ class Profile01a3AccountSwitcherPolicyTest {
         )
         assertEquals(
             "Add",
-            presentation.actionLabel,
+            presentation.actionLabel?.s,
         )
     }
 
@@ -69,11 +75,11 @@ class Profile01a3AccountSwitcherPolicyTest {
 
         assertEquals(
             "Add Reddit account",
-            presentation.headline,
+            presentation.headline.s,
         )
         assertEquals(
             "Add",
-            presentation.actionLabel,
+            presentation.actionLabel?.s,
         )
     }
 
@@ -90,11 +96,11 @@ class Profile01a3AccountSwitcherPolicyTest {
 
         assertEquals(
             "Connect Reddit account",
-            presentation.headline,
+            presentation.headline.s,
         )
         assertEquals(
             "Connect",
-            presentation.actionLabel,
+            presentation.actionLabel?.s,
         )
     }
 
@@ -111,7 +117,7 @@ class Profile01a3AccountSwitcherPolicyTest {
             accountSwitcherSessionLabel(
                 account = account,
                 selected = true,
-            ),
+            ).s,
         )
 
         assertEquals(
@@ -119,7 +125,7 @@ class Profile01a3AccountSwitcherPolicyTest {
             accountSwitcherSessionLabel(
                 account = account,
                 selected = false,
-            ),
+            ).s,
         )
     }
 

@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.error
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -96,8 +98,11 @@ internal class ViewportErrorHostState {
             fingerprint = fingerprint,
             presentation = presentation,
             failureDetails = failureDetails,
+            // ISSUE303B_AN_EXPIRED_WEB_SIGN_IN_OFFERS_SIGN_IN_AGAIN_V1: a sign-in
+            // action keeps its callback too.
             onRetry = onRetry.takeIf {
-                presentation.primaryAction?.kind == ErrorActionKind.RETRY
+                presentation.primaryAction?.kind == ErrorActionKind.RETRY ||
+                    presentation.primaryAction?.kind == ErrorActionKind.SIGN_IN
             },
             tone = tone,
             dismissesItself = dismissesItself,
@@ -153,6 +158,14 @@ internal fun ViewportErrorHostState.presentNotice(
     message: String,
     tone: TrayTone = TrayTone.INFO,
     dismissesItself: Boolean = false,
+) = presentNotice(scopeKey, UiText.Plain(title), UiText.Plain(message), tone, dismissesItself)
+
+internal fun ViewportErrorHostState.presentNotice(
+    scopeKey: String,
+    title: UiText,
+    message: UiText,
+    tone: TrayTone = TrayTone.INFO,
+    dismissesItself: Boolean = false,
 ) {
     clear(scopeKey)
     present(
@@ -176,8 +189,8 @@ internal fun FailureDetails?.isClientAccessRefusal(): Boolean =
 internal fun FailureDetails?.isRedditBlockPage(): Boolean =
     this?.providerCode?.value == io.github.brealorg.subshell.data.error.REDDIT_BLOCK_PAGE_REASON
 
-internal const val REDDIT_BLOCK_PAGE_MESSAGE =
-    "Reddit is blocking this request from third-party apps right now."
+internal val REDDIT_BLOCK_PAGE_MESSAGE: UiText =
+    UiText.Resource(R.string.error_viewport_reddit_is_blocking_this_request_from_third)
 
 internal val LocalViewportErrorHostState =
     staticCompositionLocalOf<ViewportErrorHostState?> { null }

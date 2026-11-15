@@ -145,7 +145,7 @@ class Issue239NotificationPermissionComposeTest {
         shadowOf(application).grantPermissions(Manifest.permission.POST_NOTIFICATIONS)
         returnToTheApp()
         assertTrue(state.isWatchingCommunityPosts("pics"))
-        assertEquals("Notifications on for r/pics", notices.currentRequest?.presentation?.title)
+        assertEquals("Notifications on for r/pics", notices.currentRequest?.presentation?.title?.s)
     }
 
     @Test
@@ -157,7 +157,7 @@ class Issue239NotificationPermissionComposeTest {
 
         assertFalse("no settings opened", openedSettings())
         assertFalse(state.isWatchingCommunityPosts("pics"))
-        assertEquals("Notifications are not allowed", notices.currentRequest?.presentation?.title)
+        assertEquals("Notifications are not allowed", notices.currentRequest?.presentation?.title?.s)
     }
 
     @Test
@@ -174,7 +174,7 @@ class Issue239NotificationPermissionComposeTest {
         assertTrue(openedSettings())
         returnToTheApp()
         assertFalse("still off: not turned on", state.isWatchingCommunityPosts("pics"))
-        assertEquals("Notifications are not allowed", notices.currentRequest?.presentation?.title)
+        assertEquals("Notifications are not allowed", notices.currentRequest?.presentation?.title?.s)
 
         shadowOf(manager).setNotificationsEnabled(true)
         turnOn()

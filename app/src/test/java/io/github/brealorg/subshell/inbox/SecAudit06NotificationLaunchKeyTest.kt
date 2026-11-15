@@ -59,6 +59,33 @@ class SecAudit06NotificationLaunchKeyTest {
         )
     }
 
+    /**
+     * MODMAIL07: MainActivity asks the inbox consumer first and the modmail
+     * consumer second. The inbox one used to take the key off a modmail tap, so
+     * every modmail notification tap was dropped as foreign.
+     */
+    @Test
+    fun aModmailTapSurvivesTheInboxConsumerAskedFirst() {
+        val tap = modmailTap().putExtra(NOTIFICATION_LAUNCH_KEY_EXTRA, NotificationLaunchKey.value(context))
+
+        assertNull(takeInboxNotificationTarget(context, tap))
+        assertEquals(
+            ModmailNotificationTarget("reddit:redreader:t2_victim", "abc1", "modmail:abc1"),
+            takeModmailNotificationTarget(context, tap),
+        )
+    }
+
+    @Test
+    fun anInboxTapSurvivesTheModmailConsumerAskedFirst() {
+        val tap = inboxTap().putExtra(NOTIFICATION_LAUNCH_KEY_EXTRA, NotificationLaunchKey.value(context))
+
+        assertNull(takeModmailNotificationTarget(context, tap))
+        assertEquals(
+            InboxNotificationTarget("reddit:redreader:t2_victim", "t4_message", "activity:t4_message"),
+            takeInboxNotificationTarget(context, tap),
+        )
+    }
+
     @Test
     fun theKeyStaysTheSameForNotificationsPostedBeforeARestart() {
         val first = NotificationLaunchKey.value(context)

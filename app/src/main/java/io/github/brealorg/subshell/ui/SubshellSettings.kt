@@ -6,90 +6,90 @@ import io.github.brealorg.subshell.ui.theme.AppUiScale
 import io.github.brealorg.subshell.data.RedditListingTimePeriod
 import io.github.brealorg.subshell.ui.theme.ThemeMode
 
-enum class NavigationLabelMode(val label: String) {
-    ON("On"),
-    PARTIAL("Partial"),
-    OFF("Off"),
+enum class NavigationLabelMode(@androidx.annotation.StringRes val labelRes: Int) {
+    ON( io.github.brealorg.subshell.R.string.navigation_label_mode_on),
+    PARTIAL( io.github.brealorg.subshell.R.string.navigation_label_mode_partial),
+    OFF( io.github.brealorg.subshell.R.string.navigation_label_mode_off),
 }
 
 // ISSUE211_RANDOM_NSFW_COMMUNITY_V1 (#211, owner): where "Random NSFW
 // community" is offered, chosen in Settings; Off by default, and shown only
 // while NSFW posts are.
-enum class RandomNsfwCommunityPlacement(val label: String) {
-    OFF("Off"),
-    SEARCH("Search"),
-    COMMUNITIES("Communities"),
-    MENU("Navigation menu"),
+enum class RandomNsfwCommunityPlacement(@androidx.annotation.StringRes val labelRes: Int) {
+    OFF( io.github.brealorg.subshell.R.string.random_nsfw_community_placement_off),
+    SEARCH( io.github.brealorg.subshell.R.string.random_nsfw_community_placement_search),
+    COMMUNITIES( io.github.brealorg.subshell.R.string.random_nsfw_community_placement_communities),
+    MENU( io.github.brealorg.subshell.R.string.random_nsfw_community_placement_menu),
 }
 
 // ISSUE230_PINNED_POSTS_FIRST_V1 (owner 2026-10-16): how a community's pinned
 // posts show at the top of its feed in every sort; cards by default.
-enum class PinnedPostsPresentation(val label: String) {
-    CARDS("Cards at the top"),
-    HIGHLIGHTS("Highlights row"),
+enum class PinnedPostsPresentation(@androidx.annotation.StringRes val labelRes: Int) {
+    CARDS( io.github.brealorg.subshell.R.string.pinned_posts_presentation_cards),
+    HIGHLIGHTS( io.github.brealorg.subshell.R.string.pinned_posts_presentation_highlights),
 }
 
 // ISSUE290_FEEDS_RESUME_WHERE_YOU_LEFT_OFF_V1 (owner, #290): how long a feed
 // position kept across a restart counts, and what a feed does with it at start.
-enum class FeedPositionAge(val label: String, val maxAgeMillis: Long?) {
-    ONE_HOUR("1 hour", 60L * 60L * 1000L),
-    TWELVE_HOURS("12 hours", 12L * 60L * 60L * 1000L),
-    ONE_DAY("1 day", 24L * 60L * 60L * 1000L),
-    NO_LIMIT("No time limit", null),
+enum class FeedPositionAge(@androidx.annotation.StringRes val labelRes: Int, val maxAgeMillis: Long?) {
+    ONE_HOUR( io.github.brealorg.subshell.R.string.feed_position_age_one_hour, 60L * 60L * 1000L),
+    TWELVE_HOURS( io.github.brealorg.subshell.R.string.feed_position_age_twelve_hours, 12L * 60L * 60L * 1000L),
+    ONE_DAY( io.github.brealorg.subshell.R.string.feed_position_age_one_day, 24L * 60L * 60L * 1000L),
+    NO_LIMIT( io.github.brealorg.subshell.R.string.feed_position_age_no_limit, null),
 }
 
-enum class FeedPositionStart(val label: String) {
-    SHOW_STORED("Show where I left off"),
-    LOAD_NEW("Load new posts and find my place"),
+enum class FeedPositionStart(@androidx.annotation.StringRes val labelRes: Int) {
+    SHOW_STORED( io.github.brealorg.subshell.R.string.feed_position_start_show_stored),
+    LOAD_NEW( io.github.brealorg.subshell.R.string.feed_position_start_load_new),
 }
 
 // ISSUE234_FEED_POST_LAYOUTS_V1 (owner 2026-10-18): how feeds show posts.
-enum class PostLayout(val label: String) {
-    LARGE("Large"),
-    COMPACT("Compact"),
-    LIST("List"),
-    GRID("Grid"),
+enum class PostLayout(@androidx.annotation.StringRes val labelRes: Int) {
+    LARGE( io.github.brealorg.subshell.R.string.post_layout_large),
+    COMPACT( io.github.brealorg.subshell.R.string.post_layout_compact),
+    LIST( io.github.brealorg.subshell.R.string.post_layout_list),
+    GRID( io.github.brealorg.subshell.R.string.post_layout_grid),
 }
 
-enum class ListThumbnailSide(val label: String) {
-    RIGHT("Right"),
-    LEFT("Left"),
+enum class ListThumbnailSide(@androidx.annotation.StringRes val labelRes: Int) {
+    RIGHT( io.github.brealorg.subshell.R.string.list_thumbnail_side_right),
+    LEFT( io.github.brealorg.subshell.R.string.list_thumbnail_side_left),
 }
 
-enum class TabletLayoutMode(val label: String) {
-    SPLIT("Split"),
-    SINGLE("Single"),
+enum class TabletLayoutMode(@androidx.annotation.StringRes val labelRes: Int) {
+    SPLIT( io.github.brealorg.subshell.R.string.tablet_layout_mode_split),
+    SINGLE( io.github.brealorg.subshell.R.string.tablet_layout_mode_single),
 }
 
-enum class CommunityDiscoveryLayout(val label: String) {
-    CAROUSEL("Carousel"),
-    LIST("List"),
+enum class CommunityDiscoveryLayout(@androidx.annotation.StringRes val labelRes: Int) {
+    CAROUSEL( io.github.brealorg.subshell.R.string.community_discovery_layout_carousel),
+    LIST( io.github.brealorg.subshell.R.string.community_discovery_layout_list),
 }
 
-enum class MediaCaptionMode(val label: String) {
-    OVERLAY("Overlay"),
-    BELOW_MEDIA("Below media"),
-    HIDDEN("Hidden"),
+enum class MediaCaptionMode(@androidx.annotation.StringRes val labelRes: Int) {
+    OVERLAY( io.github.brealorg.subshell.R.string.media_caption_mode_overlay),
+    BELOW_MEDIA( io.github.brealorg.subshell.R.string.media_caption_mode_below_media),
+    HIDDEN( io.github.brealorg.subshell.R.string.media_caption_mode_hidden),
 }
 
-enum class FullscreenCaptionMode(val label: String) {
-    WITH_CONTROLS("With controls"),
-    ALWAYS_VISIBLE("Always visible"),
+enum class FullscreenCaptionMode(@androidx.annotation.StringRes val labelRes: Int) {
+    WITH_CONTROLS( io.github.brealorg.subshell.R.string.fullscreen_caption_mode_with_controls),
+    ALWAYS_VISIBLE( io.github.brealorg.subshell.R.string.fullscreen_caption_mode_always_visible),
 }
 
-enum class CommentCollapseMode(val label: String) {
-    HEADER("Header"),
-    COMMENT("Comment"),
+enum class CommentCollapseMode(@androidx.annotation.StringRes val labelRes: Int) {
+    HEADER( io.github.brealorg.subshell.R.string.comment_collapse_mode_header),
+    COMMENT( io.github.brealorg.subshell.R.string.comment_collapse_mode_comment),
     // DEFAULTS102_COLLAPSE_BOTH_V1 (owner 2026-11-11): both targets collapse.
-    BOTH("Header and comment");
+    BOTH( io.github.brealorg.subshell.R.string.comment_collapse_mode_both);
 
     val collapsesFromHeader: Boolean get() = this == HEADER || this == BOTH
     val collapsesFromComment: Boolean get() = this == COMMENT || this == BOTH
 }
 
-enum class CommentHierarchyStyle(val label: String) {
-    GUIDE_LINES("Guide lines"),
-    PARENT_CONNECTORS("Parent connectors"),
+enum class CommentHierarchyStyle(@androidx.annotation.StringRes val labelRes: Int) {
+    GUIDE_LINES( io.github.brealorg.subshell.R.string.comment_hierarchy_style_guide_lines),
+    PARENT_CONNECTORS( io.github.brealorg.subshell.R.string.comment_hierarchy_style_parent_connectors),
 }
 
 /**
@@ -97,21 +97,21 @@ enum class CommentHierarchyStyle(val label: String) {
  * each top-level comment a card of its own, so it is easy to see where a thread starts. Off is how
  * comments always looked.
  */
-enum class CommentThreadColours(val label: String) {
-    OFF("Off"),
-    BY_DEPTH("By depth"),
-    ONE_COLOUR("One colour"),
+enum class CommentThreadColours(@androidx.annotation.StringRes val labelRes: Int) {
+    OFF( io.github.brealorg.subshell.R.string.comment_thread_colours_off),
+    BY_DEPTH( io.github.brealorg.subshell.R.string.comment_thread_colours_by_depth),
+    ONE_COLOUR( io.github.brealorg.subshell.R.string.comment_thread_colours_one_colour),
 }
 
 /**
  * REPLYCONTEXT03_INDENT_SIZE_IS_A_SETTING_V1: how far each reply level steps right (Guide lines).
  * Normal is what REPLYCONTEXT02 introduced; None is the flat look of before.
  */
-enum class CommentIndentSize(val label: String, val stepDp: Int) {
-    NONE("None", 0),
-    SMALL("Small", 4),
-    NORMAL("Normal", 6),
-    LARGE("Large", 9),
+enum class CommentIndentSize(@androidx.annotation.StringRes val labelRes: Int, val stepDp: Int) {
+    NONE( io.github.brealorg.subshell.R.string.comment_indent_size_none, 0),
+    SMALL( io.github.brealorg.subshell.R.string.comment_indent_size_small, 4),
+    NORMAL( io.github.brealorg.subshell.R.string.comment_indent_size_normal, 6),
+    LARGE( io.github.brealorg.subshell.R.string.comment_indent_size_large, 9),
 }
 
 internal fun encodeShownLanguages(languages: Set<String>): String =
@@ -125,36 +125,36 @@ internal fun decodeShownLanguages(value: String?): Set<String> =
         .filter { code -> code in SELECTABLE_LANGUAGES }
         .toSet()
 
-enum class DrawerCommunitiesMode(val label: String) {
-    CURRENT("Simple"),
-    COLLAPSIBLE("Dropdown"),
-    FULL("Full list"),
+enum class DrawerCommunitiesMode(@androidx.annotation.StringRes val labelRes: Int) {
+    CURRENT( io.github.brealorg.subshell.R.string.drawer_communities_mode_current),
+    COLLAPSIBLE( io.github.brealorg.subshell.R.string.drawer_communities_mode_collapsible),
+    FULL( io.github.brealorg.subshell.R.string.drawer_communities_mode_full),
 }
 
-enum class VoteColorPalette(val label: String) {
-    NEUTRAL("Theme accent"),
-    RED_BLUE("Red & blue"),
+enum class VoteColorPalette(@androidx.annotation.StringRes val labelRes: Int) {
+    NEUTRAL( io.github.brealorg.subshell.R.string.vote_color_palette_neutral),
+    RED_BLUE( io.github.brealorg.subshell.R.string.vote_color_palette_red_blue),
 }
 
-enum class VoteControlMode(val label: String) {
+enum class VoteControlMode(@androidx.annotation.StringRes val labelRes: Int) {
     // ISSUE278_EACH_COMPACT_SAYS_WHAT_IT_DOES_V1: labels only; stored names unchanged.
-    COMFORTABLE("Thumbs with score"),
-    COMPACT("Arrows"),
+    COMFORTABLE( io.github.brealorg.subshell.R.string.vote_control_mode_comfortable),
+    COMPACT( io.github.brealorg.subshell.R.string.vote_control_mode_compact),
 }
 
 // ISSUE16_CONFIGURABLE_SWIPE_ACTIONS_V1
-enum class PostSwipeAction(val label: String) {
-    NONE("None"),
-    UPVOTE("Upvote"),
-    DOWNVOTE("Downvote"),
-    SAVE("Save"),
-    HIDE("Hide"),
+enum class PostSwipeAction(@androidx.annotation.StringRes val labelRes: Int) {
+    NONE( io.github.brealorg.subshell.R.string.post_swipe_action_none),
+    UPVOTE( io.github.brealorg.subshell.R.string.post_swipe_action_upvote),
+    DOWNVOTE( io.github.brealorg.subshell.R.string.post_swipe_action_downvote),
+    SAVE( io.github.brealorg.subshell.R.string.post_swipe_action_save),
+    HIDE( io.github.brealorg.subshell.R.string.post_swipe_action_hide),
 }
 
-enum class CommentSwipeAction(val label: String) {
-    NONE("None"),
-    UPVOTE("Upvote"),
-    DOWNVOTE("Downvote"),
+enum class CommentSwipeAction(@androidx.annotation.StringRes val labelRes: Int) {
+    NONE( io.github.brealorg.subshell.R.string.comment_swipe_action_none),
+    UPVOTE( io.github.brealorg.subshell.R.string.comment_swipe_action_upvote),
+    DOWNVOTE( io.github.brealorg.subshell.R.string.comment_swipe_action_downvote),
 }
 
 // NOTIFY02_ON_BY_DEFAULT_IN_THE_MAIN_APP_V1 (owner, 2026-10-06): inbox
@@ -236,6 +236,11 @@ data class SubshellSettings(
     val resumeFeedPositionStart: FeedPositionStart = FeedPositionStart.SHOW_STORED,
     val contentFilters: ContentFilters = ContentFilters(),
     val communitySortPreferences: Map<String, CommunitySort> = emptyMap(),
+    // ISSUE302_START_FEED_V1 / ISSUE300_DEFAULT_FEED_SORT_V1 (owner 2026-11-13, in the
+    // backup): the defaults are today's behaviour, so nothing changes until a reader picks.
+    val startFeed: StartFeed = StartFeed.HOME,
+    val defaultFeedSort: FeedSort = FeedSort.BEST,
+    val defaultCommunitySort: CommunitySort = CommunitySort.HOT,
     val listingTimePeriod: RedditListingTimePeriod = RedditListingTimePeriod.ALL,
     val drawerCommunitiesMode: DrawerCommunitiesMode = DrawerCommunitiesMode.COLLAPSIBLE,
     val drawerRecentCommunities: Boolean = false,
@@ -334,6 +339,9 @@ data class SubshellSettings(
         RESUME_FEED_POSITION_AGE to resumeFeedPositionAge.name,
         RESUME_FEED_POSITION_START to resumeFeedPositionStart.name,
         COMMUNITY_SORT_PREFERENCES to encodeCommunitySortPreferences(communitySortPreferences),
+        START_FEED to startFeed.name,
+        DEFAULT_FEED_SORT to defaultFeedSort.name,
+        DEFAULT_COMMUNITY_SORT to defaultCommunitySort.name,
         LISTING_TIME_PERIOD to listingTimePeriod.name,
         DRAWER_COMMUNITIES_MODE to drawerCommunitiesMode.name,
         DRAWER_RECENT_COMMUNITIES to drawerRecentCommunities.toString(),
@@ -427,6 +435,9 @@ data class SubshellSettings(
         const val RESUME_FEED_POSITION_START = "resume_feed_position_start"
         const val COMMENT_VISIT_HISTORY = "comment_visit_history"
         const val COMMUNITY_SORT_PREFERENCES = "community_sort_preferences"
+        const val START_FEED = "start_feed"
+        const val DEFAULT_FEED_SORT = "default_feed_sort"
+        const val DEFAULT_COMMUNITY_SORT = "default_community_sort"
         const val LISTING_TIME_PERIOD = "listing_time_period"
         const val DISCOVER_EXPANDED = "discover_expanded"
         const val SUBS_EXPLORE_SHORTCUT_MODE = "subs_explore_shortcut_mode"
@@ -535,6 +546,9 @@ data class SubshellSettings(
             RESUME_FEED_POSITION_AGE,
             RESUME_FEED_POSITION_START,
             COMMUNITY_SORT_PREFERENCES,
+            START_FEED,
+            DEFAULT_FEED_SORT,
+            DEFAULT_COMMUNITY_SORT,
             LISTING_TIME_PERIOD,
             DRAWER_COMMUNITIES_MODE,
             DRAWER_RECENT_COMMUNITIES,
@@ -776,6 +790,9 @@ data class SubshellSettings(
                 communitySortPreferences = decodeCommunitySortPreferences(
                     compatibleValues.getValue(COMMUNITY_SORT_PREFERENCES),
                 ),
+                startFeed = enumValue(START_FEED, compatibleValues, StartFeed.entries),
+                defaultFeedSort = enumValue(DEFAULT_FEED_SORT, compatibleValues, FeedSort.entries),
+                defaultCommunitySort = enumValue(DEFAULT_COMMUNITY_SORT, compatibleValues, CommunitySort.entries),
                 listingTimePeriod = enumValue(
                     LISTING_TIME_PERIOD,
                     compatibleValues,

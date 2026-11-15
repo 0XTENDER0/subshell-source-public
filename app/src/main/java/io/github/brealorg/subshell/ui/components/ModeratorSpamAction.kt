@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -47,8 +49,8 @@ internal fun ModeratorSpamConfirmationDialog(
         title = {
             Text(
                 when (kind) {
-                    RedditModeratorQueueKind.POST -> "Mark this post as spam?"
-                    RedditModeratorQueueKind.COMMENT -> "Mark this comment as spam?"
+                    RedditModeratorQueueKind.POST -> stringResource(R.string.all_mark_this_post_as_spam)
+                    RedditModeratorQueueKind.COMMENT -> stringResource(R.string.all_mark_this_comment_as_spam)
                 },
             )
         },
@@ -66,20 +68,18 @@ internal fun ModeratorSpamConfirmationDialog(
                     )
                 }
                 Text(
-                    "This removes the item and marks it as spam. " +
-                        "Use Remove for other rule violations. " +
-                        "This action does not ban the author or send a removal message.",
+                    stringResource(R.string.all2_this_removes_the_item_and_marks_it),
                 )
             }
         },
         confirmButton = {
             TextButton(onClick = onConfirm, enabled = canConfirm) {
-                Text("Mark as spam")
+                Text(stringResource(R.string.comp_mark_as_spam))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.comp_cancel))
             }
         },
     )

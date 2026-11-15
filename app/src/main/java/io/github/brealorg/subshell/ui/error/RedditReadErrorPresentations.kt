@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.error
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
 import io.github.brealorg.subshell.data.account.CustomFeedPostsFailureKind
 import io.github.brealorg.subshell.data.account.RedditCommentUiFailureKind
 import io.github.brealorg.subshell.data.account.RedditCommunityDiscoveryUiFailureKind
@@ -17,24 +19,24 @@ internal fun redditFeedErrorPresentation(
     retryable: Boolean,
     showingCachedContent: Boolean,
 ): ErrorPresentation = readErrorPresentation(
-    title = if (showingCachedContent) "Couldn't refresh the feed" else "Couldn't load the feed",
+    title = if (showingCachedContent) UiText.Resource(R.string.error_read_couldn_t_refresh_the_feed) else UiText.Resource(R.string.error_read_couldn_t_load_the_feed),
     reason = when (failureKind) {
         RedditFeedUiFailureKind.CLIENT_CONFIGURATION ->
-            "Reddit feed access isn't configured for the active account."
+            UiText.Resource(R.string.error_read_reddit_feed_access_isn_t_configured_for)
         RedditFeedUiFailureKind.SESSION ->
-            "The Reddit sign-in for this account needs attention."
+            UiText.Resource(R.string.error_read_the_reddit_sign_in_for_this_account)
         RedditFeedUiFailureKind.HTTP ->
-            redditReadHttpReason(details?.httpStatusCode, "Reddit rejected the feed request.")
+            redditReadHttpReason(details?.httpStatusCode, UiText.Resource(R.string.error_read_reddit_rejected_the_feed_request))
         RedditFeedUiFailureKind.TRANSPORT ->
-            "subshell couldn't reach Reddit."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_reach_reddit)
         RedditFeedUiFailureKind.PROTOCOL ->
-            "Reddit returned a feed response that subshell couldn't read."
+            UiText.Resource(R.string.error_read_reddit_returned_a_feed_response_that_subshell)
         RedditFeedUiFailureKind.STORAGE ->
-            "subshell couldn't store the Reddit feed on this device."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_store_the_reddit_feed)
         RedditFeedUiFailureKind.END_REACHED ->
-            "There are no more posts in this listing."
+            UiText.Resource(R.string.error_read_there_are_no_more_posts_in_this)
     },
-    cachedMessage = "Posts already loaded remain visible.",
+    cachedMessage = UiText.Resource(R.string.error_read_posts_already_loaded_remain_visible),
     details = details,
     retryable = retryable && failureKind != RedditFeedUiFailureKind.END_REACHED,
     showingCachedContent = showingCachedContent,
@@ -49,7 +51,7 @@ internal fun redditFeedAppendErrorPresentation(
     details = details,
     retryable = retryable,
     showingCachedContent = true,
-).copy(title = "Couldn't load more posts")
+).copy(title = UiText.Resource(R.string.error_read_couldn_t_load_more_posts))
 
 // FEEDS01_CUSTOM_FEED_APPEND_FAILURE_V1: a custom feed read that failed
 // while posts are already shown goes to the viewport error tray.
@@ -60,24 +62,24 @@ internal fun customFeedPostsErrorPresentation(
     append: Boolean,
     details: FailureDetails? = null,
 ): ErrorPresentation = readErrorPresentation(
-    title = if (append) "Couldn't load more posts" else "Couldn't refresh the feed",
+    title = if (append) UiText.Resource(R.string.error_read_couldn_t_load_more_posts) else UiText.Resource(R.string.error_read_couldn_t_refresh_the_feed),
     reason = when (failureKind) {
         CustomFeedPostsFailureKind.CLIENT_CONFIGURATION ->
-            "Reddit feed access isn't configured for the active account."
+            UiText.Resource(R.string.error_read_reddit_feed_access_isn_t_configured_for)
         CustomFeedPostsFailureKind.SESSION ->
-            "The Reddit sign-in for this account needs attention."
+            UiText.Resource(R.string.error_read_the_reddit_sign_in_for_this_account)
         CustomFeedPostsFailureKind.HTTP ->
             if (statusCode != null && !redditReadHttpStatusHasOwnReason(statusCode)) {
-                "Reddit returned HTTP $statusCode."
+                UiText.Resource(R.string.error_read_reddit_returned_http, statusCode)
             } else {
-                redditReadHttpReason(statusCode, "Reddit rejected the feed request.")
+                redditReadHttpReason(statusCode, UiText.Resource(R.string.error_read_reddit_rejected_the_feed_request))
             }
         CustomFeedPostsFailureKind.TRANSPORT ->
-            "subshell couldn't reach Reddit."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_reach_reddit)
         CustomFeedPostsFailureKind.PROTOCOL ->
-            "Reddit returned a feed response that subshell couldn't read."
+            UiText.Resource(R.string.error_read_reddit_returned_a_feed_response_that_subshell)
     },
-    cachedMessage = "Loaded posts remain visible.",
+    cachedMessage = UiText.Resource(R.string.error_read_loaded_posts_remain_visible),
     details = details,
     retryable = retryable,
     showingCachedContent = true,
@@ -89,22 +91,22 @@ internal fun redditCommentsErrorPresentation(
     retryable: Boolean,
     showingCachedContent: Boolean,
 ): ErrorPresentation = readErrorPresentation(
-    title = if (showingCachedContent) "Couldn't refresh comments" else "Couldn't load comments",
+    title = if (showingCachedContent) UiText.Resource(R.string.error_read_couldn_t_refresh_comments) else UiText.Resource(R.string.error_read_couldn_t_load_comments),
     reason = when (failureKind) {
         RedditCommentUiFailureKind.CLIENT_CONFIGURATION ->
-            "Reddit comment access isn't configured for the active account."
+            UiText.Resource(R.string.error_read_reddit_comment_access_isn_t_configured_for)
         RedditCommentUiFailureKind.SESSION ->
-            "The Reddit sign-in for this account needs attention."
+            UiText.Resource(R.string.error_read_the_reddit_sign_in_for_this_account)
         RedditCommentUiFailureKind.HTTP ->
-            redditReadHttpReason(details?.httpStatusCode, "Reddit rejected the comments request.")
+            redditReadHttpReason(details?.httpStatusCode, UiText.Resource(R.string.error_read_reddit_rejected_the_comments_request))
         RedditCommentUiFailureKind.TRANSPORT ->
-            "subshell couldn't reach Reddit for comments."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_reach_reddit_for_comments)
         RedditCommentUiFailureKind.PROTOCOL ->
-            "Reddit returned a comments response that subshell couldn't read."
+            UiText.Resource(R.string.error_read_reddit_returned_a_comments_response_that_subshell)
         RedditCommentUiFailureKind.STORAGE ->
-            "subshell couldn't read or store the local comments data."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_read_or_store_the)
     },
-    cachedMessage = "Saved comments remain visible.",
+    cachedMessage = UiText.Resource(R.string.error_read_saved_comments_remain_visible),
     details = details,
     retryable = retryable,
     showingCachedContent = showingCachedContent,
@@ -116,22 +118,22 @@ internal fun redditInboxErrorPresentation(
     retryable: Boolean,
     showingCachedContent: Boolean,
 ): ErrorPresentation = readErrorPresentation(
-    title = if (showingCachedContent) "Couldn't refresh Inbox" else "Couldn't load Inbox",
+    title = if (showingCachedContent) UiText.Resource(R.string.error_read_couldn_t_refresh_inbox) else UiText.Resource(R.string.error_read_couldn_t_load_inbox),
     reason = when (failureKind) {
         RedditInboxUiFailureKind.CLIENT_CONFIGURATION ->
-            "Reddit Inbox access isn't configured for the active account."
+            UiText.Resource(R.string.error_read_reddit_inbox_access_isn_t_configured_for)
         RedditInboxUiFailureKind.SESSION ->
-            "The Reddit sign-in for this account needs attention before Inbox can load."
+            UiText.Resource(R.string.error_read_the_reddit_sign_in_for_this_account_2)
         RedditInboxUiFailureKind.HTTP ->
-            redditReadHttpReason(details?.httpStatusCode, "Reddit rejected the Inbox request.")
+            redditReadHttpReason(details?.httpStatusCode, UiText.Resource(R.string.error_read_reddit_rejected_the_inbox_request))
         RedditInboxUiFailureKind.TRANSPORT ->
-            "subshell couldn't reach Reddit for Inbox."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_reach_reddit_for_inbox)
         RedditInboxUiFailureKind.PROTOCOL ->
-            "Reddit returned an Inbox response that subshell couldn't read."
+            UiText.Resource(R.string.error_read_reddit_returned_an_inbox_response_that_subshell)
         RedditInboxUiFailureKind.STORAGE ->
-            "subshell couldn't read or store the local Inbox data."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_read_or_store_the_2)
     },
-    cachedMessage = "Saved Inbox items remain visible.",
+    cachedMessage = UiText.Resource(R.string.error_read_saved_inbox_items_remain_visible),
     details = details,
     retryable = retryable,
     showingCachedContent = showingCachedContent,
@@ -143,22 +145,22 @@ internal fun redditSubscriptionsErrorPresentation(
     retryable: Boolean,
     showingCachedContent: Boolean,
 ): ErrorPresentation = readErrorPresentation(
-    title = if (showingCachedContent) "Couldn't refresh communities" else "Couldn't load communities",
+    title = if (showingCachedContent) UiText.Resource(R.string.error_read_couldn_t_refresh_communities) else UiText.Resource(R.string.error_read_couldn_t_load_communities),
     reason = when (failureKind) {
         RedditSubscriptionsUiFailureKind.CLIENT_CONFIGURATION ->
-            "Reddit community access isn't configured for the active account."
+            UiText.Resource(R.string.error_read_reddit_community_access_isn_t_configured_for)
         RedditSubscriptionsUiFailureKind.SESSION ->
-            "The Reddit sign-in for this account needs attention."
+            UiText.Resource(R.string.error_read_the_reddit_sign_in_for_this_account)
         RedditSubscriptionsUiFailureKind.HTTP ->
-            redditReadHttpReason(details?.httpStatusCode, "Reddit rejected the community list request.")
+            redditReadHttpReason(details?.httpStatusCode, UiText.Resource(R.string.error_read_reddit_rejected_the_community_list_request))
         RedditSubscriptionsUiFailureKind.TRANSPORT ->
-            "subshell couldn't reach Reddit for the community list."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_reach_reddit_for_the)
         RedditSubscriptionsUiFailureKind.PROTOCOL ->
-            "Reddit returned a community list response that subshell couldn't read."
+            UiText.Resource(R.string.error_read_reddit_returned_a_community_list_response_that)
         RedditSubscriptionsUiFailureKind.STORAGE ->
-            "subshell couldn't read or store the saved community list."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_read_or_store_the_3)
     },
-    cachedMessage = "Your saved community list remains visible.",
+    cachedMessage = UiText.Resource(R.string.error_read_your_saved_community_list_remains_visible),
     details = details,
     retryable = retryable,
     showingCachedContent = showingCachedContent,
@@ -170,22 +172,22 @@ internal fun redditCommunityDiscoveryErrorPresentation(
     retryable: Boolean,
     showingCachedContent: Boolean,
 ): ErrorPresentation = readErrorPresentation(
-    title = if (showingCachedContent) "Couldn't refresh Explore" else "Couldn't load Explore",
+    title = if (showingCachedContent) UiText.Resource(R.string.error_read_couldn_t_refresh_explore) else UiText.Resource(R.string.error_read_couldn_t_load_explore),
     reason = when (failureKind) {
         RedditCommunityDiscoveryUiFailureKind.CLIENT_CONFIGURATION ->
-            "Reddit community discovery isn't configured for the active account."
+            UiText.Resource(R.string.error_read_reddit_community_discovery_isn_t_configured_for)
         RedditCommunityDiscoveryUiFailureKind.SESSION ->
-            "The Reddit sign-in for this account needs attention."
+            UiText.Resource(R.string.error_read_the_reddit_sign_in_for_this_account)
         RedditCommunityDiscoveryUiFailureKind.HTTP ->
-            redditReadHttpReason(details?.httpStatusCode, "Reddit rejected the community discovery request.")
+            redditReadHttpReason(details?.httpStatusCode, UiText.Resource(R.string.error_read_reddit_rejected_the_community_discovery_request))
         RedditCommunityDiscoveryUiFailureKind.TRANSPORT ->
-            "subshell couldn't reach Reddit for community discovery."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_reach_reddit_for_community)
         RedditCommunityDiscoveryUiFailureKind.PROTOCOL ->
-            "Reddit returned a community response that subshell couldn't read."
+            UiText.Resource(R.string.error_read_reddit_returned_a_community_response_that_subshell)
         RedditCommunityDiscoveryUiFailureKind.STORAGE ->
-            "subshell couldn't read or store the saved Explore results."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_read_or_store_the_4)
     },
-    cachedMessage = "Saved Explore results remain visible.",
+    cachedMessage = UiText.Resource(R.string.error_read_saved_explore_results_remain_visible),
     details = details,
     retryable = retryable,
     showingCachedContent = showingCachedContent,
@@ -198,25 +200,25 @@ internal fun redditProfileCommentsErrorPresentation(
     showingCachedContent: Boolean,
 ): ErrorPresentation = readErrorPresentation(
     title = if (showingCachedContent) {
-        "Couldn't refresh profile comments"
+        UiText.Resource(R.string.error_read_couldn_t_refresh_profile_comments)
     } else {
-        "Couldn't load profile comments"
+        UiText.Resource(R.string.error_read_couldn_t_load_profile_comments)
     },
     reason = when (failureKind) {
         RedditProfileCommentsUiFailureKind.CLIENT_CONFIGURATION ->
-            "Reddit profile comments aren't configured for the active account."
+            UiText.Resource(R.string.error_read_reddit_profile_comments_aren_t_configured_for)
         RedditProfileCommentsUiFailureKind.SESSION ->
-            "The Reddit sign-in for this account needs attention before profile comments can load."
+            UiText.Resource(R.string.error_read_the_reddit_sign_in_for_this_account_3)
         RedditProfileCommentsUiFailureKind.HTTP ->
-            redditReadHttpReason(details?.httpStatusCode, "Reddit rejected the profile comments request.")
+            redditReadHttpReason(details?.httpStatusCode, UiText.Resource(R.string.error_read_reddit_rejected_the_profile_comments_request))
         RedditProfileCommentsUiFailureKind.TRANSPORT ->
-            "subshell couldn't reach Reddit for profile comments."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_reach_reddit_for_profile)
         RedditProfileCommentsUiFailureKind.PROTOCOL ->
-            "Reddit returned a profile comments response that subshell couldn't read."
+            UiText.Resource(R.string.error_read_reddit_returned_a_profile_comments_response_that)
         RedditProfileCommentsUiFailureKind.STORAGE ->
-            "subshell couldn't read or store the local profile comments data."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_read_or_store_the_5)
     },
-    cachedMessage = "Saved profile comments remain visible.",
+    cachedMessage = UiText.Resource(R.string.error_read_saved_profile_comments_remain_visible),
     details = details,
     retryable = retryable,
     showingCachedContent = showingCachedContent,
@@ -230,17 +232,17 @@ internal fun redditCommunityDiscoverySuggestionErrorPresentation(
 ): ErrorPresentation {
     val reason = when (failureKind) {
         RedditCommunityDiscoveryUiFailureKind.CLIENT_CONFIGURATION ->
-            "Reddit community discovery isn't configured for the active account."
+            UiText.Resource(R.string.error_read_reddit_community_discovery_isn_t_configured_for)
         RedditCommunityDiscoveryUiFailureKind.SESSION ->
-            "The Reddit sign-in for this account needs attention."
+            UiText.Resource(R.string.error_read_the_reddit_sign_in_for_this_account)
         RedditCommunityDiscoveryUiFailureKind.HTTP ->
-            redditReadHttpReason(details?.httpStatusCode, "Reddit rejected the community discovery request.")
+            redditReadHttpReason(details?.httpStatusCode, UiText.Resource(R.string.error_read_reddit_rejected_the_community_discovery_request))
         RedditCommunityDiscoveryUiFailureKind.TRANSPORT ->
-            "subshell couldn't reach Reddit for community suggestions."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_reach_reddit_for_community_2)
         RedditCommunityDiscoveryUiFailureKind.PROTOCOL ->
-            "Reddit returned community suggestions that subshell couldn't read."
+            UiText.Resource(R.string.error_read_reddit_returned_community_suggestions_that_subshell_couldn)
         RedditCommunityDiscoveryUiFailureKind.STORAGE ->
-            "subshell couldn't read the saved community suggestions."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_read_the_saved_community)
     }.let { text ->
         // HOSTILEREDDIT01_EVERY_READ_ERROR_NAMES_THE_BLOCK_PAGE_V1: as readErrorPresentation.
         if (details.isRedditBlockPage()) REDDIT_BLOCK_PAGE_MESSAGE else text
@@ -252,17 +254,17 @@ internal fun redditCommunityDiscoverySuggestionErrorPresentation(
             ErrorPresentationKind.INLINE
         },
         title = if (showingFallbackResults) {
-            "Broader search unavailable"
+            UiText.Resource(R.string.error_read_broader_search_unavailable)
         } else {
-            "Couldn't update suggestions"
+            UiText.Resource(R.string.error_read_couldn_t_update_suggestions)
         },
         message = if (showingFallbackResults) {
-            "$reason Quick suggestions remain visible."
+            UiText.Resource(R.string.error_read_quick_suggestions_remain_visible, reason)
         } else {
             reason
         },
         primaryAction = if (retryable) {
-            ErrorAction(ErrorActionKind.RETRY, "Retry")
+            ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.error_read_retry))
         } else {
             null
         },
@@ -272,25 +274,26 @@ internal fun redditCommunityDiscoverySuggestionErrorPresentation(
 // ISSUE208_SERVER_FAILURES_ARE_NOT_REJECTIONS_V1: a 5xx is a problem on
 // Reddit's side and a 429 its request limit; only other statuses are a
 // rejection of the request.
-internal const val REDDIT_READ_SERVER_PROBLEM_REASON =
-    "Reddit had a server problem. Try again in a moment."
-internal const val REDDIT_READ_RATE_LIMIT_REASON = "Reddit's request limit was reached."
-internal const val REDDIT_READ_ACCESS_REFUSED_REASON =
-    "Reddit has shut out this app's Client ID, and nothing is stored here on this device."
+internal val REDDIT_READ_SERVER_PROBLEM_REASON: UiText =
+    UiText.Resource(R.string.error_read_reddit_had_a_server_problem_try_again)
+internal val REDDIT_READ_RATE_LIMIT_REASON: UiText =
+    UiText.Resource(R.string.error_read_reddit_s_request_limit_was_reached)
+internal val REDDIT_READ_ACCESS_REFUSED_REASON: UiText =
+    UiText.Resource(R.string.error_read_reddit_has_shut_out_this_app_s)
 
 internal fun redditReadHttpStatusHasOwnReason(statusCode: Int?): Boolean =
     statusCode == 429 || statusCode in 500..599
 
-internal fun redditReadHttpReason(statusCode: Int?, rejected: String): String = when {
+internal fun redditReadHttpReason(statusCode: Int?, rejected: UiText): UiText = when {
     statusCode == 429 -> REDDIT_READ_RATE_LIMIT_REASON
     statusCode != null && statusCode in 500..599 -> REDDIT_READ_SERVER_PROBLEM_REASON
     else -> rejected
 }
 
 private fun readErrorPresentation(
-    title: String,
-    reason: String,
-    cachedMessage: String,
+    title: UiText,
+    reason: UiText,
+    cachedMessage: UiText,
     details: FailureDetails?,
     retryable: Boolean,
     showingCachedContent: Boolean,
@@ -305,15 +308,15 @@ private fun readErrorPresentation(
     message = when {
         details.isClientAccessRefusal() -> REDDIT_READ_ACCESS_REFUSED_REASON
         // REDDITBLOCK01_REDDITS_BLOCK_PAGE_IS_NAMED_V1
-        details.isRedditBlockPage() && showingCachedContent -> "$REDDIT_BLOCK_PAGE_MESSAGE $cachedMessage"
+        details.isRedditBlockPage() && showingCachedContent -> UiText.Resource(R.string.error_join_sentences, REDDIT_BLOCK_PAGE_MESSAGE, cachedMessage)
         details.isRedditBlockPage() -> REDDIT_BLOCK_PAGE_MESSAGE
-        showingCachedContent -> "$reason $cachedMessage"
+        showingCachedContent -> UiText.Resource(R.string.error_join_sentences, reason, cachedMessage)
         else -> reason
     },
     primaryAction = if (retryable && !details.isClientAccessRefusal()) {
         ErrorAction(
             kind = ErrorActionKind.RETRY,
-            label = "Retry",
+            label = UiText.Resource(R.string.error_read_retry),
         )
     } else {
         null
@@ -331,23 +334,23 @@ internal fun redditCommunityInfoErrorPresentation(
     showingPartialContent: Boolean,
 ): ErrorPresentation = readErrorPresentation(
     title = if (showingPartialContent) {
-        "Couldn't refresh community info"
+        UiText.Resource(R.string.error_read_couldn_t_refresh_community_info)
     } else {
-        "Couldn't load community info"
+        UiText.Resource(R.string.error_read_couldn_t_load_community_info)
     },
     reason = when (failureKind) {
         RedditCommunityInfoUiFailureKind.CLIENT_CONFIGURATION ->
-            "Reddit community information isn't configured for the active account."
+            UiText.Resource(R.string.error_read_reddit_community_information_isn_t_configured_for)
         RedditCommunityInfoUiFailureKind.SESSION ->
-            "The Reddit sign-in for this account needs attention."
+            UiText.Resource(R.string.error_read_the_reddit_sign_in_for_this_account)
         RedditCommunityInfoUiFailureKind.HTTP ->
-            redditReadHttpReason(details?.httpStatusCode, "Reddit rejected the community information request.")
+            redditReadHttpReason(details?.httpStatusCode, UiText.Resource(R.string.error_read_reddit_rejected_the_community_information_request))
         RedditCommunityInfoUiFailureKind.TRANSPORT ->
-            "subshell couldn't reach Reddit for community information."
+            UiText.Resource(R.string.error_read_subshell_couldn_t_reach_reddit_for_community_3)
         RedditCommunityInfoUiFailureKind.PROTOCOL ->
-            "Reddit returned community information that subshell couldn't read."
+            UiText.Resource(R.string.error_read_reddit_returned_community_information_that_subshell_couldn)
     },
-    cachedMessage = "Community details already loaded remain visible.",
+    cachedMessage = UiText.Resource(R.string.error_read_community_details_already_loaded_remain_visible),
     details = details,
     retryable = retryable,
     showingCachedContent = showingPartialContent,
@@ -363,48 +366,48 @@ internal fun redditModQueueFailureMessage(
     failureKind: RedditModerationUiFailureKind,
     httpStatusCode: Int?,
     details: FailureDetails?,
-): String = when {
+): UiText = when {
     details.isRedditBlockPage() -> REDDIT_BLOCK_PAGE_MESSAGE
     failureKind == RedditModerationUiFailureKind.HTTP && httpStatusCode == 403 ->
-        "Reddit denied this mod queue. Your moderator role may not include the Posts permission."
+        UiText.Resource(R.string.error_read_reddit_denied_this_mod_queue_your_moderator)
     failureKind == RedditModerationUiFailureKind.SESSION ->
-        "The Reddit sign-in for this account needs attention."
+        UiText.Resource(R.string.error_read_the_reddit_sign_in_for_this_account)
     // ISSUE208_SERVER_FAILURES_ARE_NOT_REJECTIONS_V1
     failureKind == RedditModerationUiFailureKind.HTTP ->
-        redditReadHttpReason(httpStatusCode, "Reddit rejected the mod queue request.")
+        redditReadHttpReason(httpStatusCode, UiText.Resource(R.string.error_read_reddit_rejected_the_mod_queue_request))
     failureKind == RedditModerationUiFailureKind.TRANSPORT ->
-        "subshell couldn't reach Reddit for the mod queue."
+        UiText.Resource(R.string.error_read_subshell_couldn_t_reach_reddit_for_the_2)
     failureKind == RedditModerationUiFailureKind.PROTOCOL ->
-        "Reddit returned a mod queue response that subshell couldn't read."
-    else -> "Moderator tools aren't configured for the active account."
+        UiText.Resource(R.string.error_read_reddit_returned_a_mod_queue_response_that)
+    else -> UiText.Resource(R.string.error_read_moderator_tools_aren_t_configured_for_the)
 }
 
-internal fun redditModQueueMoreFailedLabel(details: FailureDetails?): String =
-    if (details.isRedditBlockPage()) "Reddit is blocking the rest of the queue" else "Couldn't load more of the queue"
+internal fun redditModQueueMoreFailedLabel(details: FailureDetails?): UiText =
+    if (details.isRedditBlockPage()) UiText.Resource(R.string.error_read_reddit_is_blocking_the_rest_of_the) else UiText.Resource(R.string.error_read_couldn_t_load_more_of_the_queue)
 
 /** [lead] says what was not loaded; the status follows, or the block page instead. */
 internal fun redditModeratorLogFailureMessage(
-    lead: String,
+    lead: UiText,
     httpStatusCode: Int?,
     details: FailureDetails?,
-): String = when {
+): UiText = when {
     details.isRedditBlockPage() -> REDDIT_BLOCK_PAGE_MESSAGE
-    httpStatusCode != null -> "$lead HTTP $httpStatusCode."
+    httpStatusCode != null -> UiText.Resource(R.string.error_read_http, lead, httpStatusCode)
     else -> lead
 }
 
-internal fun redditWikiHttpFailureMessage(httpStatusCode: Int?, details: FailureDetails?): String = when {
+internal fun redditWikiHttpFailureMessage(httpStatusCode: Int?, details: FailureDetails?): UiText = when {
     details.isRedditBlockPage() -> REDDIT_BLOCK_PAGE_MESSAGE
-    httpStatusCode != null -> "Reddit returned HTTP $httpStatusCode for this Wiki request."
-    else -> "Reddit rejected this Wiki request."
+    httpStatusCode != null -> UiText.Resource(R.string.error_read_reddit_returned_http_for_this_wiki_request, httpStatusCode)
+    else -> UiText.Resource(R.string.error_read_reddit_rejected_this_wiki_request)
 }
 
-internal fun redditPeopleSearchFailureMessage(details: FailureDetails?): String =
+internal fun redditPeopleSearchFailureMessage(details: FailureDetails?): UiText =
     if (details.isRedditBlockPage()) {
-        "$REDDIT_BLOCK_PAGE_MESSAGE Submit the search again to retry."
+        UiText.Resource(R.string.error_read_submit_the_search_again_to_retry, REDDIT_BLOCK_PAGE_MESSAGE)
     } else {
-        "Couldn't load Reddit people. Submit the search again to retry."
+        UiText.Resource(R.string.error_read_couldn_t_load_reddit_people_submit_the)
     }
 
-internal fun redditMoreRepliesFailedLabel(details: FailureDetails?): String =
-    if (details.isRedditBlockPage()) "Reddit is blocking these replies · Retry" else "Couldn't load replies · Retry"
+internal fun redditMoreRepliesFailedLabel(details: FailureDetails?): UiText =
+    if (details.isRedditBlockPage()) UiText.Resource(R.string.error_read_reddit_is_blocking_these_replies_retry) else UiText.Resource(R.string.error_read_couldn_t_load_replies_retry)

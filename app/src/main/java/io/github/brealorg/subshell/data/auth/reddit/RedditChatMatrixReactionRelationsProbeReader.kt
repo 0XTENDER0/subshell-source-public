@@ -111,7 +111,7 @@ internal class RedditChatMatrixReactionRelationsProbeReader(
         val webToken = when (val result = tokenProvider.token()) {
             is RedditChatWebTokenResult.Success -> result.token
             RedditChatWebTokenResult.NoRedditWebSession,
-            RedditChatWebTokenResult.Failed,
+            is RedditChatWebTokenResult.Failed,
             -> {
                 Log.d(
                     RELATIONS_PROBE_LOG_TAG,

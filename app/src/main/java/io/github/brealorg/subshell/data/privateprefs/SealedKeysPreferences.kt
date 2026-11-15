@@ -279,7 +279,9 @@ internal class SealedKeysPreferences(
             SETTINGS_PREFERENCES_NAME to ::isPrivatePreferenceKey,
             DEVICE_PREFERENCES_NAME to { key -> DEVICE_SEALED_PREFIXES.any(key::startsWith) },
             REDDIT_FAVORITES_PREFERENCES_NAME to { key -> key.startsWith("names.") },
-            CONVERSATION_REPLIES_PREFERENCES_NAME to { key -> key.startsWith("target:") },
+            // ISSUE305_A_NOTIFICATION_REPLY_IS_SEALED_V1: the typed reply waits here
+            // for its worker, sealed like the target beside it.
+            CONVERSATION_REPLIES_PREFERENCES_NAME to { key -> key.startsWith("target:") || key.startsWith("text:") },
         )
 
         private val lock = Any()

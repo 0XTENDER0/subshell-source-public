@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.ui.screens.description
+import io.github.brealorg.subshell.ui.screens.title
 import android.app.Application
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -122,7 +124,7 @@ class Issue224AdaptiveComposeTest {
 
         assertTrue(item("Communities").any { it.left < px(80f) })
         // The visible label (its text is cleared from semantics, A11Y01A11).
-        assertEquals("Communities", navigationRailVisualLabel(MainDestination.SUBS))
+        assertEquals(io.github.brealorg.subshell.R.string.nav_communities, navigationRailVisualLabel(MainDestination.SUBS))
     }
 
     @Test

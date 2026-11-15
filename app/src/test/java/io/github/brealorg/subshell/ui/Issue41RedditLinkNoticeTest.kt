@@ -52,11 +52,11 @@ class Issue41RedditLinkNoticeTest {
         }
         assertEquals(
             "Can't open this link here",
-            redditLinkUnavailablePresentation(RedditLinkUnavailableReason.UNSUPPORTED_LINK).title,
+            redditLinkUnavailablePresentation(RedditLinkUnavailableReason.UNSUPPORTED_LINK).title.s,
         )
         assertEquals(
             "Couldn't open this post",
-            redditLinkUnavailablePresentation(RedditLinkUnavailableReason.POST_UNAVAILABLE).title,
+            redditLinkUnavailablePresentation(RedditLinkUnavailableReason.POST_UNAVAILABLE).title.s,
         )
     }
 

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertEquals
@@ -9,7 +10,7 @@ import org.junit.Test
 
 /** Source-policy checks. These do not replace rendered Compose/UI tests. */
 class Moderation02A2ExpressivePresentationPolicyTest {
-    private fun source(name: String) = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/$name.kt").readText()
+    private fun source(name: String) = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/$name.kt").readSourceText()
 
     @Test fun bothQueuesUseOneHeaderAndWrapActionsWithoutChangingCallbacks() {
         // ISSUE295_QUEUE_USES_THE_SHEET_V1: one summary and one action row for

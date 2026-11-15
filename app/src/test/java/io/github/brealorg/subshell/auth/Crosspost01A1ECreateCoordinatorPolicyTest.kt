@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.auth
 
+import io.github.brealorg.subshell.ui.s
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import io.github.brealorg.subshell.data.account.TextPostWriteRequest
 import io.github.brealorg.subshell.data.auth.reddit.AuthenticatedComposerPolicyLoader
 import io.github.brealorg.subshell.data.auth.reddit.AuthenticatedComposerPolicyResult
@@ -13,6 +17,9 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
 
+// TRANSLATE14: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Crosspost01A1ECreateCoordinatorPolicyTest {
     private class Fixture {
         var active: String? = "owner"
@@ -90,7 +97,7 @@ class Crosspost01A1ECreateCoordinatorPolicyTest {
     }
     @Test fun sourceBecomingNsfwRequiresUserToEnableNsfwAndReviewAgain() = runBlocking {
         val f = Fixture(); f.review(); f.evidence = f.evidence.copy(nsfw = true); f.publish()
-        assertTrue(f.writes.isEmpty()); assertTrue(f.coordinator.uiState.value.message!!.contains("NSFW"))
+        assertTrue(f.writes.isEmpty()); assertTrue(f.coordinator.uiState.value.message!!.s.contains("NSFW"))
     }
     @Test fun accountChangeDuringSourceReadCannotApproveReview() = runBlocking {
         val f = Fixture(); f.duringSource = { f.active = "other" }; f.review()

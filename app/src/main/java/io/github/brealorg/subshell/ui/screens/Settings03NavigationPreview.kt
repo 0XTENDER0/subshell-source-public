@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
@@ -157,21 +159,21 @@ internal fun NavigationSettingsPreview(
                     ) {
                         // A11Y01A411_STABLE_PREVIEW_CHROME_V1
                         Text(
-                            "Live preview",
+                            stringResource(R.string.all_live_preview),
                             style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
                             when (previewContext) {
                                 NavigationPreviewContext.NAVIGATION ->
-                                    "Scroll this page or tap the preview to replay the change."
+                                    stringResource(R.string.all_scroll_this_page_or_tap_the_preview)
                                 NavigationPreviewContext.TABLET_MODE ->
-                                    "Switch modes to compare the same fixed preview frame."
+                                    stringResource(R.string.all_switch_modes_to_compare_the_same_fixed)
                                 NavigationPreviewContext.COMMUNITY_DISCOVERY ->
-                                    "Switch layouts to compare the same fixed preview frame."
+                                    stringResource(R.string.all_switch_layouts_to_compare_the_same_fixed)
                                 NavigationPreviewContext.POST_SWIPE ->
-                                    "Swipe the card to preview the configured post actions."
+                                    stringResource(R.string.all_swipe_the_card_to_preview_the_configured)
                                 NavigationPreviewContext.COMMENT_SWIPE ->
-                                    "Swipe the card to preview the configured comment actions."
+                                    stringResource(R.string.all_swipe_the_card_to_preview_the_configured_2)
                             },
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -202,13 +204,13 @@ internal fun NavigationSettingsPreview(
                     ) {
                         Crossfade(
                             targetState = when (previewContext) {
-                                NavigationPreviewContext.TABLET_MODE -> tabletLayoutMode.label
+                                NavigationPreviewContext.TABLET_MODE -> stringResource(tabletLayoutMode.labelRes)
                                 NavigationPreviewContext.COMMUNITY_DISCOVERY ->
-                                    communityDiscoveryLayout.label
+                                    stringResource(communityDiscoveryLayout.labelRes)
                                 NavigationPreviewContext.NAVIGATION ->
-                                    if (scrolling) "Scrolling" else "At rest"
-                                NavigationPreviewContext.POST_SWIPE -> "Post"
-                                NavigationPreviewContext.COMMENT_SWIPE -> "Comment"
+                                    if (scrolling) stringResource(R.string.all_scrolling) else stringResource(R.string.all_at_rest)
+                                NavigationPreviewContext.POST_SWIPE -> stringResource(R.string.all_post)
+                                NavigationPreviewContext.COMMENT_SWIPE -> stringResource(R.string.all_comment)
                             },
                             animationSpec = tween(180),
                             label = "preview-state-label",
@@ -376,15 +378,15 @@ private fun NavigationSwipePreviewSnapshot(
                 )
                 Text(
                     text = if (target == NavigationPreviewContext.POST_SWIPE) {
-                        "Swipe preview post"
+                        stringResource(R.string.all_swipe_preview_post)
                     } else {
-                        "This is a comment swipe preview."
+                        stringResource(R.string.all_this_is_a_comment_swipe_preview)
                     },
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                 )
                 Text(
-                    text = "Preview only · no Reddit action is performed",
+                    text = stringResource(R.string.sw_preview_only_no_reddit_action_is_performed),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -457,7 +459,7 @@ private fun TabletPreviewListPane(
         verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {
         Text(
-            "Home",
+            stringResource(R.string.all_home),
             style = MaterialTheme.typography.labelLarge,
         )
         repeat(3) { index ->
@@ -509,13 +511,13 @@ private fun TabletPreviewPostPane(
             color = MaterialTheme.colorScheme.secondaryContainer,
         ) {
             Text(
-                "Discussion",
+                stringResource(R.string.all_discussion),
                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                 style = MaterialTheme.typography.labelSmall,
             )
         }
         Text(
-            "Why does Plex still have no API keys in settings?",
+            stringResource(R.string.all_why_does_plex_still_have_no_api),
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontWeight = FontWeight.SemiBold,
             ),
@@ -554,13 +556,13 @@ private fun CommunityDiscoveryPreviewSnapshot(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    "Discover communities",
+                    stringResource(R.string.all_discover_communities),
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.labelLarge,
                 )
                 if (layout == CommunityDiscoveryLayout.CAROUSEL) {
                     Text(
-                        "See all",
+                        stringResource(R.string.all_see_all),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -724,7 +726,7 @@ private fun NavigationPhoneSnapshot(
             .height(NavigationSettingsPreviewViewportHeight)
             // LOWUI7_LABELS_SAY_WHAT_A_CONTROL_DOES_V1 (OCB-264): one button that
             // says what it shows and what a tap does; the drawing is decoration.
-            .clickable(onClickLabel = "Replay preview", role = Role.Button, onClick = onReplay)
+            .clickable(onClickLabel = stringResource(R.string.sw_replay_preview), role = Role.Button, onClick = onReplay)
             .clearAndSetSemantics { contentDescription = "Navigation preview" },
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainer,
@@ -851,7 +853,7 @@ private fun NavigationPhoneSnapshot(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         PreviewNavigationItem(
-                            label = "Home",
+                            label = stringResource(R.string.sw_home),
                             selected = true,
                             showLabel = navigationPreviewLabelVisible(
                                 navigationLabelMode,
@@ -859,7 +861,7 @@ private fun NavigationPhoneSnapshot(
                             ),
                         )
                         PreviewNavigationItem(
-                            label = "Subs",
+                            label = stringResource(R.string.sw_subs),
                             selected = false,
                             showLabel = navigationPreviewLabelVisible(
                                 navigationLabelMode,
@@ -867,7 +869,7 @@ private fun NavigationPhoneSnapshot(
                             ),
                         )
                         PreviewNavigationItem(
-                            label = "You",
+                            label = stringResource(R.string.sw_you),
                             selected = false,
                             showLabel = navigationPreviewLabelVisible(
                                 navigationLabelMode,

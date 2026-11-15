@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.ui.components.postBodyMentions
 import io.github.brealorg.subshell.ui.components.MentionSuggestions
 import io.github.brealorg.subshell.data.account.RedditPeopleSearchUiState
@@ -197,7 +199,7 @@ fun PostEditScreen(
         topBar = {
             RouteTopBar(
                 scrollBehavior = routeTopBarScroll,
-                title = { Text("Edit post") },
+                title = { Text(stringResource(R.string.scr_edit_post)) },
                 navigationIcon = {
                     IconButton(
                         enabled = closeEnabled,
@@ -205,16 +207,16 @@ fun PostEditScreen(
                     ) {
                         Icon(
                             Symbols.ArrowBack,
-                            contentDescription = "Close post editor",
+                            contentDescription = stringResource(R.string.scr_close_post_editor),
                         )
                     }
                 },
                 actions = {
                     ComposerPrimaryAction(
                         text = when (scopedState.phase) {
-                            PostEditPhase.SENDING -> "Saving…"
-                            PostEditPhase.CHECKING -> "Checking…"
-                            else -> "Save"
+                            PostEditPhase.SENDING -> stringResource(R.string.all_saving_2)
+                            PostEditPhase.CHECKING -> stringResource(R.string.all_checking)
+                            else -> stringResource(R.string.all_save)
                         },
                         enabled = canSave,
                         onClick = ::submit,
@@ -258,7 +260,7 @@ fun PostEditScreen(
         ) {
             // COMPOSE06: the fixed title mirrors the Body field (same header
             // style, outlined surface in the editor's shape and text style).
-            Text("Title", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.scr_title), style = MaterialTheme.typography.titleMedium)
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -275,18 +277,16 @@ fun PostEditScreen(
             }
             ComposerContextNote(
                 if (post.kind == PostKind.TEXT) {
-                    "Only the body of this Reddit post is edited. " +
-                        "The title, community and post type stay unchanged."
+                    stringResource(R.string.all2_only_the_body_of_this_reddit_post)
                 } else {
-                    "Controlled test: only the Markdown body is sent to Reddit. " +
-                        "The title, link, media, community and post type stay unchanged."
+                    stringResource(R.string.all2_controlled_test_only_the_markdown_body_is)
                 },
                 modifier = Modifier.padding(top = 8.dp),
             )
             // label = { Text("Post body") } is now the editor's placeholder; the
             // POST_EDIT_TEXT_MAX_CHARS limit gates Save and colours the counter.
             ComposerBodyHeader(
-                title = "Body",
+                title = stringResource(R.string.scr_body),
                 length = body.length,
                 maxLength = POST_EDIT_TEXT_MAX_CHARS,
                 previewVisible = previewVisible,
@@ -303,7 +303,7 @@ fun PostEditScreen(
             } else {
                 PostStyleComposerEditor(
                     state = editor,
-                    placeholder = "Share the details…",
+                    placeholder = stringResource(R.string.scr_share_the_details),
                     focusRequester = focusRequester,
                     onFormat = ::applyFormat,
                     onMediaReceived = {},
@@ -321,7 +321,7 @@ fun PostEditScreen(
 
                 PostEditPhase.AUTHORIZATION_REQUIRED -> {
                     Text(
-                        "Reddit's edit permission is required before this post can be changed.",
+                        stringResource(R.string.all_reddit_s_edit_permission_is_required_before),
                         modifier = Modifier.padding(top = 12.dp),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -329,7 +329,7 @@ fun PostEditScreen(
                         onClick = onAuthorizeEdit,
                         modifier = Modifier.padding(top = 8.dp),
                     ) {
-                        Text("Authorize Reddit")
+                        Text(stringResource(R.string.scr_authorize_reddit))
                     }
                 }
 
@@ -340,10 +340,10 @@ fun PostEditScreen(
                 -> {
                     Text(
                         when (scopedState.phase) {
-                            PostEditPhase.SENDING -> "Saving post body to Reddit…"
-                            PostEditPhase.CHECKING -> "Checking Reddit for your edit…"
-                            PostEditPhase.AUTHORIZING -> "Opening Reddit authorization…"
-                            else -> "Waiting for Reddit authorization…"
+                            PostEditPhase.SENDING -> stringResource(R.string.all_saving_post_body_to_reddit)
+                            PostEditPhase.CHECKING -> stringResource(R.string.all_checking_reddit_for_your_edit)
+                            PostEditPhase.AUTHORIZING -> stringResource(R.string.all_opening_reddit_authorization)
+                            else -> stringResource(R.string.all_waiting_for_reddit_authorization)
                         },
                         modifier = Modifier.padding(top = 12.dp),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -356,7 +356,7 @@ fun PostEditScreen(
                             onClick = onCancelAuthorization,
                             modifier = Modifier.padding(top = 8.dp),
                         ) {
-                            Text("Cancel authorization")
+                            Text(stringResource(R.string.scr_cancel_authorization))
                         }
                     }
                 }

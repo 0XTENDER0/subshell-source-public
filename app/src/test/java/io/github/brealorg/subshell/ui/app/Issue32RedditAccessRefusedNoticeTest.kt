@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.s
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import io.github.brealorg.subshell.data.account.RedditAccessRefusal
 import io.github.brealorg.subshell.data.account.RedditAccessRefusalState
@@ -54,7 +55,7 @@ class Issue32RedditAccessRefusedNoticeTest {
         RedditAccessRefusal.markRefused("fingerprint", 1L)
         composeRule.waitForIdle()
         assertEquals(REDDIT_ACCESS_REFUSED_SCOPE, host.currentRequest?.scopeKey)
-        assertEquals("Reddit has shut out this app's Client ID", host.currentRequest?.presentation?.title)
+        assertEquals("Reddit has shut out this app's Client ID", host.currentRequest?.presentation?.title?.s)
         assertEquals(true, RedditAccessRefusal.blocks("fingerprint"))
 
         host.retryCurrent()
