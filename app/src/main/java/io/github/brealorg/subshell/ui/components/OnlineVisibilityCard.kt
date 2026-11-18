@@ -111,7 +111,7 @@ internal fun OnlineVisibilitySettingRow(
                         style = MaterialTheme.typography.bodyLarge,
                     )
                     Text(
-                        "Allow Reddit to show when u/${account.username} is online",
+                        stringResource(R.string.comp_online_allow_show, account.username),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -206,7 +206,7 @@ internal fun OnlineVisibilitySettingRow(
             },
             text = {
                 Text(
-                    "Change Reddit's online-visibility setting for u/${account.username}? This applies to your Reddit account, not just this device.",
+                    stringResource(R.string.comp_change_reddit_s_online_visibility_setting, account.username),
                 )
             },
             confirmButton = {
@@ -221,13 +221,14 @@ internal fun OnlineVisibilitySettingRow(
     }
 }
 
+@androidx.compose.runtime.Composable
 internal fun onlineVisibilityIssueMessage(issue: OnlineVisibilityIssue): String = when (issue) {
-    OnlineVisibilityIssue.AUTHORIZATION -> "Sign in again to read or change this Reddit account setting. No change will be sent automatically."
-    OnlineVisibilityIssue.ACCOUNT_CHANGED -> "The active account changed. Reopen Accounts settings to load the current account."
-    OnlineVisibilityIssue.HTTP -> "Reddit rejected the request. Refresh to check the current setting."
-    OnlineVisibilityIssue.TRANSPORT -> "Could not reach Reddit. Refresh to read the setting again."
-    OnlineVisibilityIssue.PROTOCOL -> "Reddit returned an unexpected response. The setting is unknown."
-    OnlineVisibilityIssue.CONFIGURATION -> "Online visibility is not available for this connection."
-    OnlineVisibilityIssue.CHANGED_ON_REDDIT -> "The setting changed since you reviewed it. The latest value is shown; no change was sent."
-    OnlineVisibilityIssue.OUTCOME_UNKNOWN -> "Reddit may have applied the change. Refresh to check the current setting before making another change."
+    OnlineVisibilityIssue.AUTHORIZATION -> stringResource(R.string.comp_online_visibility_authorization)
+    OnlineVisibilityIssue.ACCOUNT_CHANGED -> stringResource(R.string.comp_online_visibility_account_changed)
+    OnlineVisibilityIssue.HTTP -> stringResource(R.string.comp_online_visibility_http)
+    OnlineVisibilityIssue.TRANSPORT -> stringResource(R.string.comp_online_visibility_transport)
+    OnlineVisibilityIssue.PROTOCOL -> stringResource(R.string.comp_online_visibility_protocol)
+    OnlineVisibilityIssue.CONFIGURATION -> stringResource(R.string.comp_online_visibility_configuration)
+    OnlineVisibilityIssue.CHANGED_ON_REDDIT -> stringResource(R.string.comp_online_visibility_changed_on_reddit)
+    OnlineVisibilityIssue.OUTCOME_UNKNOWN -> stringResource(R.string.comp_online_visibility_outcome_unknown)
 }

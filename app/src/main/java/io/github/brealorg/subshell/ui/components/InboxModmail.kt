@@ -612,43 +612,46 @@ fun InboxModmailQueueFilters(
 }
 
 
+@androidx.compose.runtime.Composable
 internal fun RedditModmailListMode.modmailQueueLabel(): String = when (this) {
-    RedditModmailListMode.ACTIVE -> "Active"
-    RedditModmailListMode.NEW -> "New"
-    RedditModmailListMode.IN_PROGRESS -> "In progress"
-    RedditModmailListMode.FILTERED -> "Filtered"
-    RedditModmailListMode.HIGHLIGHTED -> "Highlighted"
-    RedditModmailListMode.ARCHIVED -> "Archived"
-    RedditModmailListMode.APPEALS -> "Appeals"
-    RedditModmailListMode.JOIN_REQUESTS -> "Join requests"
-    RedditModmailListMode.MOD_DISCUSSIONS -> "Mod discussions"
-    RedditModmailListMode.NOTIFICATIONS -> "Notifications"
+    RedditModmailListMode.ACTIVE -> stringResource(R.string.comp_modmail_mode_1)
+    RedditModmailListMode.NEW -> stringResource(R.string.comp_modmail_mode_2)
+    RedditModmailListMode.IN_PROGRESS -> stringResource(R.string.comp_modmail_mode_3)
+    RedditModmailListMode.FILTERED -> stringResource(R.string.comp_modmail_mode_4)
+    RedditModmailListMode.HIGHLIGHTED -> stringResource(R.string.comp_modmail_mode_5)
+    RedditModmailListMode.ARCHIVED -> stringResource(R.string.comp_modmail_mode_6)
+    RedditModmailListMode.APPEALS -> stringResource(R.string.comp_modmail_mode_7)
+    RedditModmailListMode.JOIN_REQUESTS -> stringResource(R.string.comp_modmail_mode_8)
+    RedditModmailListMode.MOD_DISCUSSIONS -> stringResource(R.string.comp_modmail_mode_9)
+    RedditModmailListMode.NOTIFICATIONS -> stringResource(R.string.comp_modmail_mode_10)
 }
 
+@androidx.compose.runtime.Composable
 internal fun RedditModmailListMode.modmailEmptyTitle(): String = when (this) {
-    RedditModmailListMode.ACTIVE -> "Modmail is clear"
-    RedditModmailListMode.NEW -> "No new Modmail"
-    RedditModmailListMode.IN_PROGRESS -> "No Modmail in progress"
-    RedditModmailListMode.FILTERED -> "No filtered Modmail"
-    RedditModmailListMode.HIGHLIGHTED -> "No highlighted Modmail"
-    RedditModmailListMode.ARCHIVED -> "No archived Modmail"
-    RedditModmailListMode.APPEALS -> "No Modmail appeals"
-    RedditModmailListMode.JOIN_REQUESTS -> "No join requests"
-    RedditModmailListMode.MOD_DISCUSSIONS -> "No mod discussions"
-    RedditModmailListMode.NOTIFICATIONS -> "No Modmail notifications"
+    RedditModmailListMode.ACTIVE -> stringResource(R.string.comp_modmail_empty_title_1)
+    RedditModmailListMode.NEW -> stringResource(R.string.comp_modmail_empty_title_2)
+    RedditModmailListMode.IN_PROGRESS -> stringResource(R.string.comp_modmail_empty_title_3)
+    RedditModmailListMode.FILTERED -> stringResource(R.string.comp_modmail_empty_title_4)
+    RedditModmailListMode.HIGHLIGHTED -> stringResource(R.string.comp_modmail_empty_title_5)
+    RedditModmailListMode.ARCHIVED -> stringResource(R.string.comp_modmail_empty_title_6)
+    RedditModmailListMode.APPEALS -> stringResource(R.string.comp_modmail_empty_title_7)
+    RedditModmailListMode.JOIN_REQUESTS -> stringResource(R.string.comp_modmail_empty_title_8)
+    RedditModmailListMode.MOD_DISCUSSIONS -> stringResource(R.string.comp_modmail_empty_title_9)
+    RedditModmailListMode.NOTIFICATIONS -> stringResource(R.string.comp_modmail_empty_title_10)
 }
 
+@androidx.compose.runtime.Composable
 internal fun RedditModmailListMode.modmailEmptySupportingText(): String = when (this) {
-    RedditModmailListMode.ACTIVE -> "No active Modmail conversations are available."
-    RedditModmailListMode.NEW -> "New conversations will appear here."
-    RedditModmailListMode.IN_PROGRESS -> "Conversations being handled will appear here."
-    RedditModmailListMode.FILTERED -> "Reddit-filtered conversations will appear here."
-    RedditModmailListMode.HIGHLIGHTED -> "Highlighted conversations will appear here."
-    RedditModmailListMode.ARCHIVED -> "Archived conversations will appear here."
-    RedditModmailListMode.APPEALS -> "Appeal conversations will appear here."
-    RedditModmailListMode.JOIN_REQUESTS -> "Join-request conversations will appear here."
-    RedditModmailListMode.MOD_DISCUSSIONS -> "Internal moderator discussions will appear here."
-    RedditModmailListMode.NOTIFICATIONS -> "Moderator notifications will appear here."
+    RedditModmailListMode.ACTIVE -> stringResource(R.string.comp_modmail_empty_text_1)
+    RedditModmailListMode.NEW -> stringResource(R.string.comp_modmail_empty_text_2)
+    RedditModmailListMode.IN_PROGRESS -> stringResource(R.string.comp_modmail_empty_text_3)
+    RedditModmailListMode.FILTERED -> stringResource(R.string.comp_modmail_empty_text_4)
+    RedditModmailListMode.HIGHLIGHTED -> stringResource(R.string.comp_modmail_empty_text_5)
+    RedditModmailListMode.ARCHIVED -> stringResource(R.string.comp_modmail_empty_text_6)
+    RedditModmailListMode.APPEALS -> stringResource(R.string.comp_modmail_empty_text_7)
+    RedditModmailListMode.JOIN_REQUESTS -> stringResource(R.string.comp_modmail_empty_text_8)
+    RedditModmailListMode.MOD_DISCUSSIONS -> stringResource(R.string.comp_modmail_empty_text_9)
+    RedditModmailListMode.NOTIFICATIONS -> stringResource(R.string.comp_modmail_empty_text_10)
 }
 
 @Composable
@@ -662,7 +665,7 @@ fun InboxModmailMessageRow(
     val authorLabel = modmailMessageAuthorLabel(message, communityName)
     // ISSUE34_USER_TAGS_V1: only next to a person, never the community label.
     val shownAuthorTag = authorTag?.takeIf { authorLabel.startsWith("u/") }
-    val semanticRole = modmailMessageSemanticRole(message)
+    val semanticRole = modmailMessageSemanticRole(message)?.asString()
     val roleBorder = when {
         message.isInternal -> BorderStroke(
             width = 1.dp,
@@ -756,20 +759,20 @@ internal fun modmailMessageAuthorLabel(
     }
 }
 
-internal fun modmailMessageSemanticRole(message: RedditModmailMessage): String? {
+internal fun modmailMessageSemanticRole(message: RedditModmailMessage): UiText? {
     val role = message.participatingAs.orEmpty().lowercase()
     return when {
-        message.isInternal -> "Internal note · moderators only"
+        message.isInternal -> UiText.Resource(R.string.comp_modmail_role_1)
         message.authorHidden -> {
             val moderator = message.authorName.removePrefix("u/")
             if (moderator.isBlank() || moderator == "[deleted]") {
-                "Hidden moderator reply"
+                UiText.Resource(R.string.comp_modmail_role_3)
             } else {
-                "Sent by u/$moderator · hidden from participant"
+                UiText.Resource(R.string.comp_modmail_role_4, moderator)
             }
         }
         role.contains("subreddit") || role.contains("moderator") || role == "mod" ->
-            "Moderator reply"
+            UiText.Resource(R.string.comp_modmail_role_8)
         role.contains("participant") || role.contains("user") -> null
         role.isBlank() -> null
         else -> null
@@ -883,7 +886,7 @@ private fun ModmailUserAvatar(
         ?: "?"
     RemoteIdentityImage(
         uri = avatarUri,
-        contentDescription = "Avatar for u/${username.removePrefix("u/")}",
+        contentDescription = stringResource(R.string.comp_avatar_for_u, username.removePrefix("u/")),
         modifier = modifier.clip(CircleShape),
     ) {
         Surface(
@@ -925,7 +928,7 @@ private fun ModmailReplyIdentitySelector(
     ) {
         OutlinedTextField(
             value = if (replyAsSubreddit) {
-                "r/$communityName mod team"
+                stringResource(R.string.comp_r_mod_team_2, communityName)
             } else {
                 "u/${moderatorUsername.removePrefix("u/")}"
             },
@@ -1208,7 +1211,7 @@ fun InboxModmailComposer(
                 longReplyTitle = if (mode == InboxModmailComposeMode.INTERNAL_NOTE) {
                     stringResource(R.string.all_internal_note)
                 } else {
-                    "Reply in r/${conversation.communityName}"
+                    stringResource(R.string.comp_modmail_reply_in, conversation.communityName)
                 },
                 interactionActionsAtStart = true,
                 maxCharacters = 10_000,
@@ -1216,7 +1219,7 @@ fun InboxModmailComposer(
                     sendInProgress && mode == InboxModmailComposeMode.INTERNAL_NOTE ->
                         stringResource(R.string.all_adding_internal_note)
                     sendInProgress -> stringResource(R.string.all_sending_modmail_reply)
-                    mode == InboxModmailComposeMode.INTERNAL_NOTE -> "Add internal note"
+                    mode == InboxModmailComposeMode.INTERNAL_NOTE -> stringResource(R.string.comp_add_internal_note)
                     else -> stringResource(R.string.all_send_modmail_reply)
                 },
             )

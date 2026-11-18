@@ -200,7 +200,7 @@ class Issue267WidgetContentTest {
     @Test
     fun aPickedCommunityKeepsHowItWritesItsName() {
         PostsWidgetSourceStore.write(context, 41, PostsWidgetSource("r/BoostForReddit"))
-        assertEquals("r/BoostForReddit", PostsWidgetSourceStore.read(context, 41).label)
+        assertEquals("r/BoostForReddit", PostsWidgetSourceStore.read(context, 41).label(context))
 
         PostsWidgetSourceStore.write(context, 41, PostsWidgetSource.Home)
         assertEquals(PostsWidgetSource.Home, PostsWidgetSourceStore.read(context, 41))

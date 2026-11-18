@@ -208,7 +208,7 @@ fun ModeratorUserManagementDialog(
             title = { Text(stringResource(R.string.comp_unmute_u, user.username)) },
             text = {
                 Text(
-                    "This allows u/${user.username} to send modmail to r/$community again. Reddit will be checked again after the action.",
+                    stringResource(R.string.comp_um_unmute_explained, user.username, community),
                 )
             },
             confirmButton = {
@@ -242,7 +242,7 @@ fun ModeratorUserManagementDialog(
             title = { Text(stringResource(R.string.comp_unapprove_u, user.username)) },
             text = {
                 Text(
-                    "This removes u/${user.username} from the approved-user list for r/$community. Reddit will be checked again after the action.",
+                    stringResource(R.string.comp_um_unapprove_explained, user.username, community),
                 )
             },
             confirmButton = {
@@ -526,14 +526,17 @@ private fun ModeratorUserManagementOverview(
                         permissionDenied ->
                             stringResource(R.string.all2_reddit_denied_this_request_your_moderator_role, community)
                         state.failureKind == ModeratorUserManagementFailureKind.OUTCOME_UNKNOWN ->
-                            "subshell did not confirm the requested server state. Refresh user management before acting again."
+                            stringResource(R.string.comp_um_outcome_unknown)
                         state.failureKind == ModeratorUserManagementFailureKind.ALREADY_MUTATING ->
-                            "Another user-management action is already in progress."
+                            stringResource(R.string.comp_um_already_mutating)
                         // LOW_NET_USER_MUTATION_KEEPS_REDDITS_ERROR_V1 (OCB-552)
                         state.failureKind == ModeratorUserManagementFailureKind.VALIDATION &&
                             state.failureDetails?.toSafeTechnicalDetail() != null ->
-                            "Reddit refused this action for r/$community: " +
-                                state.failureDetails.toSafeTechnicalDetail()
+                            stringResource(
+                                R.string.comp_um_refused,
+                                community,
+                                state.failureDetails.toSafeTechnicalDetail().orEmpty(),
+                            )
                         else ->
                             stringResource(R.string.all_reddit_user_management_could_not_be_completed, community)
                     },
@@ -549,9 +552,11 @@ private fun ModeratorUserManagementOverview(
             state.verifiedUsername?.let { username ->
                 item("verified-$username-${state.verifiedBanned}") {
                     ModeratorUserManagementNotice(
-                        title = if (state.verifiedBanned == true) "Ban confirmed" else "Unban confirmed",
-                        message = "Reddit now reports u/$username as " +
-                            if (state.verifiedBanned == true) "banned." else "not banned.",
+                        title = stringResource(if (state.verifiedBanned == true) R.string.comp_um_ban_confirmed else R.string.comp_um_unban_confirmed),
+                        message = stringResource(
+                            if (state.verifiedBanned == true) R.string.comp_um_now_banned else R.string.comp_um_now_not_banned,
+                            username,
+                        ),
                         actionLabel = null,
                         onAction = {},
                     )
@@ -637,9 +642,11 @@ private fun ModeratorUserManagementOverview(
             state.verifiedMutedUsername?.let { username ->
                 item("verified-muted-$username-${state.verifiedMuted}") {
                     ModeratorUserManagementNotice(
-                        title = if (state.verifiedMuted == true) "Mute confirmed" else "Unmute confirmed",
-                        message = "Reddit now reports u/$username as " +
-                            if (state.verifiedMuted == true) "muted." else "not muted.",
+                        title = stringResource(if (state.verifiedMuted == true) R.string.comp_um_mute_confirmed else R.string.comp_um_unmute_confirmed),
+                        message = stringResource(
+                            if (state.verifiedMuted == true) R.string.comp_um_now_muted else R.string.comp_um_now_not_muted,
+                            username,
+                        ),
                         actionLabel = null,
                         onAction = {},
                     )
@@ -729,12 +736,10 @@ private fun ModeratorUserManagementOverview(
                         } else {
                             stringResource(R.string.all_unapprove_confirmed)
                         },
-                        message = "Reddit now reports u/$username as " +
-                            if (state.verifiedApproved == true) {
-                                "an approved user."
-                            } else {
-                                "not an approved user."
-                            },
+                        message = stringResource(
+                            if (state.verifiedApproved == true) R.string.comp_um_now_approved else R.string.comp_um_now_not_approved,
+                            username,
+                        ),
                         actionLabel = null,
                         onAction = {},
                     )
@@ -1120,7 +1125,7 @@ private fun ModeratorBanUserEditor(
                 color = MaterialTheme.colorScheme.surfaceContainerLow,
             ) {
                 Text(
-                    text = "This is a real subreddit ban. Leave duration blank for a permanent ban. subshell verifies the banned-user relationship after the action.",
+                    text = stringResource(R.string.comp_um_ban_explained),
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1371,7 +1376,7 @@ private fun ModeratorMuteUserEditor(
                 color = MaterialTheme.colorScheme.surfaceContainerLow,
             ) {
                 Text(
-                    "Muting prevents this user from sending new modmail to r/$communityName while Reddit's mute is active. subshell verifies the muted-user relationship after the action.",
+                    stringResource(R.string.comp_um_mute_explained, communityName),
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1576,7 +1581,7 @@ private fun ModeratorApproveUserEditor(
                 color = MaterialTheme.colorScheme.surfaceContainerLow,
             ) {
                 Text(
-                    "Approving adds this account to r/$communityName's approved-user list. Reddit controls how approved-user status affects participation based on the community's settings. subshell verifies the relationship after the action.",
+                    stringResource(R.string.comp_um_approve_explained, communityName),
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1693,13 +1698,13 @@ private fun ModeratorSelectedApprovedUser(
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    "Selected approved-user target",
+                    stringResource(R.string.comp_um_selected_approve_target),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             IconButton(enabled = enabled, onClick = onClear) {
-                Icon(Symbols.Close, "Change approved-user target")
+                Icon(Symbols.Close, stringResource(R.string.comp_um_change_approve_target))
             }
         }
     }
@@ -1800,6 +1805,7 @@ private fun ModeratorUserAvatar(
 private const val MODERATOR_USER_SEARCH_DEBOUNCE_MS = 300L
 private const val MODERATOR_USER_SEARCH_RESULT_LIMIT = 6
 
+@Composable
 private fun moderatorBanAgeLabel(
     createdEpochSeconds: Long,
     nowEpochSeconds: Long = Instant.now().epochSecond,
@@ -1810,11 +1816,11 @@ private fun moderatorBanAgeLabel(
         Instant.ofEpochSecond(nowEpochSeconds),
     ).seconds.coerceAtLeast(0L)
     return when {
-        seconds < 60L -> "just now"
-        seconds < 3_600L -> "${seconds / 60L}m ago"
-        seconds < 86_400L -> "${seconds / 3_600L}h ago"
-        seconds < 604_800L -> "${seconds / 86_400L}d ago"
-        else -> "${seconds / 604_800L}w ago"
+        seconds < 60L -> stringResource(R.string.comp_just_now)
+        seconds < 3_600L -> stringResource(R.string.comp_age_minutes_ago, seconds / 60L)
+        seconds < 86_400L -> stringResource(R.string.comp_age_hours_ago, seconds / 3_600L)
+        seconds < 604_800L -> stringResource(R.string.comp_age_days_ago, seconds / 86_400L)
+        else -> stringResource(R.string.comp_age_weeks_ago, seconds / 604_800L)
     }
 }
 

@@ -791,8 +791,9 @@ rg -U -q 'private fun reloadRedditConfigurationHost\(\) \{\n(\s*//[^\n]*\n)*\s*s
     "$M/MainActivity.kt" &&
 ! rg -q 'killProcess\(|System\.exit\(' "$M/MainActivity.kt" &&
 rg -U -q 'onRedditConfigurationChanged =\n\s*onRedditConfigurationChanged,' "$M/ui/app/SecondaryRouteHost.kt" &&
-rg -U -q '"Reddit connection configuration saved"\n\s*onRedditConfigurationChanged\(\)' "$M/ui/screens/SettingsScreen.kt" &&
-rg -U -q '"Reddit connection configuration removed"\n\s*onRedditConfigurationChanged\(\)' "$M/ui/screens/SettingsScreen.kt" ||
+# TRANSLATE14: the message may be the English literal or its string resource.
+rg -U -q '("Reddit connection configuration saved"|R\.string\.set_connection_configuration_saved\))\n\s*onRedditConfigurationChanged\(\)' "$M/ui/screens/SettingsScreen.kt" &&
+rg -U -q '("Reddit connection configuration removed"|R\.string\.set_connection_configuration_removed\))\n\s*onRedditConfigurationChanged\(\)' "$M/ui/screens/SettingsScreen.kt" ||
     fail CONFIGURATION_CHANGE_RELOADS_THE_HOST
 pass CONFIGURATION_CHANGE_RELOADS_THE_HOST
 

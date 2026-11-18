@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
 import android.app.ActivityManager
@@ -56,7 +57,7 @@ internal sealed interface UpdateInstallState {
      */
     data class Installing(val versionCode: Int, val waitingForYou: Boolean = false) : UpdateInstallState
 
-    data class Failed(val versionCode: Int, val message: String) : UpdateInstallState
+    data class Failed(val versionCode: Int, val message: UiText) : UpdateInstallState
 }
 
 /** Android must let subshell install apps before Update can work. */
@@ -130,7 +131,7 @@ internal object UpdateInstallCoordinator {
                     }
                 when (result) {
                     is UpdateApkDownload.Failed ->
-                        mutableState.value = UpdateInstallState.Failed(release.versionCode, result.failure.message)
+                        mutableState.value = UpdateInstallState.Failed(release.versionCode, UiText.Resource(result.failure.messageRes))
                     is UpdateApkDownload.Verified -> {
                         mutableState.value = UpdateInstallState.Installing(release.versionCode)
                         val committed = install(appContext, result.file)
@@ -261,17 +262,17 @@ internal object UpdateInstallCoordinator {
     }
 }
 
-internal const val UPDATE_INSTALL_NOT_STARTED = "Android's installer couldn't be started. Try again."
+internal val UPDATE_INSTALL_NOT_STARTED: UiText = UiText.Resource(io.github.brealorg.subshell.R.string.update_install_not_started)
 
-internal fun updateInstallFailureMessage(status: Int): String = when (status) {
-    PackageInstaller.STATUS_FAILURE_ABORTED -> "The update wasn't installed."
-    PackageInstaller.STATUS_FAILURE_BLOCKED -> "Android blocked the install."
+internal fun updateInstallFailureMessage(status: Int): UiText = when (status) {
+    PackageInstaller.STATUS_FAILURE_ABORTED -> UiText.Resource(io.github.brealorg.subshell.R.string.update_install_aborted)
+    PackageInstaller.STATUS_FAILURE_BLOCKED -> UiText.Resource(io.github.brealorg.subshell.R.string.update_install_blocked)
     PackageInstaller.STATUS_FAILURE_CONFLICT,
     PackageInstaller.STATUS_FAILURE_INCOMPATIBLE,
-    -> "Android refused the update because it doesn't match the installed app."
-    PackageInstaller.STATUS_FAILURE_STORAGE -> "There isn't enough storage to install the update."
-    PackageInstaller.STATUS_FAILURE_INVALID -> "Android couldn't read the downloaded update."
-    else -> "Android didn't install the update."
+    -> UiText.Resource(io.github.brealorg.subshell.R.string.update_install_conflict)
+    PackageInstaller.STATUS_FAILURE_STORAGE -> UiText.Resource(io.github.brealorg.subshell.R.string.update_install_storage)
+    PackageInstaller.STATUS_FAILURE_INVALID -> UiText.Resource(io.github.brealorg.subshell.R.string.update_install_invalid)
+    else -> UiText.Resource(io.github.brealorg.subshell.R.string.update_install_failed)
 }
 
 /** Copies [apk] into an install session and commits it; Android takes it from there. Returns the session id. */

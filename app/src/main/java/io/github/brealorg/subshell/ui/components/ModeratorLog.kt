@@ -289,7 +289,7 @@ private fun ModeratorLogRow(entry: RedditModeratorLogEntry) {
             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
             content = {
                 Text(
-                    text = moderationLogActionLabel(entry.action),
+                    text = moderationLogActionLabel(entry.action).asString(),
                     style = MaterialTheme.typography.titleSmall,
                 )
             },
@@ -393,27 +393,29 @@ internal fun moderatorLogRelativeAgeLabel(
     }
 }
 
-internal fun moderationLogActionLabel(rawAction: String): String =
+internal fun moderationLogActionLabel(rawAction: String): UiText =
     when (rawAction.trim().lowercase()) {
-        "approvelink" -> "Approved post"
-        "approvecomment" -> "Approved comment"
-        "removelink" -> "Removed post"
-        "removecomment" -> "Removed comment"
-        "spamlink" -> "Marked post as spam"
-        "spamcomment" -> "Marked comment as spam"
-        "ignorereports" -> "Ignored reports"
-        "unignorereports" -> "Restored reports"
-        "lock" -> "Locked"
-        "unlock" -> "Unlocked"
-        "distinguish" -> "Changed distinguish"
-        "sticky" -> "Pinned post"
-        "unsticky" -> "Unpinned post"
-        "marknsfw" -> "Marked NSFW"
-        "unmarknsfw" -> "Removed NSFW"
-        else -> rawAction
-            .trim()
-            .replace('_', ' ')
-            .replaceFirstChar { char ->
-                if (char.isLowerCase()) char.titlecase() else char.toString()
-            }
+        "approvelink" -> UiText.Resource(R.string.comp_modlog_action_1)
+        "approvecomment" -> UiText.Resource(R.string.comp_modlog_action_2)
+        "removelink" -> UiText.Resource(R.string.comp_modlog_action_3)
+        "removecomment" -> UiText.Resource(R.string.comp_modlog_action_4)
+        "spamlink" -> UiText.Resource(R.string.comp_modlog_action_5)
+        "spamcomment" -> UiText.Resource(R.string.comp_modlog_action_6)
+        "ignorereports" -> UiText.Resource(R.string.comp_modlog_action_7)
+        "unignorereports" -> UiText.Resource(R.string.comp_modlog_action_8)
+        "lock" -> UiText.Resource(R.string.comp_modlog_action_9)
+        "unlock" -> UiText.Resource(R.string.comp_modlog_action_10)
+        "distinguish" -> UiText.Resource(R.string.comp_modlog_action_11)
+        "sticky" -> UiText.Resource(R.string.comp_modlog_action_12)
+        "unsticky" -> UiText.Resource(R.string.comp_modlog_action_13)
+        "marknsfw" -> UiText.Resource(R.string.comp_modlog_action_14)
+        "unmarknsfw" -> UiText.Resource(R.string.comp_modlog_action_15)
+        else -> UiText.Plain(
+            rawAction
+                .trim()
+                .replace('_', ' ')
+                .replaceFirstChar { char ->
+                    if (char.isLowerCase()) char.titlecase() else char.toString()
+                },
+        )
     }

@@ -4,7 +4,9 @@
 Usage: python3 -I tools/translation-status.py [LANG ...] [--list] [--check]
 
 Compares app/src/main/res/values/strings.xml (English, the source) with each
-app/src/main/res/values-<lang>/strings.xml. For each language it prints how many
+app/src/main/res/values-<lang>/strings.xml (a BCP 47 tag such as es-419 lives in
+values-b+es+419, the only form aapt2 accepts for a numeric region; pass it as
+es-419). For each language it prints how many
 strings are translated, which are missing, which are extra (no longer in
 English) and which have a different set of format arguments (%1$s, %2$d, ...),
 a mistake that crashes or garbles text at run time.
@@ -45,6 +47,12 @@ def args(text):
     return sorted(set(ARG.findall(text)))
 
 
+def lang_of(folder):
+    """values-nb -> nb, values-pt-rBR -> pt-rBR, values-b+es+419 -> es-419."""
+    name = folder.name[len("values-"):]
+    return name[2:].replace("+", "-") if name.startswith("b+") else name
+
+
 def main(argv):
     want_list = "--list" in argv
     check = "--check" in argv
@@ -52,13 +60,13 @@ def main(argv):
     english = load(RES / "values/strings.xml")
     translatable = {n: t for n, (t, no) in english.items() if not no}
     dirs = sorted(p for p in RES.glob("values-*") if (p / "strings.xml").is_file())
-    dirs = [p for p in dirs if re.fullmatch(r"values-[a-z]{2,3}(-r[A-Z]{2}|-\d{3})?", p.name)]
+    dirs = [p for p in dirs if re.fullmatch(r"values-([a-z]{2,3}(-r[A-Z]{2})?|b\+[a-z]{2,3}(\+[A-Za-z0-9]+)*)", p.name)]
     if langs:
-        dirs = [p for p in dirs if p.name[len("values-"):] in langs]
+        dirs = [p for p in dirs if lang_of(p) in langs]
     bad = False
     print(f"English: {len(translatable)} strings to translate")
     for d in dirs:
-        lang = d.name[len("values-"):]
+        lang = lang_of(d)
         have = {n: t for n, (t, no) in load(d / "strings.xml").items()}
         missing = [n for n in translatable if n not in have]
         extra = [n for n in have if n not in translatable]

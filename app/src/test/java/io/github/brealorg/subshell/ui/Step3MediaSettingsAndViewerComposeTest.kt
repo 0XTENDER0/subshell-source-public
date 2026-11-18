@@ -170,7 +170,7 @@ class Step3MediaSettingsAndViewerComposeTest {
 
         val deletes = composeRule.onAllNodes(hasText("Delete all") and hasClickAction())
         deletes[deletes.fetchSemanticsNodes().size - 1].performSemanticsAction(SemanticsActions.OnClick)
-        composeRule.waitUntil(10_000) { exists("Deleted 1 videos", substring = true) }
+        composeRule.waitUntil(10_000) { exists("Deleted 1 video ·", substring = true) }
 
         assertFalse(folder.exists())
     }

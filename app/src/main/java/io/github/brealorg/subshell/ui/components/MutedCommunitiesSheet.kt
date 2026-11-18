@@ -146,7 +146,7 @@ fun MutedCommunitiesSheet(
                                         Icon(
                                             imageVector = Symbols.VolumeUp,
                                             contentDescription =
-                                                "Unmute ${communityLabel(mute.communityName)}",
+                                                stringResource(R.string.comm_unmute_name, communityLabel(mute.communityName)),
                                         )
                                     }
                                 }

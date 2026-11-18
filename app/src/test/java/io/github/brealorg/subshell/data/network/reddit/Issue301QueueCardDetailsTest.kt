@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.data.network.reddit
 
+import io.github.brealorg.subshell.ui.s
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import io.github.brealorg.subshell.data.account.RedditModeratorQueueKind
 import io.github.brealorg.subshell.data.network.SubshellNetworkJson
 import io.github.brealorg.subshell.model.PostKind
@@ -22,6 +26,8 @@ import org.junit.Test
  * comment's first picture, flair, age and the first lines of a post's text. The JSON
  * follows what Reddit answered for r/subshell's lists on 2026-11-13 (ids changed).
  */
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue301QueueCardDetailsTest {
     private val now = 1_794_600_000L
 
@@ -83,10 +89,11 @@ class Issue301QueueCardDetailsTest {
         val item = page(reportedImagePost).items.single()
         assertEquals(
             listOf("AutoModerator: Review image: low effort", "Reported: Spam (2)"),
-            moderatorQueueItemReasons(item),
+            moderatorQueueItemReasons(item).map { it.s },
         )
         assertFalse(moderatorQueueItemIsHeldWithoutReports(item))
-        assertEquals("r/subshell · u/poster (Regular) · 3h · Meme", moderatorQueueItemByline(item))
+        // QUEUEBYLINE01: the age before the user flair, so a long flair cannot hide it.
+        assertEquals("r/subshell · 3h · u/poster (Regular) · Meme", moderatorQueueItemByline(item))
         assertEquals(PostKind.IMAGE, item.details.post?.kind)
         assertTrue(moderatorQueueItemHasPicture(item))
         assertEquals(item.details.post, moderatorQueueThumbnailPost(item))
@@ -96,7 +103,7 @@ class Issue301QueueCardDetailsTest {
     fun anUnreportedItemInTheQueueIsHeldAndShowsItsText() {
         val item = page(heldTextPost).items.single()
         assertTrue(moderatorQueueItemIsHeldWithoutReports(item))
-        assertEquals(emptyList<String>(), moderatorQueueItemReasons(item))
+        assertEquals(emptyList<String>(), moderatorQueueItemReasons(item).map { it.s })
         assertEquals("Just testing. Second line", item.details.snippet)
         // A text post has no picture.
         assertFalse(moderatorQueueItemHasPicture(item))
@@ -110,7 +117,7 @@ class Issue301QueueCardDetailsTest {
         assertEquals("Mohahahah · Image", item.summary)
         assertEquals("Subshell 1.0.2 is out", item.details.linkTitle)
         assertEquals("https://preview.redd.it/gif1.gif?width=320&s=b", item.details.commentImageUrl)
-        assertEquals(listOf("AutoModerator: Review image comment"), moderatorQueueItemReasons(item))
+        assertEquals(listOf("AutoModerator: Review image comment"), moderatorQueueItemReasons(item).map { it.s })
         val picture = moderatorQueueThumbnailPost(item)!!
         assertEquals(PostKind.GIF, picture.kind)
         assertEquals("t1_ccc333", picture.id)
@@ -124,13 +131,13 @@ class Issue301QueueCardDetailsTest {
             "https://preview.redd.it/xyz.jpeg?width=1080&format=pjpg&s=e1",
             item.details.commentImageUrl,
         )
-        assertEquals(listOf("Reported: Off topic"), moderatorQueueItemReasons(item))
+        assertEquals(listOf("Reported: Off topic"), moderatorQueueItemReasons(item).map { it.s })
     }
 
     @Test
     fun aRemovedItemSaysWhoRemovedItAndWhy() {
         val item = page(removedComment).items.single()
-        assertEquals("Removed by u/brealorg · Test removal reason", moderatorQueueItemRemovalLine(item))
+        assertEquals("Removed by u/brealorg · Test removal reason", moderatorQueueItemRemovalLine(item)?.s)
         assertFalse(moderatorQueueItemHasPicture(item))
     }
 

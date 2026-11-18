@@ -180,7 +180,7 @@ fun PostEditScreen(
     }
     if (discardConfirmVisible) {
         ComposerDiscardChangesDialog(
-            subject = "post",
+            message = R.string.comp_edits_lost_post,
             onKeepEditing = { discardConfirmVisible = false },
             onDiscard = {
                 discardConfirmVisible = false

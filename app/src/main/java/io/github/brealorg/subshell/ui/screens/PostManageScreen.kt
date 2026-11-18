@@ -444,18 +444,19 @@ fun PostManageScreen(
     }
 }
 
+@Composable
 private fun postManageAuthorizationMessage(
     operation: PostManageOperation?,
 ): String = when (operation) {
     PostManageOperation.FLAIR_ACCESS,
     PostManageOperation.SET_FLAIR,
-    -> "Reddit's flair permission is required to change post flair."
+    -> stringResource(R.string.scr_manage_permission_flair)
     PostManageOperation.SET_NSFW,
     PostManageOperation.SET_SPOILER,
-    -> "Reddit's post-moderation permission is required by this endpoint. subshell requests it only when you change NSFW or spoiler status."
+    -> stringResource(R.string.scr_manage_permission_modposts)
     PostManageOperation.SET_SEND_REPLIES ->
-        "Reddit's edit permission is required to change reply notifications."
-    null -> "Reddit requires additional permission for this change."
+        stringResource(R.string.scr_manage_permission_edit)
+    null -> stringResource(R.string.scr_manage_permission_other)
 }
 
 

@@ -165,14 +165,17 @@ internal fun ModeratorActionsSheet(
 
 private const val MODERATOR_ACTION_NOTICE_SCOPE = "moderator-action"
 
-internal fun moderatorQuickActionSuccessTitle(request: RedditModeratorActionRequest): String {
-    val what = if (request.thingFullname.startsWith("t3_")) "Post" else "Comment"
-    return when (request.action) {
-        RedditModeratorAction.APPROVE -> "$what approved"
-        RedditModeratorAction.REMOVE -> "$what removed"
-        RedditModeratorAction.SPAM -> "$what marked as spam"
-        else -> "Done"
-    }
+internal fun moderatorQuickActionSuccessTitle(request: RedditModeratorActionRequest): UiText {
+    // TRANSLATE14: one whole title per action and kind.
+    val post = request.thingFullname.startsWith("t3_")
+    return UiText.Resource(
+        when (request.action) {
+            RedditModeratorAction.APPROVE -> if (post) R.string.comp_quick_post_approved else R.string.comp_quick_comment_approved
+            RedditModeratorAction.REMOVE -> if (post) R.string.comp_quick_post_removed else R.string.comp_quick_comment_removed
+            RedditModeratorAction.SPAM -> if (post) R.string.comp_quick_post_spam else R.string.comp_quick_comment_spam
+            else -> R.string.comp_quick_done
+        },
+    )
 }
 
 /**
@@ -304,7 +307,7 @@ internal fun ModeratorQuickActionsHost(
                 } else {
                     notices.noticeInfo(
                         moderatorQuickActionSuccessTitle(awaiting),
-                        "r/${awaiting.communityName}",
+                        UiText.Plain("r/${awaiting.communityName}"),
                     )
                 }
             }
@@ -318,7 +321,7 @@ internal fun ModeratorQuickActionsHost(
                     presentation = ErrorPresentation(
                         kind = ErrorPresentationKind.DEGRADED,
                         title = UiText.Resource(R.string.ep_moderator_action_failed),
-                        message = UiText.Plain(moderatorActionFailureMessage(actionState)),
+                        message = moderatorActionFailureMessage(actionState),
                         primaryAction = ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.ep_retry)).takeIf { retryable },
                     ),
                     failureDetails = actionState.failureDetails,

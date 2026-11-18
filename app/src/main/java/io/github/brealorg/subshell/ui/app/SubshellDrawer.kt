@@ -650,7 +650,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.drawerCommunityItems(
                         Icon(
                             imageVector = Symbols.VolumeOff,
                             contentDescription =
-                                "Mute settings for r/${community.name}",
+                                stringResource(R.string.drawer_mute_settings_for, community.name),
                             modifier = Modifier.size(18.dp),
                             tint = MaterialTheme.colorScheme.primary,
                         )

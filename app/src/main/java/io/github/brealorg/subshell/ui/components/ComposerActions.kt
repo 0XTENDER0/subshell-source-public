@@ -73,14 +73,14 @@ fun editHasUnsavedChanges(original: String, current: String): Boolean =
  */
 @Composable
 fun ComposerDiscardChangesDialog(
-    subject: String,
+    @androidx.annotation.StringRes message: Int,
     onKeepEditing: () -> Unit,
     onDiscard: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onKeepEditing,
         title = { Text(stringResource(R.string.comp_discard_changes)) },
-        text = { Text(stringResource(R.string.comp_your_edits_to_this_will_be_lost, subject)) },
+        text = { Text(stringResource(message)) },
         confirmButton = {
             TextButton(onClick = onDiscard) {
                 Text(stringResource(R.string.comp_discard), color = MaterialTheme.colorScheme.error)

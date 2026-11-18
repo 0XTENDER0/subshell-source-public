@@ -473,11 +473,12 @@ internal fun ConversationRouteHost(
 // ISSUE48_CONVERSATION_WAITS_FOR_THE_LIVE_INBOX_V1
 @Composable
 private fun ConversationRouteWaiting(padding: PaddingValues) {
+    val loadingDescription = stringResource(R.string.scr_loading_conversation)
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .semantics { contentDescription = "Loading conversation" },
+            .semantics { contentDescription = loadingDescription },
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator()

@@ -55,7 +55,7 @@
     <!-- Used in: SubshellDrawer -->
     <string name="drawer_no_cached_communities">No cached joined communities</string>
     <!-- TRANSLATE01_SHELL_NAV_AND_SETUP_V1 -->
-    <!-- Used in: SubshellDrawer, SubshellState -->
+    <!-- Used in: SubshellDrawer, SubshellState, WidgetContent -->
     <string name="nav_home">Home</string>
     <!-- Used in: SubshellState -->
     <string name="nav_communities">Communities</string>
@@ -65,7 +65,7 @@
     <string name="nav_you">You</string>
     <!-- Used in: LayoutPolicy -->
     <string name="nav_subs">Subs</string>
-    <!-- Used in: AppFloatingActionButton -->
+    <!-- Used in: AppFloatingActionButton, CommunitiesScreen -->
     <string name="fab_create">Create</string>
     <!-- Used in: AppFloatingActionButton -->
     <string name="fab_message">Message</string>
@@ -367,7 +367,7 @@
     <string name="error_read_reddit_is_blocking_these_replies_retry">Reddit is blocking these replies · Retry</string>
     <!-- Used in: RedditReadErrorPresentations -->
     <string name="error_read_couldn_t_load_replies_retry">Couldn\'t load replies · Retry</string>
-    <!-- Used in: RedditReadErrorPresentations -->
+    <!-- Used in: BackupRestoreScreen, RedditReadErrorPresentations -->
     <string name="error_join_sentences">%1$s %2$s</string>
     <!-- Used in: ViewportErrorHost -->
     <string name="error_viewport_reddit_is_blocking_this_request_from_third">Reddit is blocking this request from third-party apps right now.</string>
@@ -469,7 +469,7 @@
     <string name="error_write_reddit_may_have_received_the_check_the_2">Reddit may have received the %1$s. Check the post before trying again.</string>
     <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_the_reddit_safety_action_couldn_t_be">The Reddit safety action couldn\'t be completed.</string>
-    <!-- Used in: RedditWriteErrorPresentations -->
+    <!-- Used in: PostScreen, RedditWriteErrorPresentations -->
     <string name="error_write_retry">Retry</string>
     <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_dismiss">Dismiss</string>
@@ -518,10 +518,6 @@
     <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_the_comment_couldn_t_be_posted">The comment couldn\'t be posted.</string>
     <!-- Used in: RedditWriteErrorPresentations -->
-    <string name="error_write_message">Message</string>
-    <!-- Used in: RedditWriteErrorPresentations -->
-    <string name="error_write_reply">Reply</string>
-    <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_media_sent_text_may_have_been_sent">Media sent; text may have been sent</string>
     <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_the_image_gif_was_sent_but_reddit">The image/GIF was sent, but Reddit did not confirm the text. Refresh the conversation before trying the text again.</string>
@@ -537,10 +533,6 @@
     <string name="error_write_image_may_have_been_sent">Image may have been sent</string>
     <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_reddit_did_not_confirm_the_image">Reddit did not confirm the image/GIF. Refresh the conversation: it shows up there if it arrived. The text was not sent.</string>
-    <!-- Used in: RedditWriteErrorPresentations -->
-    <string name="error_write_may_have_been_sent">%1$s may have been sent</string>
-    <!-- Used in: RedditWriteErrorPresentations -->
-    <string name="error_write_reddit_may_have_received_this_refresh_the">Reddit may have received this %1$s. Refresh the conversation before trying again.</string>
     <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_grant_media_access">Grant media access</string>
     <!-- Used in: RedditWriteErrorPresentations -->
@@ -560,8 +552,6 @@
     <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_couldn_t_send_reply">Couldn\'t send reply</string>
     <!-- Used in: RedditWriteErrorPresentations -->
-    <string name="error_write_review_the_and_try_again">Review the %1$s and try again.</string>
-    <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_subshell_couldn_t_open_reddit_s_chat">subshell couldn\'t open Reddit\'s chat session for images. Text messages still work; the details below say which step failed.</string>
     <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_subshell_couldn_t_match_this_conversation_to">subshell couldn\'t match this conversation to its Reddit Chat room.</string>
@@ -576,19 +566,7 @@
     <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_reddit_media_access_is_required_to_send">Reddit media access is required to send images or GIFs.</string>
     <!-- Used in: RedditWriteErrorPresentations -->
-    <string name="error_write_the_reddit_sign_in_for_this_account_2">The Reddit sign-in for this account needs attention before %1$s sending can continue.</string>
-    <!-- Used in: RedditWriteErrorPresentations -->
-    <string name="error_write_reddit_asked_you_to_wait_before_sending">Reddit asked you to wait before sending another %1$s.</string>
-    <!-- Used in: RedditWriteErrorPresentations -->
-    <string name="error_write_reddit_rejected_the_request">Reddit rejected the %1$s request.</string>
-    <!-- Used in: RedditWriteErrorPresentations -->
-    <string name="error_write_subshell_couldn_t_reach_reddit_to_send">subshell couldn\'t reach Reddit to send the %1$s.</string>
-    <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_reddit_returned_a_send_result_subshell_couldn">Reddit returned a send result subshell couldn\'t verify.</string>
-    <!-- Used in: RedditWriteErrorPresentations -->
-    <string name="error_write_sending_is_unavailable_for_this_conversation">%1$s sending is unavailable for this conversation.</string>
-    <!-- Used in: RedditWriteErrorPresentations -->
-    <string name="error_write_the_couldn_t_be_sent">The %1$s couldn\'t be sent.</string>
     <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_post_may_have_been_published">Post may have been published</string>
     <!-- Used in: RedditWriteErrorPresentations -->
@@ -697,7 +675,7 @@
     <string name="error_write_this_comment_is_already_being_deleted">This comment is already being deleted.</string>
     <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_the_comment_couldn_t_be_deleted">The comment couldn\'t be deleted.</string>
-    <!-- Used in: RedditWriteErrorPresentations -->
+    <!-- Used in: PostScreen, RedditWriteErrorPresentations -->
     <string name="error_write_deletion_not_confirmed">Deletion not confirmed</string>
     <!-- Used in: RedditWriteErrorPresentations -->
     <string name="error_write_couldn_t_delete_post">Couldn\'t delete post</string>
@@ -989,7 +967,7 @@
     <string name="feed_thumbnail">Thumbnail %1$s</string>
     <!-- Used in: MediaComponents -->
     <string name="feed_open_external_link">Open external link</string>
-    <!-- Used in: MediaComponents -->
+    <!-- Used in: MediaComponents, MediaPostActions -->
     <string name="feed_share_media">Share media</string>
     <!-- Used in: MediaComponents -->
     <string name="feed_share_post_link">Share post link</string>
@@ -1005,7 +983,7 @@
     <string name="feed_gif_paused">GIF paused</string>
     <!-- Used in: MediaComponents -->
     <string name="feed_open_image_of_full_screen">Open image %1$s of %2$s full screen</string>
-    <!-- Used in: MediaComponents -->
+    <!-- Used in: MediaComponents, PostLayouts -->
     <string name="feed_open_link">Open link</string>
     <!-- Used in: MediaComponents -->
     <string name="feed_u">u/%1$s</string>
@@ -1033,8 +1011,14 @@
     <string name="comp_open_comment_image_fullscreen">Open comment image fullscreen</string>
     <!-- Used in: CommentRemoteMedia -->
     <string name="comp_comment_gif">Comment GIF</string>
-    <!-- Used in: CommentRemoteMedia -->
+    <!-- Used in: CommentRemoteMedia, VideoPlayer -->
     <string name="comp_media_actions">Media actions</string>
+    <!-- Used in: CommunityWikiContent -->
+    <string name="comp_wiki_index_new_system">Reddit only returned configuration pages. This community\'s Wiki is probably in Reddit\'s new Wiki, which Reddit doesn\'t offer to apps.</string>
+    <!-- Used in: CommunityWikiContent -->
+    <string name="comp_wiki_page_new_system">Reddit\'s API doesn\'t have this page. It may be in Reddit\'s new Wiki, which Reddit doesn\'t offer to apps, or it may not exist.</string>
+    <!-- Used in: CommunityWikiContent -->
+    <string name="comp_open_wiki_on_reddit">Open on reddit.com</string>
     <!-- Used in: CommunityAboutSheet -->
     <string name="comp_wiki">Wiki</string>
     <!-- Used in: CommunityAboutSheet -->
@@ -1069,8 +1053,6 @@
     <string name="comp_hide_posts_from_home_popular_and_all">Hide posts from Home, Popular and All. Direct visits and saved posts still work.</string>
     <!-- Used in: CommunityMuteSheet -->
     <string name="comp_change_duration">Change duration</string>
-    <!-- Used in: CommunityMuteSheet -->
-    <string name="comp_automatically_unmute_after">Automatically unmute after %1$s</string>
     <!-- Used in: CommunityMuteSheet -->
     <string name="comp_until">Until…</string>
     <!-- Used in: CommunityMuteSheet -->
@@ -1138,8 +1120,6 @@
     <!-- Used in: ComposerActions -->
     <string name="comp_discard_changes">Discard changes?</string>
     <!-- Used in: ComposerActions -->
-    <string name="comp_your_edits_to_this_will_be_lost">Your edits to this %1$s will be lost.</string>
-    <!-- Used in: ComposerActions -->
     <string name="comp_keep_editing">Keep editing</string>
     <!-- Used in: ComposerFormattingDock -->
     <string name="comp_undo">Undo</string>
@@ -1147,8 +1127,6 @@
     <string name="comp_redo">Redo</string>
     <!-- Used in: ComposerFormattingDock -->
     <string name="comp_more_formatting">More formatting</string>
-    <!-- Used in: ContentSafetyDialogs -->
-    <string name="comp_report">Report %1$s</string>
     <!-- Used in: ContentSafetyDialogs -->
     <string name="comp_loading_report_reasons">Loading report reasons</string>
     <!-- Used in: ContentSafetyDialogs -->
@@ -1167,8 +1145,6 @@
     <string name="comp_copy_text">Copy text</string>
     <!-- Used in: CopyActions -->
     <string name="comp_select_text">Select text</string>
-    <!-- Used in: CopyActions -->
-    <string name="comp_copy_link_to">Copy link to %1$s</string>
     <!-- Used in: CopyActions -->
     <string name="comp_link_actions">Link actions</string>
     <!-- Used in: CopyActions -->
@@ -1201,7 +1177,7 @@
     <string name="comp_choose_which_reddit_queue_to_view">Choose which Reddit queue to view</string>
     <!-- Used in: InboxModmail -->
     <string name="comp_more_queues_below">More queues below</string>
-    <!-- Used in: ModeratorTeam, ModeratorUserManagement -->
+    <!-- Used in: InboxModmail, ModeratorTeam, ModeratorUserManagement -->
     <string name="comp_avatar_for_u">Avatar for u/%1$s</string>
     <!-- Used in: InboxModmail -->
     <string name="comp_replying_as">Replying as</string>
@@ -1448,8 +1424,6 @@
     <!-- Used in: PagingComponents -->
     <string name="comp_offline">Offline</string>
     <!-- Used in: RedditComposer -->
-    <string name="comp_replace_existing">Replace existing %1$s?</string>
-    <!-- Used in: RedditComposer -->
     <string name="comp_replace">Replace</string>
     <!-- Used in: RedditComposer -->
     <string name="comp_keep_existing">Keep existing</string>
@@ -1481,7 +1455,7 @@
     <string name="comp_save_as_response_2">Save as response</string>
     <!-- Used in: RemovalResponseSection -->
     <string name="comp_title">Title</string>
-    <!-- Used in: RemovalResponseSection, UserActionDialogs -->
+    <!-- Used in: CommunitiesScreen, RemovalResponseSection, UserActionDialogs -->
     <string name="comp_save">Save</string>
     <!-- Used in: SearchOrderMenu -->
     <string name="comp_sort_posts">Sort posts: %1$s</string>
@@ -1545,8 +1519,6 @@
     <string name="comp_back_to_playback_options">Back to playback options</string>
     <!-- Used in: VideoPlaybackPanels -->
     <string name="comp_close_playback_options">Close playback options</string>
-    <!-- Used in: VideoPlaybackPanels -->
-    <string name="comp_no_available">No %1$s available</string>
     <!-- Used in: VideoPlaybackPanels -->
     <string name="comp_read_only_runtime_diagnostics">Read-only runtime diagnostics</string>
     <!-- Used in: VideoPlayer -->
@@ -1668,8 +1640,6 @@
     <!-- Used in: BackupRestoreScreen, CommunitiesScreen, ConversationScreen +3 -->
     <string name="scr_cancel">Cancel</string>
     <!-- Used in: BackupRestoreScreen -->
-    <string name="scr_keep_only">Keep only %1$s?</string>
-    <!-- Used in: BackupRestoreScreen -->
     <string name="scr_apply">Apply</string>
     <!-- Used in: BackupRestoreScreen -->
     <string name="scr_delete_all_backups_2">Delete all %1$s backups?</string>
@@ -1689,7 +1659,7 @@
     <string name="scr_more_backup_folder_options">More backup folder options</string>
     <!-- Used in: BackupRestoreScreen -->
     <string name="scr_stop_copying_to_this_folder">Stop copying to this folder</string>
-    <!-- Used in: BackupRestoreScreen -->
+    <!-- Used in: BackupFolderOnboarding, BackupRestoreScreen -->
     <string name="scr_choose_backup_folder">Choose backup folder</string>
     <!-- Used in: BackupRestoreScreen -->
     <string name="scr_more_actions">More actions</string>
@@ -1709,7 +1679,7 @@
     <string name="scr_not_now">Not now</string>
     <!-- Used in: CommentComposerScreen, CommentEditScreen, InboxScreen +2 -->
     <string name="scr_cancel_authorization">Cancel authorization</string>
-    <!-- Used in: CommentComposerScreen, RedditOnboardingScreen -->
+    <!-- Used in: BackupFolderOnboarding, CommentComposerScreen, RedditOnboardingScreen -->
     <string name="scr_try_again">Try again</string>
     <!-- Used in: CommentComposerScreen -->
     <string name="scr_dismiss">Dismiss</string>
@@ -1849,7 +1819,7 @@
     <string name="scr_choose_listing_time_period">Choose listing time period</string>
     <!-- Used in: ContentFiltersScreen -->
     <string name="scr_show_all_active_filters">Show all active filters</string>
-    <!-- Used in: ContentFiltersScreen -->
+    <!-- Used in: ContentFilters, ContentFiltersScreen -->
     <string name="scr_no_active_filters">No active filters</string>
     <!-- Used in: ContentFiltersScreen -->
     <string name="scr_add">Add %1$s</string>
@@ -2003,7 +1973,7 @@
     <string name="scr_direct_chat_recipient">Direct Chat recipient</string>
     <!-- Used in: NewMessageScreen -->
     <string name="scr_change_recipient">Change recipient</string>
-    <!-- Used in: PostEditScreen -->
+    <!-- Used in: Common, PostEditScreen -->
     <string name="scr_edit_post">Edit post</string>
     <!-- Used in: PostEditScreen -->
     <string name="scr_close_post_editor">Close post editor</string>
@@ -2013,13 +1983,13 @@
     <string name="scr_share_the_details">Share the details…</string>
     <!-- Used in: PostEditScreen -->
     <string name="scr_authorize_reddit">Authorize Reddit</string>
-    <!-- Used in: PostFlairPickerSheet -->
+    <!-- Used in: CrosspostCreateScreen, PostFlairPickerSheet -->
     <string name="scr_choose_post_flair">Choose post flair</string>
-    <!-- Used in: PostFlairPickerSheet -->
+    <!-- Used in: CreatePostScreenV4, PostFlairPickerSheet -->
     <string name="scr_no_flair">No flair</string>
     <!-- Used in: PostFlairPickerSheet -->
     <string name="scr_flair_text">Flair text</string>
-    <!-- Used in: PostManageScreen -->
+    <!-- Used in: PostManageScreen, PostScreen -->
     <string name="scr_permission_required">Permission required</string>
     <!-- Used in: PostManageScreen -->
     <string name="scr_authorize">Authorize</string>
@@ -2091,7 +2061,7 @@
     <string name="scr_set_as_default">Set as default</string>
     <!-- Used in: SearchScreen -->
     <string name="scr_recent_people">Recent people</string>
-    <!-- Used in: SearchScreen -->
+    <!-- Used in: SearchScreen, SubshellSearchField -->
     <string name="scr_search">Search</string>
     <!-- Used in: SearchScreen -->
     <string name="scr_run_search">Run search</string>
@@ -2605,7 +2575,7 @@
     <string name="sw_hours">Hours</string>
     <!-- Used in: AppLockUi -->
     <string name="sw_minutes">Minutes</string>
-    <!-- Used in: AppLockUi -->
+    <!-- Used in: AppLockUi, SwipeActionSurface -->
     <string name="sw_save">Save</string>
     <!-- Used in: AppLockUi, CreatePostScreenV4 -->
     <string name="sw_cancel">Cancel</string>
@@ -3158,9 +3128,9 @@
     <string name="feed_preview_state_loading">Loading</string>
     <!-- Used in: SubshellState -->
     <string name="feed_preview_state_content">Content</string>
-    <!-- Used in: InteractionSide -->
+    <!-- Used in: FirstRunSetup, InteractionSide -->
     <string name="interaction_side_right">Right</string>
-    <!-- Used in: InteractionSide -->
+    <!-- Used in: FirstRunSetup, InteractionSide -->
     <string name="interaction_side_left">Left</string>
     <!-- Used in: InteractionSide -->
     <string name="drawer_side_preference_right">Right</string>
@@ -3274,19 +3244,19 @@
     <string name="vote_control_mode_compact">Arrows</string>
     <!-- Used in: SubshellSettings -->
     <string name="vote_control_mode_comfortable">Thumbs with score</string>
-    <!-- Used in: SubshellSettings -->
+    <!-- Used in: SubshellSettings, SwipeActionSurface -->
     <string name="post_swipe_action_hide">Hide</string>
     <!-- Used in: SubshellSettings -->
     <string name="post_swipe_action_save">Save</string>
-    <!-- Used in: SubshellSettings -->
+    <!-- Used in: SubshellSettings, SwipeActionSurface -->
     <string name="post_swipe_action_downvote">Downvote</string>
-    <!-- Used in: SubshellSettings -->
+    <!-- Used in: SubshellSettings, SwipeActionSurface -->
     <string name="post_swipe_action_upvote">Upvote</string>
-    <!-- Used in: SubshellSettings -->
+    <!-- Used in: SubshellSettings, SwipeActionSurface -->
     <string name="post_swipe_action_none">None</string>
-    <!-- Used in: SubshellSettings -->
+    <!-- Used in: SubshellSettings, SwipeActionSurface -->
     <string name="comment_swipe_action_downvote">Downvote</string>
-    <!-- Used in: SubshellSettings -->
+    <!-- Used in: SubshellSettings, SwipeActionSurface -->
     <string name="comment_swipe_action_upvote">Upvote</string>
     <!-- Used in: SubshellSettings -->
     <string name="comment_swipe_action_none">None</string>
@@ -3516,7 +3486,7 @@
     <string name="all_expand_communities">Expand communities</string>
     <!-- Used in: SubshellDrawer -->
     <string name="all_favorites">Favorites</string>
-    <!-- Used in: SubshellDrawer -->
+    <!-- Used in: CommunitiesScreen, SubshellDrawer -->
     <string name="all_recent">Recent</string>
     <!-- Used in: SubshellDrawer -->
     <string name="all_other_communities">Other communities</string>
@@ -3597,8 +3567,6 @@
     <!-- Used in: CommunityWikiContent -->
     <string name="all_reddit_did_not_return_any_wiki_pages">Reddit did not return any Wiki pages for this community.</string>
     <!-- Used in: CommunityWikiContent -->
-    <string name="all_this_wiki_only_returned_configuration_or_moderation">This Wiki only returned configuration or moderation pages.</string>
-    <!-- Used in: CommunityWikiContent -->
     <string name="all_wiki_access_is_not_configured_for_this">Wiki access is not configured for this Reddit account.</string>
     <!-- Used in: CommunityWikiContent -->
     <string name="all_the_reddit_session_could_not_be_used">The Reddit session could not be used to load this Wiki.</string>
@@ -3623,13 +3591,9 @@
     <!-- Used in: CreatePostScreenV4 -->
     <string name="all_spoiler">Spoiler</string>
     <!-- Used in: ContentSafetyDialogs -->
-    <string name="all_tell_reddit_why_this_should_be_reported">Tell Reddit why this %1$s should be reported.</string>
-    <!-- Used in: ContentSafetyDialogs -->
     <string name="all_checking_r_rules_on_reddit">Checking r/%1$s rules on Reddit…</string>
     <!-- Used in: ContentSafetyDialogs -->
     <string name="all_reddit_didn_t_confirm_that_r_accepts">Reddit didn\'t confirm that r/%1$s accepts custom report reasons.</string>
-    <!-- Used in: ContentSafetyDialogs -->
-    <string name="all_no_safe_report_reason_is_available_from">No safe report reason is available from Reddit for this %1$s.</string>
     <!-- Used in: FullscreenVideoGestures -->
     <string name="all_brightness">Brightness</string>
     <!-- Used in: FullscreenVideoGestures -->
@@ -3666,7 +3630,7 @@
     <string name="all_adding_internal_note_2">Adding internal note…</string>
     <!-- Used in: InboxModmail -->
     <string name="all_sending_reply">Sending reply…</string>
-    <!-- Used in: MediaComponents -->
+    <!-- Used in: LinkActions, MediaComponents -->
     <string name="all_external_link">External link</string>
     <!-- Used in: MarkdownText -->
     <string name="all_hide_spoiler">Hide spoiler</string>
@@ -3824,6 +3788,16 @@
     <string name="all_count_unavailable">Count unavailable</string>
     <!-- Used in: ModeratorReviewPresentation -->
     <string name="all_on">On: %1$s</string>
+    <!-- Used in: ModeratorReviewPresentation -->
+    <string name="comp_held_by_automoderator_reason">Held by AutoModerator: %1$s</string>
+    <!-- Used in: ModeratorReviewPresentation -->
+    <string name="comp_held_by_reddit_reason">Held by Reddit\'s filters: %1$s</string>
+    <!-- Used in: ModeratorReviewPresentation -->
+    <string name="comp_held_by_automoderator">Held by AutoModerator.</string>
+    <!-- Used in: ModeratorReviewPresentation -->
+    <string name="comp_held_by_reddit">Held by Reddit\'s filters.</string>
+    <!-- Used in: ModeratorReviewPresentation -->
+    <string name="comp_held_by_filters_or_guidance">Held by Reddit\'s filters or post guidance.</string>
     <!-- Used in: ModeratorSpamAction -->
     <string name="all_mark_this_post_as_spam">Mark this post as spam?</string>
     <!-- Used in: ModeratorSpamAction -->
@@ -4198,7 +4172,7 @@
     <string name="all_suggestions">Suggestions</string>
     <!-- Used in: CommunitiesScreen -->
     <string name="all_popular_on_reddit">Popular on Reddit</string>
-    <!-- Used in: CommunitiesScreen -->
+    <!-- Used in: CommunitiesScreen, ReadingStatsPanel -->
     <string name="all_clear">Clear</string>
     <!-- Used in: CommunitiesScreen -->
     <string name="all_this_feed_no_longer_exists">This feed no longer exists.</string>
@@ -4822,7 +4796,7 @@
     <string name="all_feeds">Feeds</string>
     <!-- Used in: SettingsScreen -->
     <string name="all_filtering">Filtering</string>
-    <!-- Used in: SettingsScreen -->
+    <!-- Used in: Settings03Navigation, SettingsScreen -->
     <string name="all_appearance">Appearance</string>
     <!-- Used in: SettingsScreen -->
     <string name="all_size">Size</string>
@@ -4832,13 +4806,13 @@
     <string name="all_use_the_device_palette_instead_of_subshell">Use the device palette instead of subshell orange</string>
     <!-- Used in: SettingsScreen -->
     <string name="all_needs_android_12_or_later">Needs Android 12 or later</string>
-    <!-- Used in: SettingsScreen -->
+    <!-- Used in: Settings03Navigation, SettingsScreen -->
     <string name="all_home_feeds">Home &amp; feeds</string>
-    <!-- Used in: SettingsScreen -->
+    <!-- Used in: Settings03Navigation, SettingsScreen -->
     <string name="all_navigation">Navigation</string>
     <!-- Used in: SettingsScreen -->
     <string name="all_side_menu">Side menu</string>
-    <!-- Used in: SettingsScreen -->
+    <!-- Used in: Settings03Navigation, SettingsScreen -->
     <string name="all_privacy">Privacy</string>
     <!-- Used in: SettingsScreen -->
     <string name="all_ask_for_biometrics_or_your_device_screen">Ask for biometrics or your device screen lock before revealing hidden community names</string>
@@ -4874,13 +4848,13 @@
     <string name="all_how_much_watched_video_to_keep_on">How much watched video to keep on this device</string>
     <!-- Used in: SettingsScreen -->
     <string name="all_deleting_downloaded_videos">Deleting downloaded videos…</string>
-    <!-- Used in: SettingsScreen -->
+    <!-- Used in: Settings03Navigation, SettingsScreen -->
     <string name="all_accessibility">Accessibility</string>
     <!-- Used in: SettingsScreen -->
     <string name="all_on_because_android_s_remove_animations_is">On because Android\'s Remove animations is on</string>
     <!-- Used in: SettingsScreen -->
     <string name="all_prefer_immediate_state_changes_over_decorative_movement">Prefer immediate state changes over decorative movement</string>
-    <!-- Used in: SettingsScreen -->
+    <!-- Used in: Settings03Navigation, SettingsScreen -->
     <string name="all_developer_states">Developer states</string>
     <!-- Used in: SettingsScreen -->
     <string name="all_comment_presentation">Comment presentation</string>
@@ -4892,7 +4866,7 @@
     <string name="all_the_line_a_reply_starts_leaves_the">The line a reply starts leaves the middle of the comment it answers</string>
     <!-- Used in: SettingsScreen -->
     <string name="all_behaviour">Behaviour</string>
-    <!-- Used in: SettingsScreen -->
+    <!-- Used in: Settings03Navigation, SettingsScreen -->
     <string name="all_reddit_connection">Reddit connection</string>
     <!-- Used in: SettingsScreen -->
     <string name="all_configured_locally_changes_apply_automatically">Configured locally · changes apply automatically</string>
@@ -5028,8 +5002,6 @@
     <string name="all2_only_the_body_of_this_reddit_post">Only the body of this Reddit post is edited. The title, community and post type stay unchanged.</string>
     <!-- Used in: PostEditScreen -->
     <string name="all2_controlled_test_only_the_markdown_body_is">Controlled test: only the Markdown body is sent to Reddit. The title, link, media, community and post type stay unchanged.</string>
-    <!-- Used in: BackupRestoreScreen -->
-    <string name="all2_older_over_this_limit_are_deleted_from">Older %1$s over this limit are deleted from this device and the backup folder. %2$s</string>
     <!-- Used in: SettingsScreen -->
     <string name="all2_this_removes_this_reddit_account_from_subshell">This removes this Reddit account from subshell on this device. You can connect it again later.</string>
     <!-- Used in: SettingsScreen -->
@@ -5048,8 +5020,6 @@
     <string name="all2_reddit_does_not_expose_a_supported_operation">Reddit does not expose a supported operation to replace the published media asset. Metadata above can still be changed.</string>
     <!-- Used in: PostScreen -->
     <string name="all2_comments_with_media_attached_in_subshell_can">Comments with media attached in subshell can\'t be edited yet. subshell can\'t safely keep that media during an edit.</string>
-    <!-- Used in: CommunityWikiContent -->
-    <string name="all2_this_community_wiki_is_unavailable_through_reddit">This community Wiki is unavailable through Reddit\'s API or the requested page does not exist.</string>
     <!-- Used in: ModeratorToolsSheet -->
     <string name="all2_remove_from_r_a_subreddit_removal_reason">Remove from r/%1$s. A subreddit removal reason is optional and is recorded for moderators; one with a message also switches on the removal message below.</string>
     <!-- Used in: ModeratorToolsSheet -->
@@ -5555,7 +5525,7 @@
         <item quantity="one">A post can\'t have both. %1$d attachment will be removed from this draft.</item>
         <item quantity="other">A post can\'t have both. %1$d attachments will be removed from this draft.</item>
     </plurals>
-    <!-- Used in: MediaComponents -->
+    <!-- Used in: MediaComponents, MediaDownloadPanel -->
     <string name="media_could_not_download">Could not download</string>
     <!-- Used in: CreatePostScreenV4 -->
     <string name="composer_loss_title_link_and_attachments">Remove the link and the attachments?</string>
@@ -5577,4 +5547,2275 @@
     <string name="composer_loss_title_image">Remove the image?</string>
     <!-- Used in: CreatePostScreenV4 -->
     <string name="composer_loss_message_image">A post can\'t have both. The image will be removed from this draft.</string>
+    <!-- TRANSLATE14: backup screen notices, whole sentences -->
+    <!-- Used in: SettingsBackup -->
+    <string name="backup_retention_five">5 backups</string>
+    <!-- Used in: SettingsBackup -->
+    <string name="backup_retention_ten">10 backups</string>
+    <!-- Used in: SettingsBackup -->
+    <string name="backup_retention_twenty">20 backups</string>
+    <!-- Used in: SettingsBackup -->
+    <string name="backup_retention_unlimited">Unlimited</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <plurals name="backup_keep_only">
+        <item quantity="one">Keep only %d backup?</item>
+        <item quantity="other">Keep only %d backups?</item>
+    </plurals>
+    <!-- Used in: BackupRestoreScreen -->
+    <plurals name="backup_notice_keeping_newest">
+        <item quantity="one">Keeping the newest backup</item>
+        <item quantity="other">Keeping the newest %d backups</item>
+    </plurals>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_keeping_every">Keeping every backup</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_of_automatic">Of the backups made automatically.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_of_safety">Of the backups made before a restore.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_backed_up_detail">New backups hold them, and a restore brings them back.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_left_out_detail">New backups leave them out, and a restore leaves yours as they are.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_hidden_communities_backed_up">Hidden communities will be backed up</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_hidden_communities_left_out">Hidden communities are left out</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_muted_communities_backed_up">Muted communities will be backed up</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_muted_communities_left_out">Muted communities are left out</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_post_drafts_backed_up">Post drafts will be backed up</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_post_drafts_left_out">Post drafts are left out</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_moderator_responses_backed_up">Saved moderator responses will be backed up</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_moderator_responses_left_out">Saved moderator responses are left out</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_notes_and_tags_backed_up">Private notes &amp; tags will be backed up</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_notes_and_tags_left_out">Private notes &amp; tags are left out</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_folder_connected">Backup folder connected</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <plurals name="backup_notice_found_in_folder">
+        <item quantity="one">Found %d backup in it.</item>
+        <item quantity="other">Found %d backups in it.</item>
+    </plurals>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_copied_to_folder">New backups are copied to it.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_exported">Backup exported</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_saved_as_file">%1$s is saved as a file.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_added">Added %1$s</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_under_your_backups">It\'s under Your backups.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_folder_up_to_date">Backup folder is up to date</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_every_backup_copied">Every backup is copied to it.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_stopped_copying">Stopped copying to the backup folder</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_folder_backups_kept">The backups already in it were kept.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_automatic_on">Automatic backups are on</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_automatic_on_detail">A backup is made after you change a setting.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_automatic_off">Automatic backups are off</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_automatic_off_detail">The ones already made were kept.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_backed_up">Backed up</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_under_your_backups_as">It\'s under Your backups as %1$s.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_renamed">Renamed</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_now_called">It\'s now called %1$s.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_restored">Restored %1$s</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_restored_detail">Your setup before it is under Undo.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <plurals name="backup_notice_deleted_count">
+        <item quantity="one">Deleted %d backup</item>
+        <item quantity="other">Deleted %d backups</item>
+    </plurals>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_deleted_many_detail">They\'re gone from this device and the backup folder.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_deleted_one">Deleted %1$s</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_deleted_one_detail">It\'s gone from this device and the backup folder.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_nothing_to_delete">Nothing to delete</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_notice_no_longer_exists">That backup no longer exists.</string>
+    <!-- Used in: SettingsScreen -->
+    <plurals name="set_deleted_videos_with_size">
+        <item quantity="one">Deleted %1$d video · %2$s</item>
+        <item quantity="other">Deleted %1$d videos · %2$s</item>
+    </plurals>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_could_not_delete_downloads">Couldn’t delete downloads</string>
+    <!-- Used in: MediaDownloadPanel -->
+    <string name="comp_saving_n_of_total">Saving %1$d of %2$d</string>
+    <!-- Used in: MediaDownloadPanel -->
+    <string name="comp_saving">Saving</string>
+    <!-- Used in: MediaDownloadPanel -->
+    <string name="comp_saved">Saved</string>
+    <!-- Used in: MediaDownloadPanel -->
+    <plurals name="comp_saved_items">
+        <item quantity="one">Saved %d item</item>
+        <item quantity="other">Saved %d items</item>
+    </plurals>
+    <!-- Used in: MediaDownloadPanel -->
+    <string name="comp_saved_n_of_total">Saved %1$d of %2$d</string>
+    <!-- Used in: MediaDownloadPanel -->
+    <string name="comp_keep_open_until_done">Keep this open until it is done</string>
+    <!-- Used in: MediaDownloadPanel -->
+    <string name="comp_saved_in_folder">In %1$s</string>
+    <!-- Used in: MediaDownloadPanel -->
+    <plurals name="comp_saved_in_folder_with_failures">
+        <item quantity="one">In %1$s · %2$d could not be saved</item>
+        <item quantity="other">In %1$s · %2$d could not be saved</item>
+    </plurals>
+    <!-- Used in: CustomFeedCoordinator -->
+    <string name="custom_feed_create_not_confirmed">Reddit hasn\'t shown this feed yet. Refresh your feeds before trying Create again.</string>
+    <!-- Used in: CustomFeedCoordinator -->
+    <string name="custom_feed_save_not_confirmed">Reddit hasn\'t shown these settings yet. Refresh your feeds before trying Save again.</string>
+    <!-- Used in: CustomFeedCoordinator -->
+    <string name="custom_feed_delete_not_confirmed">Reddit still shows this feed. Refresh your feeds before trying Delete again.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_cannot_be_played_nthe_server">This video cannot be played.\nThe server requires authentication for this video resource.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_access_denied_by_server">Access denied by server.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_cannot_be_played_nthe_request">This video cannot be played.\nThe requested video resource could not be found.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_could_not_be_loaded_nthe_serv">This video could not be loaded.\nThe server timed out while receiving the request.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_is_no_longer_available_from_t">This video is no longer available from the server.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_cannot_be_played_nthe_server_2">This video cannot be played.\nThe server could not provide the requested part of the video.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_could_not_be_loaded_right_now">This video could not be loaded right now.\nThe server received too many requests. Try again later.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_cannot_be_played_nthe_server_3">This video cannot be played.\nThe server reports that access is restricted for legal reasons.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_could_not_be_loaded_nthe_serv_2">This video could not be loaded.\nThe server encountered an internal error.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_could_not_be_loaded_na_server">This video could not be loaded.\nA server gateway received an invalid upstream response.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_the_video_service_is_temporarily_unavail">The video service is temporarily unavailable.\nTry again later.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_could_not_be_loaded_na_server_2">This video could not be loaded.\nA server gateway did not receive an upstream response in time.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_cannot_be_played_nthe_video_r">This video cannot be played.\nThe video request returned an unexpected HTTP response.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_clip_not_available">Clip not available</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_clip_was_removed_or_is_no_longer_av">This clip was removed or is no longer available.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_redgifs_playback_is_off">RedGIFs playback is off</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_turn_on_show_nsfw_posts_to_play_redgifs">Turn on Show NSFW posts to play RedGIFs clips in the app.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_connection_timed_out">Connection timed out</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_the_video_server_did_not_respond_in_time">The video server did not respond in time. Try again.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_dns_lookup_failed">DNS lookup failed</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_the_video_server_s_address_could_not_be">The video server\'s address could not be resolved. Check your connection and try again.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_tls_connection_failed">TLS connection failed</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_a_secure_connection_to_the_video_server">A secure connection to the video server could not be established.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_connection_failed">Connection failed</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_the_video_server_could_not_be_reached_ch">The video server could not be reached. Check your connection and try again.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_media3_2004_http_request_failed">Media3 2004 · HTTP request failed</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_cannot_be_played_nthe_http_re">This video cannot be played.\nThe HTTP response status was not available in the playback error.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_media3_2005_file_not_found">Media3 2005 · File not found</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_the_requested_video_file_could_not_be_fo">The requested video file could not be found.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_media3_2006_no_permission">Media3 2006 · No permission</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_permission_to_read_this_video_resource_w">Permission to read this video resource was denied.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_media3_2007_cleartext_not_permitted">Media3 2007 · Cleartext not permitted</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_uses_an_insecure_connection_t">This video uses an insecure connection that the app does not allow.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_media3_2008_read_position_out_of_range">Media3 2008 · Read position out of range</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_the_requested_position_is_outside_the_av">The requested position is outside the available video data.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_media3_n_source_parsing_failed">Media3 %1$d · Source parsing failed</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_cannot_be_played_nthe_video_s">This video cannot be played.\nThe video source returned data the player could not parse.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_media3_n_decoding_failed">Media3 %1$d · Decoding failed</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_cannot_be_played_nthe_device">This video cannot be played.\nThe device could not decode this video format.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_media3_n_audio_output_failed">Media3 %1$d · Audio output failed</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_cannot_be_played_nplayback_fa">This video cannot be played.\nPlayback failed while using the device audio output.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_media3_n_protected_playback_failed">Media3 %1$d · Protected playback failed</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_cannot_be_played_nthe_protect">This video cannot be played.\nThe protected video session could not be opened.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_media3_n_playback_error">Media3 %1$d · Playback error</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_cannot_be_played_nthe_player">This video cannot be played.\nThe player could not complete playback.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_title_playback_error">Playback error</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_msg_this_video_cannot_be_played_nno_further">This video cannot be played.\nNo further error details were available.</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_other_source_attempts_1">%1$s\nOther source attempts: %2$s</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_other_source_attempts_2">%1$s\nOther source attempts: %2$s; %3$s</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_other_source_attempts_3">%1$s\nOther source attempts: %2$s; %3$s; %4$s</string>
+    <!-- Used in: VideoPlaybackFailure -->
+    <string name="video_err_other_source_attempts_more">%1$s\nOther source attempts: %2$s; %3$s; %4$s; …</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_could_not_log_out">Couldn\'t log out of u/%1$s on this device. Try again.</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_compatibility_mode_explained">This explicit compatibility mode uses a locally supplied OAuth client ID. The value is encrypted in no-backup storage and is never added to saved setups.</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_connection_configuration_saved">Reddit connection configuration saved</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_connection_configuration_removed">Reddit connection configuration removed</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_could_not_save_compatibility">Couldn’t save compatibility configuration</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_could_not_remove_compatibility">Couldn’t remove compatibility configuration</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_cache_cleared">Cache cleared</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_cache_cleared_cached_again">Cache cleared; active media cached data again</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_could_not_clear_cache">Couldn’t clear cache</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_add_oauth_client_id">Add a user-supplied OAuth client ID in encrypted no-backup storage</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_downloads_will_be_removed">Downloaded files and temporary files will be removed. The playback cache is separate and will not be cleared.</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_unlock_show_hidden_title">Show hidden communities freely</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_unlock_show_hidden_subtitle">Confirm your device unlock to stop protecting hidden community names</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_unlock_turn_off_app_lock_title">Turn off app lock</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_unlock_turn_off_app_lock_subtitle">Confirm your device unlock to stop locking subshell</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_link_handling_partial">Partial · %1$d of %2$d domains selected</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_thread_colours_description">Colour the thread lines and give each top-level comment its own card</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_notifications_off_none_selected">Notifications off · no types selected</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_notifications_off_n_selected">Notifications off · %1$d selected</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_no_notification_types">No types enabled</string>
+    <!-- Used in: SettingsScreen -->
+    <plurals name="set_notification_types_enabled">
+        <item quantity="one">%d type enabled</item>
+        <item quantity="other">%d types enabled</item>
+    </plurals>
+    <!-- Used in: RedditDataExportWork, SettingsScreen -->
+    <string name="export_notification_running">Exporting your Reddit data</string>
+    <!-- Used in: RedditDataExportWork -->
+    <string name="export_lists_done">%1$d of %2$d lists</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="export_running_row">Exporting… %1$d of %2$d lists</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="export_notice_message">Takes a minute or two. The ZIP goes to Downloads and holds your private messages.</string>
+    <!-- Used in: RedditDataExportWork -->
+    <string name="export_notification_saved">Your Reddit data is exported</string>
+    <!-- Used in: RedditDataExportWork -->
+    <string name="export_notification_failed">Your Reddit data wasn\'t exported</string>
+    <!-- Used in: RedditDataExportWork -->
+    <string name="export_channel_name">Data export</string>
+    <!-- Used in: RedditDataExportWork -->
+    <string name="export_channel_description">Progress while your Reddit data is exported</string>
+    <!-- Used in: RedditDataExportWork -->
+    <plurals name="export_items_saved">
+        <item quantity="one">%1$d item saved to %2$s.</item>
+        <item quantity="other">%1$d items saved to %2$s.</item>
+    </plurals>
+    <!-- Used in: RedditDataExportWork -->
+    <plurals name="export_lists_incomplete">
+        <item quantity="one">%d list is incomplete; summary.json says why.</item>
+        <item quantity="other">%d lists are incomplete; summary.json says why.</item>
+    </plurals>
+    <!-- Used in: RedditDataExportWork -->
+    <string name="export_saved_with_incomplete">%1$s %2$s</string>
+    <!-- Used in: RedditDataExportWork -->
+    <string name="export_failed_sign_in">Sign in to Reddit with this account again, then export.</string>
+    <!-- Used in: RedditDataExportWork -->
+    <string name="export_failed_no_token">Couldn\'t reach Reddit to start the export. Try again later.</string>
+    <!-- Used in: RedditDataExportWork -->
+    <string name="export_failed_nothing_read">Reddit didn\'t answer for any list. Try again later.</string>
+    <!-- Used in: RedditDataExportWork -->
+    <string name="export_failed_not_saved">Couldn\'t save the file to Downloads.</string>
+    <!-- Used in: RedditDataExportWork -->
+    <string name="export_failed_not_available">Export isn\'t available with this sign-in.</string>
+    <!-- Used in: ModeratorTeam, ModeratorTeamPolicy -->
+    <string name="comp_mod_permission_access">Access</string>
+    <!-- Used in: ModeratorTeam, ModeratorTeamPolicy -->
+    <string name="comp_mod_permission_config">Configuration</string>
+    <!-- Used in: ModeratorTeam, ModeratorTeamPolicy -->
+    <string name="comp_mod_permission_flair">Flair</string>
+    <!-- Used in: ModeratorTeam, ModeratorTeamPolicy -->
+    <string name="comp_mod_permission_mail">Modmail</string>
+    <!-- Used in: ModeratorTeam, ModeratorTeamPolicy -->
+    <string name="comp_mod_permission_posts">Posts</string>
+    <!-- Used in: ModeratorTeam, ModeratorTeamPolicy -->
+    <string name="comp_mod_permission_wiki">Wiki</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_desc_access">Manage approved, banned, and muted users</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_desc_config">Manage community settings and configuration</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_desc_flair">Manage user and post flair</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_desc_mail">Read and reply to moderator mail</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_desc_posts">Approve, remove, spam, and distinguish content</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_desc_wiki">Manage community wiki pages and access</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_invite_failed_client_configuration">Moderator invitations are not configured for this Reddit session.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_invite_failed_session">The Reddit session could not authorize this moderator invitation.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_invite_failed_authorization">Reddit refused this moderator invitation. Full moderator permissions are required.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_invite_failed_http">Reddit rejected the invitation.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_invite_failed_transport">The invitation could not reach Reddit. No automatic retry was made.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_invite_failed_protocol">Reddit returned an unexpected response to the moderator invitation.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_invite_failed_validation">Reddit rejected the moderator invitation details.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_invite_failed_outcome_unknown">The invitation outcome is unknown. Do not send it again until you verify the moderator invitation on Reddit.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_invite_failed_already_mutating">Another moderator invitation is already in progress.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_invite_failed_account_changed">The active Reddit account changed. Reopen Moderators before inviting anyone.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_failed_client_configuration">Moderator permission changes are not configured for this Reddit session.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_failed_session">The Reddit session could not authorize this moderator permission change.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_failed_authorization">Reddit refused this permission change. The target may be outside your editable moderator hierarchy.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_failed_http">Reddit rejected the moderator permission change.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_failed_transport">The permission change could not reach Reddit. No automatic retry was made.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_failed_protocol">Reddit returned an unexpected response to the moderator permission change.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_failed_validation">Reddit rejected the moderator permission details.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_failed_outcome_unknown">The permission-change outcome is unknown. Refresh the moderator list before trying again.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_failed_already_mutating">Another moderator permission change is already in progress.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_permission_failed_account_changed">The active Reddit account changed. Reopen Moderators before changing permissions.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_removal_failed_client_configuration">Moderator removal is not configured for this Reddit session.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_removal_failed_session">The Reddit session could not authorize this moderator removal.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_removal_failed_authorization">Reddit refused this removal. The target may be above you in the moderator hierarchy.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_removal_failed_http">Reddit rejected the moderator removal.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_removal_failed_transport">The moderator removal could not reach Reddit. No automatic retry was made.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_removal_failed_protocol">Reddit returned an unexpected response to the moderator removal.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_removal_failed_validation">This moderator cannot be removed from this subshell workflow.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_removal_failed_outcome_unknown">The removal outcome is unknown. Refresh the moderator list before trying again.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_removal_failed_already_mutating">Another moderator removal is already in progress.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_removal_failed_account_changed">The active Reddit account changed. Reopen Moderators before removing anyone.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_remove_confirm">Remove u/%1$s from the moderator team for r/%2$s? Their moderator access will be revoked. Re-adding them requires a new invitation. Reddit may refuse the removal when the target is above you in the moderator hierarchy.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_remove_explained">Removing a moderator revokes their moderator access. Re-adding them requires a new invitation. Reddit decides whether this moderator can be removed based on the moderator hierarchy.</string>
+    <!-- Used in: ModeratorTeamPolicy -->
+    <string name="comp_mod_permission_all">All permissions</string>
+    <!-- Used in: OnlineVisibilityCard -->
+    <string name="comp_online_visibility_authorization">Sign in again to read or change this Reddit account setting. No change will be sent automatically.</string>
+    <!-- Used in: OnlineVisibilityCard -->
+    <string name="comp_online_visibility_account_changed">The active account changed. Reopen Accounts settings to load the current account.</string>
+    <!-- Used in: OnlineVisibilityCard -->
+    <string name="comp_online_visibility_http">Reddit rejected the request. Refresh to check the current setting.</string>
+    <!-- Used in: OnlineVisibilityCard -->
+    <string name="comp_online_visibility_transport">Could not reach Reddit. Refresh to read the setting again.</string>
+    <!-- Used in: OnlineVisibilityCard -->
+    <string name="comp_online_visibility_protocol">Reddit returned an unexpected response. The setting is unknown.</string>
+    <!-- Used in: OnlineVisibilityCard -->
+    <string name="comp_online_visibility_configuration">Online visibility is not available for this connection.</string>
+    <!-- Used in: OnlineVisibilityCard -->
+    <string name="comp_online_visibility_changed_on_reddit">The setting changed since you reviewed it. The latest value is shown; no change was sent.</string>
+    <!-- Used in: OnlineVisibilityCard -->
+    <string name="comp_online_visibility_outcome_unknown">Reddit may have applied the change. Refresh to check the current setting before making another change.</string>
+    <!-- Used in: UpdateApkDownload -->
+    <string name="update_failed_network">Couldn\'t download the update. Check your connection and try again.</string>
+    <!-- Used in: UpdateApkDownload -->
+    <string name="update_failed_not_found">GitHub doesn\'t have this release\'s APK.</string>
+    <!-- Used in: UpdateApkDownload -->
+    <string name="update_failed_unexpected_address">The download went somewhere other than GitHub, so it was stopped.</string>
+    <!-- Used in: UpdateApkDownload -->
+    <string name="update_failed_too_large">The download is larger than an update can be, so it was stopped.</string>
+    <!-- Used in: UpdateApkDownload -->
+    <string name="update_failed_hash_mismatch">The downloaded file isn\'t the published update, so it was deleted.</string>
+    <!-- Used in: UpdateInstall -->
+    <string name="update_install_aborted">The update wasn\'t installed.</string>
+    <!-- Used in: UpdateInstall -->
+    <string name="update_install_blocked">Android blocked the install.</string>
+    <!-- Used in: UpdateInstall -->
+    <string name="update_install_conflict">Android refused the update because it doesn\'t match the installed app.</string>
+    <!-- Used in: UpdateInstall -->
+    <string name="update_install_storage">There isn\'t enough storage to install the update.</string>
+    <!-- Used in: UpdateInstall -->
+    <string name="update_install_invalid">Android couldn\'t read the downloaded update.</string>
+    <!-- Used in: UpdateInstall -->
+    <string name="update_install_failed">Android didn\'t install the update.</string>
+    <!-- Used in: UpdateInstall -->
+    <string name="update_install_not_started">Android\'s installer couldn\'t be started. Try again.</string>
+    <!-- Used in: ModeratorReportLookupPresentation -->
+    <string name="comp_report_lookup_other_account">The queue is unavailable for this account. Open an item by link or ID.</string>
+    <!-- Used in: ModeratorReportLookupPresentation -->
+    <string name="comp_report_lookup_loading">Loading the moderation queue…</string>
+    <!-- Used in: ModeratorReportLookupPresentation -->
+    <string name="comp_report_lookup_failed">The queue could not be refreshed. Any items shown are from the last successful load.</string>
+    <!-- Used in: ModeratorReportLookupPresentation -->
+    <string name="comp_report_lookup_not_loaded">No queue has been loaded. Open an item by link or ID, or return to the queue to refresh.</string>
+    <!-- Used in: ModeratorReportLookupPresentation -->
+    <string name="comp_report_lookup_empty">No items from the loaded queue are available here. You can still open an item by link or ID.</string>
+    <!-- Used in: ModeratorReportLookupPresentation -->
+    <string name="comp_report_lookup_more">Showing loaded items only. More may be available in the moderation queue.</string>
+    <!-- Used in: RemovalResponseSection -->
+    <string name="comp_removal_type_public">Public comment as you</string>
+    <!-- Used in: RemovalResponseSection -->
+    <string name="comp_removal_type_public_as_subreddit">Public comment as the subreddit</string>
+    <!-- Used in: RemovalResponseSection -->
+    <string name="comp_removal_type_private">Private modmail (your name hidden)</string>
+    <!-- Used in: RemovalResponseSection -->
+    <string name="comp_removal_type_private_exposed">Private modmail (your name shown)</string>
+    <!-- Used in: RemovalResponseSection -->
+    <string name="comp_removal_type_desc_post">Reddit posts it as a distinguished, stickied comment.</string>
+    <!-- Used in: RemovalResponseSection -->
+    <string name="comp_removal_type_desc_comment">Reddit posts it as a distinguished reply.</string>
+    <!-- Used in: RemovalResponseSection -->
+    <string name="comp_removal_type_desc_modmail">Sent from the subreddit\'s modmail.</string>
+    <!-- Used in: ConversationScreen -->
+    <string name="scr_reaction_failed_session">Your Reddit chat session needs attention. Reopen the chat and try again.</string>
+    <!-- Used in: ConversationScreen -->
+    <string name="scr_reaction_failed_room">subshell no longer has a verified room for this chat. Reopen the chat and try again.</string>
+    <!-- Used in: ConversationScreen -->
+    <string name="scr_reaction_failed_http">Reddit rejected the reaction request.</string>
+    <!-- Used in: ConversationScreen -->
+    <string name="scr_reaction_failed_unknown">The reaction wasn\'t confirmed. Check the chat in another Reddit client before trying again.</string>
+    <!-- Used in: ConversationScreen -->
+    <string name="scr_reaction_failed_protocol">Reddit returned a response subshell couldn\'t verify.</string>
+    <!-- Used in: ConversationScreen -->
+    <string name="scr_reaction_failed_target">This message is not backed by one unambiguous live Direct Chat event.</string>
+    <!-- Used in: ConversationScreen -->
+    <string name="scr_reaction_failed_unavailable">Direct Chat reactions aren\'t available for this session.</string>
+    <!-- Used in: ConversationScreen -->
+    <string name="scr_conversation_today">Today</string>
+    <!-- Used in: CommunitiesScreen, ConversationScreen -->
+    <string name="scr_conversation_yesterday">Yesterday</string>
+    <!-- Used in: MediaDownloadPanel -->
+    <string name="media_could_not_share">Could not share</string>
+    <!-- Used in: MediaDownloadPanel -->
+    <string name="media_share_failed_detail">This media could not be prepared for sharing</string>
+    <!-- Used in: MediaDownloadPanel -->
+    <string name="media_download_failed_detail">This media could not be saved</string>
+    <!-- Used in: VideoPlayer -->
+    <string name="comp_hide_video_controls">Hide video controls</string>
+    <!-- Used in: VideoPlayer -->
+    <string name="comp_show_video_controls">Show video controls</string>
+    <!-- Used in: VideoPlayer -->
+    <string name="comp_saving_ellipsis">Saving…</string>
+    <!-- Used in: VideoPlayer -->
+    <string name="comp_saved_to_folder">Saved to %1$s</string>
+    <!-- Used in: MediaComponents -->
+    <string name="comp_link_preview_domain">Link preview, %1$s</string>
+    <string name="comp_open_poll_on_reddit">Open poll on Reddit</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_connect_status_unavailable">The Reddit connection isn\'t available with the current local configuration.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_connect_status_idle">No Reddit account is connected yet.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_connect_status_launching">Opening Reddit sign-in…</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_connect_status_awaiting">Finish signing in to Reddit, then return to subshell.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_connect_status_exchanging">Completing Reddit authorization…</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_connect_status_resolving">Loading your Reddit account…</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_connect_status_syncing">Preparing your Reddit account…</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_connect_status_connected">Reddit connected. Finishing setup…</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_connect_status_cancelled">Reddit sign-in was cancelled. Nothing was changed.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_connect_status_error_retry">Reddit sign-in didn\'t finish. You can try again.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_connect_status_error_client_id">The Reddit connection couldn\'t be completed. Review the Client ID.</string>
+    <!-- Used in: CreatePostScreenV4 -->
+    <string name="composer_posting_access_required">Posting access is required to check community rules</string>
+    <!-- Used in: CreatePostScreenV4 -->
+    <string name="composer_flair_no_longer_available">This flair is no longer available.</string>
+    <!-- Used in: CompactReplyComposer, CreatePostScreenV4, ModeratorReports +1 -->
+    <string name="composer_state_expanded">Expanded</string>
+    <!-- Used in: CompactReplyComposer, CreatePostScreenV4, ModeratorReports +1 -->
+    <string name="composer_state_collapsed">Collapsed</string>
+    <!-- Used in: CreatePostScreenV4 -->
+    <string name="composer_remove_video">Remove video</string>
+    <!-- Used in: CreatePostScreenV4 -->
+    <string name="composer_remove_gif_n">Remove GIF %1$d</string>
+    <!-- Used in: CreatePostScreenV4 -->
+    <string name="composer_remove_image_n">Remove image %1$d</string>
+    <!-- Used in: CreatePostScreenV4 -->
+    <string name="composer_request_unbuildable">This post can\'t be sent as it is. Check its link and attachments.</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_search_results">Search results</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_discovery_shown">%1$d shown</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_discovery_saved_shown">Saved · %1$d shown</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_recent_just_now">Just now</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_recent_minutes_ago">%1$d min ago</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_recent_hours_ago">%1$d h ago</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_recent_days_ago">%1$d d ago</string>
+    <!-- Used in: UserActionDialogs -->
+    <string name="comp_tag_color_grey">Grey</string>
+    <!-- Used in: UserActionDialogs -->
+    <string name="comp_tag_color_red">Red</string>
+    <!-- Used in: UserActionDialogs -->
+    <string name="comp_tag_color_orange">Orange</string>
+    <!-- Used in: UserActionDialogs -->
+    <string name="comp_tag_color_yellow">Yellow</string>
+    <!-- Used in: UserActionDialogs -->
+    <string name="comp_tag_color_green">Green</string>
+    <!-- Used in: UserActionDialogs -->
+    <string name="comp_tag_color_teal">Teal</string>
+    <!-- Used in: UserActionDialogs -->
+    <string name="comp_tag_color_blue">Blue</string>
+    <!-- Used in: UserActionDialogs -->
+    <string name="comp_tag_color_purple">Purple</string>
+    <!-- Used in: LayoutPolicy, UserProfileScreen -->
+    <string name="scr_profile_tab_posts">Posts</string>
+    <!-- Used in: LayoutPolicy, UserProfileScreen -->
+    <string name="scr_profile_tab_comments">Comments</string>
+    <!-- Used in: LayoutPolicy, UserProfileScreen -->
+    <string name="scr_profile_tab_saved">Saved</string>
+    <!-- Used in: LayoutPolicy, UserProfileScreen -->
+    <string name="scr_profile_tab_upvotes">Upvotes</string>
+    <!-- Used in: LayoutPolicy, UserProfileScreen -->
+    <string name="scr_profile_tab_downvotes">Downvotes</string>
+    <!-- Used in: LayoutPolicy, UserProfileScreen -->
+    <string name="scr_profile_tab_hidden">Hidden</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_profile_tab_blocked">Blocked</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_profile_tab_drafts">Drafts</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_profile_tab_reading">Reading</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_profile_tab_library">Library</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_local_empty_saved_title">No saved posts</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_local_empty_saved">No saved posts are available in this local account.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_local_empty_upvotes_title">No upvotes</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_local_empty_upvotes">No upvoted posts are available in this local account.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_local_empty_downvotes_title">No downvotes</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_local_empty_downvotes">No downvoted posts are available in this local account.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_local_empty_hidden_title">No hidden</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_local_empty_hidden">No hidden posts are available in this local account.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_loading_upvoted">Loading upvoted…</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_empty_upvoted">No upvoted posts</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_permission_upvoted">Reddit needs history permission before subshell can load upvoted activity for this account.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_loading_downvoted">Loading downvoted…</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_empty_downvoted">No downvoted posts</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_permission_downvoted">Reddit needs history permission before subshell can load downvoted activity for this account.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_loading_hidden">Loading hidden…</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_empty_hidden">No hidden posts</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_permission_hidden">Reddit needs history permission before subshell can load hidden activity for this account.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_loading_comments">Loading comments…</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_empty_comments">No comments</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_permission_comments">Reddit needs history permission before subshell can load comments activity for this account.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_loading_saved_posts">Loading saved posts…</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_empty_saved_posts">No saved posts</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_permission_saved_posts">Reddit needs history permission before subshell can load saved posts activity for this account.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_loading_saved_comments">Loading saved comments…</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_empty_saved_comments">No saved comments</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_permission_saved_comments">Reddit needs history permission before subshell can load saved comments activity for this account.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_none_upvoted">No upvoted Reddit posts are available for this account.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_none_downvoted">No downvoted Reddit posts are available for this account.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_none_hidden">No hidden Reddit posts are available for this account.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_history_none">No Reddit account history items are available.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_profile_unavailable">Profile unavailable</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_profile_unavailable_detail">This Reddit profile could not be found. The account may have been deleted, suspended, or otherwise unavailable.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_profile_privacy">Profile privacy may be enabled</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_profile_privacy_detail">This user may have enabled Reddit\'s profile privacy settings. Some posts and comments can be hidden from their profile while remaining visible elsewhere on Reddit.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_profile_no_public_posts">No public profile posts</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_profile_no_public_posts_detail">No public posts are currently available on u/%1$s\'s profile.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_profile_no_public_comments">No public profile comments</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_profile_no_public_comments_detail">No public comments are currently available on u/%1$s\'s profile.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_1">subshell needs Reddit\'s edit permission before it can delete this post.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_2">Post deletion is not configured for this account.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_3">The active account changed. Reopen the post and try again.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_4">This post is not owned by the active account.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_5">The authorization browser could not be opened.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_6">The authorization callback could not be completed.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_7">Reddit did not grant the permission required to delete this post.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_8">The Reddit session could not be refreshed.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_rate_limited_seconds">Reddit rate-limited the request. Try again in about %1$d seconds.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_10">Reddit rate-limited the request. Try again shortly.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_http">Reddit rejected the delete request (HTTP %1$d).</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_12">Reddit rejected the delete request.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_13">The delete request could not reach Reddit.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_14">Reddit returned an unexpected response.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_15">A post deletion is already in progress.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_16">Reddit may have deleted the post.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_17">Reddit didn\'t delete the post.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_18">The post could not be deleted.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_post_delete_19">This permanently deletes your post from Reddit. This can\'t be undone.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_1">This permanently deletes your comment from Reddit. Replies to it will remain.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_2">subshell needs Reddit\'s edit permission before it can delete this comment.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_3">Opening Reddit authorization…</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_4">Waiting for Reddit authorization…</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_5">Deleting the comment from Reddit…</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_6">Comment deleted.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_7">Comment deletion is not configured for this account.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_8">The active account changed before the comment could be deleted.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_9">Only comments authored by the active account can be deleted.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_10">Reddit authorization could not be opened.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_11">Reddit authorization did not complete.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_12">Reddit did not grant the permission required to delete this comment.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_13">The Reddit session needs attention before this comment can be deleted.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_14">Reddit rate-limited the delete request. Try again shortly.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_http">Reddit returned HTTP %1$d while deleting the comment.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_16">Reddit rejected the delete request.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_17">Reddit could not be reached. The comment was not deleted.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_18">The delete request or Reddit response was not valid.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_19">Reddit may have received the delete request, but subshell could not confirm that the comment was deleted. Check the thread before trying again.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_20">This comment is already being deleted.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_comment_delete_21">The comment could not be deleted.</string>
+    <!-- Used in: CopyActions, LinkActions, PostSystemActions -->
+    <string name="nt_copied_what_link">Link</string>
+    <!-- Used in: PostScreen -->
+    <string name="nt_copied_what_code">Code</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_unsent_reply">You have an unsent reply.</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_unsent_reply_other_post">You have an unsent reply on another post. Discard it to start this one?</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_unsent_reply_other_post_other_account">You have an unsent reply on another post, written with another account. Discard it to start this one?</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_unsent_reply_this_post">You have an unsent reply to this post. Discard it to start this one?</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_unsent_reply_this_post_other_account">You have an unsent reply to this post, written with another account. Discard it to start this one?</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_unsent_reply_to_user">You have an unsent reply to u/%1$s. Discard it to start this one?</string>
+    <!-- Used in: PostScreen -->
+    <string name="scr_unsent_reply_to_user_other_account">You have an unsent reply to u/%1$s, written with another account. Discard it to start this one?</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_mode_1">Active</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_mode_2">New</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_mode_3">In progress</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_mode_4">Filtered</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_mode_5">Highlighted</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_mode_6">Archived</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_mode_7">Appeals</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_mode_8">Join requests</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_mode_9">Mod discussions</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_mode_10">Notifications</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_title_1">Modmail is clear</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_title_2">No new Modmail</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_title_3">No Modmail in progress</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_title_4">No filtered Modmail</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_title_5">No highlighted Modmail</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_title_6">No archived Modmail</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_title_7">No Modmail appeals</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_title_8">No join requests</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_title_9">No mod discussions</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_title_10">No Modmail notifications</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_text_1">No active Modmail conversations are available.</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_text_2">New conversations will appear here.</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_text_3">Conversations being handled will appear here.</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_text_4">Reddit-filtered conversations will appear here.</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_text_5">Highlighted conversations will appear here.</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_text_6">Archived conversations will appear here.</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_text_7">Appeal conversations will appear here.</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_text_8">Join-request conversations will appear here.</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_text_9">Internal moderator discussions will appear here.</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_empty_text_10">Moderator notifications will appear here.</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_role_1">Internal note · moderators only</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_role_3">Hidden moderator reply</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_role_4">Sent by u/%1$s · hidden from participant</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_role_8">Moderator reply</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_1">Lock this item?</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_2">Lock</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_3">New replies will be blocked until a moderator unlocks this item.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_4">You can reverse this with Unlock after Reddit confirms the locked state.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_5">Unlock this item?</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_6">Unlock</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_7">New replies can be added again after Reddit confirms the unlocked state.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_8">You can lock the item again later.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_9">Distinguish as moderator?</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_10">Distinguish</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_11">This contribution will be marked as an official moderator contribution.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_12">Only your own contribution is eligible here. You can undistinguish it later.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_13">Remove moderator distinction?</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_14">Undistinguish</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_15">The moderator distinction will be removed from this contribution.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_16">You can distinguish your own contribution again later.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_notice_1">Reddit did not return the exact target.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_notice_2">Could not read current moderator controls. Refresh before acting.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_notice_3">Reddit did not confirm Posts moderation permission for this target.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_notice_4">Reddit did not return a usable lock or distinction state.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_notice_5">The target changed since you opened the confirmation. Review the current state.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_notice_6">Another moderation action is in progress. This action was not queued.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_notice_7">Moderator authorization is required. Refresh and confirm again after authorizing.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_notice_8">The moderation action could not be completed. Refresh before making another choice.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_notice_9">The requested state was confirmed by a fresh Reddit response.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_notice_10">The write response was unclear, but a fresh Reddit response confirms the requested state.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_notice_11">The requested state could not be confirmed. No automatic retry was sent.</string>
+    <!-- Used in: ModeratorContentControls -->
+    <string name="comp_mod_control_notice_12">The active moderator account changed. Reopen the controls with the intended account.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_1">Comment access is required for this account.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_2">Preparing Reddit authorization…</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_3">Waiting for Reddit authorization…</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_4">Posting comment…</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_5">Reddit may have received this comment. Check the thread before trying again to avoid a duplicate.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_6">Comment posting is not configured for this account.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_7">The active account changed. Review the draft before posting.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_8">Reddit authorization could not be opened.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_9">Reddit authorization could not be completed.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_10">Comment access was not granted.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_11">The Reddit session could not be refreshed.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_12">Reddit asked you to wait about %1$d seconds.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_13">Reddit asked you to wait before posting again.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_14">This thread can no longer accept replies.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_15">This account cannot comment in this community.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_16">The comment could not be posted. Review the text and try again.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_17">Reddit doesn\'t show this comment. You can send it again.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_18">This community doesn\'t allow this kind of image in comments. Remove it to send the text.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_19">This image is too large to post. Choose a smaller one.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_20">This image type can\'t be posted. Choose a JPEG, PNG, WebP, or GIF.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_21">This image can no longer be read. Choose it again.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_22">Reddit rejected the comment.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_23">The comment could not be sent.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_24">This comment is already being posted.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_write_25">The comment could not be posted.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_1">Post access is required for this account.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_2">Preparing Reddit authorization…</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_3">Waiting for Reddit authorization…</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_4">Posting to Reddit…</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_5">Checking Reddit for the submitted post…</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_6">Couldn\'t confirm whether Reddit created this post. Check your profile before trying again to avoid a duplicate.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_no_gifs_allowed">This community doesn\'t allow GIFs in comments. Remove it to send the text.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_no_images_allowed">This community doesn\'t allow images in comments. Remove it to send the text.</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_request_unbuildable">This reply can\'t be sent as it is. Check its text and image.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_1">Post publishing is not configured for this account.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_2">The active account changed. Review the draft before posting.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_3">Reddit authorization could not be opened.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_4">Reddit authorization could not be completed.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_5">Post access was not granted.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_6">The Reddit session could not be refreshed.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_7">Reddit asked you to wait about %1$s seconds.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_8">Reddit asked you to wait before posting again.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_9">This community is unavailable.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_10">This account cannot post in this community.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_11">This community is not accepting this post.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_12">Reddit requires an additional verification step.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_13">The post could not be published. Review the highlighted field.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_14">Reddit rejected the post.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_15">The post could not be sent.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_16">This post is already being published.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_17">Reddit doesn\'t show this post. You can post it again.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_18">Reddit may have received an earlier post from this account. Check it before posting this one.</string>
+    <!-- Used in: CreatePostScreen -->
+    <string name="scr_post_write_failed_19">The post could not be published.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_1">Edit access is required for this account.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_2">Preparing Reddit authorization…</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_3">Waiting for Reddit authorization…</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_4">Saving comment…</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_5">Checking Reddit for your edit…</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_6">Comment editing is not configured for this account.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_7">The active account changed. Reopen the comment before editing.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_8">Only comments from the active account can be edited.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_9">Reddit authorization could not be opened.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_10">Reddit authorization could not be completed.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_11">Edit access was not granted.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_12">The Reddit session could not be refreshed.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_13">Reddit asked you to wait about %1$s seconds.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_14">Reddit asked you to wait before editing again.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_15">The edited comment is invalid.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_16">Reddit rejected the edit.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_17">The edited comment could not be sent.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_18">This comment is already being edited.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_19">The edit may have been saved.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_20">The edit wasn\'t saved.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="scr_comment_edit_21">The comment could not be edited.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_action_failure_1">Reddit denied this moderation action. Your moderator role may not include the required Posts permission.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_action_failure_2">The outcome could not be confirmed. The mod queue is being refreshed from Reddit before you act again.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_action_failure_3">The Reddit sign-in for this account needs attention.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_action_failure_4">Reddit rejected this moderation action.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_action_failure_5">This moderation action couldn\'t be completed.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_title_1">Mod queue</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_title_2">Removed</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_title_3">Edited</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_title_4">Unmoderated</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_description_1">Review reported posts and comments, then approve, remove, or mark them as spam.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_description_2">Posts and comments removed by moderators or Reddit\'s filters. Approve puts one back.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_description_3">Posts and comments edited after they were posted.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_description_4">Posts no moderator has approved or removed yet.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_empty_title_1">Mod queue is clear</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_empty_title_2">Nothing removed</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_empty_title_3">Nothing edited</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_empty_title_4">Nothing unmoderated</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_empty_message_1">Reddit returned no posts or comments requiring review.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_empty_message_2">Reddit returned no removed posts or comments.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_empty_message_3">Reddit returned no edited posts or comments.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_queue_list_empty_message_4">Reddit returned no posts waiting for a moderator.</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_activityVerbLabel_1">Replied to your comment</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_activityVerbLabel_2">Replied to your post</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_activityVerbLabel_3">Mentioned you</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_activityVerbLabel_4">Reddit activity</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_activityVerbLabel_5">Message</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_mod_action_failure_transport">subshell couldn\'t reach Reddit for this moderation action.</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inboxOperationalStatusLabel_1">Loading Inbox…</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inboxOperationalStatusLabel_2">Waiting for Reddit authorization…</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inboxOperationalStatusLabel_3">Inbox permission required</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inboxOperationalStatusLabel_4">Loading Inbox…</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inboxOperationalStatusLabel_5">Showing saved Inbox</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inboxOperationalStatusLabel_6">Inbox unavailable</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inboxEmptyLabel_1">Nothing unread here.</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inboxEmptyLabel_2">No local items for this filter.</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inboxEmptyLabel_3">Loading Inbox…</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inboxEmptyLabel_4">Allow Inbox read access to load Reddit activity and messages.</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inboxEmptyLabel_5">Nothing unread here.</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inboxEmptyLabel_6">No Reddit items for this filter.</string>
+    <!-- Used in: InboxScreen -->
+    <plurals name="scr_across_moderated_communities">
+        <item quantity="one">Across %d moderated community</item>
+        <item quantity="other">Across %d moderated communities</item>
+    </plurals>
+    <!-- Used in: InboxScreen -->
+    <plurals name="scr_modmail_for_communities">
+        <item quantity="one">Modmail for %d community</item>
+        <item quantity="other">Modmail for %d communities</item>
+    </plurals>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_1">Approved post</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_2">Approved comment</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_3">Removed post</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_4">Removed comment</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_5">Marked post as spam</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_6">Marked comment as spam</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_7">Ignored reports</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_8">Restored reports</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_9">Locked</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_10">Unlocked</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_11">Changed distinguish</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_12">Pinned post</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_13">Unpinned post</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_14">Marked NSFW</string>
+    <!-- Used in: ModeratorLog -->
+    <string name="comp_modlog_action_15">Removed NSFW</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_notice_1">Enter one valid post/comment link or fullname.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_notice_2">Reddit did not return the exact target. Its report status is unknown.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_notice_3">Could not read report details. Refresh to check again; no report state is assumed.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_notice_4">Reddit did not confirm Posts moderation permission for this target. Report settings cannot be changed.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_notice_5">Reddit did not return a known report-ignore setting. No change can be sent.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_notice_6">Report settings changed since you opened the dialog. Review the current state before confirming again.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_notice_7">Another moderator action is in progress. This action was not queued. Refresh before confirming again.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_notice_8">Moderator authorization is required. After authorizing, refresh reports and confirm again. No write is resumed automatically.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_notice_9">The report action could not be completed. Refresh the target before making a new explicit choice.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_notice_10">Report setting verified by a fresh read from Reddit.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_notice_11">The write response was unclear. A fresh read now confirms the displayed report setting. The write was not retried.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_notice_12">The requested report setting could not be confirmed. Refresh and inspect the current state before acting again. No retry was sent.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_notice_13">The active account changed. Reopen reports with the intended moderator account.</string>
+    <!-- Used in: ComposerFormattingDock -->
+    <string name="comp_format_bold">Bold</string>
+    <!-- Used in: ComposerFormattingDock -->
+    <string name="comp_format_italic">Italic</string>
+    <!-- Used in: ComposerFormattingDock -->
+    <string name="comp_format_link">Link</string>
+    <!-- Used in: ComposerFormattingDock -->
+    <string name="comp_format_code_block">Code block</string>
+    <!-- Used in: ComposerFormattingDock -->
+    <string name="comp_format_quote">Quote</string>
+    <!-- Used in: ComposerFormattingDock -->
+    <string name="comp_format_bulleted_list">Bulleted list</string>
+    <!-- Used in: ComposerFormattingDock -->
+    <string name="comp_format_numbered_list">Numbered list</string>
+    <!-- Used in: ComposerFormattingDock -->
+    <string name="comp_format_strikethrough">Strikethrough</string>
+    <!-- Used in: ComposerFormattingDock -->
+    <string name="comp_format_inline_code">Inline code</string>
+    <!-- Used in: ComposerFormattingDock -->
+    <string name="comp_format_spoiler">Spoiler</string>
+    <!-- Used in: LayoutPolicy -->
+    <string name="layout_select_an_account">Select an account</string>
+    <!-- Used in: LayoutPolicy -->
+    <string name="layout_select_a_draft">Select a draft</string>
+    <!-- Used in: LayoutPolicy -->
+    <string name="layout_you">You</string>
+    <!-- Used in: LayoutPolicy -->
+    <string name="layout_select_a_comment">Select a comment</string>
+    <!-- Used in: LayoutPolicy -->
+    <string name="layout_select_a_saved_item">Select a saved item</string>
+    <!-- Used in: LayoutPolicy -->
+    <string name="layout_select_a_post">Select a post</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="scr_community_notifications_on">Notifications on for %1$s</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="scr_community_notifications_on_detail">New posts are checked every 15 minutes</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="scr_community_notifications_limit">You get notifications from %1$d communities</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="scr_community_notifications_limit_detail">Turn one off in Settings › Notifications › New posts first</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="scr_community_notifications_not_allowed">Notifications are not allowed</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="scr_community_notifications_not_allowed_detail">Allow notifications for subshell to get new posts</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="scr_community_notifications_off">Notifications off for %1$s</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="scr_community_notifications_off_detail">No more notifications about its new posts</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="scr_sort_posts_description">Sort posts: %1$s</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="scr_time_period_description">Time: %1$s</string>
+    <!-- Used in: RedditLinkUnavailableNotice -->
+    <string name="app_link_unsupported">Can\'t open this link here</string>
+    <!-- Used in: RedditLinkUnavailableNotice -->
+    <string name="app_link_post_unavailable">Couldn\'t open this post</string>
+    <!-- Used in: RedditLinkUnavailableNotice -->
+    <string name="app_link_share_unavailable">Couldn\'t open this shared link</string>
+    <!-- Used in: RedditLinkUnavailableNotice -->
+    <string name="app_link_unsupported_detail">subshell doesn\'t support this kind of Reddit link</string>
+    <!-- Used in: RedditLinkUnavailableNotice -->
+    <string name="app_link_post_unavailable_detail">It may have been removed, its community banned, or the connection failed</string>
+    <!-- Used in: RedditLinkUnavailableNotice -->
+    <string name="app_link_share_unavailable_detail">Reddit didn\'t say where it leads, or the connection failed</string>
+    <!-- Used in: CommunityMuteSheet -->
+    <string name="comp_muted_indefinitely">Muted indefinitely</string>
+    <!-- Used in: CommunityMuteSheet -->
+    <string name="comp_mute_expired">Mute expired</string>
+    <!-- Used in: CommunityMuteSheet -->
+    <string name="comp_muted_until">Muted until %1$s</string>
+    <!-- Used in: UpdateNotifications -->
+    <string name="update_channel_name">App updates</string>
+    <!-- Used in: UpdateNotifications -->
+    <string name="update_channel_description">New subshell releases</string>
+    <!-- Used in: CommunityMuteSheet -->
+    <string name="comp_mute_remaining_1">Until you unmute it</string>
+    <!-- Used in: CommunityMuteSheet -->
+    <string name="comp_mute_remaining_days_hours">%1$dd %2$dh remaining</string>
+    <!-- Used in: CommunityMuteSheet -->
+    <string name="comp_mute_remaining_days">%1$dd remaining</string>
+    <!-- Used in: CommunityMuteSheet -->
+    <string name="comp_mute_remaining_hours_minutes">%1$dh %2$dm remaining</string>
+    <!-- Used in: CommunityMuteSheet -->
+    <string name="comp_mute_remaining_hours">%1$dh remaining</string>
+    <!-- Used in: CommunityMuteSheet -->
+    <string name="comp_mute_remaining_minutes">%1$dm remaining</string>
+    <!-- Used in: InboxNotifications -->
+    <string name="notif_new_modmail">New Reddit Modmail</string>
+    <!-- Used in: InboxNotifications -->
+    <string name="notif_open_modmail_conversation">Open the Modmail conversation</string>
+    <!-- Used in: Common, PostLayouts -->
+    <string name="feed_action_upvote">Upvote</string>
+    <!-- Used in: Common, PostLayouts, SwipeActionSurface -->
+    <string name="feed_action_remove_upvote">Remove upvote</string>
+    <!-- Used in: Common, PostLayouts -->
+    <string name="feed_action_downvote">Downvote</string>
+    <!-- Used in: Common, PostLayouts, SwipeActionSurface -->
+    <string name="feed_action_remove_downvote">Remove downvote</string>
+    <!-- Used in: PostLayouts -->
+    <string name="feed_action_save">Save</string>
+    <!-- Used in: PostLayouts, SwipeActionSurface -->
+    <string name="feed_action_unsave">Unsave</string>
+    <!-- Used in: PostLayouts -->
+    <string name="feed_action_comments">Comments</string>
+    <!-- Used in: Common, PostLayouts -->
+    <string name="feed_unread_post">Unread post</string>
+    <!-- Used in: CompactReplyComposer -->
+    <string name="comp_reply_gif">GIF</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inbox_read">Read</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inbox_unread">Unread</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inbox_opening">Opening</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inbox_direct_chat">Direct chat</string>
+    <!-- Used in: InboxScreen -->
+    <string name="scr_inbox_message">Message</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_default_name">My backup</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_delete_all_explained">This removes your backups, automatic backups and the ones made before a restore from this device and the backup folder.</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="set_your_folder">your folder</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="set_copied_to_folder">Copied to %1$s</string>
+    <!-- Used in: FirstRunSetup -->
+    <plurals name="set_copied_to_folder_found">
+        <item quantity="one">Copied to %1$s · %2$d backup found</item>
+        <item quantity="other">Copied to %1$s · %2$d backups found</item>
+    </plurals>
+    <!-- Used in: Settings03AppearancePreview -->
+    <string name="set_theme_system">System</string>
+    <!-- Used in: Settings03AppearancePreview -->
+    <string name="set_theme_system_pure_black">System · Pure black</string>
+    <!-- Used in: Settings03AppearancePreview -->
+    <string name="set_theme_light">Light</string>
+    <!-- Used in: Settings03AppearancePreview -->
+    <string name="set_theme_dark">Dark</string>
+    <!-- Used in: Settings03AppearancePreview -->
+    <string name="set_theme_pure_black">Pure black</string>
+    <!-- Used in: CodeFont -->
+    <string name="code_font_balanced">Balanced</string>
+    <!-- Used in: CodeFont -->
+    <string name="code_font_narrow">Narrow</string>
+    <!-- Used in: CodeFont -->
+    <string name="code_font_casual">Casual</string>
+    <!-- Used in: PostsWidgetConfigureActivity -->
+    <string name="widget_your_home_feed">Your Home feed</string>
+    <!-- Used in: PostsWidgetConfigureActivity -->
+    <string name="widget_no_joined_communities">No joined communities stored yet</string>
+    <!-- Used in: PostsWidgetConfigureActivity -->
+    <string name="widget_no_community_matches">No community matches</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_unmute_explained">This allows u/%1$s to send modmail to r/%2$s again. Reddit will be checked again after the action.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_unapprove_explained">This removes u/%1$s from the approved-user list for r/%2$s. Reddit will be checked again after the action.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_outcome_unknown">subshell did not confirm the requested server state. Refresh user management before acting again.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_already_mutating">Another user-management action is already in progress.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_refused">Reddit refused this action for r/%1$s: %2$s</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_ban_confirmed">Ban confirmed</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_unban_confirmed">Unban confirmed</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_now_banned">Reddit now reports u/%1$s as banned.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_now_not_banned">Reddit now reports u/%1$s as not banned.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_mute_confirmed">Mute confirmed</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_unmute_confirmed">Unmute confirmed</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_now_muted">Reddit now reports u/%1$s as muted.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_now_not_muted">Reddit now reports u/%1$s as not muted.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_now_approved">Reddit now reports u/%1$s as an approved user.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_now_not_approved">Reddit now reports u/%1$s as not an approved user.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_ban_explained">This is a real subreddit ban. Leave duration blank for a permanent ban. subshell verifies the banned-user relationship after the action.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_mute_explained">Muting prevents this user from sending new modmail to r/%1$s while Reddit\'s mute is active. subshell verifies the muted-user relationship after the action.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_approve_explained">Approving adds this account to r/%1$s\'s approved-user list. Reddit controls how approved-user status affects participation based on the community\'s settings. subshell verifies the relationship after the action.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_selected_approve_target">Selected approved-user target</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_um_change_approve_target">Change approved-user target</string>
+    <!-- Used in: SubshellState -->
+    <string name="search_hint_reddit">Search Reddit</string>
+    <!-- Used in: SubshellState -->
+    <string name="search_hint_subshell">Search subshell</string>
+    <!-- Used in: SubshellState -->
+    <string name="search_hint_my_communities">Search my communities</string>
+    <!-- Used in: SubshellState -->
+    <string name="search_hint_community">Search r/%1$s</string>
+    <!-- Used in: SubshellState -->
+    <string name="search_area_all_reddit">All Reddit</string>
+    <!-- Used in: SubshellState -->
+    <string name="search_area_all_subshell">All subshell</string>
+    <!-- Used in: SubshellState -->
+    <string name="search_area_my_communities">My communities</string>
+    <!-- Used in: SubshellState -->
+    <string name="search_area_this_community">This community</string>
+    <!-- Used in: SubshellState -->
+    <string name="search_area_desc_reddit">Reddit posts, communities and people</string>
+    <!-- Used in: SubshellState -->
+    <string name="search_area_desc_subshell">Posts, communities and people</string>
+    <!-- Used in: SubshellState -->
+    <string name="search_area_desc_my_communities">Communities you joined</string>
+    <!-- Used in: ModeratorQuickActions -->
+    <string name="comp_quick_post_approved">Post approved</string>
+    <!-- Used in: ModeratorQuickActions -->
+    <string name="comp_quick_comment_approved">Comment approved</string>
+    <!-- Used in: ModeratorQuickActions -->
+    <string name="comp_quick_post_removed">Post removed</string>
+    <!-- Used in: ModeratorQuickActions -->
+    <string name="comp_quick_comment_removed">Comment removed</string>
+    <!-- Used in: ModeratorQuickActions -->
+    <string name="comp_quick_post_spam">Post marked as spam</string>
+    <!-- Used in: ModeratorQuickActions -->
+    <string name="comp_quick_comment_spam">Comment marked as spam</string>
+    <!-- Used in: ModeratorQuickActions -->
+    <string name="comp_quick_done">Done</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_removal_partial_both">Reddit removed the item, but the removal reason or mod note could not be confirmed and the removal message was not sent.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_removal_partial_reason">Reddit removed the item, but the removal reason or mod note could not be confirmed.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_removal_partial_message">Reddit removed the item, but the removal message was not sent.</string>
+    <!-- Used in: ModeratorToolsSheet -->
+    <string name="comp_removal_done">Reddit removed the item.</string>
+    <!-- Used in: ContentSafetyDialogs -->
+    <string name="comp_report_post_title">Report post</string>
+    <!-- Used in: ContentSafetyDialogs -->
+    <string name="comp_report_comment_title">Report comment</string>
+    <!-- Used in: ContentSafetyDialogs -->
+    <string name="all_report_why_post">Tell Reddit why this post should be reported.</string>
+    <!-- Used in: ContentSafetyDialogs -->
+    <string name="all_report_why_comment">Tell Reddit why this comment should be reported.</string>
+    <!-- Used in: ContentSafetyDialogs -->
+    <string name="all_report_no_reason_post">No safe report reason is available from Reddit for this post.</string>
+    <!-- Used in: ContentSafetyDialogs -->
+    <string name="all_report_no_reason_comment">No safe report reason is available from Reddit for this comment.</string>
+    <!-- Used in: PostEditScreen -->
+    <string name="comp_edits_lost_post">Your edits to this post will be lost.</string>
+    <!-- Used in: CommentEditScreen -->
+    <string name="comp_edits_lost_comment">Your edits to this comment will be lost.</string>
+    <!-- Used in: NewMessageScreen -->
+    <string name="comp_edits_lost_message">Your edits to this message will be lost.</string>
+    <!-- Used in: VideoPlaybackPanels -->
+    <string name="comp_no_video_tracks">No video tracks available</string>
+    <!-- Used in: VideoPlaybackPanels -->
+    <string name="comp_no_audio_tracks">No audio tracks available</string>
+    <!-- Used in: VideoPlaybackPanels -->
+    <string name="comp_no_subtitle_tracks">No subtitle tracks available</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_message_may_have_been_sent">Message may have been sent</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_reply_may_have_been_sent">Reply may have been sent</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_may_have_received_message">Reddit may have received this message. Refresh the conversation before trying again.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_may_have_received_reply">Reddit may have received this reply. Refresh the conversation before trying again.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_review_message">Review the message and try again.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_review_reply">Review the reply and try again.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_sign_in_before_message">The Reddit sign-in for this account needs attention before message sending can continue.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_sign_in_before_reply">The Reddit sign-in for this account needs attention before reply sending can continue.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_wait_before_message">Reddit asked you to wait before sending another message.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_wait_before_reply">Reddit asked you to wait before sending another reply.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_rejected_message">Reddit rejected the message.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_rejected_reply">Reddit rejected the reply.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_rejected_message_request">Reddit rejected the message request.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_rejected_reply_request">Reddit rejected the reply request.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_could_not_reach_message">subshell couldn\'t reach Reddit to send the message.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_could_not_reach_reply">subshell couldn\'t reach Reddit to send the reply.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_message_sending_unavailable">Message sending is unavailable for this conversation.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_reply_sending_unavailable">Reply sending is unavailable for this conversation.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_message_not_sent">The message couldn\'t be sent.</string>
+    <!-- Used in: RedditWriteErrorPresentations -->
+    <string name="error_write_reply_not_sent">The reply couldn\'t be sent.</string>
+    <!-- Used in: Settings03Navigation -->
+    <string name="set_section_theme_style">Theme &amp; style</string>
+    <!-- Used in: Settings03Navigation -->
+    <string name="set_section_motion">Motion</string>
+    <!-- Used in: Settings03Navigation -->
+    <string name="set_section_navigation_bars">Navigation bars</string>
+    <!-- Used in: Settings03Navigation -->
+    <string name="set_section_controls_side_menu">Controls &amp; side menu</string>
+    <!-- Used in: Settings03Navigation -->
+    <string name="set_section_hidden_communities">Hidden communities</string>
+    <!-- Used in: Settings03Navigation -->
+    <string name="set_section_feed_content">Feed &amp; content</string>
+    <!-- Used in: Settings03Navigation -->
+    <string name="set_section_connection">Connection</string>
+    <!-- Used in: Settings03Navigation -->
+    <string name="set_section_developer">Developer</string>
+    <!-- Used in: ThreadFind -->
+    <string name="thread_find_loading_rest">Loading the rest of the thread · searched %1$d of %2$d</string>
+    <!-- Used in: ThreadFind -->
+    <plurals name="thread_find_searched">
+        <item quantity="one">Searched %1$d of %2$d comment</item>
+        <item quantity="other">Searched %1$d of %2$d comments</item>
+    </plurals>
+    <!-- Used in: ThreadFind -->
+    <string name="thread_find_no_matches">No matches</string>
+    <!-- Used in: ThreadFind -->
+    <string name="thread_find_match_of">Match %1$d of %2$d</string>
+    <!-- Used in: ThreadFind -->
+    <plurals name="thread_find_matches">
+        <item quantity="one">%1$d match</item>
+        <item quantity="other">%1$d matches</item>
+    </plurals>
+    <!-- Used in: Settings03MediaPreview -->
+    <string name="set_autoplay_preview_auto">Auto</string>
+    <!-- Used in: Settings03MediaPreview -->
+    <string name="set_autoplay_preview_wifi">Wi-Fi</string>
+    <!-- Used in: Settings03MediaPreview -->
+    <string name="set_autoplay_preview_manual">Manual</string>
+    <!-- Used in: NewPostNotificationsSettingsScreen -->
+    <string name="set_new_posts_sign_in">Sign in to a Reddit account to get notifications about new posts.</string>
+    <!-- Used in: NewPostNotificationsSettingsScreen -->
+    <string name="set_new_posts_none_yet">No communities yet. Open a community and choose ⋮ › Notify about new posts.</string>
+    <!-- Used in: NewPostNotificationsSettingsScreen -->
+    <string name="set_new_posts_explained">A notification for each new post, checked every 15 minutes. Add a community from its ⋮ menu; up to %1$d.</string>
+    <!-- Used in: NewPostNotificationsSettingsScreen -->
+    <string name="set_new_posts_off">Off for every community</string>
+    <!-- Used in: NewPostNotificationsSettingsScreen -->
+    <plurals name="set_new_posts_communities">
+        <item quantity="one">%1$d community</item>
+        <item quantity="other">%1$d communities</item>
+    </plurals>
+    <!-- Used in: PostManageScreen -->
+    <string name="scr_manage_permission_flair">Reddit\'s flair permission is required to change post flair.</string>
+    <!-- Used in: PostManageScreen -->
+    <string name="scr_manage_permission_modposts">Reddit\'s post-moderation permission is required by this endpoint. subshell requests it only when you change NSFW or spoiler status.</string>
+    <!-- Used in: PostManageScreen -->
+    <string name="scr_manage_permission_edit">Reddit\'s edit permission is required to change reply notifications.</string>
+    <!-- Used in: PostManageScreen -->
+    <string name="scr_manage_permission_other">Reddit requires additional permission for this change.</string>
+    <!-- Used in: UserTagChip -->
+    <string name="comp_user_tag_note">Note</string>
+    <!-- Used in: UserTagChip -->
+    <string name="comp_user_tag_description">Your tag: %1$s</string>
+    <!-- Used in: VideoTimeline -->
+    <string name="comp_video_seek">Seek</string>
+    <!-- Used in: VideoTimeline -->
+    <string name="comp_video_back_10">Back 10 seconds</string>
+    <!-- Used in: VideoTimeline -->
+    <string name="comp_video_forward_10">Forward 10 seconds</string>
+    <!-- Used in: MarkdownText -->
+    <string name="comp_spoiler_revealed">Revealed</string>
+    <!-- Used in: MarkdownText -->
+    <string name="comp_spoiler_hidden">Hidden</string>
+    <!-- Used in: Common -->
+    <string name="comp_account_menu">Account menu</string>
+    <!-- Used in: MentionSuggestions -->
+    <string name="comp_mention_user">Mention u/%1$s</string>
+    <!-- Used in: ConversationRouteHost -->
+    <string name="scr_loading_conversation">Loading conversation</string>
+    <!-- Used in: Settings03NavigationPreview -->
+    <string name="set_navigation_preview">Navigation preview</string>
+    <!-- Used in: CommunityMutes -->
+    <string name="mute_preset_1_hour">1 hour</string>
+    <!-- Used in: CommunityMutes -->
+    <string name="mute_preset_8_hours">8 hours</string>
+    <!-- Used in: CommunityMutes -->
+    <string name="mute_preset_24_hours">24 hours</string>
+    <!-- Used in: CommunityMutes -->
+    <string name="mute_preset_3_days">3 days</string>
+    <!-- Used in: CommunityMutes -->
+    <string name="mute_preset_1_week">1 week</string>
+    <!-- Used in: CommunityMutes -->
+    <string name="mute_preset_indefinitely">Indefinitely</string>
+    <!-- Used in: CommunityMutes -->
+    <string name="mute_unmute_after_1_hour">Automatically unmute after 1 hour</string>
+    <!-- Used in: CommunityMutes -->
+    <string name="mute_unmute_after_8_hours">Automatically unmute after 8 hours</string>
+    <!-- Used in: CommunityMutes -->
+    <string name="mute_unmute_after_24_hours">Automatically unmute after 24 hours</string>
+    <!-- Used in: CommunityMutes -->
+    <string name="mute_unmute_after_3_days">Automatically unmute after 3 days</string>
+    <!-- Used in: CommunityMutes -->
+    <string name="mute_unmute_after_1_week">Automatically unmute after 1 week</string>
+    <!-- Used in: ContentFiltersScreen -->
+    <string name="scr_filter_error_community">Enter a community name, like r/movies</string>
+    <!-- Used in: ContentFiltersScreen -->
+    <string name="scr_filter_error_user">Enter a username, like u/someone</string>
+    <!-- Used in: ContentFiltersScreen -->
+    <string name="scr_filter_error_domain">Enter a domain, like example.com</string>
+    <!-- Used in: ContentFiltersScreen -->
+    <string name="scr_filter_error_flair">Enter a flair, like Discussion</string>
+    <!-- Used in: ContentFiltersScreen -->
+    <string name="scr_filter_error_word">Enter a word or phrase</string>
+    <!-- Used in: UpdatesScreen -->
+    <string name="update_downloading_of">Downloading… %1$s of %2$s MB</string>
+    <!-- Used in: UpdatesScreen -->
+    <string name="update_downloading">Downloading…</string>
+    <!-- Used in: UpdateNotifications -->
+    <string name="update_notification_known_problem">Known problem in your subshell version</string>
+    <!-- Used in: UpdateNotifications, UpdatePresentationUi -->
+    <string name="update_notification_available">subshell update available</string>
+    <!-- Used in: ContentFilters -->
+    <plurals name="filters_active_hidden_locally">
+        <item quantity="one">%1$d active filter · hidden locally</item>
+        <item quantity="other">%1$d active filters · hidden locally</item>
+    </plurals>
+    <!-- Used in: PostFollowIntentQueuePolicy -->
+    <string name="post_follow">Follow post</string>
+    <!-- Used in: PostFollowIntentQueuePolicy -->
+    <string name="post_unfollow">Unfollow post</string>
+    <!-- Used in: FeedPositionResume -->
+    <string name="feed_resume_not_found_title">Couldn\'t find where you left off</string>
+    <!-- Used in: FeedPositionResume -->
+    <string name="feed_resume_not_found">It wasn\'t in the newest posts, so the feed starts at the top.</string>
+    <!-- Used in: AppTopBar -->
+    <string name="offline_saving_title">Saving for offline</string>
+    <!-- Used in: AppTopBar -->
+    <string name="offline_saving">The top %1$d posts, their comments and images download in the background</string>
+    <!-- Used in: HelpScreen -->
+    <string name="help_reddit_api_2027_note">Reddit plans to end API access for unregistered apps on 12 January 2027. subshell may stop loading new content then; what is stored stays readable.</string>
+    <!-- Used in: CommunitiesScreen -->
+    <plurals name="comm_pinned">
+        <item quantity="one">%1$d pinned</item>
+        <item quantity="other">%1$d pinned</item>
+    </plurals>
+    <!-- Used in: CommunitiesScreen -->
+    <plurals name="comm_joined">
+        <item quantity="one">%1$d joined</item>
+        <item quantity="other">%1$d joined</item>
+    </plurals>
+    <!-- Used in: CommunitiesScreen -->
+    <plurals name="comm_shown">
+        <item quantity="one">%1$d shown</item>
+        <item quantity="other">%1$d shown</item>
+    </plurals>
+    <!-- Used in: CommunitiesScreen -->
+    <plurals name="comm_hidden">
+        <item quantity="one">%1$d hidden</item>
+        <item quantity="other">%1$d hidden</item>
+    </plurals>
+    <!-- Used in: CommunitiesScreen -->
+    <plurals name="comm_visited">
+        <item quantity="one">%1$d visited</item>
+        <item quantity="other">%1$d visited</item>
+    </plurals>
+    <!-- Used in: CommunitiesScreen, CommunityScreen -->
+    <string name="comm_remove_from_favorites">Remove %1$s from favorites</string>
+    <!-- Used in: CommunitiesScreen, CommunityScreen -->
+    <string name="comm_add_to_favorites">Add %1$s to favorites</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="comm_edit_mute_for">Edit mute for %1$s</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="comm_mute_name">Mute %1$s</string>
+    <!-- Used in: Common -->
+    <string name="comm_mute_name_more">Mute %1$s…</string>
+    <!-- Used in: Common, MutedCommunitiesSheet -->
+    <string name="comm_unmute_name">Unmute %1$s</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="comm_show_in_joined">Show %1$s in Joined</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="comm_hide_from_joined">Hide %1$s from Joined</string>
+    <!-- Used in: CommunitiesScreen, CommunityScreen, CreatePostScreenV4 -->
+    <string name="comm_members_text">%1$s members</string>
+    <!-- Used in: CreatePostScreenV4 -->
+    <plurals name="comm_members_count">
+        <item quantity="one">%1$d member</item>
+        <item quantity="other">%1$d members</item>
+    </plurals>
+    <!-- Used in: CommunityScreen -->
+    <string name="comm_search_name">Search %1$s</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="comm_about_name">About %1$s</string>
+    <!-- Used in: Common -->
+    <string name="comm_search_flair">Search %1$s for this flair</string>
+    <!-- Used in: PostScreen -->
+    <plurals name="post_new_comments">
+        <item quantity="one">%1$d new</item>
+        <item quantity="other">%1$d new</item>
+    </plurals>
+    <!-- Used in: InboxScreen -->
+    <plurals name="scr_inbox_dismissed">
+        <item quantity="one">%1$d dismissed</item>
+        <item quantity="other">%1$d dismissed</item>
+    </plurals>
+    <!-- Used in: CompactReplyComposer -->
+    <plurals name="comp_character_limit">
+        <item quantity="one">%1$d character limit</item>
+        <item quantity="other">%1$d character limit</item>
+    </plurals>
+    <!-- Used in: VideoTimeline -->
+    <string name="comp_video_position_of">%1$s of %2$s</string>
+    <!-- Used in: ReadingStatsPanel -->
+    <string name="reading_under_a_minute">under a minute</string>
+    <!-- Used in: ReadingStatsPanel -->
+    <string name="reading_minutes">%1$d min</string>
+    <!-- Used in: ReadingStatsPanel -->
+    <string name="reading_hours">%1$d h</string>
+    <!-- Used in: ReadingStatsPanel -->
+    <string name="reading_hours_minutes">%1$d h %2$d min</string>
+    <!-- Used in: ReadingStatsPanel -->
+    <string name="reading_home_feed">Home feed %1$s</string>
+    <!-- Used in: ReadingStatsPanel -->
+    <plurals name="reading_last_days">
+        <item quantity="one">Last %1$d day</item>
+        <item quantity="other">Last %1$d days</item>
+    </plurals>
+    <!-- Used in: ReadingStatsPanel -->
+    <plurals name="reading_opened_every_community">
+        <item quantity="one">You opened every community you subscribe to in the last %1$d day.</item>
+        <item quantity="other">You opened every community you subscribe to in the last %1$d days.</item>
+    </plurals>
+    <!-- Used in: ReadingStatsPanel -->
+    <plurals name="reading_not_opened_in">
+        <item quantity="one">Not opened in %1$d day. Hide keeps them out of your lists; Leave unsubscribes on Reddit.</item>
+        <item quantity="other">Not opened in %1$d days. Hide keeps them out of your lists; Leave unsubscribes on Reddit.</item>
+    </plurals>
+    <!-- Used in: CreatePostScreenV4 -->
+    <string name="post_preview_found">%1$s · Preview found</string>
+    <!-- Used in: CreatePostScreenV4 -->
+    <plurals name="post_photos_left_out">
+        <item quantity="one">%1$d photo was left out.</item>
+        <item quantity="other">%1$d photos were left out.</item>
+    </plurals>
+    <!-- Used in: BackupRestoreScreen -->
+    <plurals name="backup_settings_will_change">
+        <item quantity="one">%1$d setting will change.</item>
+        <item quantity="other">%1$d settings will change.</item>
+    </plurals>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_date_version">%1$s · subshell %2$s</string>
+    <!-- Used in: SettingsScreen -->
+    <string name="set_offline_images_saved">%1$s of images saved for offline reading</string>
+    <!-- Used in: HomeScreen -->
+    <string name="feed_listing_empty">%1$s returned an empty listing. Try another sort or time period.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="onb_domains_selected">%1$d of %2$d supported Reddit domains are currently selected.</string>
+    <!-- Used in: UpdateNotifications, UpdatePresentationUi -->
+    <string name="update_notification_fixes_it">%1$s fixes it</string>
+    <!-- Used in: UpdateNotifications -->
+    <string name="update_notification_ready">%1$s is ready</string>
+    <!-- Used in: CopyActions -->
+    <string name="comp_copy_menu">Copy…</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="profile_redditor_for">Redditor for %1$s</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="profile_stat_karma">karma</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="profile_stat_account_age">account age</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="profile_stat_followers">followers</string>
+    <!-- Used in: AppTopBar -->
+    <string name="top_bar_custom_feed">Feed: %1$s</string>
+    <!-- Used in: SwipeActionSurface -->
+    <string name="swipe_unhide">Unhide</string>
+    <!-- Used in: ContentFiltersScreen -->
+    <string name="filters_none_word">No words filtered</string>
+    <!-- Used in: ContentFiltersScreen -->
+    <string name="filters_none_community">No communities filtered</string>
+    <!-- Used in: ContentFiltersScreen -->
+    <string name="filters_none_user">No users filtered</string>
+    <!-- Used in: ContentFiltersScreen -->
+    <string name="filters_none_domain">No domains filtered</string>
+    <!-- Used in: ContentFiltersScreen -->
+    <string name="filters_none_flair">No flairs filtered</string>
+    <!-- Used in: RedditComposer -->
+    <string name="comp_replace_existing_photo">Replace existing photo?</string>
+    <!-- Used in: RedditComposer -->
+    <string name="comp_replace_existing_gif">Replace existing GIF?</string>
+    <!-- Used in: RedditComposer -->
+    <string name="comp_replace_existing_video">Replace existing video?</string>
+    <!-- Used in: RedditComposer -->
+    <string name="comp_replace_with_new_photo">For now, this draft supports one inline image or GIF. Replace it with the new photo?</string>
+    <!-- Used in: RedditComposer -->
+    <string name="comp_replace_with_new_gif">For now, this draft supports one inline image or GIF. Replace it with the new GIF?</string>
+    <!-- Used in: RedditComposer -->
+    <string name="comp_replace_with_new_video">For now, this draft supports one inline image or GIF. Replace it with the new video?</string>
+    <!-- Used in: InboxNotifications -->
+    <string name="notif_modmail_in">Modmail · r/%1$s</string>
+    <!-- Used in: SubshellDrawer -->
+    <string name="drawer_mute_settings_for">Mute settings for r/%1$s</string>
+    <!-- Used in: CommunityHighlightsRow -->
+    <string name="comp_pinned_post_description">Pinned post: %1$s, %2$s</string>
+    <!-- Used in: CommunityHighlightsRow -->
+    <string name="comp_pinned_age">Pinned · %1$s</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_modmail_reply_in">Reply in r/%1$s</string>
+    <!-- Used in: ModeratorReviewPresentation -->
+    <string name="comp_reported_reason">Reported: %1$s</string>
+    <!-- Used in: ModeratorReviewPresentation -->
+    <string name="comp_moderator_report_reason">Moderator report: %1$s</string>
+    <!-- Used in: ModeratorReviewPresentation -->
+    <string name="comp_removed_by_reason">Removed by %1$s · %2$s</string>
+    <!-- Used in: ModeratorReviewPresentation -->
+    <string name="comp_removed_by">Removed by %1$s</string>
+    <!-- Used in: ModeratorReviewPresentation -->
+    <string name="comp_removal_reason_line">Removal reason: %1$s</string>
+    <!-- Used in: ModeratorReports, ModeratorReviewPresentation -->
+    <string name="comp_pill_post">Post</string>
+    <!-- Used in: ModeratorReports, ModeratorReviewPresentation -->
+    <string name="comp_pill_comment">Comment</string>
+    <!-- Used in: ModeratorReviewPresentation -->
+    <string name="comp_held_for_review">Held for review</string>
+    <!-- Used in: ModeratorReviewPresentation -->
+    <string name="comp_reports_ignored">Reports ignored</string>
+    <!-- Used in: MutedCommunityDirectView -->
+    <string name="comp_preview_of">Preview: %1$s</string>
+    <!-- Used in: OnlineVisibilityCard -->
+    <string name="comp_online_allow_show">Allow Reddit to show when u/%1$s is online</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_commenting_on">Commenting on r/%1$s · %2$s</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_comment_on">Comment on r/%1$s</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_custom_feeds_http">Reddit returned HTTP %1$d. Pull to refresh or try again.</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="comm_couldnt_refresh">Couldn\'t refresh %1$s</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="comm_mod_tools_for">Mod tools for %1$s</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="comm_actions_for">Actions for %1$s</string>
+    <!-- Used in: ConversationScreen -->
+    <string name="scr_reply_to">Reply to %1$s</string>
+    <!-- Used in: CreatePostScreenV4 -->
+    <plurals name="post_gallery_items">
+        <item quantity="one">Gallery · %1$d item</item>
+        <item quantity="other">Gallery · %1$d items</item>
+    </plurals>
+    <!-- Used in: PostScreen -->
+    <string name="post_sort_comments_description">Sort comments: %1$s</string>
+    <!-- Used in: PostScreen -->
+    <string name="post_replying_to">Replying to %1$s</string>
+    <!-- Used in: CopyActions -->
+    <string name="comp_copy_part_post">Copy part of the post</string>
+    <!-- Used in: CopyActions -->
+    <string name="comp_copy_part_comment">Copy part of the comment</string>
+    <!-- Used in: CopyActions -->
+    <string name="comp_copy_link_to_post">Copy link to post</string>
+    <!-- Used in: CopyActions -->
+    <string name="comp_copy_link_to_comment">Copy link to comment</string>
+    <!-- Used in: CopyActions -->
+    <string name="comp_clip_post_text">Text of the post</string>
+    <!-- Used in: CopyActions -->
+    <string name="comp_clip_comment_text">Text of the comment</string>
+    <!-- Used in: CopyActions -->
+    <string name="comp_clip_post_link">Reddit post link</string>
+    <!-- Used in: CopyActions -->
+    <string name="comp_clip_comment_link">Reddit comment link</string>
+    <!-- Used in: CopyActions -->
+    <string name="nt_copied_what_text">Text</string>
+    <!-- Used in: CopyActions -->
+    <plurals name="comp_links_in_post">
+        <item quantity="one">Link in this post</item>
+        <item quantity="other">Links in this post</item>
+    </plurals>
+    <!-- Used in: CopyActions -->
+    <plurals name="comp_links_in_comment">
+        <item quantity="one">Link in this comment</item>
+        <item quantity="other">Links in this comment</item>
+    </plurals>
+    <!-- Used in: UserProfileScreen -->
+    <plurals name="profile_age_years">
+        <item quantity="one">%1$d year</item>
+        <item quantity="other">%1$d years</item>
+    </plurals>
+    <!-- Used in: UserProfileScreen -->
+    <plurals name="profile_age_months">
+        <item quantity="one">%1$d month</item>
+        <item quantity="other">%1$d months</item>
+    </plurals>
+    <!-- Used in: UserProfileScreen -->
+    <plurals name="profile_age_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <!-- Used in: CreatePostScreenV4, MediaLabelText, PostComposer -->
+    <string name="media_label_video">Video</string>
+    <!-- Used in: CreatePostScreenV4, MediaComponents, MediaLabelText +1 -->
+    <string name="media_label_gif">GIF</string>
+    <!-- Used in: MediaLabelText -->
+    <string name="media_label_image">Image</string>
+    <!-- Used in: MediaLabelText, PostComposer -->
+    <string name="media_label_photo">Photo</string>
+    <!-- Used in: MediaLabelText -->
+    <string name="media_label_image_number">Image %1$d</string>
+    <!-- Used in: MediaLabelText -->
+    <plurals name="media_label_items">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
+    <!-- Used in: MediaLabelText -->
+    <string name="media_embedded_video">Embedded video</string>
+    <!-- Used in: MediaLabelText -->
+    <string name="media_linked_gif">Linked GIF</string>
+    <!-- Used in: MediaLabelText -->
+    <string name="media_linked_image">Linked image</string>
+    <!-- Used in: PostSystemActions -->
+    <string name="ui_reddit_custom_feed_link">Reddit custom feed link</string>
+    <!-- Used in: MediaViewerScreen -->
+    <string name="scr_this_post_has_no_full_screen">This post has no full-screen media.</string>
+    <!-- Used in: ReadingStatsPanel -->
+    <string name="scr_turn_off_your_reading">Turn off Your reading?</string>
+    <!-- Used in: ReadingStatsPanel -->
+    <string name="scr_clear_your_reading">Clear Your reading?</string>
+    <!-- Used in: CommunityScreen -->
+    <string name="scr_stop_new_post_notifications">Stop new-post notifications</string>
+    <!-- Used in: CommunityScreen, HomeScreen -->
+    <string name="scr_nsfw_posts_are_hidden">NSFW posts are hidden</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_best_match">Best match</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_most_active">Most active</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_create_custom_feed">Create custom feed</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_edit_custom_feed">Edit custom feed</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_creating_feed">Creating feed…</string>
+    <!-- Used in: CommunitiesScreen -->
+    <string name="scr_saving_feed">Saving feed…</string>
+    <!-- Used in: HelpScreen -->
+    <string name="scr_subshell_hasn_t_been_able_to">subshell hasn\'t been able to read its update information for a few days. New releases are published on GitHub.</string>
+    <!-- Used in: ConversationScreen -->
+    <string name="scr_u_is_typing">u/%1$s is typing…</string>
+    <!-- Used in: ConversationScreen -->
+    <string name="scr_uploading_and_sending">Uploading and sending…</string>
+    <!-- Used in: ConversationScreen -->
+    <string name="scr_another_message_is_still_being_sent">Another message is still being sent.</string>
+    <!-- Used in: ConversationScreen -->
+    <string name="scr_a_message_in_another_conversation_may">A message in another conversation may have been sent. Open it and confirm before sending here.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_u_isn_t_a_valid_reddit">u/%1$s isn\'t a valid Reddit username.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_fetching_your_authoritative_blocked_account_list">Fetching your authoritative blocked-account list from Reddit.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_reddit_rejected_the_blocked_account_request">Reddit rejected the blocked-account request. HTTP %1$s</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_reddit_rejected_the_blocked_account_request_2">Reddit rejected the blocked-account request.</string>
+    <!-- Used in: UserProfileScreen -->
+    <string name="scr_reddit_returned_an_unexpected_blocked_account">Reddit returned an unexpected blocked-account response.</string>
+    <!-- Used in: CrosspostCreateScreen -->
+    <string name="scr_checking_destination_requirements">Checking destination requirements…</string>
+    <!-- Used in: CrosspostCreateScreen -->
+    <string name="scr_change_post_flair">Change post flair</string>
+    <!-- Used in: Settings03FeedsPreview -->
+    <string name="scr_nsfw_shown">NSFW shown</string>
+    <!-- Used in: Settings03FeedsPreview -->
+    <string name="scr_nsfw_hidden">NSFW hidden</string>
+    <!-- Used in: Settings03FeedsPreview -->
+    <string name="scr_nsfw_visibility">NSFW visibility</string>
+    <!-- Used in: Settings03FeedsPreview -->
+    <string name="scr_nsfw_post_hidden">NSFW post hidden</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="scr_saved_searches_and_new_post_notifications">Saved searches and new-post notifications</string>
+    <!-- Used in: BackupRestoreScreen, FirstRunSetup -->
+    <string name="scr_privacy_sensitive_backup_data">Privacy-sensitive backup data</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="scr_never_backed_up_sign_ins_and">Never backed up: sign-ins and your Reddit Client ID (sign in again after restoring), cached posts, history and posts saved for offline.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="scr_in_this_backup_but_turned_off">In this backup, but turned off under Privacy-sensitive backup data, so it stays as it is.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="scr_subshell_backs_up_your_current_setup">subshell backs up your current setup first, so you can undo this.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="scr_for_example_create_documents_subshell_backups">For example, create Documents/subshell Backups in the folder picker.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="scr_automatic_backup">Automatic backup</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="scr_this_privacy_sensitive_module_is_disabled">This privacy-sensitive module is disabled and will be kept unchanged.</string>
+    <!-- Used in: TopLevelCommentJump -->
+    <string name="scr_next_top_level_comment">Next top-level comment</string>
+    <!-- Used in: TopLevelCommentJump -->
+    <string name="scr_previous_top_level_comment">Previous top-level comment</string>
+    <!-- Used in: NewPostNotificationsSettingsScreen -->
+    <string name="scr_a_notification_for_each_new_comment">A notification for each new comment in these communities. Your own posts and comments never notify you.</string>
+    <!-- Used in: Settings03NavigationPreview -->
+    <string name="scr_search_communities_2">⌕  Search communities</string>
+    <!-- Used in: Settings03NavigationPreview -->
+    <string name="scr_search_by_name_or_topic">⌕  Search by name or topic</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_reddit_sign_in_cannot_start_until">Reddit sign-in cannot start until subshell has a Client ID. You only need to set this up once for this subshell installation.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_setup_required_before_sign_in">Setup required before sign-in</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_subshell_cannot_create_this_client_id">subshell cannot create this Client ID for you. Use RedReader once to get the value Reddit assigns.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_1_open_redreader_and_sign_in">1. Open RedReader and sign in to Reddit.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_2_open_reddit_s_authorization_email">2. Open Reddit\'s authorization email and find App ID.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_3_paste_that_app_id_into">3. Paste that App ID into subshell. Then sign in here.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_your_client_id_is_kept_in">Your Client ID is kept in encrypted no-backup storage on this device and isn\'t included in subshell settings backups.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_complete_redreader_s_normal_reddit_sign">Complete RedReader\'s normal Reddit sign-in and authorize it when Reddit asks.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_example_only_not_a_real_email">EXAMPLE ONLY — NOT A REAL EMAIL</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_your_client_id_appears_here">your Client ID appears here</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_stored_locally_in_encrypted_no_backup">Stored locally in encrypted no-backup storage.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_only_change_these_if_sign_in">Only change these if sign-in stopped working or you were told to. Wrong values break sign-in.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_subshell_couldn_t_save_the_client">subshell couldn\'t save the Client ID.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_your_client_id_is_configured_subshell">Your Client ID is configured. subshell can now open Reddit sign-in.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_subshell_will_use_this_reddit_account">subshell will use this Reddit account for your feeds, communities, Inbox, profile and supported account actions.</string>
+    <!-- Used in: RedditOnboardingScreen -->
+    <string name="scr_1_turn_on_open_supported_links">1. Turn on Open supported links.\n2. Select the Reddit addresses you want subshell to open.</string>
+    <!-- Used in: BackupFolderOnboarding -->
+    <string name="scr_subshell_already_keeps_automatic_settings_history">subshell already keeps automatic settings history on this device. Choose a folder outside the app so it survives uninstalling or clearing app data. We recommend creating a folder named subshell Backups in Documents.</string>
+    <!-- Used in: CreatePostScreenV4 -->
+    <string name="scr_add_link_2">+ Add link</string>
+    <!-- Used in: ThreadFind -->
+    <string name="scr_only_op_s_comments">Only OP\'s comments</string>
+    <!-- Used in: PostScreen, ThreadFind -->
+    <string name="scr_find_in_thread">Find in thread</string>
+    <!-- Used in: Common -->
+    <string name="comp_edit_body_test">Edit body (test)</string>
+    <!-- Used in: CommunityWikiContent -->
+    <string name="comp_reddit_requires_separate_permission_to_read">Reddit requires separate permission to read community Wiki pages. This permission is read-only.</string>
+    <!-- Used in: CommunityWikiContent -->
+    <string name="comp_subshell_couldn_t_reach_reddit_while">subshell couldn\'t reach Reddit while loading this Wiki.</string>
+    <!-- Used in: MediaComponents -->
+    <string name="comp_read_only_reddit_poll">Read-only Reddit poll</string>
+    <!-- Used in: UserFlairSheet -->
+    <string name="comp_subshell_needs_reddit_s_flair_permission">subshell needs Reddit\'s flair permission for this account.</string>
+    <!-- Used in: UserFlairSheet -->
+    <string name="comp_this_community_returned_no_self_selectable">This community returned no self-selectable user flairs.</string>
+    <!-- Used in: ContentSafetyDialogs -->
+    <string name="comp_subshell_won_t_guess_whether_r">subshell won\'t guess whether r/%1$s accepts custom reports.</string>
+    <!-- Used in: ContentSafetyDialogs -->
+    <string name="comp_r_accepts_only_its_listed_report">r/%1$s accepts only its listed report reasons.</string>
+    <!-- Used in: RemovalResponseSection -->
+    <string name="comp_no_message_yet_tap_to_write">No message yet — tap to write one.</string>
+    <!-- Used in: RemovalResponseSection -->
+    <string name="comp_reddit_adds_the_removed_item_s">%1$s/%2$s · Reddit adds the removed item\'s details.</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_r_mod_team_2">r/%1$s mod team</string>
+    <!-- Used in: InboxModmail -->
+    <string name="comp_add_internal_note">Add internal note</string>
+    <!-- Used in: OnlineVisibilityCard -->
+    <string name="comp_change_reddit_s_online_visibility_setting">Change Reddit\'s online-visibility setting for u/%1$s? This applies to your Reddit account, not just this device.</string>
+    <!-- Used in: VideoPlayer -->
+    <string name="comp_show_controls">Show controls</string>
+    <!-- Used in: VideoPlayer -->
+    <string name="comp_reset_zoom">Reset zoom</string>
+    <!-- Used in: UserTagChip -->
+    <string name="comp_add_private_note">Add private note</string>
+    <!-- Used in: UserTagChip -->
+    <string name="comp_edit_private_note">Edit private note</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_enter_one_valid_reddit_post_comment">Enter one valid Reddit post/comment link or full ID.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_user_report_details_unavailable">User report details unavailable.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_no_user_reports_returned">No user reports returned.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_moderator_report_details_unavailable">Moderator report details unavailable.</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_no_moderator_reports_returned">No moderator reports returned.</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_just_now">just now</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="app_finally_happy_with_my_desk">Finally happy with my desk</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="app_the_rack_is_done_for_now">The rack is done, for now</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="app_where_the_apps_get_made">Where the apps get made</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="app_nsfw_images_gifs_and_videos_show">NSFW images, GIFs and videos show without a cover; spoilers stay covered</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="app_links_to_reddit_com_in_other">Links to reddit.com in other apps can open in subshell instead of the browser. Android lets only you turn this on.</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="app_nsfw_posts">NSFW posts</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="app_reddit_links">Reddit links</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="app_open_here">Open here</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="app_not_set_up">Not set up</string>
+    <!-- Used in: UpdatesScreen -->
+    <string name="upd_couldn_t_reach_the_update_information">Couldn\'t reach the update information. Try again later.</string>
+    <!-- Used in: UpdatesScreen -->
+    <string name="upd_you_have_the_latest_version">You have the latest version.</string>
+    <!-- Used in: UpdatesScreen -->
+    <string name="upd_android_is_waiting_for_you_to">Android is waiting for you to confirm the update.</string>
+    <!-- Used in: UpdatesScreen -->
+    <string name="upd_update_checks_are_off_in_this">Update checks are off in this build.</string>
+    <!-- Used in: UpdatesScreen -->
+    <string name="upd_subshell_is_available">subshell %1$s is available</string>
+    <!-- Used in: UpdatePresentationUi -->
+    <string name="upd_known_problem_in_your_version">Known problem in your version</string>
+    <!-- Used in: AppLockUi -->
+    <string name="lock_subshell_is_locked">subshell is locked</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_invite_becomes_moderator">u/%1$s becomes a moderator after accepting the invitation on Reddit.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_invite_confirm">Reddit will send a moderator invitation for r/%1$s with: %2$s. The account is not a moderator until it accepts.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_invite_needs_permission">subshell needs Reddit\'s moderator-management permission before it can send this invitation.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_update_confirm">Replace this moderator\'s permissions for r/%1$s with: %2$s. This does not remove the moderator.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_update_needs_permission">subshell needs Reddit\'s moderator-management permission before it can update moderator permissions.</string>
+    <!-- Used in: ModeratorTeam -->
+    <string name="comp_mod_remove_needs_permission">subshell needs Reddit\'s moderator-management permission before it can remove this moderator.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_retention_older_automatic">Older automatic backups over this limit are deleted from this device and the backup folder. %1$s</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_retention_older_safety">Older backups made before a restore over this limit are deleted from this device and the backup folder. %1$s</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_delete_all_automatic_on">New automatic backups are made after your next settings change.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_delete_all_automatic_off">Automatic backups are off.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <plurals name="backup_more_accounts">
+        <item quantity="one">…and %1$d more account</item>
+        <item quantity="other">…and %1$d more accounts</item>
+    </plurals>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_another_account">another account</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_this_device">This device</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_diff_clear_current">%1$s: clear %2$d current</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_diff_explicit_empty">%1$s: establish explicit empty</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_diff_added_removed">%1$s: +%2$d / -%3$d</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_joined_diff_ends_empty">u/%1$s: +%2$d / -%3$d — will end at 0 joined communities.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_joined_diff_set_empty">u/%1$s: set to 0 joined communities.</string>
+    <!-- Used in: BackupRestoreScreen -->
+    <string name="backup_joined_diff_to">u/%1$s: +%2$d / -%3$d → %4$d joined.</string>
+    <!-- Used in: SubshellWidgets -->
+    <string name="widget_message">Message</string>
+    <!-- Used in: MediaLabelText -->
+    <string name="media_label_comment_picture">Picture in a comment by u/%1$s</string>
+    <!-- Used in: MediaViewerScreen -->
+    <string name="scr_show_or_hide_controls">Show or hide controls</string>
+    <!-- Used in: CrosspostCreateScreen -->
+    <string name="xpost_review_flags">NSFW: %1$s · Spoiler: %2$s</string>
+    <!-- Used in: CrosspostCreateScreen -->
+    <string name="xpost_flag_on">on</string>
+    <!-- Used in: CrosspostCreateScreen -->
+    <string name="xpost_flag_off">off</string>
+    <!-- Used in: CrosspostCreateScreen -->
+    <string name="xpost_reply_notifications_on">Reply notifications: on</string>
+    <!-- Used in: CrosspostCreateScreen -->
+    <string name="xpost_reply_notifications_off">Reply notifications: off</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_replying_to_u_title">Replying to u/%1$s · %2$s</string>
+    <!-- Used in: CommentComposerScreen -->
+    <string name="scr_reply_to_u_title">Reply to u/%1$s</string>
+    <!-- Used in: PostComposer -->
+    <string name="composer_type_text">Text</string>
+    <!-- Used in: PostComposer -->
+    <string name="composer_type_link">Link</string>
+    <!-- Used in: PostComposer -->
+    <string name="composer_type_media">Media</string>
+    <!-- Used in: PostComposer -->
+    <string name="composer_type_crosspost">Crosspost</string>
+    <!-- Used in: PostComposer -->
+    <string name="composer_untitled_text">Untitled text post</string>
+    <!-- Used in: PostComposer -->
+    <string name="composer_untitled_link">Untitled link post</string>
+    <!-- Used in: PostComposer -->
+    <string name="composer_untitled_media">Untitled media post</string>
+    <!-- Used in: PostComposer -->
+    <string name="composer_untitled_crosspost">Untitled crosspost post</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_age_minutes_ago">%1$dm ago</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_age_hours_ago">%1$dh ago</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_age_days_ago">%1$dd ago</string>
+    <!-- Used in: ModeratorUserManagement -->
+    <string name="comp_age_weeks_ago">%1$dw ago</string>
+    <!-- Used in: IdentityMetadataState -->
+    <string name="identity_live_community">Live Reddit community</string>
+    <!-- Used in: IdentityMetadataState -->
+    <string name="identity_community_preview">Public community preview.</string>
+    <!-- Used in: IdentityMetadataState -->
+    <string name="identity_profile_preview">Public profile preview.</string>
+    <!-- Used in: VideoPlaybackPanels -->
+    <string name="comp_track_auto_ceiling">Auto · %1$s ceiling</string>
+    <!-- Used in: VideoPlaybackPanels -->
+    <string name="comp_track_video_number">Video %1$d</string>
+    <!-- Used in: VideoPlaybackPanels -->
+    <string name="comp_track_pixel_video">%1$dpx video</string>
+    <!-- Used in: VideoPlaybackPanels -->
+    <string name="comp_track_off">Off</string>
+    <!-- Used in: VideoPlaybackPanels -->
+    <string name="comp_track_auto_source_default">Auto · source default</string>
+    <!-- Used in: VideoPlaybackPanels -->
+    <string name="comp_track_auto_forced_or_source_default">Auto · forced or source default</string>
+    <!-- Used in: VideoPlaybackPanels -->
+    <string name="comp_track_loading">Loading tracks…</string>
+    <!-- Used in: VideoPlaybackPanels -->
+    <string name="comp_track_selected_unavailable">Selected track unavailable</string>
+    <!-- Used in: VideoPlaybackPanels -->
+    <string name="comp_track_text">Text track</string>
+    <!-- Used in: MediaComponents -->
+    <string name="comp_poll_votes_closes">%1$s votes · %2$s</string>
+    <!-- Used in: MediaComponents -->
+    <string name="comp_poll_stored_locally">%1$s · stored locally</string>
+    <!-- Used in: SubshellState -->
+    <string name="row_label_post_and_full_screen">Post + full screen</string>
+    <!-- Used in: SubshellState -->
+    <string name="row_label_full_screen">Full screen</string>
+    <!-- Used in: SubshellState -->
+    <string name="row_label_everywhere">Everywhere</string>
+    <!-- Used in: SubshellState -->
+    <string name="row_label_off">Off</string>
+    <!-- Used in: SubshellState -->
+    <string name="row_label_auto">Auto</string>
+    <!-- Used in: SubshellState -->
+    <string name="row_label_system">System</string>
+    <!-- Used in: SubshellState -->
+    <string name="row_label_videos_own">Video\'s own</string>
+    <!-- Used in: SubshellState -->
+    <string name="row_label_device">Device</string>
+    <!-- Used in: MediaComponents -->
+    <string name="comp_poll_minutes_left">%1$dm left</string>
+    <!-- Used in: MediaComponents -->
+    <string name="comp_poll_hours_left">%1$dh left</string>
+    <!-- Used in: MediaComponents -->
+    <string name="comp_poll_days_left">%1$dd left</string>
+    <!-- Used in: MediaComponents -->
+    <string name="comp_poll_closed">Closed</string>
+    <!-- Used in: MediaComponents -->
+    <string name="comp_poll_end_unavailable">Voting end unavailable</string>
+    <!-- Used in: Settings03AppearancePreview -->
+    <string name="scr_a_compact_appearance_preview">A compact appearance preview</string>
+    <!-- Used in: ViewportErrorTray -->
+    <string name="all_yes">Yes</string>
+    <!-- Used in: ModeratorReports -->
+    <string name="comp_reports_title">Reports</string>
+    <!-- Used in: PostScreen -->
+    <string name="comp_gif_pause">Pause</string>
+    <!-- Used in: PostScreen -->
+    <string name="comp_gif_play">Play</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="app_summary_hand">Hand</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="app_summary_on">On</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="app_summary_off">Off</string>
+    <!-- Used in: FirstRunSetup -->
+    <string name="app_summary_videos_muted">%1$s, muted</string>
 </resources>

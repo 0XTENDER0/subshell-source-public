@@ -123,6 +123,8 @@ internal fun ModeratorReportsDialog(
     var lookup by remember(accountStableId, state.target) { mutableStateOf("") }
     var invalidLookup by remember(accountStableId, state.target) { mutableStateOf(false) }
     var lookupExpanded by remember(accountStableId, state.target) { mutableStateOf(false) }
+    val expandedState = stringResource(R.string.composer_state_expanded)
+    val collapsedState = stringResource(R.string.composer_state_collapsed)
     var pending by remember(accountStableId, state.target, state.revision) {
         mutableStateOf<ModeratorReportConfirmation?>(null)
     }
@@ -134,7 +136,7 @@ internal fun ModeratorReportsDialog(
     val reportListState = key(accountStableId, state.target?.fullname) { rememberLazyListState() }
     // MODERATION02A2R3_COMPACT_REPORT_TOP_BAR_V1, M3225_FORM_DIALOGS_ARE_FULL_SCREEN_ON_PHONES_V1
     AdaptiveFullScreenDialog(
-        title = if (state.target == null) "Find reports" else "Reports",
+        title = if (state.target == null) stringResource(R.string.comp_find_reports) else stringResource(R.string.comp_reports_title),
         onDismissRequest = onDismiss,
         closeLabel = stringResource(R.string.all_close_reports),
         navigationIcon = if (state.target != null) {
@@ -167,7 +169,7 @@ internal fun ModeratorReportsDialog(
                 item("queue-heading") {
                     ReportSectionHeading(stringResource(R.string.all_in_the_loaded_queue))
                     lookupContent.queueMessage?.let { message ->
-                        Text(message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(message.asString(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
                 itemsIndexed(lookupContent.queueItems, key = { _, item -> "lookup-queue-${item.fullname}" }) { _, item ->
@@ -201,7 +203,7 @@ internal fun ModeratorReportsDialog(
                             Row(
                                 modifier = Modifier.fillMaxWidth()
                                     .clickable(enabled = !busy, role = Role.Button) { lookupExpanded = !lookupExpanded }
-                                    .semantics { stateDescription = if (lookupExpanded) "Expanded" else "Collapsed" }
+                                    .semantics { stateDescription = if (lookupExpanded) expandedState else collapsedState }
                                     .heightIn(min = 56.dp).padding(horizontal = 14.dp, vertical = 10.dp),
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                                 verticalAlignment = Alignment.CenterVertically,
@@ -220,7 +222,7 @@ internal fun ModeratorReportsDialog(
                                         onValueChange = { lookup = it.take(2_000); invalidLookup = false },
                                         label = { Text(stringResource(R.string.comp_reddit_link_or_t3_t1_id)) },
                                         supportingText = {
-                                            Text(if (invalidLookup) "Enter one valid Reddit post/comment link or full ID." else stringResource(R.string.all_also_works_for_items_no_longer_in))
+                                            Text(if (invalidLookup) stringResource(R.string.comp_enter_one_valid_reddit_post_comment) else stringResource(R.string.all_also_works_for_items_no_longer_in))
                                         },
                                         isError = invalidLookup,
                                         enabled = !busy,
@@ -251,7 +253,7 @@ internal fun ModeratorReportsDialog(
                     // MODERATION02A2R3_CONTENT_BEFORE_TECHNICAL_ID_V1
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            ModeratorMetadataPill(if (target.fullname.startsWith("t3_")) "Post" else "Comment")
+                            ModeratorMetadataPill(stringResource(if (target.fullname.startsWith("t3_")) R.string.comp_pill_post else R.string.comp_pill_comment))
                             target.communityName?.let { ModeratorMetadataPill("r/$it") }
                         }
                         state.item?.let { item ->
@@ -307,7 +309,7 @@ internal fun ModeratorReportsDialog(
                 if (userReasons == null || userReasons.isEmpty()) {
                     item("user-empty") {
                         ReportEmptySection(
-                            text = if (userReasons == null || reports.incomplete) "User report details unavailable." else "No user reports returned.",
+                            text = if (userReasons == null || reports.incomplete) stringResource(R.string.comp_user_report_details_unavailable) else stringResource(R.string.comp_no_user_reports_returned),
                             unavailable = userReasons == null || reports.incomplete,
                         )
                     }
@@ -319,7 +321,7 @@ internal fun ModeratorReportsDialog(
                 if (modReasons == null || modReasons.isEmpty()) {
                     item("mod-empty") {
                         ReportEmptySection(
-                            text = if (modReasons == null || reports.incomplete) "Moderator report details unavailable." else "No moderator reports returned.",
+                            text = if (modReasons == null || reports.incomplete) stringResource(R.string.comp_moderator_report_details_unavailable) else stringResource(R.string.comp_no_moderator_reports_returned),
                             unavailable = modReasons == null || reports.incomplete,
                         )
                     }
@@ -414,7 +416,7 @@ private fun ModeratorReportTargetButton(
             leadingContent = { ModeratorItemGlyph(isPost = target.fullname.startsWith("t3_")) },
             content = {
                 Text(
-                    summary ?: if (target.fullname.startsWith("t3_")) "Post" else "Comment",
+                    summary ?: stringResource(if (target.fullname.startsWith("t3_")) R.string.comp_pill_post else R.string.comp_pill_comment),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -498,18 +500,19 @@ private fun ModeratorReportNotice(notice: ModeratorReportsNotice) {
     }
 }
 
+@androidx.compose.runtime.Composable
 internal fun moderatorReportsNoticeText(notice: ModeratorReportsNotice): String = when (notice) {
-    ModeratorReportsNotice.INVALID_TARGET -> "Enter one valid post/comment link or fullname."
-    ModeratorReportsNotice.NOT_FOUND -> "Reddit did not return the exact target. Its report status is unknown."
-    ModeratorReportsNotice.READ_FAILED -> "Could not read report details. Refresh to check again; no report state is assumed."
-    ModeratorReportsNotice.NO_PERMISSION -> "Reddit did not confirm Posts moderation permission for this target. Report settings cannot be changed."
-    ModeratorReportsNotice.STATE_UNKNOWN -> "Reddit did not return a known report-ignore setting. No change can be sent."
-    ModeratorReportsNotice.SETTINGS_CHANGED -> "Report settings changed since you opened the dialog. Review the current state before confirming again."
-    ModeratorReportsNotice.BUSY -> "Another moderator action is in progress. This action was not queued. Refresh before confirming again."
-    ModeratorReportsNotice.AUTHORIZATION_REQUIRED -> "Moderator authorization is required. After authorizing, refresh reports and confirm again. No write is resumed automatically."
-    ModeratorReportsNotice.WRITE_FAILED -> "The report action could not be completed. Refresh the target before making a new explicit choice."
-    ModeratorReportsNotice.VERIFIED -> "Report setting verified by a fresh read from Reddit."
-    ModeratorReportsNotice.VERIFIED_AFTER_UNKNOWN -> "The write response was unclear. A fresh read now confirms the displayed report setting. The write was not retried."
-    ModeratorReportsNotice.NOT_CONFIRMED -> "The requested report setting could not be confirmed. Refresh and inspect the current state before acting again. No retry was sent."
-    ModeratorReportsNotice.ACCOUNT_CHANGED -> "The active account changed. Reopen reports with the intended moderator account."
+    ModeratorReportsNotice.INVALID_TARGET -> stringResource(R.string.comp_reports_notice_1)
+    ModeratorReportsNotice.NOT_FOUND -> stringResource(R.string.comp_reports_notice_2)
+    ModeratorReportsNotice.READ_FAILED -> stringResource(R.string.comp_reports_notice_3)
+    ModeratorReportsNotice.NO_PERMISSION -> stringResource(R.string.comp_reports_notice_4)
+    ModeratorReportsNotice.STATE_UNKNOWN -> stringResource(R.string.comp_reports_notice_5)
+    ModeratorReportsNotice.SETTINGS_CHANGED -> stringResource(R.string.comp_reports_notice_6)
+    ModeratorReportsNotice.BUSY -> stringResource(R.string.comp_reports_notice_7)
+    ModeratorReportsNotice.AUTHORIZATION_REQUIRED -> stringResource(R.string.comp_reports_notice_8)
+    ModeratorReportsNotice.WRITE_FAILED -> stringResource(R.string.comp_reports_notice_9)
+    ModeratorReportsNotice.VERIFIED -> stringResource(R.string.comp_reports_notice_10)
+    ModeratorReportsNotice.VERIFIED_AFTER_UNKNOWN -> stringResource(R.string.comp_reports_notice_11)
+    ModeratorReportsNotice.NOT_CONFIRMED -> stringResource(R.string.comp_reports_notice_12)
+    ModeratorReportsNotice.ACCOUNT_CHANGED -> stringResource(R.string.comp_reports_notice_13)
 }

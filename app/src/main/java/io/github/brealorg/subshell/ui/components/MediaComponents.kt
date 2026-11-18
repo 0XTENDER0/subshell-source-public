@@ -26,7 +26,6 @@ import android.graphics.drawable.Drawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.media3.common.MimeTypes
@@ -114,7 +113,6 @@ import io.github.brealorg.subshell.media.splitAssetVideoMedia
 import io.github.brealorg.subshell.media.adaptiveAssetVideoMedia
 import io.github.brealorg.subshell.media.localRawVideoMedia
 import io.github.brealorg.subshell.ui.MediaCaptionMode
-import io.github.brealorg.subshell.ui.RedditExternalPollHandoffStore
 import io.github.brealorg.subshell.ui.noticeFailure
 import io.github.brealorg.subshell.ui.resolveRedditTarget
 import io.github.brealorg.subshell.ui.PostMediaActionTarget
@@ -450,7 +448,7 @@ fun PostMedia(
                 LocalUriMedia(
                     uri = post.localMediaUri,
                     mimeType = post.localMediaMimeType,
-                    contentDescription = post.mediaLabel,
+                    contentDescription = mediaLabelShown(post.mediaLabel),
                     modifier = Modifier
                         .aspectRatio(16f / 9f)
                         .combinedClickable(
@@ -464,7 +462,7 @@ fun PostMedia(
                     if (imageUri != null) {
                         RemoteImage(
                             uri = imageUri,
-                            label = post.mediaLabel,
+                            label = mediaLabelShown(post.mediaLabel),
                             modifier = Modifier.combinedClickable(
                                 onClick = { state.openMedia(post) },
                                 onLongClick = showPostMediaActions,
@@ -475,7 +473,7 @@ fun PostMedia(
                     } else {
                         StaticMedia(
                             asset = post.mediaAsset,
-                            label = post.mediaLabel,
+                            label = mediaLabelShown(post.mediaLabel),
                             modifier = Modifier.combinedClickable(
                                 onClick = { state.openMedia(post) },
                                 onLongClick = showPostMediaActions,
@@ -501,7 +499,7 @@ fun PostMedia(
                     if (gifUri != null) {
                         RemoteGifMedia(
                             uri = gifUri,
-                            label = post.mediaLabel,
+                            label = mediaLabelShown(post.mediaLabel),
                             playing = state.activeAnimatedMediaId == post.id,
                             modifier = Modifier.combinedClickable(
                                 onClick = { state.openMedia(post) },
@@ -513,7 +511,7 @@ fun PostMedia(
                     } else {
                         GifMedia(
                             asset = post.mediaAsset,
-                            label = post.mediaLabel,
+                            label = mediaLabelShown(post.mediaLabel),
                             playing = state.activeAnimatedMediaId == post.id,
                             modifier = Modifier
                                 // ISSUE234_FEED_MEDIA_CAPPED_AT_4_5_V1
@@ -538,7 +536,7 @@ fun PostMedia(
                             Box(Modifier.fillMaxWidth()) {
                                 RemoteImage(
                                     uri = imageUri,
-                                    label = postMediaDescription(post),
+                                    label = postMediaDescription(post).asString(),
                                     modifier = Modifier.combinedClickable(
                                         onClick = openExternalLink,
                                         onLongClick = showPostMediaActions,
@@ -571,16 +569,10 @@ fun PostMedia(
                         state = state,
                         canOpenOnReddit = pollUrl != null,
                         onOpenReddit = {
-                            val intent = redditPollExternalIntent(context, post)
-                            if (intent == null) {
+                            // ISSUE308_REDDIT_LINKS_STAY_OFF_UNTIL_THE_READER_RETURNS_V1: the poll goes through
+                            // the same browser hand-off as the wiki; Subshell no longer catches the page coming back.
+                            if (pollUrl == null || !openRedditPageInBrowser(context, pollUrl)) {
                                 mediaErrorHost.noticeFailure(UiText.Resource(R.string.nt_couldn_t_open_the_poll_on_reddit), UiText.Resource(R.string.nt_no_app_on_this_device_can_open_2))
-                            } else {
-                                val handoffStore = RedditExternalPollHandoffStore(context)
-                                handoffStore.mark(post.id)
-                                if (runCatching { context.startActivity(intent) }.isFailure) {
-                                    handoffStore.clear()
-                                    mediaErrorHost.noticeFailure(UiText.Resource(R.string.nt_couldn_t_open_the_poll_on_reddit), UiText.Resource(R.string.nt_no_app_on_this_device_can_open_2))
-                                }
                             }
                         },
                     )
@@ -602,7 +594,7 @@ fun PostMedia(
             post.mediaLabel.isNotBlank() &&
             post.kind !in listOf(PostKind.LINK, PostKind.GALLERY)
         ) {
-            MediaBadge(post.mediaLabel, Modifier.align(Alignment.BottomStart))
+            MediaBadge(mediaLabelShown(post.mediaLabel), Modifier.align(Alignment.BottomStart))
         }
     }
 
@@ -705,10 +697,7 @@ fun PostMedia(
                             mediaSharePreparing = false
                             mediaActionTarget = null
                             if (!shared) {
-                                mediaErrorHost?.reportMediaActionFailure(
-                                    title = "Could not share",
-                                    message = "This media could not be prepared for sharing",
-                                )
+                                mediaErrorHost?.reportMediaShareFailure()
                             }
                         }
                     },
@@ -742,10 +731,7 @@ fun PostMedia(
                             )
                             delay(MEDIA_DOWNLOAD_SAVED_VISIBLE_MS)
                         } else {
-                            mediaErrorHost?.reportMediaActionFailure(
-                                title = "Could not download",
-                                message = "This media could not be saved",
-                            )
+                            mediaErrorHost?.reportMediaDownloadFailure()
                         }
                         mediaDownload = null
                         mediaActionTarget = null
@@ -928,7 +914,7 @@ fun LocalUriMedia(
         }
 
         if (mimeType.equals("image/gif", ignoreCase = true)) {
-            MediaBadge("GIF", Modifier.align(Alignment.TopStart))
+            MediaBadge(stringResource(R.string.media_label_gif), Modifier.align(Alignment.TopStart))
         } else if (mimeType?.startsWith("video/") == true) {
             Surface(
                 modifier = Modifier.align(Alignment.Center),
@@ -1449,7 +1435,7 @@ fun GifMedia(
             },
             modifier = Modifier.fillMaxSize(),
         )
-        MediaBadge("GIF", Modifier.align(Alignment.TopStart))
+        MediaBadge(stringResource(R.string.media_label_gif), Modifier.align(Alignment.TopStart))
         if (!playing) {
             Surface(
                 modifier = Modifier.align(Alignment.Center).size(48.dp),
@@ -1752,13 +1738,13 @@ fun GalleryTile(item: GalleryItem, playing: Boolean, modifier: Modifier = Modifi
         LocalUriMedia(
             uri = item.localMediaUri,
             mimeType = item.localMediaMimeType,
-            contentDescription = item.label,
+            contentDescription = mediaLabelShown(item.label),
             modifier = modifier,
         )
     } else if (imageUri != null) {
         RemoteMedia(
             uri = imageUri,
-            label = item.label,
+            label = mediaLabelShown(item.label),
             format = item.format,
             playing = playing,
             modifier = modifier,
@@ -1769,7 +1755,7 @@ fun GalleryTile(item: GalleryItem, playing: Boolean, modifier: Modifier = Modifi
         )
     } else {
         when (item.format) {
-            MediaFormat.GIF -> GifMedia(item.asset, item.label, playing, modifier)
+            MediaFormat.GIF -> GifMedia(item.asset, mediaLabelShown(item.label), playing, modifier)
             MediaFormat.IMAGE -> StaticMedia(item.asset, item.label, modifier)
             MediaFormat.VIDEO -> StaticMedia(item.asset, item.label, modifier)
         }
@@ -1797,12 +1783,12 @@ fun InlineCommentMedia(media: InlineMedia, playing: Boolean, modifier: Modifier 
  * TalkBack read it out character by character. A link's picture is described
  * as "Link preview, <domain>"; the card beside it names the short address.
  */
-internal fun postMediaDescription(post: Post): String {
-    if (post.kind != PostKind.LINK) return post.mediaLabel.ifBlank { post.title }
+internal fun postMediaDescription(post: Post): UiText {
+    if (post.kind != PostKind.LINK) return if (post.mediaLabel.isBlank()) mediaPostTitleText(post) else mediaLabelText(post.mediaLabel)
     val where = post.domain?.takeIf(String::isNotBlank)
         ?: UrlCleaner.cardLabel(post.mediaLabel).takeIf(String::isNotBlank)
-        ?: return post.title
-    return "Link preview, $where"
+        ?: return UiText.Plain(post.title)
+    return UiText.Resource(R.string.comp_link_preview_domain, where)
 }
 
 @Composable
@@ -2181,49 +2167,6 @@ internal fun redditPollWebUrl(post: Post): String? {
     ).toString()
 }
 
-private const val CUSTOM_TABS_SESSION_EXTRA =
-    "android.support.customtabs.extra.SESSION"
-private const val CUSTOM_TABS_SEND_TO_EXTERNAL_HANDLER_EXTRA =
-    "android.support.customtabs.extra.SEND_TO_EXTERNAL_HANDLER"
-private const val CUSTOM_TABS_INITIAL_NAVIGATION_CAN_LEAVE_BROWSER_EXTRA =
-    "androidx.browser.customtabs.extra.INITIAL_NAVIGATION_CAN_LEAVE_BROWSER"
-
-internal fun redditPollExternalIntent(context: Context, post: Post): Intent? {
-    val url = redditPollWebUrl(post) ?: return null
-    val uri = Uri.parse(url)
-    val browserProbeUri = Uri.Builder()
-        .scheme("https")
-        .authority("example.com")
-        .build()
-    val browserProbe = Intent(Intent.ACTION_VIEW, browserProbeUri)
-        .addCategory(Intent.CATEGORY_BROWSABLE)
-    val defaultBrowserPackage = context.packageManager
-        .resolveActivity(
-            browserProbe,
-            android.content.pm.PackageManager.MATCH_DEFAULT_ONLY,
-        )
-        ?.activityInfo
-        ?.packageName
-        ?.takeUnless { packageName -> packageName == "android" }
-
-    if (defaultBrowserPackage != null) {
-        val customTabsSession = Bundle().apply {
-            putBinder(CUSTOM_TABS_SESSION_EXTRA, null)
-        }
-        return Intent(Intent.ACTION_VIEW, uri)
-            .addCategory(Intent.CATEGORY_BROWSABLE)
-            .setPackage(defaultBrowserPackage)
-            .putExtra(CUSTOM_TABS_SEND_TO_EXTERNAL_HANDLER_EXTRA, false)
-            .putExtra(CUSTOM_TABS_INITIAL_NAVIGATION_CAN_LEAVE_BROWSER_EXTRA, false)
-            .putExtras(customTabsSession)
-    }
-
-    return Intent.createChooser(
-        Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE),
-        "Open poll on Reddit",
-    )
-}
-
 internal fun shouldOpenRedditPollOptionExternally(
     localMutationsAllowed: Boolean,
     canOpenOnReddit: Boolean,
@@ -2273,7 +2216,7 @@ private fun PollPanel(
                         state.localMutationsAllowed && localResultsVisible -> stringResource(R.string.all_local_poll_result)
                         state.localMutationsAllowed -> stringResource(R.string.all_choose_one)
                         poll.isClosed -> stringResource(R.string.all_poll_closed)
-                        else -> "Read-only Reddit poll"
+                        else -> stringResource(R.string.comp_read_only_reddit_poll)
                     },
                     style = MaterialTheme.typography.titleMedium,
                 )
@@ -2356,11 +2299,8 @@ private fun PollPanel(
             }
 
             Text(
-                buildString {
-                    append(compactNumber(total))
-                    append(" votes · ")
-                    append(poll.closesIn)
-                    if (localResultsVisible) append(" · stored locally")
+                stringResource(R.string.comp_poll_votes_closes, compactNumber(total), pollTimingShown(poll.closesIn)).let { line ->
+                    if (localResultsVisible) stringResource(R.string.comp_poll_stored_locally, line) else line
                 },
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -2651,3 +2591,24 @@ private const val LOCAL_MEDIA_MAX_DIMENSION = 4096
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun mediaActionSheetMayChange(target: SheetValue, busy: Boolean): Boolean =
     target != SheetValue.Hidden || !busy
+
+// TRANSLATE14_POLL_TIMING_IS_SHOWN_TRANSLATED_V1: the data layer and the cache
+// keep the English timing ("2d left", "Closed"); the card shows it translated.
+private val POLL_TIME_LEFT = Regex("""^(\d+)([mhd]) left$""")
+
+@Composable
+internal fun pollTimingShown(stored: String): String {
+    POLL_TIME_LEFT.matchEntire(stored)?.let { match ->
+        val count = match.groupValues[1].toInt()
+        return when (match.groupValues[2]) {
+            "m" -> stringResource(R.string.comp_poll_minutes_left, count)
+            "h" -> stringResource(R.string.comp_poll_hours_left, count)
+            else -> stringResource(R.string.comp_poll_days_left, count)
+        }
+    }
+    return when (stored) {
+        "Closed" -> stringResource(R.string.comp_poll_closed)
+        "Voting end unavailable" -> stringResource(R.string.comp_poll_end_unavailable)
+        else -> stored
+    }
+}

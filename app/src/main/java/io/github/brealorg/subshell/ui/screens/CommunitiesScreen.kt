@@ -346,7 +346,12 @@ fun CommunitiesScreen(
         // keep the reader's text size; when the four no longer fit equal slots
         // the row scrolls (M3 scrollable tabs) instead of shrinking every label
         // (ISSUE32 shrank them toward 9 sp and "Favorites" still clipped).
-        val sectionTitles = listOf("Favorites", "Joined", "Recent", "Feeds")
+        val sectionTitles = listOf(
+            stringResource(R.string.scr_favorites),
+            stringResource(R.string.scr_joined),
+            stringResource(R.string.all_recent),
+            stringResource(R.string.scr_feeds),
+        )
         val tabLabelStyle = MaterialTheme.typography.labelLarge
         var tabRowWidth by remember { mutableStateOf(0.dp) }
         val rowDensity = LocalDensity.current
@@ -817,14 +822,14 @@ private fun FavoriteCommunitiesContent(
             item("favorites-title") {
                 SectionTitle(
                     title = stringResource(R.string.scr_favorites),
-                    meta = "$favoriteCount pinned",
+                    meta = pluralStringResource(R.plurals.comm_pinned, favoriteCount, favoriteCount),
                 )
             }
             if (favoriteFeeds.isNotEmpty()) {
                 item("favorite-feeds-title") {
                     SectionTitle(
                         title = stringResource(R.string.scr_feeds),
-                        meta = "${favoriteFeeds.size} pinned",
+                        meta = pluralStringResource(R.plurals.comm_pinned, favoriteFeeds.size, favoriteFeeds.size),
                     )
                 }
                 items(
@@ -844,7 +849,7 @@ private fun FavoriteCommunitiesContent(
                 item("favorite-communities-title") {
                     SectionTitle(
                         title = stringResource(R.string.scr_communities),
-                        meta = "${favoriteCommunities.size} pinned",
+                        meta = pluralStringResource(R.plurals.comm_pinned, favoriteCommunities.size, favoriteCommunities.size),
                     )
                 }
                 items(
@@ -1013,9 +1018,9 @@ private fun JoinedCommunitiesContent(
             SectionTitle(
                 title = stringResource(R.string.scr_joined_communities),
                 meta = if (hiddenJoinedCommunities.isEmpty()) {
-                    "${visibleJoinedCommunities.size} joined"
+                    pluralStringResource(R.plurals.comm_joined, visibleJoinedCommunities.size, visibleJoinedCommunities.size)
                 } else {
-                    "${visibleJoinedCommunities.size} shown"
+                    pluralStringResource(R.plurals.comm_shown, visibleJoinedCommunities.size, visibleJoinedCommunities.size)
                 },
             )
         }
@@ -1544,7 +1549,7 @@ private fun HiddenSubscriptionsContent(
         item("hidden-subscriptions-title") {
             SectionTitle(
                 title = stringResource(R.string.scr_hidden_communities),
-                meta = "${hiddenCommunities.size} hidden",
+                meta = pluralStringResource(R.plurals.comm_hidden, hiddenCommunities.size, hiddenCommunities.size),
             )
         }
         if (hiddenCommunities.isEmpty()) {
@@ -1725,7 +1730,7 @@ private fun ExploreCommunitiesContent(
                         ),
                         selected = discoveryState.searchSort,
                         label = { sort ->
-                            if (sort == CommunityDiscoverySort.RELEVANCE) "Best match" else "Most active"
+                            if (sort == CommunityDiscoverySort.RELEVANCE) stringResource(R.string.scr_best_match) else stringResource(R.string.scr_most_active)
                         },
                         onSelect = { sort ->
                             onSubmitDiscovery(normalizedDraft, sort, true)
@@ -1856,12 +1861,13 @@ private fun ExploreCommunitiesContent(
                     SectionTitle(
                         title = when {
                             suggestionsVisible -> stringResource(R.string.all_suggestions)
-                            discoveryState.searchQuery != null -> "Search results"
+                            discoveryState.searchQuery != null -> stringResource(R.string.scr_search_results)
                             else -> stringResource(R.string.all_popular_on_reddit)
                         },
-                        meta = buildString {
-                            if (discoveryState.fromCache) append("Saved · ")
-                            append("${visibleDiscoveryItems.size} shown")
+                        meta = if (discoveryState.fromCache) {
+                            stringResource(R.string.scr_discovery_saved_shown, visibleDiscoveryItems.size)
+                        } else {
+                            stringResource(R.string.scr_discovery_shown, visibleDiscoveryItems.size)
                         },
                     )
                 }
@@ -1990,7 +1996,7 @@ private fun LocalCommunitiesContent(
             item("your-title") {
                 SectionTitle(
                     stringResource(R.string.all_joined_communities),
-                    "${joinedCommunities.size} joined",
+                    pluralStringResource(R.plurals.comm_joined, joinedCommunities.size, joinedCommunities.size),
                 )
             }
             items(joinedCommunities, key = { "joined-${it.id}" }) { community ->
@@ -2043,7 +2049,7 @@ private fun RecentCommunitiesContent(
             item("recent-history-title") {
                 SectionTitle(
                     title = stringResource(R.string.scr_recently_visited),
-                    meta = "${recentCommunities.size} visited",
+                    meta = pluralStringResource(R.plurals.comm_visited, recentCommunities.size, recentCommunities.size),
                     actionLabel = stringResource(R.string.all_clear),
                     onAction = state::clearRecentCommunities,
                 )
@@ -2060,7 +2066,7 @@ private fun RecentCommunitiesContent(
                     showMembershipAction = showMembershipAction,
                     showFavoriteAction = true,
                     supportingMeta = visitedAt?.let { timestamp ->
-                        formatRecentCommunityAge(timestamp, nowEpochMillis)
+                        formatRecentCommunityAge(timestamp, nowEpochMillis).asString()
                     },
                 ) { state.toggleCommunity(community.id) }
             }
@@ -2258,9 +2264,9 @@ internal fun CustomFeedsContent(
             phaseMessage = if (editingFeedGone) {
                 stringResource(R.string.all_this_feed_no_longer_exists)
             } else if (editingExistingFeed) {
-                liveState.manageMessage?.takeUnless { liveState.managePhase == CustomFeedManagePhase.FAILED }
+                liveState.manageMessage?.takeUnless { liveState.managePhase == CustomFeedManagePhase.FAILED }?.asString()
             } else {
-                liveState.createMessage?.takeUnless { liveState.createPhase == CustomFeedCreatePhase.FAILED }
+                liveState.createMessage?.takeUnless { liveState.createPhase == CustomFeedCreatePhase.FAILED }?.asString()
             },
             errorPresentation = if (editingExistingFeed) {
                 if (liveState.managePhase == CustomFeedManagePhase.FAILED) {
@@ -2363,7 +2369,7 @@ internal fun CustomFeedsContent(
                     } else {
                         liveState.manageMessage?.let { message ->
                             Text(
-                                text = message,
+                                text = message.asString(),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -2452,7 +2458,7 @@ internal fun CustomFeedsContent(
                     title = stringResource(R.string.scr_couldn_t_load_custom_feeds),
                     description = when {
                         liveState.failureStatusCode != null ->
-                            "Reddit returned HTTP ${liveState.failureStatusCode}. Pull to refresh or try again."
+                            stringResource(R.string.scr_custom_feeds_http, liveState.failureStatusCode)
                         liveState.failureKind == CustomFeedFailureKind.PROTOCOL ->
                             stringResource(R.string.all_reddit_returned_an_unexpected_response_pull_to)
                         liveState.failureKind == CustomFeedFailureKind.SESSION ->
@@ -2558,7 +2564,7 @@ private fun CustomFeedEditorDialog(
     val valid = feedName.trim().isNotEmpty() && selectedCommunities.isNotEmpty()
 
     AdaptiveFullScreenDialog(
-        title = if (editingFeed == null) "Create custom feed" else "Edit custom feed",
+        title = if (editingFeed == null) stringResource(R.string.scr_create_custom_feed) else stringResource(R.string.scr_edit_custom_feed),
         onDismissRequest = onDismiss,
         closeEnabled = !closeLocked,
         closeLabel = stringResource(R.string.all_cancel),
@@ -2567,7 +2573,7 @@ private fun CustomFeedEditorDialog(
                 enabled = !busy && valid && !submitBlocked,
                 onClick = onSubmit,
             ) {
-                Text(if (editingFeed == null) "Create" else "Save")
+                Text(if (editingFeed == null) stringResource(R.string.fab_create) else stringResource(R.string.comp_save))
             }
         },
     ) {
@@ -2596,7 +2602,7 @@ private fun CustomFeedEditorDialog(
             ) {
                 InlineProgressIndicator()
                 Text(
-                    text = if (editingFeed == null) "Creating feed…" else "Saving feed…",
+                    text = if (editingFeed == null) stringResource(R.string.scr_creating_feed) else stringResource(R.string.scr_saving_feed),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -3190,9 +3196,9 @@ private fun CustomFeedRow(
                         Symbols.Star
                     },
                     contentDescription = if (favorite) {
-                        "Remove ${feed.displayName} from favorites"
+                        stringResource(R.string.comm_remove_from_favorites, feed.displayName)
                     } else {
-                        "Add ${feed.displayName} to favorites"
+                        stringResource(R.string.comm_add_to_favorites, feed.displayName)
                     },
                     tint = favoriteStarTint(favorite),
                 )
@@ -3385,14 +3391,14 @@ private fun LiveCommunityDiscoveryEmpty(
 internal fun formatRecentCommunityAge(
     visitedAtEpochMillis: Long,
     nowEpochMillis: Long,
-): String {
+): UiText {
     val elapsedMinutes = ((nowEpochMillis - visitedAtEpochMillis).coerceAtLeast(0L) / 60_000L)
     return when {
-        elapsedMinutes < 1L -> "Just now"
-        elapsedMinutes < 60L -> "$elapsedMinutes min ago"
-        elapsedMinutes < 24L * 60L -> "${elapsedMinutes / 60L} h ago"
-        elapsedMinutes < 48L * 60L -> "Yesterday"
-        else -> "${elapsedMinutes / (24L * 60L)} d ago"
+        elapsedMinutes < 1L -> UiText.Resource(R.string.scr_recent_just_now)
+        elapsedMinutes < 60L -> UiText.Resource(R.string.scr_recent_minutes_ago, elapsedMinutes)
+        elapsedMinutes < 24L * 60L -> UiText.Resource(R.string.scr_recent_hours_ago, elapsedMinutes / 60L)
+        elapsedMinutes < 48L * 60L -> UiText.Resource(R.string.scr_conversation_yesterday)
+        else -> UiText.Resource(R.string.scr_recent_days_ago, elapsedMinutes / (24L * 60L))
     }
 }
 
@@ -3504,9 +3510,9 @@ private fun CommunityRow(
                             Symbols.VolumeOff
                         },
                         contentDescription = if (communityMute != null) {
-                            "Edit mute for ${state.subredditLabel(community.name)}"
+                            stringResource(R.string.comm_edit_mute_for, state.subredditLabel(community.name))
                         } else {
-                            "Mute ${state.subredditLabel(community.name)}"
+                            stringResource(R.string.comm_mute_name, state.subredditLabel(community.name))
                         },
                         tint = if (communityMute != null) {
                             MaterialTheme.colorScheme.primary
@@ -3528,9 +3534,9 @@ private fun CommunityRow(
                             Symbols.Star
                         },
                         contentDescription = if (favorite) {
-                            "Remove ${state.subredditLabel(community.name)} from favorites"
+                            stringResource(R.string.comm_remove_from_favorites, state.subredditLabel(community.name))
                         } else {
-                            "Add ${state.subredditLabel(community.name)} to favorites"
+                            stringResource(R.string.comm_add_to_favorites, state.subredditLabel(community.name))
                         },
                         tint = favoriteStarTint(favorite),
                     )
@@ -3547,9 +3553,9 @@ private fun CommunityRow(
                             Symbols.VisibilityOff
                         },
                         contentDescription = if (hidden) {
-                            "Show ${state.subredditLabel(community.name)} in Joined"
+                            stringResource(R.string.comm_show_in_joined, state.subredditLabel(community.name))
                         } else {
-                            "Hide ${state.subredditLabel(community.name)} from Joined"
+                            stringResource(R.string.comm_hide_from_joined, state.subredditLabel(community.name))
                         },
                         tint = if (hidden) {
                             MaterialTheme.colorScheme.primary
@@ -3736,11 +3742,17 @@ private fun CommunityStatusBadge(
     }
 }
 
-private fun communityMeta(community: Community): String? = buildList {
-    community.members
+@Composable
+private fun communityMeta(community: Community): String? {
+    val membersText = community.members
         .takeUnless { members -> members.isBlank() || members == "—" }
-        ?.let { members -> add("$members members") }
-    community.description
+        ?.let { members -> stringResource(R.string.comm_members_text, members) }
+    return communityMetaText(io.github.brealorg.subshell.ui.state.identityDescriptionShown(community.description), membersText)
+}
+
+private fun communityMetaText(description: String, membersText: String?): String? = buildList {
+    membersText?.let(::add)
+    description
         .trim()
         .takeIf(String::isNotEmpty)
         ?.let(::add)

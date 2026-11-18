@@ -548,7 +548,7 @@ internal fun PostRouteHost(
                         listSubtitle =
                             youContentWorkspaceLabel(
                                 userContentTab,
-                            ),
+                            ).asString(),
                         listContent = { listModifier ->
                             mainYouProfileContent(
                                 userOrigin.username,
@@ -582,7 +582,7 @@ internal fun PostRouteHost(
                         listSubtitle =
                             youContentWorkspaceLabel(
                                 userContentTab,
-                            ),
+                            ).asString(),
                         listContent = { listModifier ->
                             publicUserProfileContent(
                                 userOrigin.username,

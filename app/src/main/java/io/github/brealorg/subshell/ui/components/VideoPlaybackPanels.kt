@@ -88,7 +88,7 @@ internal fun PlaybackOptionsPanel(
             }
             PlaybackOptionNavigationRow(
                 title = stringResource(R.string.comp_quality),
-                summary = options.videoSelectionSummary(automaticVideoQuality),
+                summary = trackSummaryShown(options.videoSelectionSummary(automaticVideoQuality)),
                 onClick = onQuality,
             )
             // VIDEO04_EMPTY_CHOICES_ARE_HIDDEN_V1: Reddit videos rarely carry a
@@ -96,14 +96,14 @@ internal fun PlaybackOptionsPanel(
             if (playbackAudioChoiceOffered(options)) {
                 PlaybackOptionNavigationRow(
                     title = stringResource(R.string.comp_audio),
-                    summary = options.audioSelectionSummary(),
+                    summary = trackSummaryShown(options.audioSelectionSummary()),
                     onClick = onAudio,
                 )
             }
             if (playbackSubtitleChoiceOffered(options)) {
                 PlaybackOptionNavigationRow(
                     title = stringResource(R.string.comp_subtitles),
-                    summary = options.textSelectionSummary(),
+                    summary = trackSummaryShown(options.textSelectionSummary()),
                     onClick = onSubtitles,
                 )
             }
@@ -138,7 +138,7 @@ internal fun PlaybackQualityPanel(
 ) {
     PlaybackSelectionPanel(
         title = stringResource(R.string.comp_quality),
-        subtitle = options.videoSelectionSummary(automaticVideoQuality),
+        subtitle = trackSummaryShown(options.videoSelectionSummary(automaticVideoQuality)),
         onBack = onBack,
         onDismiss = onDismiss,
         modifier = modifier,
@@ -152,7 +152,7 @@ internal fun PlaybackQualityPanel(
         options.video.forEach { choice ->
             PlaybackTrackChoiceRow(choice, onClick = { onVideoTrack(choice.key) })
         }
-        PlaybackTrackAvailability(options.known, options.video, "video tracks")
+        PlaybackTrackAvailability(options.known, options.video, R.string.comp_no_video_tracks)
     }
 }
 
@@ -167,7 +167,7 @@ internal fun PlaybackAudioPanel(
 ) {
     PlaybackSelectionPanel(
         title = stringResource(R.string.comp_audio),
-        subtitle = options.audioSelectionSummary(),
+        subtitle = trackSummaryShown(options.audioSelectionSummary()),
         onBack = onBack,
         onDismiss = onDismiss,
         modifier = modifier,
@@ -181,7 +181,7 @@ internal fun PlaybackAudioPanel(
         options.audio.forEach { choice ->
             PlaybackTrackChoiceRow(choice, onClick = { onAudioTrack(choice.key) })
         }
-        PlaybackTrackAvailability(options.known, options.audio, "audio tracks")
+        PlaybackTrackAvailability(options.known, options.audio, R.string.comp_no_audio_tracks)
     }
 }
 
@@ -197,7 +197,7 @@ internal fun PlaybackSubtitlesPanel(
 ) {
     PlaybackSelectionPanel(
         title = stringResource(R.string.comp_subtitles),
-        subtitle = options.textSelectionSummary(),
+        subtitle = trackSummaryShown(options.textSelectionSummary()),
         onBack = onBack,
         onDismiss = onDismiss,
         modifier = modifier,
@@ -217,7 +217,7 @@ internal fun PlaybackSubtitlesPanel(
         options.text.forEach { choice ->
             PlaybackTrackChoiceRow(choice, onClick = { onTextTrack(choice.key) })
         }
-        PlaybackTrackAvailability(options.known, options.text, "subtitle tracks")
+        PlaybackTrackAvailability(options.known, options.text, R.string.comp_no_subtitle_tracks)
     }
 }
 
@@ -422,8 +422,8 @@ private fun PlaybackTrackChoiceRow(
     onClick: () -> Unit,
 ) {
     PlaybackOptionRow(
-        title = choice.title,
-        summary = choice.summary,
+        title = trackSummaryShown(choice.title),
+        summary = trackSummaryShown(choice.summary),
         selected = choice.selected,
         onClick = onClick,
     )
@@ -483,11 +483,11 @@ private fun PlaybackOptionRow(
 private fun PlaybackTrackAvailability(
     known: Boolean,
     choices: List<PlaybackTrackChoice>,
-    name: String,
+    @androidx.annotation.StringRes text: Int,
 ) {
     if (!known || choices.isNotEmpty()) return
     Text(
-        text = stringResource(R.string.comp_no_available, name),
+        text = stringResource(text),
         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         style = MaterialTheme.typography.labelMedium,
@@ -567,5 +567,28 @@ private fun PlaybackDiagnosticRow(label: String, value: String) {
             color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.bodyMedium,
         )
+    }
+}
+
+// TRANSLATE14_TRACK_SUMMARIES_ARE_SHOWN_TRANSLATED_V1: media/VideoTrackSelection
+// builds English summaries (tests read them); the panel shows them translated.
+// Track names that come from the stream (a language, a label) are shown as they are.
+private val TRACK_AUTO_CEILING = Regex("""^Auto · (.+) ceiling$""")
+private val TRACK_VIDEO_NUMBER = Regex("""^Video (\d+)$""")
+private val TRACK_PIXEL_VIDEO = Regex("""^(\d+)px video$""")
+
+@Composable
+internal fun trackSummaryShown(summary: String): String {
+    TRACK_AUTO_CEILING.matchEntire(summary)?.let { return stringResource(R.string.comp_track_auto_ceiling, it.groupValues[1]) }
+    TRACK_VIDEO_NUMBER.matchEntire(summary)?.let { return stringResource(R.string.comp_track_video_number, it.groupValues[1].toInt()) }
+    TRACK_PIXEL_VIDEO.matchEntire(summary)?.let { return stringResource(R.string.comp_track_pixel_video, it.groupValues[1].toInt()) }
+    return when (summary) {
+        "Off" -> stringResource(R.string.comp_track_off)
+        "Auto · source default" -> stringResource(R.string.comp_track_auto_source_default)
+        "Auto · forced or source default" -> stringResource(R.string.comp_track_auto_forced_or_source_default)
+        "Loading tracks…" -> stringResource(R.string.comp_track_loading)
+        "Selected track unavailable" -> stringResource(R.string.comp_track_selected_unavailable)
+        "Text track" -> stringResource(R.string.comp_track_text)
+        else -> summary
     }
 }

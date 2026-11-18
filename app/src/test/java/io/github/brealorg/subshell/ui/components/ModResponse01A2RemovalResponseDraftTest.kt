@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.account.RedditModeratorQueueKind
 import io.github.brealorg.subshell.data.account.RedditRemovalMessage
 import io.github.brealorg.subshell.data.account.RedditRemovalMessageType
@@ -11,6 +12,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class ModResponse01A2RemovalResponseDraftTest {
     private val reason = RedditRemovalReason(id = "r1", title = "Rule 1", message = "Please read rule 1.")
 
@@ -113,15 +116,15 @@ class ModResponse01A2RemovalResponseDraftTest {
     fun presentationCopyMatchesRedditSemantics() {
         assertEquals(
             "Reddit posts it as a distinguished, stickied comment.",
-            removalResponseTypeDescription(RedditRemovalMessageType.PUBLIC, RedditModeratorQueueKind.POST),
+            removalResponseTypeDescription(RedditRemovalMessageType.PUBLIC, RedditModeratorQueueKind.POST).s,
         )
         assertEquals(
             "Reddit posts it as a distinguished reply.",
-            removalResponseTypeDescription(RedditRemovalMessageType.PUBLIC_AS_SUBREDDIT, RedditModeratorQueueKind.COMMENT),
+            removalResponseTypeDescription(RedditRemovalMessageType.PUBLIC_AS_SUBREDDIT, RedditModeratorQueueKind.COMMENT).s,
         )
         assertEquals(
             "Sent from the subreddit's modmail.",
-            removalResponseTypeDescription(RedditRemovalMessageType.PRIVATE_EXPOSED, RedditModeratorQueueKind.POST),
+            removalResponseTypeDescription(RedditRemovalMessageType.PRIVATE_EXPOSED, RedditModeratorQueueKind.POST).s,
         )
         assertEquals(4, RedditRemovalMessageType.entries.map(::removalResponseTypeLabel).distinct().size)
     }
@@ -130,15 +133,15 @@ class ModResponse01A2RemovalResponseDraftTest {
     fun partialSuccessNoticeNamesEveryFailedStep() {
         assertEquals(
             "Reddit removed the item, but the removal message was not sent.",
-            removalPartialSuccessMessage(reasonWarning = false, messageOutcome = RedditRemovalStepOutcome.FAILED),
+            removalPartialSuccessMessage(reasonWarning = false, messageOutcome = RedditRemovalStepOutcome.FAILED).s,
         )
         assertEquals(
             "Reddit removed the item, but the removal reason or mod note could not be confirmed and the removal message was not sent.",
-            removalPartialSuccessMessage(reasonWarning = true, messageOutcome = RedditRemovalStepOutcome.FAILED),
+            removalPartialSuccessMessage(reasonWarning = true, messageOutcome = RedditRemovalStepOutcome.FAILED).s,
         )
         assertEquals(
             "Reddit removed the item, but the removal reason or mod note could not be confirmed.",
-            removalPartialSuccessMessage(reasonWarning = true, messageOutcome = RedditRemovalStepOutcome.SENT),
+            removalPartialSuccessMessage(reasonWarning = true, messageOutcome = RedditRemovalStepOutcome.SENT).s,
         )
     }
 }

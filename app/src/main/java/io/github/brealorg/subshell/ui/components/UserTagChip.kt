@@ -48,7 +48,8 @@ internal fun userTagChipColors(color: UserTagColor, dark: Boolean): UserTagChipC
 internal fun userTagChipColors(color: UserTagColor): UserTagChipColors =
     userTagChipColors(color, dark = MaterialTheme.colorScheme.surface.luminance() < 0.5f)
 
-internal fun userTagChipText(tag: UserTag): String = tag.label.ifEmpty { "Note" }
+@Composable
+internal fun userTagChipText(tag: UserTag): String = tag.label.ifEmpty { stringResource(R.string.comp_user_tag_note) }
 
 /** The user's own tag next to a username: the label (or "Note" for a note-only tag). */
 @Composable
@@ -58,6 +59,7 @@ internal fun UserTagChip(
 ) {
     val colors = userTagChipColors(tag.color)
     val text = userTagChipText(tag)
+    val tagDescription = stringResource(R.string.comp_user_tag_description, text)
     Text(
         text = text,
         style = MaterialTheme.typography.labelSmall,
@@ -65,7 +67,7 @@ internal fun UserTagChip(
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier
-            .semantics { contentDescription = "Your tag: $text" }
+            .semantics { contentDescription = tagDescription }
             .clip(MaterialTheme.shapes.extraSmall)
             .background(colors.container)
             .padding(horizontal = 5.dp, vertical = 1.dp),
@@ -85,7 +87,7 @@ internal fun UserTagProfileSection(
                 UserTagChip(tag = tag)
             }
             TextButton(onClick = onEdit) {
-                Text(if (tag == null) "Add private note" else "Edit private note")
+                Text(if (tag == null) stringResource(R.string.comp_add_private_note) else stringResource(R.string.comp_edit_private_note))
             }
         }
         if (tag != null && tag.note.isNotEmpty()) {

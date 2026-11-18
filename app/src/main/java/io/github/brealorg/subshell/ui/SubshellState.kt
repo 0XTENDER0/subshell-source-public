@@ -341,10 +341,10 @@ enum class VideoQuality(@androidx.annotation.StringRes val labelRes: Int) {
 // button shows; post and full screen by default, a reader may widen or narrow it.
 // VIDEO05_SETTING_ROWS_SHOW_SHORT_VALUES_V1: the row shows a short value so its
 // description keeps its width (device: one word per line); the dialog says it all.
-enum class PlaybackOptionsPlacement(@androidx.annotation.StringRes val labelRes: Int, val rowLabel: String) {
-    POST_AND_FULLSCREEN( io.github.brealorg.subshell.R.string.playback_options_placement_post_and_fullscreen, "Post + full screen"),
-    FULLSCREEN_ONLY( io.github.brealorg.subshell.R.string.playback_options_placement_fullscreen_only, "Full screen"),
-    EVERYWHERE( io.github.brealorg.subshell.R.string.playback_options_placement_everywhere, "Everywhere"),
+enum class PlaybackOptionsPlacement(@androidx.annotation.StringRes val labelRes: Int, @androidx.annotation.StringRes val rowLabelRes: Int) {
+    POST_AND_FULLSCREEN( io.github.brealorg.subshell.R.string.playback_options_placement_post_and_fullscreen, io.github.brealorg.subshell.R.string.row_label_post_and_full_screen),
+    FULLSCREEN_ONLY( io.github.brealorg.subshell.R.string.playback_options_placement_fullscreen_only, io.github.brealorg.subshell.R.string.row_label_full_screen),
+    EVERYWHERE( io.github.brealorg.subshell.R.string.playback_options_placement_everywhere, io.github.brealorg.subshell.R.string.row_label_everywhere),
 }
 
 internal fun videoPictureInPictureAllowed(
@@ -377,15 +377,15 @@ internal fun playbackOptionsButtonShown(
 
 // VIDEO05_PLAYBACK_DEFAULTS_IN_SETTINGS_V1 (#227, owner): Settings holds the
 // defaults; the playback options panel overrides them for one video only.
-enum class VideoSubtitleDefault(@androidx.annotation.StringRes val labelRes: Int, val rowLabel: String) {
-    OFF( io.github.brealorg.subshell.R.string.video_subtitle_default_off, "Off"),
-    WHEN_MARKED( io.github.brealorg.subshell.R.string.video_subtitle_default_when_marked, "Auto"),
-    SYSTEM_CAPTIONS( io.github.brealorg.subshell.R.string.video_subtitle_default_system_captions, "System"),
+enum class VideoSubtitleDefault(@androidx.annotation.StringRes val labelRes: Int, @androidx.annotation.StringRes val rowLabelRes: Int) {
+    OFF( io.github.brealorg.subshell.R.string.video_subtitle_default_off, io.github.brealorg.subshell.R.string.row_label_off),
+    WHEN_MARKED( io.github.brealorg.subshell.R.string.video_subtitle_default_when_marked, io.github.brealorg.subshell.R.string.row_label_auto),
+    SYSTEM_CAPTIONS( io.github.brealorg.subshell.R.string.video_subtitle_default_system_captions, io.github.brealorg.subshell.R.string.row_label_system),
 }
 
-enum class VideoAudioDefault(@androidx.annotation.StringRes val labelRes: Int, val rowLabel: String) {
-    VIDEO_DEFAULT( io.github.brealorg.subshell.R.string.video_audio_default_video_default, "Video's own"),
-    DEVICE_LANGUAGE( io.github.brealorg.subshell.R.string.video_audio_default_device_language, "Device"),
+enum class VideoAudioDefault(@androidx.annotation.StringRes val labelRes: Int, @androidx.annotation.StringRes val rowLabelRes: Int) {
+    VIDEO_DEFAULT( io.github.brealorg.subshell.R.string.video_audio_default_video_default, io.github.brealorg.subshell.R.string.row_label_videos_own),
+    DEVICE_LANGUAGE( io.github.brealorg.subshell.R.string.video_audio_default_device_language, io.github.brealorg.subshell.R.string.row_label_device),
 }
 
 enum class VideoTimelineSize(
@@ -2680,18 +2680,19 @@ class SubshellState(
     val canNavigateBack: Boolean
         get() = routeStack.canPop
 
-    val currentSearchHint: String
+    // TRANSLATE14: search texts are UiText; the screen resolves them.
+    val currentSearchHint: UiText
         get() = when (searchArea) {
             SearchArea.ALL_SUBSHELL -> if (activeAccountIsAuthenticated) {
-                "Search Reddit"
+                UiText.Resource(R.string.search_hint_reddit)
             } else {
-                "Search subshell"
+                UiText.Resource(R.string.search_hint_subshell)
             }
-            SearchArea.MY_COMMUNITIES -> "Search my communities"
-            SearchArea.CURRENT_COMMUNITY -> searchOriginCommunity?.let { "Search r/$it" } ?: "Search subshell"
+            SearchArea.MY_COMMUNITIES -> UiText.Resource(R.string.search_hint_my_communities)
+            SearchArea.CURRENT_COMMUNITY -> searchOriginCommunity?.let { UiText.Resource(R.string.search_hint_community, it) } ?: UiText.Resource(R.string.search_hint_subshell)
         }
 
-    val currentSearchAreaLabel: String
+    val currentSearchAreaLabel: UiText
         get() = searchAreaLabel(searchArea)
 
     val availableSearchAreas: List<SearchArea>
@@ -4322,20 +4323,20 @@ class SubshellState(
         refreshCurrentRouteSnapshot()
     }
 
-    fun searchAreaLabel(area: SearchArea): String = when (area) {
-        SearchArea.ALL_SUBSHELL -> if (activeAccountIsAuthenticated) "All Reddit" else "All subshell"
-        SearchArea.MY_COMMUNITIES -> "My communities"
-        SearchArea.CURRENT_COMMUNITY -> searchOriginCommunity?.let { "r/$it" } ?: "This community"
+    fun searchAreaLabel(area: SearchArea): UiText = when (area) {
+        SearchArea.ALL_SUBSHELL -> UiText.Resource(if (activeAccountIsAuthenticated) R.string.search_area_all_reddit else R.string.search_area_all_subshell)
+        SearchArea.MY_COMMUNITIES -> UiText.Resource(R.string.search_area_my_communities)
+        SearchArea.CURRENT_COMMUNITY -> searchOriginCommunity?.let { UiText.Plain("r/$it") } ?: UiText.Resource(R.string.search_area_this_community)
     }
 
-    fun searchAreaDescription(area: SearchArea): String = when (area) {
+    fun searchAreaDescription(area: SearchArea): UiText = when (area) {
         SearchArea.ALL_SUBSHELL -> if (activeAccountIsAuthenticated) {
-            "Reddit posts, communities and people"
+            UiText.Resource(R.string.search_area_desc_reddit)
         } else {
-            "Posts, communities and people"
+            UiText.Resource(R.string.search_area_desc_subshell)
         }
-        SearchArea.MY_COMMUNITIES -> "Communities you joined"
-        SearchArea.CURRENT_COMMUNITY -> "This community"
+        SearchArea.MY_COMMUNITIES -> UiText.Resource(R.string.search_area_desc_my_communities)
+        SearchArea.CURRENT_COMMUNITY -> UiText.Resource(R.string.search_area_this_community)
     }
 
     fun matchesSearchArea(communityName: String): Boolean = when (searchArea) {

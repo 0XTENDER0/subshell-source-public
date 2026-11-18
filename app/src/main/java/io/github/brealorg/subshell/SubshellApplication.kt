@@ -19,6 +19,8 @@ class SubshellApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         AfterTheRename.runOnceInTheBackground(this)
+        // WIKI03_SUBSHELL_STEPS_ASIDE_WHILE_THE_BROWSER_OPENS_V1
+        io.github.brealorg.subshell.ui.components.restoreRedditLinkHandling(this)
     }
 
     override val workManagerConfiguration: Configuration

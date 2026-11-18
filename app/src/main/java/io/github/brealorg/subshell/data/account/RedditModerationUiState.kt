@@ -76,9 +76,26 @@ data class RedditModeratorQueueItemDetails(
     /**
      * ISSUE301B_AUTOMOD_HELD_IS_NAMED_V1: AutoModerator filtered it into the queue
      * (`removed_by_category = automod_filtered`, or `banned_by = AutoModerator`
-     * while `removed = false`); not removed, and Reddit does not send the rule.
+     * while `removed = false`); not removed. The rule's reason is in the mod log
+     * ([heldReason]).
      */
     val heldByAutoModerator: Boolean = false,
+    /**
+     * ISSUE301C_REDDIT_FILTER_HELD_IS_NAMED_V1: Reddit's own filter (abuse and
+     * harassment, spam, …) held it: `banned_by = true` while `removed = false`
+     * (u/vpsj's comment in r/indianrailways, 2026-11-15).
+     */
+    val heldByRedditFilter: Boolean = false,
+    /** When it was posted (`created_utc`): the mod log is read back to here (ISSUE301D). */
+    val createdEpochSeconds: Long? = null,
+    /** ISSUE301C_A_FILTER_REASON_COMES_FROM_THE_MOD_LOG_V1: why the filter held it, or null. */
+    val heldReason: RedditModeratorHeldReason? = null,
+)
+
+/** A filter's own words from the mod log, and whether AutoModerator (not Reddit) wrote them. */
+data class RedditModeratorHeldReason(
+    val byAutoModerator: Boolean,
+    val reason: String,
 )
 
 // MOD01A22_EXACT_MODERATION_TARGET_V1

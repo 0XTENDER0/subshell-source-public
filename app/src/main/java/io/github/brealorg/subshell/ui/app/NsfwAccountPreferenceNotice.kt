@@ -95,7 +95,7 @@ internal fun NsfwAccountPreferenceNotice(
                 scopeKey = NSFW_ACCOUNT_PREFERENCE_SCOPE,
                 presentation = nsfwAccountPreferencePresentation(),
                 failureDetails = null,
-                onRetry = { openInBrowser(context, REDDIT_PREFERENCES_URL) },
+                onRetry = { io.github.brealorg.subshell.ui.components.openRedditPageInBrowser(context, REDDIT_PREFERENCES_URL) },
                 tone = TrayTone.INFO, // ISSUE222: information, not an error
             )
         } else if (nsfwSearchPreferenceNeedsNotice(result)) {
@@ -103,30 +103,9 @@ internal fun NsfwAccountPreferenceNotice(
                 scopeKey = NSFW_ACCOUNT_PREFERENCE_SCOPE,
                 presentation = nsfwSearchPreferencePresentation(),
                 failureDetails = null,
-                onRetry = { openInBrowser(context, REDDIT_OLD_PREFERENCES_URL) },
+                onRetry = { io.github.brealorg.subshell.ui.components.openRedditPageInBrowser(context, REDDIT_OLD_PREFERENCES_URL) },
                 tone = TrayTone.INFO,
             )
         }
     }
-}
-
-/**
- * Reddit's own site in the browser: Subshell handles reddit.com links itself,
- * so the default browser is named explicitly (as for polls).
- */
-private fun openInBrowser(context: Context, url: String) {
-    val uri = Uri.parse(url)
-    val browser = context.packageManager
-        .resolveActivity(
-            Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com")).addCategory(Intent.CATEGORY_BROWSABLE),
-            android.content.pm.PackageManager.MATCH_DEFAULT_ONLY,
-        )
-        ?.activityInfo
-        ?.packageName
-        ?.takeUnless { packageName -> packageName == "android" }
-    val intent = Intent(Intent.ACTION_VIEW, uri)
-        .addCategory(Intent.CATEGORY_BROWSABLE)
-        .apply { if (browser != null) setPackage(browser) }
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    runCatching { context.startActivity(intent) }
 }

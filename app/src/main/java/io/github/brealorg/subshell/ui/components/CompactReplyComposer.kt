@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import androidx.compose.ui.res.pluralStringResource
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
@@ -211,15 +212,17 @@ fun CompactReplyComposer(
                     sendButton()
                     expandButton()
                 }
+                val formattingResources = androidx.compose.ui.platform.LocalResources.current
                 AppBarRow(
                     modifier = Modifier.weight(1f),
                     overflowIndicator = { menuState ->
                         ComposerFormattingOverflow(menuState, enabled = !inputLocked)
                     },
                 ) {
-                    formattingToggleItem(formatting, { on -> formatting = on }, enabled = !inputLocked)
+                    formattingToggleItem(formattingResources, formatting, { on -> formatting = on }, enabled = !inputLocked)
                     if (formatting) {
                         composerFormattingItems(
+                            resources = formattingResources,
                             state = state,
                             enabled = !inputLocked,
                             onFormat = ::applyFormat,
@@ -228,6 +231,7 @@ fun CompactReplyComposer(
                     } else {
                         if (showMediaActions) {
                             composerMediaItems(
+                                resources = formattingResources,
                                 imageEnabled = mediaEnabled && imageEnabled && !inputLocked,
                                 gifEnabled = mediaEnabled && gifEnabled && !inputLocked,
                                 onPickImage = onPickImage,
@@ -281,6 +285,7 @@ fun CompactReplyComposer(
 }
 
 private fun AppBarRowScope.composerMediaItems(
+    resources: android.content.res.Resources,
     imageEnabled: Boolean,
     gifEnabled: Boolean,
     onPickImage: () -> Unit,
@@ -289,13 +294,13 @@ private fun AppBarRowScope.composerMediaItems(
     clickableItem(
         onClick = onPickImage,
         icon = { Icon(Symbols.Image, contentDescription = stringResource(R.string.comp_image)) },
-        label = "Image",
+        label = resources.getString(R.string.comp_image),
         enabled = imageEnabled,
     )
     clickableItem(
         onClick = onPickGif,
         icon = { Icon(Symbols.GifBox, contentDescription = stringResource(R.string.comp_gif)) },
-        label = "GIF",
+        label = resources.getString(R.string.comp_reply_gif),
         enabled = gifEnabled,
     )
 }
@@ -329,7 +334,7 @@ private fun ColumnScope.ComposerAttachments(
 @Composable
 private fun OverLimitNote(maxCharacters: Int, modifier: Modifier = Modifier) {
     Text(
-        "$maxCharacters character limit",
+        pluralStringResource(R.plurals.comp_character_limit, maxCharacters, maxCharacters),
         modifier = modifier,
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.error,
@@ -439,14 +444,16 @@ private fun ComposerLongReply(
             ) {
                 // COMPOSER232_LONG_REPLY_KEEPS_AA_V1 (owner): the same Aa as the
                 // quick reply, and the choice carries over both ways.
+                val formattingResources = androidx.compose.ui.platform.LocalResources.current
                 AppBarRow(
                     overflowIndicator = { menuState ->
                         ComposerFormattingOverflow(menuState, enabled = !inputLocked)
                     },
                 ) {
-                    formattingToggleItem(formatting, onFormattingChange, enabled = !inputLocked)
+                    formattingToggleItem(formattingResources, formatting, onFormattingChange, enabled = !inputLocked)
                     if (formatting) {
                         composerFormattingItems(
+                            resources = formattingResources,
                             state = state,
                             enabled = !inputLocked,
                             onFormat = onFormat,
@@ -454,6 +461,7 @@ private fun ComposerLongReply(
                         )
                     } else if (showMediaActions) {
                         composerMediaItems(
+                                resources = formattingResources,
                             imageEnabled = imageEnabled,
                             gifEnabled = gifEnabled,
                             onPickImage = onPickImage,
@@ -498,6 +506,7 @@ private fun ColumnScope.ComposerPreview(
 }
 
 private fun AppBarRowScope.formattingToggleItem(
+    resources: android.content.res.Resources,
     formatting: Boolean,
     onFormattingChange: (Boolean) -> Unit,
     enabled: Boolean,
@@ -506,7 +515,7 @@ private fun AppBarRowScope.formattingToggleItem(
         checked = formatting,
         onCheckedChange = onFormattingChange,
         icon = { Icon(Symbols.TextFormat, contentDescription = stringResource(R.string.comp_formatting)) },
-        label = "Formatting",
+        label = resources.getString(R.string.comp_formatting),
         enabled = enabled,
     )
 }
@@ -515,6 +524,8 @@ private fun AppBarRowScope.formattingToggleItem(
 @Composable
 private fun ComposerQuote(text: String, modifier: Modifier = Modifier) {
     var open by rememberSaveable { mutableStateOf(false) }
+    val expandedState = stringResource(R.string.composer_state_expanded)
+    val collapsedState = stringResource(R.string.composer_state_collapsed)
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -526,7 +537,7 @@ private fun ComposerQuote(text: String, modifier: Modifier = Modifier) {
                 .clickable(role = Role.Button, onClickLabel = if (open) stringResource(R.string.all_show_less) else stringResource(R.string.all_show_all)) {
                     open = !open
                 }
-                .semantics { stateDescription = if (open) "Expanded" else "Collapsed" }
+                .semantics { stateDescription = if (open) expandedState else collapsedState }
                 .padding(12.dp),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,

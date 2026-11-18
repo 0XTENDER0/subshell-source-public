@@ -209,7 +209,7 @@ fun NewMessageScreen(
     }
     if (discardConfirmationVisible) {
         ComposerDiscardChangesDialog(
-            subject = "message",
+            message = R.string.comp_edits_lost_message,
             onKeepEditing = { discardConfirmationVisible = false },
             onDiscard = {
                 discardConfirmationVisible = false

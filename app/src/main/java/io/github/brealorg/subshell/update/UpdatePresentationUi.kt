@@ -347,7 +347,7 @@ internal fun UpdateAvailableDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(if (advisory != null) "Known problem in your version" else "subshell update available")
+            Text(if (advisory != null) stringResource(R.string.upd_known_problem_in_your_version) else stringResource(R.string.update_notification_available))
         },
         text = {
             // ISSUE209_UPDATE_DIALOGS_SCROLL_V1 (#209): AlertDialog does not
@@ -372,7 +372,7 @@ internal fun UpdateAvailableDialog(
                     }
                 }
                 Text(
-                    if (advisory != null) "${release.versionName} fixes it" else release.versionName,
+                    if (advisory != null) stringResource(R.string.update_notification_fixes_it, release.versionName) else release.versionName,
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(

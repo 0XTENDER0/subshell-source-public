@@ -131,6 +131,6 @@ internal fun copyCustomFeedLink(context: Context, feed: CustomFeedSummary, notic
         notices.noticeFailure(UiText.Resource(R.string.sysact_couldn_t_copy_the_link), UiText.Resource(R.string.sysact_the_clipboard_is_unavailable))
         return
     }
-    clipboard.setPrimaryClip(ClipData.newPlainText("Reddit custom feed link", url))
-    notices.noticeCopied("Link")
+    clipboard.setPrimaryClip(ClipData.newPlainText(context.getString(R.string.ui_reddit_custom_feed_link), url))
+    notices.noticeCopied(io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.nt_copied_what_link))
 }

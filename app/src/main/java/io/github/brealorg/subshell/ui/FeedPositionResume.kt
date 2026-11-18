@@ -224,8 +224,8 @@ internal fun FindTheResumedFeedPlace(
         state.endFeedPositionFind(scrollKey, outcome)
         if (outcome == ResumedPlaceSearch.NOT_FOUND) {
             notices.noticeInfo(
-                "Couldn't find where you left off",
-                "It wasn't in the newest posts, so the feed starts at the top.",
+                UiText.Resource(R.string.feed_resume_not_found_title),
+                UiText.Resource(R.string.feed_resume_not_found),
             )
         }
     }

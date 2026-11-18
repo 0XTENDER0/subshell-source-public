@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import io.github.brealorg.subshell.data.account.RedditModeratorQueueItem
 import io.github.brealorg.subshell.data.account.RedditModeratorQueueKind
 import io.github.brealorg.subshell.data.account.moderatorReportCountLabel
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.ui.symbols.Symbols
 
 // MODERATION02A2R3_SHARED_EXPRESSIVE_REVIEW_PRIMITIVES_V1
@@ -86,7 +87,7 @@ internal fun ModeratorQueueItemSummary(
             }
             moderatorQueueItemReasons(item).forEach { reason ->
                 Text(
-                    reason,
+                    reason.asString(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                     maxLines = 2,
@@ -95,14 +96,14 @@ internal fun ModeratorQueueItemSummary(
             }
             moderatorQueueItemHeldExplanation(item, held)?.let { explanation ->
                 Text(
-                    explanation,
+                    explanation.asString(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             moderatorQueueItemRemovalLine(item)?.let { line ->
                 Text(
-                    line,
+                    line.asString(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
@@ -118,13 +119,13 @@ internal fun ModeratorQueueItemSummary(
             if (inProgress) {
                 InlineProgressIndicator()
             }
-            ModeratorMetadataPill(if (item.kind == RedditModeratorQueueKind.POST) "Post" else "Comment")
+            ModeratorMetadataPill(if (item.kind == RedditModeratorQueueKind.POST) stringResource(R.string.comp_pill_post) else stringResource(R.string.comp_pill_comment))
             if (held) {
-                ModeratorMetadataPill(HELD_FOR_REVIEW_LABEL, emphasized = true)
+                ModeratorMetadataPill(stringResource(R.string.comp_held_for_review), emphasized = true)
             } else if (showsReportCount || (item.reportDetails.totalCount ?: 0) > 0) {
                 ModeratorMetadataPill(moderatorReportCountLabel(item), emphasized = true)
             }
-            if (item.reportDetails.ignored == true) ModeratorMetadataPill("Reports ignored")
+            if (item.reportDetails.ignored == true) ModeratorMetadataPill(stringResource(R.string.comp_reports_ignored))
         }
     }
 }
@@ -164,29 +165,35 @@ internal fun ModeratorActionIcon(imageVector: ImageVector) {
     Icon(imageVector, contentDescription = null, modifier = Modifier.size(18.dp))
 }
 
-// ISSUE301_QUEUE_CARD_SHOWS_WHY_AND_WHAT_V1
-internal const val HELD_FOR_REVIEW_LABEL = "Held for review"
+// ISSUE301_QUEUE_CARD_SHOWS_WHY_AND_WHAT_V1: "Held for review" is R.string.comp_held_for_review.
 
 /**
- * Reddit's queue API says nothing about why an unreported item is held (checked
- * 2026-11-13 against a post Reddit's post guidance sent to the queue: every field
- * equals an ordinary post's); reddit.com shows it from data apps do not get.
- * AutoModerator is named on its own (ISSUE301B_AUTOMOD_HELD_IS_NAMED_V1).
+ * Why the item waits (ISSUE301B_AUTOMOD_HELD_IS_NAMED_V1,
+ * ISSUE301C_REDDIT_FILTER_HELD_IS_NAMED_V1): the filter's own words from the
+ * mod log when there are some (ISSUE301C_A_FILTER_REASON_COMES_FROM_THE_MOD_LOG_V1),
+ * else who held it. An unreported queue item with no sign on it was held by
+ * Reddit's filters or post guidance (post guidance leaves no field, checked
+ * 2026-11-13). Nothing is claimed about what Reddit tells apps.
  */
-internal const val HELD_WITHOUT_REPORTS_EXPLANATION =
-    "Held by Reddit's filters or post guidance. Reddit doesn't tell apps which."
-
-/** ISSUE301B_AUTOMOD_HELD_IS_NAMED_V1: AutoModerator held it; its rule is not sent to apps. */
-internal const val HELD_BY_AUTOMODERATOR_EXPLANATION =
-    "Held by AutoModerator. Reddit doesn't tell apps which rule."
-
-/** Why the item waits: AutoModerator wherever the card is shown, otherwise the unnamed filter for an unreported queue item. */
-internal fun moderatorQueueItemHeldExplanation(item: RedditModeratorQueueItem, heldWithoutReports: Boolean): String? =
-    when {
-        item.details.heldByAutoModerator -> HELD_BY_AUTOMODERATOR_EXPLANATION
-        heldWithoutReports -> HELD_WITHOUT_REPORTS_EXPLANATION
+internal fun moderatorQueueItemHeldExplanation(item: RedditModeratorQueueItem, heldWithoutReports: Boolean): UiText? {
+    val details = item.details
+    details.heldReason?.let { held ->
+        return UiText.Resource(
+            if (held.byAutoModerator) R.string.comp_held_by_automoderator_reason else R.string.comp_held_by_reddit_reason,
+            held.reason,
+        )
+    }
+    return when {
+        details.heldByAutoModerator -> UiText.Resource(R.string.comp_held_by_automoderator)
+        details.heldByRedditFilter -> UiText.Resource(R.string.comp_held_by_reddit)
+        // ISSUE301E_A_NAMED_REMOVER_IS_NOT_CALLED_A_FILTER_V1: an item a moderator
+        // or a moderator app removed into the queue (u/vpsj's monitor-test-app,
+        // 2026-11-16) says "Removed by …", not "Held by Reddit's filters".
+        heldWithoutReports && details.removedBy == null ->
+            UiText.Resource(R.string.comp_held_by_filters_or_guidance)
         else -> null
     }
+}
 
 /** In the mod queue without a report: held by a filter, not reported. */
 internal fun moderatorQueueItemIsHeldWithoutReports(item: RedditModeratorQueueItem): Boolean =
@@ -195,38 +202,41 @@ internal fun moderatorQueueItemIsHeldWithoutReports(item: RedditModeratorQueueIt
         item.reportDetails.userReports.isNullOrEmpty() &&
         item.reportDetails.moderatorReports.isNullOrEmpty()
 
-/** r/community · u/author · age · flair */
+/** r/community · age · u/author (user flair) · post flair */
+// QUEUEBYLINE01_THE_AGE_COMES_BEFORE_THE_FLAIR_V1: a long user flair
+// ("Platform Ticket Holder :platform_ticket:" in r/astronotyet) pushed the age
+// past the two lines the card shows; the age now follows the community.
 internal fun moderatorQueueItemByline(item: RedditModeratorQueueItem): String =
     listOfNotNull(
         "r/${item.communityName}",
-        "u/${item.author}" + (item.details.authorFlair?.let { flair -> " ($flair)" } ?: ""),
         item.details.ageLabel,
+        "u/${item.author}" + (item.details.authorFlair?.let { flair -> " ($flair)" } ?: ""),
         item.details.postFlair,
     ).joinToString(" · ")
 
 /** One line per report reason: user reports with their count, moderator and AutoModerator reports with who made them. */
-internal fun moderatorQueueItemReasons(item: RedditModeratorQueueItem): List<String> {
+internal fun moderatorQueueItemReasons(item: RedditModeratorQueueItem): List<UiText> {
     val user = item.reportDetails.userReports.orEmpty().map { report ->
         val count = report.count?.takeIf { it > 1 }?.let { " ($it)" } ?: ""
-        "Reported: ${report.reason}$count"
+        UiText.Resource(R.string.comp_reported_reason, report.reason + count)
     }
     val mod = item.reportDetails.moderatorReports.orEmpty().map { report ->
         val by = report.moderatorName?.let { name -> if (name.equals("AutoModerator", ignoreCase = true)) "AutoModerator" else "u/$name" }
-        if (by == null) "Moderator report: ${report.reason}" else "$by: ${report.reason}"
+        if (by == null) UiText.Resource(R.string.comp_moderator_report_reason, report.reason) else UiText.Plain("$by: ${report.reason}")
     }
     return (mod + user).take(MAX_REASON_LINES)
 }
 
 /** Removed by u/x · Reason (the Removed list). */
-internal fun moderatorQueueItemRemovalLine(item: RedditModeratorQueueItem): String? {
+internal fun moderatorQueueItemRemovalLine(item: RedditModeratorQueueItem): UiText? {
     val by = item.details.removedBy?.let { name ->
         if (name.equals("AutoModerator", ignoreCase = true)) "AutoModerator" else "u/$name"
     }
     val reason = item.details.removalReasonTitle
     return when {
-        by != null && reason != null -> "Removed by $by · $reason"
-        by != null -> "Removed by $by"
-        reason != null -> "Removal reason: $reason"
+        by != null && reason != null -> UiText.Resource(R.string.comp_removed_by_reason, by, reason)
+        by != null -> UiText.Resource(R.string.comp_removed_by, by)
+        reason != null -> UiText.Resource(R.string.comp_removal_reason_line, reason)
         else -> null
     }
 }

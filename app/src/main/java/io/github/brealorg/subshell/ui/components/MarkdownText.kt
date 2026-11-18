@@ -208,6 +208,7 @@ fun MarkdownText(
                         val spoilerShape = MaterialTheme.shapes.extraSmall
                         // ISSUE219_SPOILER_SAYS_ITS_STATE_V1: TalkBack hears "Hidden"/"Revealed"
                         // and what a double tap does.
+                        val spoilerState = if (revealed) stringResource(R.string.comp_spoiler_revealed) else stringResource(R.string.comp_spoiler_hidden)
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -216,7 +217,7 @@ fun MarkdownText(
                                     onClickLabel = if (revealed) stringResource(R.string.all_hide_spoiler) else stringResource(R.string.all_reveal_spoiler),
                                     role = Role.Button,
                                 ) { revealed = !revealed }
-                                .semantics { stateDescription = if (revealed) "Revealed" else "Hidden" },
+                                .semantics { stateDescription = spoilerState },
                             shape = spoilerShape,
                             color = if (revealed) MaterialTheme.colorScheme.surfaceContainerHigh
                             else MaterialTheme.colorScheme.surfaceContainerHighest,

@@ -13,6 +13,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class Search01C2LivePeoplePolicyTest {
     @Test
     fun authenticatedGlobalSearchExposesPeopleAsFederatedScope() {
@@ -42,7 +44,7 @@ class Search01C2LivePeoplePolicyTest {
             ),
             state.availableSearchScopes,
         )
-        assertTrue(state.searchAreaDescription(SearchArea.ALL_SUBSHELL).contains("people"))
+        assertTrue(state.searchAreaDescription(SearchArea.ALL_SUBSHELL).s.contains("people"))
     }
 
 

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
@@ -132,26 +133,26 @@ internal fun removalResponseMessageOrNull(
     )
 }
 
-internal fun removalResponseTypeLabel(type: RedditRemovalMessageType): String = when (type) {
-    RedditRemovalMessageType.PUBLIC -> "Public comment as you"
-    RedditRemovalMessageType.PUBLIC_AS_SUBREDDIT -> "Public comment as the subreddit"
-    RedditRemovalMessageType.PRIVATE -> "Private modmail (your name hidden)"
-    RedditRemovalMessageType.PRIVATE_EXPOSED -> "Private modmail (your name shown)"
+internal fun removalResponseTypeLabel(type: RedditRemovalMessageType): UiText = when (type) {
+    RedditRemovalMessageType.PUBLIC -> UiText.Resource(R.string.comp_removal_type_public)
+    RedditRemovalMessageType.PUBLIC_AS_SUBREDDIT -> UiText.Resource(R.string.comp_removal_type_public_as_subreddit)
+    RedditRemovalMessageType.PRIVATE -> UiText.Resource(R.string.comp_removal_type_private)
+    RedditRemovalMessageType.PRIVATE_EXPOSED -> UiText.Resource(R.string.comp_removal_type_private_exposed)
 }
 
 internal fun removalResponseTypeDescription(
     type: RedditRemovalMessageType,
     kind: RedditModeratorQueueKind,
-): String = when (type) {
+): UiText = when (type) {
     RedditRemovalMessageType.PUBLIC,
     RedditRemovalMessageType.PUBLIC_AS_SUBREDDIT,
     -> when (kind) {
-        RedditModeratorQueueKind.POST -> "Reddit posts it as a distinguished, stickied comment."
-        RedditModeratorQueueKind.COMMENT -> "Reddit posts it as a distinguished reply."
+        RedditModeratorQueueKind.POST -> UiText.Resource(R.string.comp_removal_type_desc_post)
+        RedditModeratorQueueKind.COMMENT -> UiText.Resource(R.string.comp_removal_type_desc_comment)
     }
     RedditRemovalMessageType.PRIVATE,
     RedditRemovalMessageType.PRIVATE_EXPOSED,
-    -> "Sent from the subreddit's modmail."
+    -> UiText.Resource(R.string.comp_removal_type_desc_modmail)
 }
 
 // MODRESPONSE01A3_SAVED_RESPONSES_PICKER_V1
@@ -219,9 +220,9 @@ internal fun RemovalResponseSection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(removalResponseTypeLabel(draft.type), style = MaterialTheme.typography.bodyMedium)
+                Text(removalResponseTypeLabel(draft.type).asString(), style = MaterialTheme.typography.bodyMedium)
                 Text(
-                    text = draft.body.trim().ifEmpty { "No message yet — tap to write one." },
+                    text = draft.body.trim().ifEmpty { stringResource(R.string.comp_no_message_yet_tap_to_write) },
                     style = MaterialTheme.typography.bodySmall,
                     color = if (draft.blocksConfirm) {
                         MaterialTheme.colorScheme.error
@@ -332,9 +333,9 @@ internal fun RemovalResponseEditor(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(stringResource(R.string.comp_send_as), style = MaterialTheme.typography.labelMedium)
-                        Text(removalResponseTypeLabel(draft.type), style = MaterialTheme.typography.bodyMedium)
+                        Text(removalResponseTypeLabel(draft.type).asString(), style = MaterialTheme.typography.bodyMedium)
                         Text(
-                            removalResponseTypeDescription(draft.type, kind),
+                            removalResponseTypeDescription(draft.type, kind).asString(),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -349,9 +350,9 @@ internal fun RemovalResponseEditor(
                                 DropdownMenuItem(
                                     text = {
                                         Column {
-                                            Text(removalResponseTypeLabel(type))
+                                            Text(removalResponseTypeLabel(type).asString())
                                             Text(
-                                                removalResponseTypeDescription(type, kind),
+                                                removalResponseTypeDescription(type, kind).asString(),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             )
@@ -402,7 +403,7 @@ internal fun RemovalResponseEditor(
                     maxLines = Int.MAX_VALUE,
                 )
                 Text(
-                    "${draft.body.length}/${RedditRemovalMessage.MAX_REMOVAL_MESSAGE_BODY_CHARS} · Reddit adds the removed item's details.",
+                    stringResource(R.string.comp_reddit_adds_the_removed_item_s, draft.body.length, RedditRemovalMessage.MAX_REMOVAL_MESSAGE_BODY_CHARS),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 4.dp),

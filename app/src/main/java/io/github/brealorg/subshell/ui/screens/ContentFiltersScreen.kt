@@ -178,7 +178,7 @@ private fun ContentFilterOverview(
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
                         Text(
-                            contentFilterSummary(filters),
+                            contentFilterSummary(filters).asString(),
                             style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
@@ -387,7 +387,7 @@ private fun ContentFilterEditor(
                     supportingText = {
                         Text(
                             if (draftError == ContentFilterDraftError.COMMUNITY) {
-                                COMMUNITY_NAME_ERROR
+                                stringResource(R.string.scr_filter_error_community)
                             } else {
                                 stringResource(R.string.all_leave_empty_to_filter_everywhere)
                             },
@@ -402,7 +402,15 @@ private fun ContentFilterEditor(
         item("list-title") {
             Text(
                 if (entries.isEmpty()) {
-                    "No ${stringResource(type.labelRes).lowercase()} filtered"
+                    stringResource(
+                        when (type) {
+                            ContentFilterType.WORD -> R.string.filters_none_word
+                            ContentFilterType.COMMUNITY -> R.string.filters_none_community
+                            ContentFilterType.USER -> R.string.filters_none_user
+                            ContentFilterType.DOMAIN -> R.string.filters_none_domain
+                            ContentFilterType.FLAIR -> R.string.filters_none_flair
+                        },
+                    )
                 } else {
                     "${stringResource(type.labelRes)} · ${entries.size}"
                 },
@@ -456,13 +464,13 @@ internal fun filterEntryViews(filters: ContentFilters, type: ContentFilterType):
     filters.entries(type).sorted().map { value -> ContentFilterEntryView(value) } +
         filters.scopedEntries(type).map { rule -> ContentFilterEntryView(rule.value, rule.community) }
 
-private const val COMMUNITY_NAME_ERROR = "Enter a community name, like r/movies"
 
 /** What a refused value needs, by filter type (OCB-192). */
+@Composable
 private fun contentFilterValueError(type: ContentFilterType): String = when (type) {
-    ContentFilterType.COMMUNITY -> COMMUNITY_NAME_ERROR
-    ContentFilterType.USER -> "Enter a username, like u/someone"
-    ContentFilterType.DOMAIN -> "Enter a domain, like example.com"
-    ContentFilterType.FLAIR -> "Enter a flair, like Discussion"
-    ContentFilterType.WORD -> "Enter a word or phrase"
+    ContentFilterType.COMMUNITY -> stringResource(R.string.scr_filter_error_community)
+    ContentFilterType.USER -> stringResource(R.string.scr_filter_error_user)
+    ContentFilterType.DOMAIN -> stringResource(R.string.scr_filter_error_domain)
+    ContentFilterType.FLAIR -> stringResource(R.string.scr_filter_error_flair)
+    ContentFilterType.WORD -> stringResource(R.string.scr_filter_error_word)
 }

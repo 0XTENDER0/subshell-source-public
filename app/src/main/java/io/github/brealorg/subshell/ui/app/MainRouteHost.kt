@@ -852,7 +852,7 @@ scaffoldPadding = padding,
                         listSubtitle =
                             youContentWorkspaceLabel(
                                 selectedYouContentTab,
-                            ),
+                            ).asString(),
                         listContent = { listModifier ->
                             mainYouProfileContent(
                                 state.activeAccountUsername,
@@ -874,7 +874,7 @@ scaffoldPadding = padding,
                                     text =
                                         youContentWorkspacePlaceholder(
                                             selectedYouContentTab,
-                                        ),
+                                        ).asString(),
                                     style =
                                         MaterialTheme.typography
                                             .titleMedium,
@@ -918,7 +918,7 @@ scaffoldPadding = padding,
                             ) {
                                 Text(
                                     text =
-                                        YOU_BLOCKED_WORKSPACE_PLACEHOLDER,
+                                        YOU_BLOCKED_WORKSPACE_PLACEHOLDER.asString(),
                                     style =
                                         MaterialTheme.typography
                                             .titleMedium,
@@ -960,7 +960,7 @@ scaffoldPadding = padding,
                             ) {
                                 Text(
                                     text =
-                                        YOU_DRAFTS_WORKSPACE_PLACEHOLDER,
+                                        YOU_DRAFTS_WORKSPACE_PLACEHOLDER.asString(),
                                     style =
                                         MaterialTheme.typography
                                             .titleMedium,

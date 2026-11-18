@@ -241,13 +241,13 @@ fun CommunityScreen(
             CommunityPostWatchChange.CHANGED -> {
                 CommunityPostNotificationCenter.ensureChannel(context)
                 userNotices.noticeInfo(
-                    "Notifications on for ${state.subredditLabel(community.name)}",
-                    "New posts are checked every 15 minutes",
+                    UiText.Resource(R.string.scr_community_notifications_on, state.subredditLabel(community.name)),
+                    UiText.Resource(R.string.scr_community_notifications_on_detail),
                 )
             }
             CommunityPostWatchChange.LIMIT_REACHED -> userNotices.noticeFailure(
-                "You get notifications from $MAX_WATCHED_COMMUNITIES communities",
-                "Turn one off in Settings › Notifications › New posts first",
+                UiText.Resource(R.string.scr_community_notifications_limit, MAX_WATCHED_COMMUNITIES),
+                UiText.Resource(R.string.scr_community_notifications_limit_detail),
             )
             CommunityPostWatchChange.UNCHANGED,
             CommunityPostWatchChange.UNAVAILABLE,
@@ -275,8 +275,8 @@ fun CommunityScreen(
                 watchCommunityPosts()
             } else {
                 userNotices.noticeFailure(
-                    "Notifications are not allowed",
-                    "Allow notifications for subshell to get new posts",
+                    UiText.Resource(R.string.scr_community_notifications_not_allowed),
+                    UiText.Resource(R.string.scr_community_notifications_not_allowed_detail),
                 )
             }
         }
@@ -286,8 +286,8 @@ fun CommunityScreen(
             granted && CommunityPostNotificationCenter.canPost(context) -> watchCommunityPosts()
             granted || !newPostPermissionDialogShown -> openNotificationSettingsThenWatch()
             else -> userNotices.noticeFailure(
-                "Notifications are not allowed",
-                "Allow notifications for subshell to get new posts",
+                UiText.Resource(R.string.scr_community_notifications_not_allowed),
+                UiText.Resource(R.string.scr_community_notifications_not_allowed_detail),
             )
         }
     }
@@ -296,8 +296,8 @@ fun CommunityScreen(
             state.isWatchingCommunityPosts(community.name) -> {
                 state.setWatchingCommunityPosts(community.name, watch = false)
                 userNotices.noticeInfo(
-                    "Notifications off for ${state.subredditLabel(community.name)}",
-                    "No more notifications about its new posts",
+                    UiText.Resource(R.string.scr_community_notifications_off, state.subredditLabel(community.name)),
+                    UiText.Resource(R.string.scr_community_notifications_off_detail),
                 )
             }
             // The limit is said before anything is asked.
@@ -710,7 +710,7 @@ fun CommunityScreen(
                 retryable = activeRedditFeedState.failureRetryable,
                 showingCachedContent = true,
             ).copy(
-                title = UiText.Plain("Couldn't refresh ${state.subredditLabel(community.name)}"),
+                title = UiText.Resource(R.string.comm_couldnt_refresh, state.subredditLabel(community.name)),
             )
         }
     } else {
@@ -969,7 +969,7 @@ fun CommunityScreen(
                         Icon(
                             Symbols.Search,
                             contentDescription =
-                                "Search ${state.subredditLabel(community.name)}",
+                                stringResource(R.string.comm_search_name, state.subredditLabel(community.name)),
                         )
                     }
                     // MOD01A1_COMMUNITY_TOP_BAR_MOD_TOOLS_ENTRY_V1
@@ -982,7 +982,7 @@ fun CommunityScreen(
                             Icon(
                                 Symbols.AdminPanelSettings,
                                 contentDescription =
-                                    "Mod tools for ${state.subredditLabel(community.name)}",
+                                    stringResource(R.string.comm_mod_tools_for, state.subredditLabel(community.name)),
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                         }
@@ -994,7 +994,7 @@ fun CommunityScreen(
                         Icon(
                             Symbols.Info,
                             contentDescription =
-                                "About ${state.subredditLabel(community.name)}",
+                                stringResource(R.string.comm_about_name, state.subredditLabel(community.name)),
                         )
                     }
                     Box {
@@ -1004,7 +1004,7 @@ fun CommunityScreen(
                             Icon(
                                 Symbols.MoreVert,
                                 contentDescription =
-                                    "Actions for ${state.subredditLabel(community.name)}",
+                                    stringResource(R.string.comm_actions_for, state.subredditLabel(community.name)),
                             )
                         }
                         DropdownMenu(
@@ -1031,7 +1031,7 @@ fun CommunityScreen(
                                     text = {
                                         Text(
                                             if (watchingPosts) {
-                                                "Stop new-post notifications"
+                                                stringResource(R.string.scr_stop_new_post_notifications)
                                             } else {
                                                 stringResource(R.string.all_notify_about_new_posts)
                                             },
@@ -1193,9 +1193,9 @@ fun CommunityScreen(
                                         Symbols.Star
                                     },
                                     contentDescription = if (favorite) {
-                                        "Remove ${state.subredditLabel(community.name)} from favorites"
+                                        stringResource(R.string.comm_remove_from_favorites, state.subredditLabel(community.name))
                                     } else {
-                                        "Add ${state.subredditLabel(community.name)} to favorites"
+                                        stringResource(R.string.comm_add_to_favorites, state.subredditLabel(community.name))
                                     },
                                     tint = favoriteStarTint(favorite),
                                 )
@@ -1267,7 +1267,7 @@ fun CommunityScreen(
                                     overflow = TextOverflow.Ellipsis,
                                 )
                                 Text(
-                                    "${community.members} members",
+                                    stringResource(R.string.comm_members_text, community.members),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -1330,7 +1330,7 @@ fun CommunityScreen(
                             }
                         }
                         Text(
-                            community.description,
+                            io.github.brealorg.subshell.ui.state.identityDescriptionShown(community.description),
                             modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1390,10 +1390,11 @@ fun CommunityScreen(
                             Box {
                                 TextButton(onClick = { sortMenuExpanded.value = true }) {
                                     val sortLabel = stringResource(state.communitySort.labelRes)
+                                    val sortDescription = stringResource(R.string.scr_sort_posts_description, sortLabel)
                                     Text(
                                         sortLabel,
                                         modifier = Modifier.semantics {
-                                            contentDescription = "Sort posts: $sortLabel"
+                                            contentDescription = sortDescription
                                         },
                                     )
                                     Icon(Symbols.KeyboardArrowDown, contentDescription = null)
@@ -1423,10 +1424,11 @@ fun CommunityScreen(
                                 Box {
                                     TextButton(onClick = { timePeriodMenuExpanded.value = true }) {
                                         val periodLabel = stringResource(state.listingTimePeriod.labelRes)
+                                        val periodDescription = stringResource(R.string.scr_time_period_description, periodLabel)
                                         Text(
                                             periodLabel,
                                             modifier = Modifier.semantics {
-                                                contentDescription = "Time: $periodLabel"
+                                                contentDescription = periodDescription
                                             },
                                         )
                                         Icon(
@@ -1557,7 +1559,7 @@ fun CommunityScreen(
                                             when {
                                                 hiddenPostsHideAllPosts -> stringResource(R.string.all_all_posts_are_hidden)
                                                 contentFiltersHideAllPosts -> stringResource(R.string.all_all_posts_are_filtered)
-                                                nsfwPreferenceHidesAllPosts -> "NSFW posts are hidden"
+                                                nsfwPreferenceHidesAllPosts -> stringResource(R.string.scr_nsfw_posts_are_hidden)
                                                 authenticatedRedditFeed && (activeRedditFeedState.inProgress || !storedFeedRead) ->
                                                     stringResource(R.string.all_loading_from_reddit)
                                                 authenticatedRedditFeed -> stringResource(R.string.all_no_cached_reddit_posts)
@@ -1734,7 +1736,7 @@ fun CommunityScreen(
             communityName = community.name,
             accountStableId = state.activeAccountId,
             authenticated = state.activeAccountIsAuthenticated,
-            fallbackDescription = community.description,
+            fallbackDescription = io.github.brealorg.subshell.ui.state.identityDescriptionShown(community.description),
             uiState = redditCommunityInfoState,
             wikiUiState = redditCommunityWikiState,
             onLoadWikiIndex = onLoadRedditCommunityWikiIndex,

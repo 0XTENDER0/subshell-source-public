@@ -27,13 +27,13 @@ const val WEEKLY_HISTORY_DAYS = 365
 const val SAFETY_SNAPSHOT_LIMIT = 10
 
 enum class BackupRetention(
-    val label: String,
+    @androidx.annotation.StringRes val labelRes: Int,
     val limit: Int?,
 ) {
-    FIVE("5 backups", 5),
-    TEN("10 backups", 10),
-    TWENTY("20 backups", 20),
-    UNLIMITED("Unlimited", null);
+    FIVE(io.github.brealorg.subshell.R.string.backup_retention_five, 5),
+    TEN(io.github.brealorg.subshell.R.string.backup_retention_ten, 10),
+    TWENTY(io.github.brealorg.subshell.R.string.backup_retention_twenty, 20),
+    UNLIMITED(io.github.brealorg.subshell.R.string.backup_retention_unlimited, null);
 
     fun isStricterThan(other: BackupRetention): Boolean = when {
         limit == null -> false

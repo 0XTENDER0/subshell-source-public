@@ -189,10 +189,6 @@ fun CommunityAboutSheet(
         applyWikiBackStep(wikiBackStep(selectedWikiPagePath, workspaceVisible = true))
     }
 
-    BackHandler(enabled = wikiWorkspaceVisible) {
-        navigateWikiBack()
-    }
-
     val moderatorIdentityHydrationGate = remember {
         Semaphore(MODERATOR_IDENTITY_CONCURRENCY)
     }
@@ -208,6 +204,15 @@ fun CommunityAboutSheet(
             shouldDismissOnBackPress = true,
         ),
     ) {
+        // WIKI02_BACK_STEPS_THROUGH_THE_SHEET_V1: the sheet is its own dialog
+        // window with its own Back dispatcher, so the wiki's Back is registered
+        // inside the sheet's content. Outside it (on the activity's dispatcher)
+        // it never ran, and the hidden veto below swallowed the dialog's own
+        // Back: Back did nothing while the wiki was open (seen on the Pixel 11,
+        // 2026-11-15).
+        BackHandler(enabled = wikiWorkspaceVisible) {
+            navigateWikiBack()
+        }
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(
@@ -400,6 +405,7 @@ fun CommunityAboutSheet(
                 if (wikiWorkspaceVisible) {
                     communityWikiItems(
                         state = wikiUiState,
+                        communityName = communityName,
                         matches = wikiMatches,
                         selectedPagePath = selectedWikiPagePath,
                         showConfigurationPages =
@@ -815,7 +821,7 @@ private fun CompactModeratorUserResult(
         .trim()
         .takeUnless {
             it.isEmpty() ||
-                it == "Public profile preview."
+                it == io.github.brealorg.subshell.ui.state.IDENTITY_PROFILE_PREVIEW_DESCRIPTION
         }
         ?: stringResource(R.string.all_moderator)
     val permissionSummary = moderator.permissions

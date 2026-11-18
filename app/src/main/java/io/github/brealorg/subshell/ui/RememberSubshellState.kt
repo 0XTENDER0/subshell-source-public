@@ -85,6 +85,7 @@ fun rememberSubshellState(
     var restoredMediaWasManual by rememberSaveable { mutableStateOf(false) }
 
     fun createState(processSnapshotToken: String?): SubshellState {
+        val applicationContext = context.applicationContext
         // STRICTMODE02_PREFERENCES_LOAD_BEFORE_THE_FIRST_FRAME_V1 (#243): the
         // application's files, read into memory by StartupPreferences; an
         // activity context would look up the folder on disk again per activity.
@@ -776,9 +777,11 @@ fun rememberSubshellState(
                 CommunitySort.entries,
                 DefaultSubshellSettings.defaultCommunitySort,
             ),
+            // LEAK01_STATE_HOLDS_NO_ACTIVITY_V1: the state outlives the activity
+            // (#245); the lazy lambda holds the application, never `context`.
             feedPositionFile = FeedPositionFile {
                 java.io.File(
-                    java.io.File(context.applicationContext.noBackupFilesDir, "feed-positions"),
+                    java.io.File(applicationContext.noBackupFilesDir, "feed-positions"),
                     FEED_POSITION_FILE_NAME,
                 )
             },

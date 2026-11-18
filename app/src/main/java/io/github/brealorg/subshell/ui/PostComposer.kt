@@ -11,12 +11,18 @@ import io.github.brealorg.subshell.model.PostKind
 import java.net.URI
 import java.util.UUID
 
-enum class ComposerPostType(val label: String) {
-    TEXT("Text"),
-    LINK("Link"),
-    MEDIA("Media"),
+// TRANSLATE14_COMPOSER_KINDS_HAVE_RESOURCES_V1: `label` stays the English
+// code (stored drafts, mediaLabel); screens show `labelRes`.
+enum class ComposerPostType(
+    val label: String,
+    @androidx.annotation.StringRes val labelRes: Int,
+    @androidx.annotation.StringRes val untitledRes: Int,
+) {
+    TEXT("Text", io.github.brealorg.subshell.R.string.composer_type_text, io.github.brealorg.subshell.R.string.composer_untitled_text),
+    LINK("Link", io.github.brealorg.subshell.R.string.composer_type_link, io.github.brealorg.subshell.R.string.composer_untitled_link),
+    MEDIA("Media", io.github.brealorg.subshell.R.string.composer_type_media, io.github.brealorg.subshell.R.string.composer_untitled_media),
     // CROSSPOST01A1C_SOURCE_BOUND_DRAFT_TYPE_V1
-    CROSSPOST("Crosspost"),
+    CROSSPOST("Crosspost", io.github.brealorg.subshell.R.string.composer_type_crosspost, io.github.brealorg.subshell.R.string.composer_untitled_crosspost),
     ;
 
     companion object {
@@ -30,10 +36,10 @@ enum class ComposerInputMode(val label: String) {
     MARKDOWN("Markdown"),
 }
 
-enum class ComposerMediaKind(val label: String) {
-    IMAGE("Photo"),
-    GIF("GIF"),
-    VIDEO("Video"),
+enum class ComposerMediaKind(val label: String, @androidx.annotation.StringRes val labelRes: Int) {
+    IMAGE("Photo", io.github.brealorg.subshell.R.string.media_label_photo),
+    GIF("GIF", io.github.brealorg.subshell.R.string.media_label_gif),
+    VIDEO("Video", io.github.brealorg.subshell.R.string.media_label_video),
 }
 
 @Immutable

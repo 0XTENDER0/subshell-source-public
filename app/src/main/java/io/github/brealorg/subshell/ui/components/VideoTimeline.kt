@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.Canvas
@@ -86,13 +87,16 @@ internal fun VideoTimeline(
         inactiveTrackColor = Color.White.copy(alpha = 0.24f),
     )
     val interactionSource = remember { MutableInteractionSource() }
-    val timeDescription = videoTimelineStateDescription(positionMs, safeDurationMs)
+    val timeDescription = videoTimelineStateDescription(positionMs, safeDurationMs).asString()
     // material3 1.5 keeps only the stateful Slider; this is what the stateless
     // one did inside: one state per range, its value set from the position.
     val sliderState = remember(safeDurationMs) {
         SliderState(value = 0f, trackRange = 0f..safeDurationMs.toFloat())
     }
     sliderState.value = positionMs.coerceIn(0L, safeDurationMs).toFloat()
+    val seekDescription = stringResource(R.string.comp_video_seek)
+    val backTenSeconds = stringResource(R.string.comp_video_back_10)
+    val forwardTenSeconds = stringResource(R.string.comp_video_forward_10)
     Slider(
         state = sliderState,
         onValueChange = { value -> onScrub(value.toLong().coerceIn(0L, safeDurationMs)) },
@@ -104,15 +108,15 @@ internal fun VideoTimeline(
             .systemGestureExclusion()
             .keepHorizontalDragsOnTheTimeline()
             .semantics {
-                contentDescription = "Seek"
+                contentDescription = seekDescription
                 stateDescription = timeDescription
                 if (seekable) {
                     customActions = listOf(
-                        CustomAccessibilityAction("Back 10 seconds") {
+                        CustomAccessibilityAction(backTenSeconds) {
                             onSeekBy(-VIDEO_TIMELINE_ACCESSIBILITY_STEP_MS)
                             true
                         },
-                        CustomAccessibilityAction("Forward 10 seconds") {
+                        CustomAccessibilityAction(forwardTenSeconds) {
                             onSeekBy(VIDEO_TIMELINE_ACCESSIBILITY_STEP_MS)
                             true
                         },
@@ -205,5 +209,5 @@ private fun Modifier.keepHorizontalDragsOnTheTimeline(): Modifier = pointerInput
     }
 }
 
-internal fun videoTimelineStateDescription(positionMs: Long, durationMs: Long): String =
-    "${formatVideoPlaybackTime(positionMs.coerceIn(0L, durationMs))} of ${formatVideoPlaybackTime(durationMs)}"
+internal fun videoTimelineStateDescription(positionMs: Long, durationMs: Long): UiText =
+    UiText.Resource(R.string.comp_video_position_of, formatVideoPlaybackTime(positionMs.coerceIn(0L, durationMs)), formatVideoPlaybackTime(durationMs))

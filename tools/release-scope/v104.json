@@ -1,0 +1,45 @@
+{
+  "id": "v104",
+  "release": {
+    "versionCode": 263,
+    "versionName": "1.0.4",
+    "date": "2026-11-17",
+    "headline": "Subshell 1.0.4: polls that stay open, clearer mod queue reasons and a sturdier Wiki",
+    "highlights": [
+      "Reading: \"Open on Reddit to vote\" on a poll opens it in your browser and keeps it there, also when you sign in on the way. Subshell's links come back when you return.",
+      "Inbox: the ⋮ menu on a chat message stays open while the keyboard is up.",
+      "Moderation: mod queue cards name why an item is held, read from the mod log: \"Held by AutoModerator: <the rule's reason>\" or \"Held by Reddit's filters: <reason>\".",
+      "Moderation: an item removed by a named moderator or app says who removed it and is not called a filter hold, and a card's age shows before a long user flair.",
+      "Moderation: Back steps out of a mod tool and the community Wiki one step at a time, and the Mod tab comes back on its own after a failed check.",
+      "Wiki: a page or wiki that only exists in Reddit's new Wiki says so and offers Open on reddit.com, and config pages such as AutoModerator's read as plain text.",
+      "Behind the scenes: the app's text is ready for translation. This release is still in English only.",
+      "If something does not work for you, tell us on r/subshell or GitHub."
+    ],
+    "notes": [
+      "Thanks to Dr-Khal for reporting the poll problem, u/Punk-Tum for the chat menu problem, and u/vpsj on r/subshell for the mod queue card idea and for testing it with real moderation data."
+    ],
+    "releaseUrl": "https://github.com/brealorg/subshell/releases/tag/v1.0.4"
+  },
+  "below": [
+    {
+      "versionCode": 262,
+      "versionName": "1.0.3",
+      "date": "2026-11-15"
+    },
+    {
+      "versionCode": 261,
+      "versionName": "1.0.2",
+      "date": "2026-11-12"
+    },
+    {
+      "versionCode": 260,
+      "versionName": "1.0.1",
+      "date": "2026-11-11"
+    },
+    {
+      "versionCode": 259,
+      "versionName": "1.0.0",
+      "date": "2026-11-10"
+    }
+  ]
+}

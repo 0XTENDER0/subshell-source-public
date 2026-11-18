@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import androidx.compose.ui.res.pluralStringResource
 import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
@@ -51,12 +52,12 @@ import io.github.brealorg.subshell.ui.symbols.Symbols
  * sheet: Copy text, Select text, Copy link to the post/comment, and every web link in the text as
  * a link card that opens the link menu (LINKMENU01).
  */
-internal const val COPY_MENU_ENTRY_LABEL = "Copy…"
+internal val COPY_MENU_ENTRY_LABEL: Int = R.string.comp_copy_menu
 
 /** What the copy sheet offers for one post or comment. */
 internal data class CopySheetContent(
-    /** "post" or "comment", as the sheet names it. */
-    val noun: String,
+    /** A comment's sheet (else a post's); each text is its own sentence (TRANSLATE14). */
+    val isComment: Boolean,
     /** A title shown above the text in Select text (a post's title), or null. */
     val title: String?,
     /** The Markdown source of the text, as stored. */
@@ -76,7 +77,7 @@ internal data class CopySheetContent(
 
 internal fun postCopySheetContent(post: Post, redditLink: String): CopySheetContent =
     CopySheetContent(
-        noun = "post",
+        isComment = false,
         title = post.title,
         body = post.body,
         redditLink = redditLink,
@@ -88,7 +89,7 @@ internal fun postCopySheetContent(post: Post, redditLink: String): CopySheetCont
 
 internal fun commentCopySheetContent(body: String, redditLink: String): CopySheetContent =
     CopySheetContent(
-        noun = "comment",
+        isComment = true,
         title = null,
         body = body,
         redditLink = redditLink,
@@ -166,27 +167,42 @@ internal fun CopySheet(
             enabled = content.copyText.isNotEmpty(),
             onClick = {
                 onDismiss()
-                copyPlainText(context, "Text of the ${content.noun}", content.copyText, "Text", notices)
+                copyPlainText(
+                    context,
+                    context.getString(if (content.isComment) R.string.comp_clip_comment_text else R.string.comp_clip_post_text),
+                    content.copyText,
+                    UiText.Resource(R.string.nt_copied_what_text),
+                    notices,
+                )
             },
         )
         CopyListItem(
             label = stringResource(R.string.comp_select_text),
-            supporting = "Copy part of the ${content.noun}",
+            supporting = stringResource(if (content.isComment) R.string.comp_copy_part_comment else R.string.comp_copy_part_post),
             icon = { Icon(Symbols.Edit, contentDescription = null) },
             enabled = content.copyText.isNotEmpty(),
             onClick = { selecting = true },
         )
         CopyListItem(
-            label = stringResource(R.string.comp_copy_link_to, content.noun),
+            label = stringResource(if (content.isComment) R.string.comp_copy_link_to_comment else R.string.comp_copy_link_to_post),
             icon = { Icon(Symbols.Link, contentDescription = null) },
             onClick = {
                 onDismiss()
-                copyPlainText(context, "Reddit ${content.noun} link", content.redditLink, "Link", notices)
+                copyPlainText(
+                    context,
+                    context.getString(if (content.isComment) R.string.comp_clip_comment_link else R.string.comp_clip_post_link),
+                    content.redditLink,
+                    UiText.Resource(R.string.nt_copied_what_link),
+                    notices,
+                )
             },
         )
         if (content.links.isNotEmpty()) {
             Text(
-                text = if (content.links.size == 1) "Link in this ${content.noun}" else "Links in this ${content.noun}",
+                text = pluralStringResource(
+                    if (content.isComment) R.plurals.comp_links_in_comment else R.plurals.comp_links_in_post,
+                    content.links.size,
+                ),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
@@ -273,7 +289,7 @@ internal fun copyPlainText(
     context: Context,
     clipLabel: String,
     text: String,
-    noticeWhat: String,
+    noticeWhat: UiText,
     notices: ViewportErrorHostState?,
 ) {
     val clipboard = context.getSystemService(ClipboardManager::class.java)

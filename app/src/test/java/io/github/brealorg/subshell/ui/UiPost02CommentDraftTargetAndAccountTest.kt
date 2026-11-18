@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.SampleData
 import io.github.brealorg.subshell.ui.screens.unsentCommentDraftConflictText
 import io.github.brealorg.subshell.ui.state.CommentDraftState
@@ -19,6 +20,8 @@ import org.junit.Test
  * - the account travels in the process snapshot (appended field 11) and an
  *   older snapshot without it still restores the draft.
  */
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class UiPost02CommentDraftTargetAndAccountTest {
     private val post = SampleData.posts.first()
     private var account: String? = "reddit:a"
@@ -69,11 +72,11 @@ class UiPost02CommentDraftTargetAndAccountTest {
         val toComment = CommentComposerDraft(target = commentReplyTarget(post, comment), body = "x")
         assertEquals(
             "You have an unsent reply to u/${comment.author}. Discard it to start this one?",
-            unsentCommentDraftConflictText(toComment, post.id, writtenWithAnotherAccount = false),
+            unsentCommentDraftConflictText(toComment, post.id, writtenWithAnotherAccount = false).s,
         )
         assertEquals(
             "You have an unsent reply on another post, written with another account. Discard it to start this one?",
-            unsentCommentDraftConflictText(toComment, "t3_other", writtenWithAnotherAccount = true),
+            unsentCommentDraftConflictText(toComment, "t3_other", writtenWithAnotherAccount = true).s,
         )
     }
 

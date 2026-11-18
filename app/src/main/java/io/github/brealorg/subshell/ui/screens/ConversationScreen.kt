@@ -126,6 +126,8 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.ui.window.PopupProperties
+import androidx.activity.compose.BackHandler
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.TextButton
 import io.github.brealorg.subshell.data.account.DirectChatDeleteFailureKind
@@ -153,7 +155,6 @@ private const val MAX_INLINE_MESSAGE_IMAGES = 4
 private const val DIRECT_CHAT_LIVE_TAIL_FOLLOW_SLOP_ITEMS = 3
 // SUBSHELL_MESSAGES02E2A_R2R1_REACTION_PICKER_PRESENTATION_V1
 private const val DIRECT_CHAT_REACTION_PICKER_COLUMNS = 4
-internal const val DIRECT_CHAT_MESSAGE_ACTIONS_LABEL = "Message actions"
 
 enum class ConversationDetailKind {
     DIRECT_CHAT,
@@ -225,7 +226,7 @@ internal fun directChatPeerTypingLabel(
     kind: ConversationDetailKind,
     participantUsername: String?,
     liveState: DirectChatLiveUiState,
-): String? {
+): UiText? {
     if (kind != ConversationDetailKind.DIRECT_CHAT || !liveState.peerTyping) return null
     val participant = participantUsername?.trim()?.takeIf(String::isNotEmpty) ?: return null
     val username = if (participant.startsWith("u/", ignoreCase = true)) {
@@ -233,7 +234,7 @@ internal fun directChatPeerTypingLabel(
     } else {
         participant
     }.takeIf(String::isNotBlank) ?: return null
-    return "u/$username is typing…"
+    return UiText.Resource(R.string.scr_u_is_typing, username)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -311,7 +312,7 @@ fun ConversationScreen(
         kind = detailKind,
         participantUsername = directChatParticipantUsername,
         liveState = scopedDirectChatLiveState,
-    )
+    )?.asString()
     var directChatDeleteCandidateEventId by rememberSaveable(item.id) {
         mutableStateOf<String?>(null)
     }
@@ -734,7 +735,7 @@ fun ConversationScreen(
         reactionNoticeHost?.presentNotice(
             scopeKey = DIRECT_CHAT_REACTION_NOTICE_SCOPE,
             title = UiText.Resource(R.string.ep_reaction_not_confirmed),
-            message = UiText.Plain(directChatReactionFailureMessage(failureKind)),
+            message = directChatReactionFailureMessage(failureKind),
             tone = TrayTone.ERROR,
         )
         onResetDirectChatReactionFailure()
@@ -826,7 +827,11 @@ fun ConversationScreen(
 
                 if (startsNewDay) {
                     ConversationDayDivider(
-                        label = conversationDayLabel(firstMessage),
+                        label = conversationDayLabel(
+                            firstMessage,
+                            todayLabel = stringResource(R.string.scr_conversation_today),
+                            yesterdayLabel = stringResource(R.string.scr_conversation_yesterday),
+                        ),
                     )
                 }
 
@@ -907,14 +912,14 @@ fun ConversationScreen(
                     onRefresh = onRefresh,
                     onResetState = onResetMessageReplyState,
                     interactionActionsAtStart = interactionActionsAtStart,
-                    longReplyTitle = "Reply to ${conversationParticipantLabel(item.sender)}",
+                    longReplyTitle = stringResource(R.string.scr_reply_to, conversationParticipantLabel(item.sender)),
                     quote = (authoritativeMessages + liveMessages)
                         .lastOrNull { message -> !message.outgoing }
                         ?.body,
                     blockedElsewhereMessage = messageReplyBlockedElsewhereMessage(
                         global = messageReplyState,
                         scoped = scopedReplyState,
-                    ),
+                    )?.asString(),
                 )
             }
         }
@@ -1049,7 +1054,7 @@ private fun MessageConversationComposer(
         state.phase == MessageReplyPhase.SENDING ->
             when {
                 directChat && media != null -> null
-                media != null -> "Uploading and sending…"
+                media != null -> stringResource(R.string.scr_uploading_and_sending)
                 else -> stringResource(R.string.all_sending)
             }
         else -> null
@@ -1300,7 +1305,7 @@ private fun DirectChatDeleteDialog(
                     DirectChatDeleteFailureKind.SESSION ->
                         stringResource(R.string.all_your_reddit_chat_session_needs_attention_reopen)
                     DirectChatDeleteFailureKind.ROOM ->
-                        "subshell no longer has a verified room for this chat. Reopen the chat and try again."
+                        stringResource(R.string.scr_reaction_failed_room)
                     DirectChatDeleteFailureKind.HTTP ->
                         stringResource(R.string.all_reddit_rejected_the_delete_request)
                     DirectChatDeleteFailureKind.OUTCOME_UNKNOWN ->
@@ -1531,6 +1536,7 @@ private fun DirectChatMessage(
     )
     val hasActions = onReact != null || onDelete != null
     val actionsAvailable = hasActions && !deleteInProgress && !reactInProgress
+    val messageActionsLabel = stringResource(R.string.scr_message_actions)
 
     // ISSUE235_LONG_PRESS_SELECTS_TEXT_V1 (owner: one behaviour in the whole
     // app): a long press on a message selects its text, as on a comment; the
@@ -1542,7 +1548,7 @@ private fun DirectChatMessage(
             .then(
                 if (actionsAvailable) {
                     Modifier.semantics {
-                        onLongClick(label = DIRECT_CHAT_MESSAGE_ACTIONS_LABEL) {
+                        onLongClick(label = messageActionsLabel) {
                             actionMenuExpanded = true
                             true
                         }
@@ -1618,9 +1624,16 @@ private fun DirectChatMessage(
                                 )
                             }
                         }
+                        // ISSUE309_THE_MESSAGE_MENU_LEAVES_THE_KEYBOARD_ALONE_V1 (#309): a
+                        // focusable menu took window focus from the reply field, Android hid
+                        // the keyboard, the layout jumped and the menu was dismissed 60-90 ms
+                        // later. The menu does not take focus (as M3's menus for text fields),
+                        // so the keyboard stays; Back still closes the menu first.
+                        BackHandler(enabled = actionMenuExpanded) { actionMenuExpanded = false }
                         DropdownMenu(
                             expanded = actionMenuExpanded,
                             onDismissRequest = { actionMenuExpanded = false },
+                            properties = PopupProperties(focusable = false),
                         ) {
                             if (onReact != null) {
                                 DropdownMenuItem(
@@ -1837,22 +1850,22 @@ internal fun directChatWebSignInExpiredPresentation(
         null
     }
 
-internal fun directChatReactionFailureMessage(failureKind: DirectChatReactionFailureKind): String =
+internal fun directChatReactionFailureMessage(failureKind: DirectChatReactionFailureKind): UiText =
     when (failureKind) {
         DirectChatReactionFailureKind.SESSION ->
-            "Your Reddit chat session needs attention. Reopen the chat and try again."
+            UiText.Resource(R.string.scr_reaction_failed_session)
         DirectChatReactionFailureKind.ROOM ->
-            "subshell no longer has a verified room for this chat. Reopen the chat and try again."
+            UiText.Resource(R.string.scr_reaction_failed_room)
         DirectChatReactionFailureKind.HTTP ->
-            "Reddit rejected the reaction request."
+            UiText.Resource(R.string.scr_reaction_failed_http)
         DirectChatReactionFailureKind.OUTCOME_UNKNOWN ->
-            "The reaction wasn't confirmed. Check the chat in another Reddit client before trying again."
+            UiText.Resource(R.string.scr_reaction_failed_unknown)
         DirectChatReactionFailureKind.PROTOCOL ->
-            "Reddit returned a response subshell couldn't verify."
+            UiText.Resource(R.string.scr_reaction_failed_protocol)
         DirectChatReactionFailureKind.TARGET ->
-            "This message is not backed by one unambiguous live Direct Chat event."
+            UiText.Resource(R.string.scr_reaction_failed_target)
         DirectChatReactionFailureKind.UNAVAILABLE ->
-            "Direct Chat reactions aren't available for this session."
+            UiText.Resource(R.string.scr_reaction_failed_unavailable)
     }
 
 @Composable
@@ -2359,6 +2372,8 @@ private fun conversationDayKey(message: MessageBubble): String {
 
 internal fun conversationDayLabel(
     message: MessageBubble,
+    todayLabel: String,
+    yesterdayLabel: String,
     nowEpochSeconds: Long = Instant.now().epochSecond,
 ): String {
     val epoch = message.createdEpochSeconds ?: return message.age
@@ -2367,8 +2382,8 @@ internal fun conversationDayLabel(
     val date = Instant.ofEpochSecond(epoch).atZone(zone).toLocalDate()
     val today = Instant.ofEpochSecond(nowEpochSeconds).atZone(zone).toLocalDate()
     return when (date) {
-        today -> "Today"
-        today.minusDays(1) -> "Yesterday"
+        today -> todayLabel
+        today.minusDays(1) -> yesterdayLabel
         // LOWUX3_CONVERSATION_DATES_AND_TIMES_READ_RIGHT_V1 (OCB-200): a date
         // from another year carries the year, and times follow the phone's
         // 12/24-hour setting.
@@ -2451,10 +2466,10 @@ internal fun conversationRouteStep(
 internal fun messageReplyBlockedElsewhereMessage(
     global: MessageReplyUiState,
     scoped: MessageReplyUiState,
-): String? = when {
+): UiText? = when {
     !global.blocksSend || scoped.blocksSend -> null
-    global.phase == MessageReplyPhase.SENDING -> "Another message is still being sent."
-    else -> "A message in another conversation may have been sent. Open it and confirm before sending here."
+    global.phase == MessageReplyPhase.SENDING -> UiText.Resource(R.string.scr_another_message_is_still_being_sent)
+    else -> UiText.Resource(R.string.scr_a_message_in_another_conversation_may)
 }
 
 // CONVPROFILE01_TAP_PARTICIPANT_OPENS_PROFILE_V1: the participant a tap may

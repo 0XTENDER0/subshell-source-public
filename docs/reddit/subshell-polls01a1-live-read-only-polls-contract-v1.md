@@ -27,7 +27,7 @@ The total vote count remains visible when supplied. Poll end state is projected 
 `PostKind.POLL` remains the canonical post kind and uses the existing `PostMedia` slot in every `PostCard` surface, including PostScreen. Authenticated Reddit polls remain read-only inside Subshell:
 
 - options never select or mutate a Reddit vote inside Subshell;
-- tapping an option uses the same external vote handoff as `Open on Reddit to vote`;
+- tapping an option uses the same browser hand-off as `Open on Reddit to vote`;
 - the local `Vote` button is not rendered;
 - open polls identify themselves as `Read-only Reddit poll`;
 - closed polls identify themselves as `Poll closed`;
@@ -56,23 +56,22 @@ No Room schema or migration is added because the existing post payload already o
 7. Poll projections survive the existing post cache and crosspost cache payloads.
 8. Local prototype poll voting remains unchanged and device-local.
 
-## Same-app external poll rebound guard
+## Reddit links stay off while the browser has the poll (#308)
 
-The browser handoff is paired with a narrow same-app rebound guard. Before an
-authenticated Reddit poll is sent to the browser, Subshell records only the
-post identity and handoff timestamp in application-private preferences.
+The rebound guard that stood here was removed on 2026-11-17 (issue #308). It
+recorded the poll before the hand-off and, when the page came back to Subshell,
+dropped it and moved Subshell's task to the back. But a browser that opens
+links in apps (Firefox "Always") hands the redirect (`/poll/<id>` ->
+`/r/.../comments/<id>`) to Subshell by closing its own tab, so nothing was
+behind Subshell: the tab vanished and the reader could not vote (Pixel 11,
+2026-11-17, handed back within 100 ms).
 
-If Android immediately returns a supported Reddit post/comment deep link for
-the same post to that same Subshell package within 60 seconds, the marker is
-consumed once, normal deep-link navigation is skipped, the delivered URI is
-cleared from the activity intent, and the Subshell task is moved behind the
-browser. Different posts, community/user links, stale markers, future
-timestamps, and subsequent normal Reddit links are not suppressed.
-
-The marker is deliberately package-private. A production installation writes
-and receives the marker in the same application package. Multi-slot development
-installations must route the runtime rebound to the slot under test; a DEV2
-marker cannot be read by a separately installed stable package.
-
-This guard does not disable Reddit App Links, change supported Reddit target
-parsing, add a browser-specific URL, add a poll write, or broaden OAuth.
+Now the poll uses the same hand-off as every Reddit page Subshell sends to the
+browser (`openRedditPageInBrowser`, `ui/components/RedditInBrowser.kt`):
+Subshell's link activity (`ExternalLaunchActivity`) is switched off before the
+browser starts and stays off until MainActivity is in front again, at the
+latest after ten minutes; every process start switches it on as well
+(ISSUE308_REDDIT_LINKS_STAY_OFF_UNTIL_THE_READER_RETURNS_V1). A sign-in or a
+vote in the tab therefore stays in the browser. Another Reddit app on the
+phone (another Subshell build included) can still take the page; that is the
+reader's own choice of apps.

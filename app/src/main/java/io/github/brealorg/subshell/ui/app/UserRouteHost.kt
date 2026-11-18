@@ -140,7 +140,7 @@ internal fun UserRouteHost(
                 listSubtitle =
                     youContentWorkspaceLabel(
                         selectedPublicUserTab,
-                    ),
+                    ).asString(),
                 listContent = { listModifier ->
                     publicUserProfileContent(
                         route.username,
@@ -166,7 +166,7 @@ internal fun UserRouteHost(
                             text =
                                 youContentWorkspacePlaceholder(
                                     selectedPublicUserTab,
-                                ),
+                                ).asString(),
                             style =
                                 MaterialTheme.typography
                                     .titleMedium,

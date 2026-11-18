@@ -45,6 +45,16 @@ internal fun AccountScopedEffects(
             onLoadRedditModeratorCommunities(state.activeAccountId, false)
         }
     }
+    // MODDIRECTORY01_A_FAILED_READ_IS_RETRIED_ON_RETURN_V1: one failed read of
+    // the moderator directory hid the Mod tab and Mod tools for the whole
+    // process (an empty directory shows no failure either). Coming back to the
+    // app asks again; the coordinator does nothing while the directory is
+    // loading or loaded, so this costs nothing once it has been read.
+    androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+        if (state.activeAccountIsAuthenticated) {
+            onLoadRedditModeratorCommunities(state.activeAccountId, false)
+        }
+    }
     // LOWUI8_ACCOUNT_RESETS_ONLY_ON_A_CHANGE_V1 (OCB-109): the inbox tab is
     // reset by its rememberSaveable(state.activeAccountId) owner in
     // SubshellApp; an effect here also ran on every recreation and threw

@@ -176,7 +176,7 @@ fun UserFlairSheet(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Text(stringResource(R.string.comp_flair_access_required), style = MaterialTheme.typography.titleMedium)
-                            Text("subshell needs Reddit's flair permission for this account.")
+                            Text(stringResource(R.string.comp_subshell_needs_reddit_s_flair_permission))
                             Button(onClick = { state.authorizeUserFlair() }) {
                                 Text(stringResource(R.string.comp_allow_flair_access))
                             }
@@ -207,7 +207,7 @@ fun UserFlairSheet(
                 uiState.loaded -> {
                     if (uiState.snapshot?.options.isNullOrEmpty()) {
                         Text(
-                            "This community returned no self-selectable user flairs.",
+                            stringResource(R.string.comp_this_community_returned_no_self_selectable),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     } else {

@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import io.github.brealorg.subshell.R
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -100,6 +102,7 @@ internal fun topLevelCommentJumpTarget(
 private fun rowKeyIsComment(key: String): Boolean =
     key.startsWith("comment:") || key.startsWith("more:")
 
+/** English texts of `scr_next_top_level_comment` / `scr_previous_top_level_comment`, for tests. */
 internal const val TOP_LEVEL_COMMENT_JUMP_NEXT_LABEL = "Next top-level comment"
 internal const val TOP_LEVEL_COMMENT_JUMP_PREVIOUS_LABEL = "Previous top-level comment"
 
@@ -111,6 +114,8 @@ internal fun TopLevelCommentJumpButton(
     onPrevious: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val nextLabel = stringResource(R.string.scr_next_top_level_comment)
+    val previousLabel = stringResource(R.string.scr_previous_top_level_comment)
     // UIPOST05: the round button stays 40dp but its touch target is 48dp
     // (the minimum interactive size); the click lives on the outer target.
     // LOWUI7_LABELS_SAY_WHAT_A_CONTROL_DOES_V1 (OCB-282): a button; "Previous"
@@ -125,8 +130,8 @@ internal fun TopLevelCommentJumpButton(
                 interactionSource = interactionSource,
                 indication = null,
                 role = Role.Button,
-                onClickLabel = TOP_LEVEL_COMMENT_JUMP_NEXT_LABEL,
-                onLongClickLabel = TOP_LEVEL_COMMENT_JUMP_PREVIOUS_LABEL,
+                onClickLabel = nextLabel,
+                onLongClickLabel = previousLabel,
                 onLongClick = onPrevious,
                 onClick = onNext,
             ),
@@ -145,7 +150,7 @@ internal fun TopLevelCommentJumpButton(
             ) {
                 Icon(
                     imageVector = Symbols.KeyboardArrowDown,
-                    contentDescription = TOP_LEVEL_COMMENT_JUMP_NEXT_LABEL,
+                    contentDescription = nextLabel,
                 )
             }
         }

@@ -165,7 +165,7 @@ fun HelpScreen(
                             style = MaterialTheme.typography.titleSmall,
                         )
                         Text(
-                            REDDIT_API_2027_NOTE,
+                            stringResource(R.string.help_reddit_api_2027_note),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -343,8 +343,6 @@ private fun Modifier.easterEggOverscrollHold(
     }
 }
 
-internal const val REDDIT_API_2027_NOTE =
-    "Reddit plans to end API access for unregistered apps on 12 January 2027. subshell may stop loading new content then; what is stored stays readable."
 
 @Composable
 private fun UpdateCheckFailingNotice(onOpenReleases: () -> Unit) {
@@ -355,7 +353,7 @@ private fun UpdateCheckFailingNotice(onOpenReleases: () -> Unit) {
             color = MaterialTheme.colorScheme.error,
         )
         Text(
-            "subshell hasn't been able to read its update information for a few days. New releases are published on GitHub.",
+            stringResource(R.string.scr_subshell_hasn_t_been_able_to),
             style = MaterialTheme.typography.bodyMedium,
         )
         TextButton(onClick = onOpenReleases) {

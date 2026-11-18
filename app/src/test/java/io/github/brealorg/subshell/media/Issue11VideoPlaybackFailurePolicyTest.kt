@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.media
 
+import io.github.brealorg.subshell.ui.s
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -12,6 +13,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class Issue11VideoPlaybackFailurePolicyTest {
     private class HttpFailure(val status: Int) : RuntimeException("Do not display this URL/token")
 
@@ -62,44 +65,44 @@ class Issue11VideoPlaybackFailurePolicyTest {
 
     @Test fun all403HasExactlyTheAcceptedCopyWithoutDuplicateTechnicalLayer() {
         val copy = videoPlaybackErrorCopy(2004, terminal(source(403), source(403, 1), source(403, 2)))
-        assertEquals("HTTP 403 · Forbidden", copy.title)
-        assertEquals("Access denied by server.", copy.message)
-        assertFalse(copy.message.contains("Other source"))
-        assertFalse(copy.message.contains("deleted", ignoreCase = true))
+        assertEquals("HTTP 403 · Forbidden", copy.title.s)
+        assertEquals("Access denied by server.", copy.message.s)
+        assertFalse(copy.message.s.contains("Other source"))
+        assertFalse(copy.message.s.contains("deleted", ignoreCase = true))
     }
 
     @Test fun http404IsNotAnAssertionThatThePostWasDeleted() {
         val copy = videoPlaybackErrorCopy(2004, terminal(source(404)))
-        assertEquals("HTTP 404 · Not Found", copy.title)
-        assertTrue(copy.message.contains("video resource could not be found"))
-        assertFalse(copy.message.contains("deleted", ignoreCase = true))
+        assertEquals("HTTP 404 · Not Found", copy.title.s)
+        assertTrue(copy.message.s.contains("video resource could not be found"))
+        assertFalse(copy.message.s.contains("deleted", ignoreCase = true))
     }
 
     @Test fun http410CanDescribeTheServerResourceAsNoLongerAvailable() {
         val copy = videoPlaybackErrorCopy(2004, terminal(source(410)))
-        assertEquals("HTTP 410 · Gone", copy.title)
-        assertEquals("This video is no longer available from the server.", copy.message)
+        assertEquals("HTTP 410 · Gone", copy.title.s)
+        assertEquals("This video is no longer available from the server.", copy.message.s)
     }
 
     @Test fun http429And503KeepDistinctNamesAndTemporaryGuidance() {
         val limited = videoPlaybackErrorCopy(2004, terminal(source(429)))
         val unavailable = videoPlaybackErrorCopy(2004, terminal(source(503)))
-        assertEquals("HTTP 429 · Too Many Requests", limited.title)
-        assertTrue(limited.message.contains("Try again later"))
-        assertEquals("HTTP 503 · Service Unavailable", unavailable.title)
-        assertTrue(unavailable.message.contains("temporarily"))
+        assertEquals("HTTP 429 · Too Many Requests", limited.title.s)
+        assertTrue(limited.message.s.contains("Try again later"))
+        assertEquals("HTTP 503 · Service Unavailable", unavailable.title.s)
+        assertTrue(unavailable.message.s.contains("temporarily"))
     }
 
     @Test fun unfamiliarStatusKeepsItsActualNumberWithoutInventedReason() {
-        assertEquals("HTTP 499", videoPlaybackErrorCopy(2004, terminal(source(499))).title)
+        assertEquals("HTTP 499", videoPlaybackErrorCopy(2004, terminal(source(499))).title.s)
     }
 
     @Test fun mixedSourceFailuresDoNotHideEarlierDifferentErrors() {
         val copy = videoPlaybackErrorCopy(2004, terminal(source(403), source(404, 1), source(503, 2)))
-        assertEquals("HTTP 503 · Service Unavailable", copy.title)
-        assertTrue(copy.message.contains("HTTP 403 · Forbidden"))
-        assertTrue(copy.message.contains("HTTP 404 · Not Found"))
-        assertFalse(copy.message.contains("deleted", ignoreCase = true))
+        assertEquals("HTTP 503 · Service Unavailable", copy.title.s)
+        assertTrue(copy.message.s.contains("HTTP 403 · Forbidden"))
+        assertTrue(copy.message.s.contains("HTTP 404 · Not Found"))
+        assertFalse(copy.message.s.contains("deleted", ignoreCase = true))
     }
 
     @Test fun timeoutDnsTlsAndConnectionHaveConcreteNonHttpTitles() {
@@ -112,26 +115,26 @@ class Issue11VideoPlaybackFailurePolicyTest {
         for ((cause, title) in cases) {
             val failure = requireNotNull(extract(cause, 2001))
             val copy = videoPlaybackErrorCopy(2001, terminal(failure))
-            assertEquals(title, copy.title)
-            assertFalse(copy.title.contains("HTTP"))
-            assertFalse(copy.message.contains("private server info"))
+            assertEquals(title, copy.title.s)
+            assertFalse(copy.title.s.contains("HTTP"))
+            assertFalse(copy.message.s.contains("private server info"))
         }
     }
 
     @Test fun media3TimeoutWithoutNestedCauseRemainsReadable() {
-        assertEquals("Connection timed out", videoPlaybackErrorCopy(2002, null).title)
+        assertEquals("Connection timed out", videoPlaybackErrorCopy(2002, null).title.s)
     }
 
     @Test fun missingHttpCauseDoesNotGuess403FromMedia3Code2004() {
         val copy = videoPlaybackErrorCopy(2004, null)
-        assertEquals("Media3 2004 · HTTP request failed", copy.title)
-        assertFalse(copy.title.contains("403"))
-        assertFalse(copy.title.contains("Bad HTTP status"))
+        assertEquals("Media3 2004 · HTTP request failed", copy.title.s)
+        assertFalse(copy.title.s.contains("403"))
+        assertFalse(copy.title.s.contains("Bad HTTP status"))
     }
 
     @Test fun codecAndUnknownErrorsKeepTheirNumericalMedia3Code() {
-        assertEquals("Media3 4001 · Decoding failed", videoPlaybackErrorCopy(4001, null).title)
-        assertEquals("Media3 9999 · Playback error", videoPlaybackErrorCopy(9999, null).title)
+        assertEquals("Media3 4001 · Decoding failed", videoPlaybackErrorCopy(4001, null).title.s)
+        assertEquals("Media3 9999 · Playback error", videoPlaybackErrorCopy(9999, null).title.s)
     }
 
     @Test fun terminalFailureCannotLeakToAnotherMediaOrRetryAttempt() {

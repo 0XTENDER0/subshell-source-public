@@ -32,7 +32,11 @@ internal fun ViewportErrorHostState?.noticeInfo(title: UiText, message: UiText) 
  * Android 13 and newer confirm a copy themselves (Google: do not add your
  * own confirmation there); older versions get a neutral tray notice.
  */
-internal fun ViewportErrorHostState?.noticeCopied(what: String, sdkInt: Int = Build.VERSION.SDK_INT) {
+internal fun ViewportErrorHostState?.noticeCopied(what: String, sdkInt: Int = Build.VERSION.SDK_INT) =
+    noticeCopied(UiText.Plain(what), sdkInt)
+
+/** TRANSLATE14: what was copied is a word that is translated too ("Link", "Code"). */
+internal fun ViewportErrorHostState?.noticeCopied(what: UiText, sdkInt: Int = Build.VERSION.SDK_INT) {
     if (sdkInt < Build.VERSION_CODES.TIRAMISU) {
         noticeInfo(UiText.Resource(R.string.nt_copied, what), UiText.Resource(R.string.nt_it_s_on_the_clipboard))
     }

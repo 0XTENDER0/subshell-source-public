@@ -128,7 +128,7 @@ internal fun PostsWidgetSourcePicker(
                     item(key = "home") {
                         SourceRow(
                             label = stringResource(R.string.sw_home),
-                            supporting = "Your Home feed",
+                            supporting = stringResource(R.string.widget_your_home_feed),
                             selected = current.community == null,
                             onClick = { onPick(PostsWidgetSource.Home) },
                         )
@@ -145,7 +145,7 @@ internal fun PostsWidgetSourcePicker(
                     shown.isEmpty() -> item(key = "none") {
                         ListItem(
                             content = {
-                                Text(if (communities.isEmpty()) "No joined communities stored yet" else "No community matches")
+                                Text(stringResource(if (communities.isEmpty()) R.string.widget_no_joined_communities else R.string.widget_no_community_matches))
                             },
                             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         )

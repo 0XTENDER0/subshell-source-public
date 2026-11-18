@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.ui.s
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
@@ -134,10 +135,10 @@ class Update09KnownBadVersionAdvisoryTest {
 
     @Test
     fun theNotificationNamesTheProblem() {
-        assertEquals("Known problem in your subshell version", updateNotificationTitle(release, 245))
-        assertEquals("0.82-beta fixes it", updateNotificationText(release, 245))
-        assertEquals("subshell update available", updateNotificationTitle(release, 244))
-        assertEquals("0.82-beta is ready", updateNotificationText(release, 244))
+        assertEquals("Known problem in your subshell version", updateNotificationTitle(release, 245).s)
+        assertEquals("0.82-beta fixes it", updateNotificationText(release, 245).s)
+        assertEquals("subshell update available", updateNotificationTitle(release, 244).s)
+        assertEquals("0.82-beta is ready", updateNotificationText(release, 244).s)
     }
 
     @Test

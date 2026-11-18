@@ -1,8 +1,12 @@
 package io.github.brealorg.subshell.data.network.reddit
 
+import io.github.brealorg.subshell.ui.s
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.R
 import io.github.brealorg.subshell.data.network.SubshellNetworkJson
-import io.github.brealorg.subshell.ui.components.HELD_BY_AUTOMODERATOR_EXPLANATION
-import io.github.brealorg.subshell.ui.components.HELD_WITHOUT_REPORTS_EXPLANATION
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.ui.components.moderatorQueueItemHeldExplanation
 import io.github.brealorg.subshell.ui.components.moderatorQueueItemIsHeldWithoutReports
 import io.github.brealorg.subshell.ui.components.moderatorQueueItemRemovalLine
@@ -15,10 +19,14 @@ import org.junit.Test
 /**
  * ISSUE301B_AUTOMOD_HELD_IS_NAMED_V1 (#301, u/vpsj): an item AutoModerator filtered
  * into the queue says "Held by AutoModerator" and is not called removed; post
- * guidance and Reddit's own filters keep the unnamed explanation. The first post
+ * guidance keeps the unnamed explanation (Reddit's own filters: Issue301cFilterReasonTest). The first post
  * follows the JSON u/vpsj shared on 2026-11-14 (author, id and text changed).
  */
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue301bAutoModHeldDetailsTest {
+    private val heldByAutoModerator = UiText.Resource(R.string.comp_held_by_automoderator)
+    private val heldByFiltersOrGuidance = UiText.Resource(R.string.comp_held_by_filters_or_guidance)
     private val now = 1_794_630_000L
 
     private fun item(child: String) =
@@ -68,9 +76,9 @@ class Issue301bAutoModHeldDetailsTest {
         assertNull(item.details.removedBy)
         assertNull(moderatorQueueItemRemovalLine(item))
         assertTrue(moderatorQueueItemIsHeldWithoutReports(item))
-        assertEquals(HELD_BY_AUTOMODERATOR_EXPLANATION, moderatorQueueItemHeldExplanation(item, heldWithoutReports = true))
+        assertEquals(heldByAutoModerator, moderatorQueueItemHeldExplanation(item, heldWithoutReports = true))
         // The Removed list does not ask about reports; AutoModerator is still named.
-        assertEquals(HELD_BY_AUTOMODERATOR_EXPLANATION, moderatorQueueItemHeldExplanation(item, heldWithoutReports = false))
+        assertEquals(heldByAutoModerator, moderatorQueueItemHeldExplanation(item, heldWithoutReports = false))
     }
 
     @Test
@@ -84,7 +92,7 @@ class Issue301bAutoModHeldDetailsTest {
     fun aPostAutoModeratorRemovedStaysRemovedByAutoModerator() {
         val item = item(autoModRemovedPost)
         assertFalse(item.details.heldByAutoModerator)
-        assertEquals("Removed by AutoModerator", moderatorQueueItemRemovalLine(item))
+        assertEquals("Removed by AutoModerator", moderatorQueueItemRemovalLine(item)?.s)
         assertNull(moderatorQueueItemHeldExplanation(item, heldWithoutReports = false))
     }
 
@@ -92,7 +100,7 @@ class Issue301bAutoModHeldDetailsTest {
     fun aPostWithoutAutoModeratorKeepsTheUnnamedExplanation() {
         val item = item(postGuidancePost)
         assertFalse(item.details.heldByAutoModerator)
-        assertEquals(HELD_WITHOUT_REPORTS_EXPLANATION, moderatorQueueItemHeldExplanation(item, heldWithoutReports = true))
+        assertEquals(heldByFiltersOrGuidance, moderatorQueueItemHeldExplanation(item, heldWithoutReports = true))
         assertNull(moderatorQueueItemHeldExplanation(item, heldWithoutReports = false))
     }
 }

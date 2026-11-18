@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.pluralStringResource
 import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
@@ -93,13 +94,13 @@ internal fun readingStatsCommunities(
 internal const val READING_STATS_COMMUNITY_ROWS = 25
 
 /** "1 h 5 min", "12 min", "under a minute". */
-internal fun readingDurationLabel(seconds: Long): String {
+internal fun readingDurationLabel(seconds: Long): UiText {
     val minutes = seconds / 60L
     return when {
-        minutes < 1L -> "under a minute"
-        minutes < 60L -> "$minutes min"
-        minutes % 60L == 0L -> "${minutes / 60L} h"
-        else -> "${minutes / 60L} h ${minutes % 60L} min"
+        minutes < 1L -> UiText.Resource(R.string.reading_under_a_minute)
+        minutes < 60L -> UiText.Resource(R.string.reading_minutes, minutes)
+        minutes % 60L == 0L -> UiText.Resource(R.string.reading_hours, minutes / 60L)
+        else -> UiText.Resource(R.string.reading_hours_minutes, minutes / 60L, minutes % 60L)
     }
 }
 
@@ -179,7 +180,7 @@ internal fun ReadingStatsPanel(state: SubshellState) {
     confirmDelete?.let { action ->
         AlertDialog(
             onDismissRequest = { confirmDelete = null },
-            title = { Text(if (action == "off") "Turn off Your reading?" else "Clear Your reading?") },
+            title = { Text(if (action == "off") stringResource(R.string.scr_turn_off_your_reading) else stringResource(R.string.scr_clear_your_reading)) },
             text = {
                 Text(
                     if (action == "off") {
@@ -195,7 +196,7 @@ internal fun ReadingStatsPanel(state: SubshellState) {
                         confirmDelete = null
                         if (action == "off") store.onDisk { setEnabled(false) } else store.onDisk { clear() }
                     },
-                ) { Text(if (action == "off") "Turn off" else "Clear") }
+                ) { Text(if (action == "off") stringResource(R.string.scr_turn_off) else stringResource(R.string.all_clear)) }
             },
             dismissButton = { TextButton(onClick = { confirmDelete = null }) { Text(stringResource(R.string.scr_cancel)) } },
         )
@@ -231,16 +232,16 @@ private fun ReadingStatsTotals(summary: ReadingSummary) {
             .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
     }
     val period = if (summary.days >= io.github.brealorg.subshell.data.reading.READING_STATS_WINDOW_DAYS) {
-        "Last ${summary.days} days"
+        pluralStringResource(R.plurals.reading_last_days, summary.days, summary.days)
     } else {
         stringResource(R.string.all_since, since)
     }
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(period, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(readingDurationLabel(summary.totalSeconds), style = MaterialTheme.typography.headlineMedium)
+        Text(readingDurationLabel(summary.totalSeconds).asString(), style = MaterialTheme.typography.headlineMedium)
         if (summary.homeSeconds > 0L) {
             Text(
-                "Home feed ${readingDurationLabel(summary.homeSeconds)}",
+                stringResource(R.string.reading_home_feed, readingDurationLabel(summary.homeSeconds).asString()),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -267,7 +268,7 @@ private fun ReadingStatsCommunityList(summary: ReadingSummary, onOpen: (String) 
             supportingContent = {
                 Text(
                     listOf(
-                        readingDurationLabel(community.seconds),
+                        readingDurationLabel(community.seconds).asString(),
                         readingCountsLabel(community.opens, community.postOpens).asString(),
                     ).filter(String::isNotBlank).joinToString(" · "),
                 )
@@ -293,14 +294,14 @@ private fun ReadingStatsSuggestionList(summary: ReadingSummary, state: SubshellS
     val suggestions = readingSuggestions(summary, subscribed, state::isCommunityHidden)
     if (suggestions.isEmpty()) {
         Text(
-            "You opened every community you subscribe to in the last ${summary.days} days.",
+            pluralStringResource(R.plurals.reading_opened_every_community, summary.days, summary.days),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         return
     }
     Text(
-        "Not opened in ${summary.days} days. Hide keeps them out of your lists; Leave unsubscribes on Reddit.",
+        pluralStringResource(R.plurals.reading_not_opened_in, summary.days, summary.days),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )

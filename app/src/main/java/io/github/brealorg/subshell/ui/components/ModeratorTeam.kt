@@ -363,7 +363,7 @@ fun ModeratorTeamContent(
                     ) {
                         Text(stringResource(R.string.comp_invitation_sent), style = MaterialTheme.typography.titleSmall)
                         Text(
-                            "u/$username becomes a moderator after accepting the invitation on Reddit.",
+                            stringResource(R.string.comp_mod_invite_becomes_moderator, username),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
@@ -561,7 +561,7 @@ private fun ModeratorTeamRow(
     isCurrentUser: Boolean,
     avatarUri: String?,
 ) {
-    val labels = moderatorTeamPermissionLabels(moderator.permissions)
+    val labels = moderatorTeamPermissionLabels(moderator.permissions).map { it.asString() }
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
@@ -691,7 +691,7 @@ private fun ModeratorInviteEditor(
             stringResource(R.string.all_all_permissions)
         } else {
             pending.permissions
-                .map(::moderatorInvitePermissionLabel)
+                .map { permission -> moderatorInvitePermissionLabel(permission) }
                 .sorted()
                 .joinToString(", ")
         }
@@ -700,8 +700,7 @@ private fun ModeratorInviteEditor(
             title = { Text(stringResource(R.string.comp_invite_u, pending.username)) },
             text = {
                 Text(
-                    "Reddit will send a moderator invitation for r/$communityName with: " +
-                        permissionSummary + ". The account is not a moderator until it accepts.",
+                    stringResource(R.string.comp_mod_invite_confirm, communityName, permissionSummary),
                 )
             },
             confirmButton = {
@@ -926,7 +925,7 @@ private fun ModeratorInviteEditor(
                     color = MaterialTheme.colorScheme.tertiaryContainer) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Text(stringResource(R.string.comp_authorization_required), style = MaterialTheme.typography.titleSmall)
-                        Text("subshell needs Reddit's moderator-management permission before it can send this invitation.")
+                        Text(stringResource(R.string.comp_mod_invite_needs_permission))
                         FilledTonalButton(enabled = !state.authorizing, onClick = onAuthorize) {
                             Text(if (state.authorizing) stringResource(R.string.all_authorizing) else stringResource(R.string.all_authorize_moderator_invites))
                         }
@@ -1020,24 +1019,27 @@ private fun ModeratorInvitePermissionRow(
     }
 }
 
+@Composable
 private fun moderatorInvitePermissionLabel(permission: RedditModeratorPermission): String = when (permission) {
-    RedditModeratorPermission.ACCESS -> "Access"
-    RedditModeratorPermission.CONFIG -> "Configuration"
-    RedditModeratorPermission.FLAIR -> "Flair"
-    RedditModeratorPermission.MAIL -> "Modmail"
-    RedditModeratorPermission.POSTS -> "Posts"
-    RedditModeratorPermission.WIKI -> "Wiki"
+    RedditModeratorPermission.ACCESS -> stringResource(R.string.comp_mod_permission_access)
+    RedditModeratorPermission.CONFIG -> stringResource(R.string.comp_mod_permission_config)
+    RedditModeratorPermission.FLAIR -> stringResource(R.string.comp_mod_permission_flair)
+    RedditModeratorPermission.MAIL -> stringResource(R.string.comp_mod_permission_mail)
+    RedditModeratorPermission.POSTS -> stringResource(R.string.comp_mod_permission_posts)
+    RedditModeratorPermission.WIKI -> stringResource(R.string.comp_mod_permission_wiki)
 }
 
+@Composable
 private fun moderatorInvitePermissionDescription(permission: RedditModeratorPermission): String = when (permission) {
-    RedditModeratorPermission.ACCESS -> "Manage approved, banned, and muted users"
-    RedditModeratorPermission.CONFIG -> "Manage community settings and configuration"
-    RedditModeratorPermission.FLAIR -> "Manage user and post flair"
-    RedditModeratorPermission.MAIL -> "Read and reply to moderator mail"
-    RedditModeratorPermission.POSTS -> "Approve, remove, spam, and distinguish content"
-    RedditModeratorPermission.WIKI -> "Manage community wiki pages and access"
+    RedditModeratorPermission.ACCESS -> stringResource(R.string.comp_mod_permission_desc_access)
+    RedditModeratorPermission.CONFIG -> stringResource(R.string.comp_mod_permission_desc_config)
+    RedditModeratorPermission.FLAIR -> stringResource(R.string.comp_mod_permission_desc_flair)
+    RedditModeratorPermission.MAIL -> stringResource(R.string.comp_mod_permission_desc_mail)
+    RedditModeratorPermission.POSTS -> stringResource(R.string.comp_mod_permission_desc_posts)
+    RedditModeratorPermission.WIKI -> stringResource(R.string.comp_mod_permission_desc_wiki)
 }
 
+@Composable
 private fun moderatorInviteFailureMessage(
     kind: ModeratorInviteFailureKind,
     httpStatusCode: Int?,
@@ -1045,25 +1047,25 @@ private fun moderatorInviteFailureMessage(
 ): String {
     val summary = when (kind) {
         ModeratorInviteFailureKind.CLIENT_CONFIGURATION ->
-            "Moderator invitations are not configured for this Reddit session."
+            stringResource(R.string.comp_mod_invite_failed_client_configuration)
         ModeratorInviteFailureKind.SESSION ->
-            "The Reddit session could not authorize this moderator invitation."
+            stringResource(R.string.comp_mod_invite_failed_session)
         ModeratorInviteFailureKind.AUTHORIZATION ->
-            "Reddit refused this moderator invitation. Full moderator permissions are required."
+            stringResource(R.string.comp_mod_invite_failed_authorization)
         ModeratorInviteFailureKind.HTTP ->
-            "Reddit rejected the invitation."
+            stringResource(R.string.comp_mod_invite_failed_http)
         ModeratorInviteFailureKind.TRANSPORT ->
-            "The invitation could not reach Reddit. No automatic retry was made."
+            stringResource(R.string.comp_mod_invite_failed_transport)
         ModeratorInviteFailureKind.PROTOCOL ->
-            "Reddit returned an unexpected response to the moderator invitation."
+            stringResource(R.string.comp_mod_invite_failed_protocol)
         ModeratorInviteFailureKind.VALIDATION ->
-            "Reddit rejected the moderator invitation details."
+            stringResource(R.string.comp_mod_invite_failed_validation)
         ModeratorInviteFailureKind.OUTCOME_UNKNOWN ->
-            "The invitation outcome is unknown. Do not send it again until you verify the moderator invitation on Reddit."
+            stringResource(R.string.comp_mod_invite_failed_outcome_unknown)
         ModeratorInviteFailureKind.ALREADY_MUTATING ->
-            "Another moderator invitation is already in progress."
+            stringResource(R.string.comp_mod_invite_failed_already_mutating)
         ModeratorInviteFailureKind.ACCOUNT_CHANGED ->
-            "The active Reddit account changed. Reopen Moderators before inviting anyone."
+            stringResource(R.string.comp_mod_invite_failed_account_changed)
     }
     val technical = failureDetails?.toSafeTechnicalDetail()
         ?: httpStatusCode
@@ -1173,7 +1175,7 @@ private fun ModeratorPermissionEditor(
             stringResource(R.string.all_all_permissions)
         } else {
             pending.permissions
-                .map(::moderatorInvitePermissionLabel)
+                .map { permission -> moderatorInvitePermissionLabel(permission) }
                 .sorted()
                 .joinToString(", ")
         }
@@ -1182,8 +1184,7 @@ private fun ModeratorPermissionEditor(
             title = { Text(stringResource(R.string.comp_update_u, pending.username)) },
             text = {
                 Text(
-                    "Replace this moderator's permissions for r/$communityName with: " +
-                        permissionSummary + ". This does not remove the moderator.",
+                    stringResource(R.string.comp_mod_update_confirm, communityName, permissionSummary),
                 )
             },
             confirmButton = {
@@ -1307,7 +1308,7 @@ private fun ModeratorPermissionEditor(
                     ) {
                         Text(stringResource(R.string.comp_authorization_required), style = MaterialTheme.typography.titleSmall)
                         Text(
-                            "subshell needs Reddit's moderator-management permission before it can update moderator permissions.",
+                            stringResource(R.string.comp_mod_update_needs_permission),
                         )
                         FilledTonalButton(enabled = !state.authorizing, onClick = onAuthorize) {
                             Text(
@@ -1360,6 +1361,7 @@ private fun ModeratorPermissionEditor(
     }
 }
 
+@Composable
 private fun moderatorPermissionUpdateFailureMessage(
     kind: ModeratorPermissionUpdateFailureKind,
     httpStatusCode: Int?,
@@ -1367,25 +1369,25 @@ private fun moderatorPermissionUpdateFailureMessage(
 ): String {
     val summary = when (kind) {
         ModeratorPermissionUpdateFailureKind.CLIENT_CONFIGURATION ->
-            "Moderator permission changes are not configured for this Reddit session."
+            stringResource(R.string.comp_mod_permission_failed_client_configuration)
         ModeratorPermissionUpdateFailureKind.SESSION ->
-            "The Reddit session could not authorize this moderator permission change."
+            stringResource(R.string.comp_mod_permission_failed_session)
         ModeratorPermissionUpdateFailureKind.AUTHORIZATION ->
-            "Reddit refused this permission change. The target may be outside your editable moderator hierarchy."
+            stringResource(R.string.comp_mod_permission_failed_authorization)
         ModeratorPermissionUpdateFailureKind.HTTP ->
-            "Reddit rejected the moderator permission change."
+            stringResource(R.string.comp_mod_permission_failed_http)
         ModeratorPermissionUpdateFailureKind.TRANSPORT ->
-            "The permission change could not reach Reddit. No automatic retry was made."
+            stringResource(R.string.comp_mod_permission_failed_transport)
         ModeratorPermissionUpdateFailureKind.PROTOCOL ->
-            "Reddit returned an unexpected response to the moderator permission change."
+            stringResource(R.string.comp_mod_permission_failed_protocol)
         ModeratorPermissionUpdateFailureKind.VALIDATION ->
-            "Reddit rejected the moderator permission details."
+            stringResource(R.string.comp_mod_permission_failed_validation)
         ModeratorPermissionUpdateFailureKind.OUTCOME_UNKNOWN ->
-            "The permission-change outcome is unknown. Refresh the moderator list before trying again."
+            stringResource(R.string.comp_mod_permission_failed_outcome_unknown)
         ModeratorPermissionUpdateFailureKind.ALREADY_MUTATING ->
-            "Another moderator permission change is already in progress."
+            stringResource(R.string.comp_mod_permission_failed_already_mutating)
         ModeratorPermissionUpdateFailureKind.ACCOUNT_CHANGED ->
-            "The active Reddit account changed. Reopen Moderators before changing permissions."
+            stringResource(R.string.comp_mod_permission_failed_account_changed)
     }
     val technical = failureDetails?.toSafeTechnicalDetail()
         ?: httpStatusCode
@@ -1433,7 +1435,7 @@ internal fun ModeratorRemovalEditor(
             title = { Text(stringResource(R.string.comp_remove_u, pending.username)) },
             text = {
                 Text(
-                    "Remove u/${pending.username} from the moderator team for r/$communityName? Their moderator access will be revoked. Re-adding them requires a new invitation. Reddit may refuse the removal when the target is above you in the moderator hierarchy.",
+                    stringResource(R.string.comp_mod_remove_confirm, pending.username, communityName),
                 )
             },
             confirmButton = {
@@ -1491,7 +1493,7 @@ internal fun ModeratorRemovalEditor(
                 color = MaterialTheme.colorScheme.errorContainer,
             ) {
                 Text(
-                    "Removing a moderator revokes their moderator access. Re-adding them requires a new invitation. Reddit decides whether this moderator can be removed based on the moderator hierarchy.",
+                    stringResource(R.string.comp_mod_remove_explained),
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onErrorContainer,
@@ -1518,7 +1520,7 @@ internal fun ModeratorRemovalEditor(
                     ) {
                         Text(stringResource(R.string.comp_authorization_required), style = MaterialTheme.typography.titleSmall)
                         Text(
-                            "subshell needs Reddit's moderator-management permission before it can remove this moderator.",
+                            stringResource(R.string.comp_mod_remove_needs_permission),
                         )
                         FilledTonalButton(enabled = !state.authorizing, onClick = onAuthorize) {
                             Text(
@@ -1578,6 +1580,7 @@ internal fun ModeratorRemovalEditor(
     }
 }
 
+@Composable
 private fun moderatorRemovalFailureMessage(
     kind: ModeratorRemovalFailureKind,
     httpStatusCode: Int?,
@@ -1585,25 +1588,25 @@ private fun moderatorRemovalFailureMessage(
 ): String {
     val summary = when (kind) {
         ModeratorRemovalFailureKind.CLIENT_CONFIGURATION ->
-            "Moderator removal is not configured for this Reddit session."
+            stringResource(R.string.comp_mod_removal_failed_client_configuration)
         ModeratorRemovalFailureKind.SESSION ->
-            "The Reddit session could not authorize this moderator removal."
+            stringResource(R.string.comp_mod_removal_failed_session)
         ModeratorRemovalFailureKind.AUTHORIZATION ->
-            "Reddit refused this removal. The target may be above you in the moderator hierarchy."
+            stringResource(R.string.comp_mod_removal_failed_authorization)
         ModeratorRemovalFailureKind.HTTP ->
-            "Reddit rejected the moderator removal."
+            stringResource(R.string.comp_mod_removal_failed_http)
         ModeratorRemovalFailureKind.TRANSPORT ->
-            "The moderator removal could not reach Reddit. No automatic retry was made."
+            stringResource(R.string.comp_mod_removal_failed_transport)
         ModeratorRemovalFailureKind.PROTOCOL ->
-            "Reddit returned an unexpected response to the moderator removal."
+            stringResource(R.string.comp_mod_removal_failed_protocol)
         ModeratorRemovalFailureKind.VALIDATION ->
-            "This moderator cannot be removed from this subshell workflow."
+            stringResource(R.string.comp_mod_removal_failed_validation)
         ModeratorRemovalFailureKind.OUTCOME_UNKNOWN ->
-            "The removal outcome is unknown. Refresh the moderator list before trying again."
+            stringResource(R.string.comp_mod_removal_failed_outcome_unknown)
         ModeratorRemovalFailureKind.ALREADY_MUTATING ->
-            "Another moderator removal is already in progress."
+            stringResource(R.string.comp_mod_removal_failed_already_mutating)
         ModeratorRemovalFailureKind.ACCOUNT_CHANGED ->
-            "The active Reddit account changed. Reopen Moderators before removing anyone."
+            stringResource(R.string.comp_mod_removal_failed_account_changed)
     }
     val technical = failureDetails?.toSafeTechnicalDetail()
         ?: httpStatusCode

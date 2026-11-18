@@ -288,7 +288,7 @@ class Step3ModeratorQueueSheetComposeTest {
         assertEquals("Post removed", trayTitle())
         // Drawn inside the Mod tools sheet's own window, not only behind it.
         assertEquals(1, count("Post removed"))
-        assertEquals(removalPartialSuccessMessage(true, RedditRemovalStepOutcome.NOT_REQUESTED), trayMessage())
+        assertEquals(removalPartialSuccessMessage(true, RedditRemovalStepOutcome.NOT_REQUESTED).s, trayMessage())
     }
 
     @Test

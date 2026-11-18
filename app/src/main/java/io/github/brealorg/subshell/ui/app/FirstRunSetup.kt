@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.app
 
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import android.os.Build
 import androidx.activity.compose.BackHandler
@@ -425,9 +426,9 @@ private fun LookPage(state: SubshellState) {
 }
 
 private val previewPosts = listOf(
-    Triple("r/battlestations", "Finally happy with my desk", R.drawable.media_linux_desk),
-    Triple("r/homelab", "The rack is done, for now", R.drawable.media_homelab),
-    Triple("r/androiddev", "Where the apps get made", R.drawable.media_android_desk),
+    Triple("r/battlestations", R.string.app_finally_happy_with_my_desk, R.drawable.media_linux_desk),
+    Triple("r/homelab", R.string.app_the_rack_is_done_for_now, R.drawable.media_homelab),
+    Triple("r/androiddev", R.string.app_where_the_apps_get_made, R.drawable.media_android_desk),
 )
 
 /**
@@ -455,13 +456,13 @@ private fun PostLayoutPreview(layout: PostLayout) {
         ) {
             when (layout) {
                 PostLayout.LARGE -> previewPosts.first().let { (community, title, image) ->
-                    PreviewCard(community, title, image, mediaHeight = 124, stats = true)
+                    PreviewCard(community, stringResource(title), image, mediaHeight = 124, stats = true)
                 }
                 PostLayout.COMPACT -> previewPosts.take(2).forEach { (community, title, image) ->
-                    PreviewCard(community, title, image, mediaHeight = 38, stats = false)
+                    PreviewCard(community, stringResource(title), image, mediaHeight = 38, stats = false)
                 }
                 PostLayout.LIST -> previewPosts.forEach { (community, title, image) ->
-                    PreviewListRow(community, title, image)
+                    PreviewListRow(community, stringResource(title), image)
                 }
                 PostLayout.GRID -> repeat(2) { row ->
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -575,7 +576,7 @@ private fun ContentPage(state: SubshellState) {
     SetupSwitchRow(
         title = stringResource(R.string.set_show_nsfw_media_without_a_tap),
         description = if (state.showNsfwPosts) {
-            "NSFW images, GIFs and videos show without a cover; spoilers stay covered"
+            stringResource(R.string.app_nsfw_images_gifs_and_videos_show)
         } else {
             stringResource(R.string.all_turn_on_nsfw_posts_first)
         },
@@ -609,7 +610,7 @@ private fun LinksPage(
     var opened by rememberSaveable { mutableStateOf(false) }
     PageTitle(stringResource(R.string.all_open_reddit_links_here))
     PageText(
-        "Links to reddit.com in other apps can open in subshell instead of the browser. Android lets only you turn this on.",
+        stringResource(R.string.app_links_to_reddit_com_in_other),
     )
     Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerLow) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -698,8 +699,13 @@ private fun BackupsPage(repository: SettingsBackupRepository) {
         supportingContent = {
             Text(
                 when {
-                    connected && found > 0 -> "Copied to ${folder ?: "your folder"} · $found backups found"
-                    connected -> "Copied to ${folder ?: "your folder"}"
+                    connected && found > 0 -> pluralStringResource(
+                        R.plurals.set_copied_to_folder_found,
+                        found,
+                        folder ?: stringResource(R.string.set_your_folder),
+                        found,
+                    )
+                    connected -> stringResource(R.string.set_copied_to_folder, folder ?: stringResource(R.string.set_your_folder))
                     failed -> stringResource(R.string.all_couldn_t_use_that_folder_try_another)
                     else -> stringResource(R.string.all_copies_that_survive_removing_subshell)
                 },
@@ -715,7 +721,7 @@ private fun BackupsPage(repository: SettingsBackupRepository) {
         colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         modifier = Modifier.clip(MaterialTheme.shapes.large),
     )
-    SectionLabel("Privacy-sensitive backup data")
+    SectionLabel(stringResource(R.string.scr_privacy_sensitive_backup_data))
     PrivacyBackupSwitch(stringResource(R.string.all_hidden_communities), repository::hiddenCommunitiesBackupEnabled, repository::setHiddenCommunitiesBackupEnabled)
     PrivacyBackupSwitch(stringResource(R.string.all_muted_communities), repository::communityMutesBackupEnabled, repository::setCommunityMutesBackupEnabled)
     PrivacyBackupSwitch(stringResource(R.string.all_post_drafts), repository::postComposerDraftsBackupEnabled, repository::setPostComposerDraftsBackupEnabled)
@@ -761,15 +767,15 @@ private fun DonePage(
             textAlign = TextAlign.Center,
         )
     }
-    val theme = state.themeChoice.label
+    val theme = stringResource(state.themeChoice.shortLabelRes)
     val rows = buildList {
-        add("Hand" to if (state.interactionSide == InteractionSide.LEFT) "Left" else "Right")
+        add(stringResource(R.string.app_summary_hand) to stringResource(if (state.interactionSide == InteractionSide.LEFT) R.string.interaction_side_left else R.string.interaction_side_right))
         add(stringResource(R.string.all_theme_posts_text) to "$theme · ${stringResource(state.postLayout.labelRes)} · ${state.appTextScale.label}")
-        add("NSFW posts" to if (state.showNsfwPosts) "On" else "Off")
-        add(stringResource(R.string.all_videos) to stringResource(state.videoAutoplay.labelRes) + if (state.startVideosMuted) ", muted" else "")
-        add(stringResource(R.string.all_notifications) to if (state.inboxNotificationsEnabled) "On" else "Off")
+        add(stringResource(R.string.app_nsfw_posts) to stringResource(if (state.showNsfwPosts) R.string.app_summary_on else R.string.app_summary_off))
+        add(stringResource(R.string.all_videos) to if (state.startVideosMuted) stringResource(R.string.app_summary_videos_muted, stringResource(state.videoAutoplay.labelRes)) else stringResource(state.videoAutoplay.labelRes))
+        add(stringResource(R.string.all_notifications) to stringResource(if (state.inboxNotificationsEnabled) R.string.app_summary_on else R.string.app_summary_off))
         if (linkHandlingState.supported) {
-            add("Reddit links" to if (linkHandlingState.status == RedditLinkHandlingStatus.ENABLED) "Open here" else "Not set up")
+            add(stringResource(R.string.app_reddit_links) to if (linkHandlingState.status == RedditLinkHandlingStatus.ENABLED) stringResource(R.string.app_open_here) else stringResource(R.string.app_not_set_up))
         }
         add(stringResource(R.string.all_backup_folder) to if (repository.folderConnected()) stringResource(R.string.all_chosen) else stringResource(R.string.all_not_chosen))
     }

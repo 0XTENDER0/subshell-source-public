@@ -37,6 +37,8 @@ internal val io.github.brealorg.subshell.ui.CommentActionPreference.label: Strin
 internal val io.github.brealorg.subshell.ui.NavigationLabelMode.label: String get() = resolvedLabel(labelRes)
 internal val io.github.brealorg.subshell.ui.RandomNsfwCommunityPlacement.label: String get() = resolvedLabel(labelRes)
 internal val io.github.brealorg.subshell.ui.PinnedPostsPresentation.label: String get() = resolvedLabel(labelRes)
+internal val io.github.brealorg.subshell.ui.CommunityMutePreset.label: String get() = resolvedLabel(labelRes)
+internal val io.github.brealorg.subshell.ui.CodeFont.label: String get() = resolvedLabel(labelRes)
 internal val io.github.brealorg.subshell.ui.FeedPositionAge.label: String get() = resolvedLabel(labelRes)
 internal val io.github.brealorg.subshell.ui.FeedPositionStart.label: String get() = resolvedLabel(labelRes)
 internal val io.github.brealorg.subshell.ui.PostLayout.label: String get() = resolvedLabel(labelRes)

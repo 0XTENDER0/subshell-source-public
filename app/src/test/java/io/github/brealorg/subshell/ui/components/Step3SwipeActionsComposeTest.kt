@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
@@ -45,7 +46,7 @@ class Step3SwipeActionsComposeTest {
     private fun setSurface(enabled: Boolean, onRight: () -> Unit) {
         val upvote = voteSwipeActionVisual(
             direction = 1,
-            label = "Upvote",
+            label = UiText.Plain("Upvote"),
             palette = VoteColorPalette.RED_BLUE,
             mode = VoteControlMode.COMFORTABLE,
             enabled = true,

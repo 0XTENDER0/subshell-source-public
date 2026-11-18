@@ -394,32 +394,33 @@ private data class ModeratorContentControlLabels(
     val reversal: String,
 )
 
+@androidx.compose.runtime.Composable
 private fun moderatorContentControlLabels(
     action: RedditModeratorAction,
 ): ModeratorContentControlLabels = when (action) {
     RedditModeratorAction.LOCK -> ModeratorContentControlLabels(
-        title = "Lock this item?",
-        confirm = "Lock",
-        description = "New replies will be blocked until a moderator unlocks this item.",
-        reversal = "You can reverse this with Unlock after Reddit confirms the locked state.",
+        title = stringResource(R.string.comp_mod_control_1),
+        confirm = stringResource(R.string.comp_mod_control_2),
+        description = stringResource(R.string.comp_mod_control_3),
+        reversal = stringResource(R.string.comp_mod_control_4),
     )
     RedditModeratorAction.UNLOCK -> ModeratorContentControlLabels(
-        title = "Unlock this item?",
-        confirm = "Unlock",
-        description = "New replies can be added again after Reddit confirms the unlocked state.",
-        reversal = "You can lock the item again later.",
+        title = stringResource(R.string.comp_mod_control_5),
+        confirm = stringResource(R.string.comp_mod_control_6),
+        description = stringResource(R.string.comp_mod_control_7),
+        reversal = stringResource(R.string.comp_mod_control_8),
     )
     RedditModeratorAction.DISTINGUISH -> ModeratorContentControlLabels(
-        title = "Distinguish as moderator?",
-        confirm = "Distinguish",
-        description = "This contribution will be marked as an official moderator contribution.",
-        reversal = "Only your own contribution is eligible here. You can undistinguish it later.",
+        title = stringResource(R.string.comp_mod_control_9),
+        confirm = stringResource(R.string.comp_mod_control_10),
+        description = stringResource(R.string.comp_mod_control_11),
+        reversal = stringResource(R.string.comp_mod_control_12),
     )
     RedditModeratorAction.UNDISTINGUISH -> ModeratorContentControlLabels(
-        title = "Remove moderator distinction?",
-        confirm = "Undistinguish",
-        description = "The moderator distinction will be removed from this contribution.",
-        reversal = "You can distinguish your own contribution again later.",
+        title = stringResource(R.string.comp_mod_control_13),
+        confirm = stringResource(R.string.comp_mod_control_14),
+        description = stringResource(R.string.comp_mod_control_15),
+        reversal = stringResource(R.string.comp_mod_control_16),
     )
     else -> error("Unsupported moderator content control action")
 }
@@ -581,31 +582,32 @@ private fun ModeratorContentControlNoticeCard(
     }
 }
 
+@androidx.compose.runtime.Composable
 internal fun moderatorContentControlNoticeText(
     notice: ModeratorContentControlsNotice,
 ): String = when (notice) {
     ModeratorContentControlsNotice.NOT_FOUND ->
-        "Reddit did not return the exact target."
+        stringResource(R.string.comp_mod_control_notice_1)
     ModeratorContentControlsNotice.READ_FAILED ->
-        "Could not read current moderator controls. Refresh before acting."
+        stringResource(R.string.comp_mod_control_notice_2)
     ModeratorContentControlsNotice.NO_PERMISSION ->
-        "Reddit did not confirm Posts moderation permission for this target."
+        stringResource(R.string.comp_mod_control_notice_3)
     ModeratorContentControlsNotice.STATE_UNKNOWN ->
-        "Reddit did not return a usable lock or distinction state."
+        stringResource(R.string.comp_mod_control_notice_4)
     ModeratorContentControlsNotice.STATE_CHANGED ->
-        "The target changed since you opened the confirmation. Review the current state."
+        stringResource(R.string.comp_mod_control_notice_5)
     ModeratorContentControlsNotice.BUSY ->
-        "Another moderation action is in progress. This action was not queued."
+        stringResource(R.string.comp_mod_control_notice_6)
     ModeratorContentControlsNotice.AUTHORIZATION_REQUIRED ->
-        "Moderator authorization is required. Refresh and confirm again after authorizing."
+        stringResource(R.string.comp_mod_control_notice_7)
     ModeratorContentControlsNotice.WRITE_FAILED ->
-        "The moderation action could not be completed. Refresh before making another choice."
+        stringResource(R.string.comp_mod_control_notice_8)
     ModeratorContentControlsNotice.VERIFIED ->
-        "The requested state was confirmed by a fresh Reddit response."
+        stringResource(R.string.comp_mod_control_notice_9)
     ModeratorContentControlsNotice.VERIFIED_AFTER_UNKNOWN ->
-        "The write response was unclear, but a fresh Reddit response confirms the requested state."
+        stringResource(R.string.comp_mod_control_notice_10)
     ModeratorContentControlsNotice.NOT_CONFIRMED ->
-        "The requested state could not be confirmed. No automatic retry was sent."
+        stringResource(R.string.comp_mod_control_notice_11)
     ModeratorContentControlsNotice.ACCOUNT_CHANGED ->
-        "The active moderator account changed. Reopen the controls with the intended account."
+        stringResource(R.string.comp_mod_control_notice_12)
 }

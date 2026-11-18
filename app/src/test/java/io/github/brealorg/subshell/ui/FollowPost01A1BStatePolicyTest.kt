@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import io.github.brealorg.subshell.data.account.PostFollowUiState
 import io.github.brealorg.subshell.data.auth.AuthCapabilityAuthorizationOwner
 import org.junit.Assert.assertEquals
@@ -8,6 +11,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class FollowPost01A1BStatePolicyTest {
     @Test
     fun unknownServerStateStaysUnknownButOffersAbsoluteFollow() {
@@ -15,7 +20,7 @@ class FollowPost01A1BStatePolicyTest {
         assertTrue(postFollowDesiredState(null))
         assertEquals(
             "Follow post",
-            postFollowActionLabel(null),
+            postFollowActionLabel(null).s,
         )
     }
 
@@ -24,11 +29,11 @@ class FollowPost01A1BStatePolicyTest {
         assertFalse(postFollowDesiredState(true))
         assertEquals(
             "Unfollow post",
-            postFollowActionLabel(true),
+            postFollowActionLabel(true).s,
         )
         assertEquals(
             "Follow post",
-            postFollowActionLabel(false),
+            postFollowActionLabel(false).s,
         )
     }
 

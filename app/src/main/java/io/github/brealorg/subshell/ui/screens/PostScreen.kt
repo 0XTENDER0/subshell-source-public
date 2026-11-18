@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.UiText
 import androidx.compose.ui.res.pluralStringResource
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
@@ -2346,9 +2347,9 @@ fun PostScreen(
             title = {
                 Text(
                     when {
-                        deleteState.phase == PostDeletePhase.AUTHORIZATION_REQUIRED -> "Permission required"
+                        deleteState.phase == PostDeletePhase.AUTHORIZATION_REQUIRED -> stringResource(R.string.scr_permission_required)
                         deleteState.failureKind == PostDeleteFailureKind.OUTCOME_UNKNOWN &&
-                            deleteState.phase == PostDeletePhase.FAILED -> "Deletion not confirmed"
+                            deleteState.phase == PostDeletePhase.FAILED -> stringResource(R.string.error_write_deletion_not_confirmed)
                         else -> stringResource(R.string.all_delete_post_2)
                     },
                 )
@@ -2445,7 +2446,7 @@ fun PostScreen(
                         currentPostId = post.id,
                         writtenWithAnotherAccount = existing != null &&
                             commentDraftBelongsToAnotherAccount(existing, state.activeAccountId),
-                    ),
+                    ).asString(),
                 )
             },
             confirmButton = {
@@ -2980,7 +2981,7 @@ fun PostScreen(
             loadedComments = threadFindCoverage.loadedComments,
             totalComments = post.comments,
             loading = threadFindStillLoading,
-        )
+        ).asString()
     } else {
         null
     }
@@ -3329,7 +3330,7 @@ fun PostScreen(
                                     countDescription = threadFindCountDescription(
                                         active = threadFindActiveIndex,
                                         size = threadFindMatches.size,
-                                    ),
+                                    ).asString(),
                                     coverageLabel = threadFindCoverageText,
                                     onNext = { threadFindGoTo(true) },
                                     onPrevious = { threadFindGoTo(false) },
@@ -3366,16 +3367,17 @@ fun PostScreen(
                                         modifier = Modifier.weight(1f),
                                     )
                                     if (newIds.isNotEmpty()) {
-                                        NewCommentBadge("${newIds.size} new")
+                                        NewCommentBadge(pluralStringResource(R.plurals.post_new_comments, newIds.size, newIds.size))
                                         Spacer(Modifier.width(6.dp))
                                     }
                                     Box {
                                         TextButton(onClick = { sortMenu = true }) {
                                             // LOWUI7_LABELS_SAY_WHAT_A_CONTROL_DOES_V1 (OCB-240)
+                                            val sortDescription = stringResource(R.string.post_sort_comments_description, sort.label)
                                             Text(
                                                 sort.label,
                                                 modifier = Modifier.semantics {
-                                                    contentDescription = "Sort comments: ${sort.label}"
+                                                    contentDescription = sortDescription
                                                 },
                                             )
                                             Icon(
@@ -3409,7 +3411,7 @@ fun PostScreen(
                                     IconButton(onClick = openThreadFind) {
                                         Icon(
                                             Symbols.Search,
-                                            contentDescription = THREAD_FIND_OPEN_LABEL,
+                                            contentDescription = stringResource(R.string.scr_find_in_thread),
                                         )
                                     }
                                 }
@@ -3714,37 +3716,38 @@ private fun PostDeleteConfirmButton(deleteState: PostDeleteUiState, onDelete: ()
         onClick = onDelete,
     ) {
         Text(
-            if (deleteState.phase == PostDeletePhase.FAILED && deleteState.retryable) "Retry" else "Delete",
+            if (deleteState.phase == PostDeletePhase.FAILED && deleteState.retryable) stringResource(R.string.error_write_retry) else stringResource(R.string.all_delete),
             color = MaterialTheme.colorScheme.error,
         )
     }
 }
 
+@Composable
 private fun postDeleteDialogMessage(state: PostDeleteUiState): String = when (state.phase) {
     PostDeletePhase.AUTHORIZATION_REQUIRED ->
-        "subshell needs Reddit's edit permission before it can delete this post."
+        stringResource(R.string.scr_post_delete_1)
     PostDeletePhase.FAILED -> when (state.failureKind) {
-        PostDeleteFailureKind.CONFIGURATION -> "Post deletion is not configured for this account."
-        PostDeleteFailureKind.ACCOUNT_CHANGED -> "The active account changed. Reopen the post and try again."
-        PostDeleteFailureKind.NOT_OWNER -> "This post is not owned by the active account."
-        PostDeleteFailureKind.BROWSER_LAUNCH -> "The authorization browser could not be opened."
-        PostDeleteFailureKind.CALLBACK -> "The authorization callback could not be completed."
-        PostDeleteFailureKind.AUTHORIZATION -> "Reddit did not grant the permission required to delete this post."
-        PostDeleteFailureKind.SESSION -> "The Reddit session could not be refreshed."
+        PostDeleteFailureKind.CONFIGURATION -> stringResource(R.string.scr_post_delete_2)
+        PostDeleteFailureKind.ACCOUNT_CHANGED -> stringResource(R.string.scr_post_delete_3)
+        PostDeleteFailureKind.NOT_OWNER -> stringResource(R.string.scr_post_delete_4)
+        PostDeleteFailureKind.BROWSER_LAUNCH -> stringResource(R.string.scr_post_delete_5)
+        PostDeleteFailureKind.CALLBACK -> stringResource(R.string.scr_post_delete_6)
+        PostDeleteFailureKind.AUTHORIZATION -> stringResource(R.string.scr_post_delete_7)
+        PostDeleteFailureKind.SESSION -> stringResource(R.string.scr_post_delete_8)
         PostDeleteFailureKind.RATE_LIMIT -> state.retryAfterMs?.let { retryAfterMs ->
-            "Reddit rate-limited the request. Try again in about ${(retryAfterMs / 1000L).coerceAtLeast(1L)} seconds."
-        } ?: "Reddit rate-limited the request. Try again shortly."
+            stringResource(R.string.scr_post_delete_rate_limited_seconds, (retryAfterMs / 1000L).coerceAtLeast(1L))
+        } ?: stringResource(R.string.scr_post_delete_10)
         PostDeleteFailureKind.HTTP -> state.httpStatusCode?.let { statusCode ->
-            "Reddit rejected the delete request (HTTP $statusCode)."
-        } ?: "Reddit rejected the delete request."
-        PostDeleteFailureKind.TRANSPORT -> "The delete request could not reach Reddit."
-        PostDeleteFailureKind.PROTOCOL -> "Reddit returned an unexpected response."
-        PostDeleteFailureKind.ALREADY_DELETING -> "A post deletion is already in progress."
-        PostDeleteFailureKind.OUTCOME_UNKNOWN -> "Reddit may have deleted the post."
-        PostDeleteFailureKind.NOT_DELETED -> "Reddit didn't delete the post."
-        null -> "The post could not be deleted."
+            stringResource(R.string.scr_post_delete_http, statusCode)
+        } ?: stringResource(R.string.scr_post_delete_12)
+        PostDeleteFailureKind.TRANSPORT -> stringResource(R.string.scr_post_delete_13)
+        PostDeleteFailureKind.PROTOCOL -> stringResource(R.string.scr_post_delete_14)
+        PostDeleteFailureKind.ALREADY_DELETING -> stringResource(R.string.scr_post_delete_15)
+        PostDeleteFailureKind.OUTCOME_UNKNOWN -> stringResource(R.string.scr_post_delete_16)
+        PostDeleteFailureKind.NOT_DELETED -> stringResource(R.string.scr_post_delete_17)
+        null -> stringResource(R.string.scr_post_delete_18)
     }
-    else -> "This permanently deletes your post from Reddit. This can't be undone."
+    else -> stringResource(R.string.scr_post_delete_19)
 }
 
 @Composable
@@ -3805,51 +3808,52 @@ private fun LiveCommentStatus(
     }
 }
 
+@Composable
 private fun commentDeleteDialogMessage(state: CommentDeleteUiState): String = when (state.phase) {
     CommentDeletePhase.IDLE ->
-        "This permanently deletes your comment from Reddit. Replies to it will remain."
+        stringResource(R.string.scr_comment_delete_1)
     CommentDeletePhase.AUTHORIZATION_REQUIRED ->
-        "subshell needs Reddit's edit permission before it can delete this comment."
+        stringResource(R.string.scr_comment_delete_2)
     CommentDeletePhase.AUTHORIZING ->
-        "Opening Reddit authorization…"
+        stringResource(R.string.scr_comment_delete_3)
     CommentDeletePhase.AWAITING_CALLBACK ->
-        "Waiting for Reddit authorization…"
+        stringResource(R.string.scr_comment_delete_4)
     CommentDeletePhase.SENDING ->
-        "Deleting the comment from Reddit…"
+        stringResource(R.string.scr_comment_delete_5)
     CommentDeletePhase.SUCCEEDED ->
-        "Comment deleted."
+        stringResource(R.string.scr_comment_delete_6)
     CommentDeletePhase.FAILED -> when (state.failureKind) {
         CommentDeleteFailureKind.CONFIGURATION ->
-            "Comment deletion is not configured for this account."
+            stringResource(R.string.scr_comment_delete_7)
         CommentDeleteFailureKind.ACCOUNT_CHANGED ->
-            "The active account changed before the comment could be deleted."
+            stringResource(R.string.scr_comment_delete_8)
         CommentDeleteFailureKind.NOT_OWNER ->
-            "Only comments authored by the active account can be deleted."
+            stringResource(R.string.scr_comment_delete_9)
         CommentDeleteFailureKind.BROWSER_LAUNCH ->
-            "Reddit authorization could not be opened."
+            stringResource(R.string.scr_comment_delete_10)
         CommentDeleteFailureKind.CALLBACK ->
-            "Reddit authorization did not complete."
+            stringResource(R.string.scr_comment_delete_11)
         CommentDeleteFailureKind.AUTHORIZATION ->
-            "Reddit did not grant the permission required to delete this comment."
+            stringResource(R.string.scr_comment_delete_12)
         CommentDeleteFailureKind.SESSION ->
-            "The Reddit session needs attention before this comment can be deleted."
+            stringResource(R.string.scr_comment_delete_13)
         CommentDeleteFailureKind.RATE_LIMIT ->
-            "Reddit rate-limited the delete request. Try again shortly."
+            stringResource(R.string.scr_comment_delete_14)
         CommentDeleteFailureKind.HTTP ->
             state.httpStatusCode?.let { code ->
-                "Reddit returned HTTP $code while deleting the comment."
-            } ?: "Reddit rejected the delete request."
+                stringResource(R.string.scr_comment_delete_http, code)
+            } ?: stringResource(R.string.scr_comment_delete_16)
         CommentDeleteFailureKind.TRANSPORT ->
-            "Reddit could not be reached. The comment was not deleted."
+            stringResource(R.string.scr_comment_delete_17)
         CommentDeleteFailureKind.PROTOCOL ->
-            "The delete request or Reddit response was not valid."
+            stringResource(R.string.scr_comment_delete_18)
         CommentDeleteFailureKind.OUTCOME_NOT_CONFIRMED ->
             // LOWUI_DELETE_NOT_CONFIRMED_SAYS_MAY_V1 (OCB-172)
-            "Reddit may have received the delete request, but subshell could not confirm that the comment was deleted. Check the thread before trying again."
+            stringResource(R.string.scr_comment_delete_19)
         CommentDeleteFailureKind.ALREADY_DELETING ->
-            "This comment is already being deleted."
+            stringResource(R.string.scr_comment_delete_20)
         null ->
-            "The comment could not be deleted."
+            stringResource(R.string.scr_comment_delete_21)
     }
 }
 
@@ -4424,11 +4428,12 @@ private fun CommentRow(
             } &&
             !threadVisual?.parentAuthor.isNullOrBlank()
         ) {
+            val replyingToDescription = stringResource(R.string.post_replying_to, threadVisual.parentAuthor.orEmpty())
             Text(
                 text = "↳ ${threadVisual.parentAuthor}",
                 modifier = Modifier
                     .padding(top = 4.dp, start = 2.dp)
-                    .semantics { contentDescription = "Replying to ${threadVisual.parentAuthor}" },
+                    .semantics { contentDescription = replyingToDescription },
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -4480,7 +4485,7 @@ private fun CommentRow(
                             .clip(MaterialTheme.shapes.medium)
                             // ISSUE219_INLINE_GIF_TOGGLE_IS_LABELLED_V1
                             .clickable(
-                                onClickLabel = if (state.activeAnimatedMediaId == comment.id) "Pause" else "Play",
+                                onClickLabel = stringResource(if (state.activeAnimatedMediaId == comment.id) R.string.comp_gif_pause else R.string.comp_gif_play),
                                 role = Role.Button,
                             ) {
                                 state.setActiveAnimatedMedia(
@@ -4545,7 +4550,6 @@ private fun CommentRow(
                 }
                 if (reportDialogVisible) {
                     RedditContentReportDialog(
-                        targetLabel = "comment",
                         communityName = post.community,
                         targetKind = RedditReportTargetKind.COMMENT,
                         state = state,
@@ -4768,7 +4772,7 @@ private fun CodeBlock(sample: CodeSample) {
                     onClick = {
                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                         clipboard.setPrimaryClip(ClipData.newPlainText("${sample.language} code", sample.source))
-                        notices.noticeCopied("Code")
+                        notices.noticeCopied(UiText.Resource(R.string.nt_copied_what_code))
                     },
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                 ) {
@@ -4961,7 +4965,7 @@ private fun CommentActionRow(
                     },
                 )
                 DropdownMenuItem(
-                    text = { Text(COPY_MENU_ENTRY_LABEL) },
+                    text = { Text(stringResource(COPY_MENU_ENTRY_LABEL)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Symbols.ContentCopy,
@@ -5056,15 +5060,21 @@ internal fun unsentCommentDraftConflictText(
     existing: CommentComposerDraft?,
     currentPostId: String,
     writtenWithAnotherAccount: Boolean,
-): String {
-    if (existing == null) return "You have an unsent reply."
-    val where = when {
-        existing.target.postId != currentPostId -> "on another post"
-        existing.target.isPostTarget -> "to this post"
-        else -> "to u/${existing.target.parentAuthor ?: "unknown"}"
+): UiText {
+    // TRANSLATE14: one whole sentence per place and account.
+    if (existing == null) return UiText.Resource(R.string.scr_unsent_reply)
+    return when {
+        existing.target.postId != currentPostId -> UiText.Resource(
+            if (writtenWithAnotherAccount) R.string.scr_unsent_reply_other_post_other_account else R.string.scr_unsent_reply_other_post,
+        )
+        existing.target.isPostTarget -> UiText.Resource(
+            if (writtenWithAnotherAccount) R.string.scr_unsent_reply_this_post_other_account else R.string.scr_unsent_reply_this_post,
+        )
+        else -> UiText.Resource(
+            if (writtenWithAnotherAccount) R.string.scr_unsent_reply_to_user_other_account else R.string.scr_unsent_reply_to_user,
+            existing.target.parentAuthor ?: "unknown",
+        )
     }
-    val account = if (writtenWithAnotherAccount) ", written with another account" else ""
-    return "You have an unsent reply $where$account. Discard it to start this one?"
 }
 
 // COMPOSER14_COMMENT_EDIT_KEPT_V1: the last copy of the comment being edited.

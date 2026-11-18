@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
@@ -37,7 +38,7 @@ class Issue39SwipeLabelComposeTest {
     private fun setSurface() {
         val downvote = voteSwipeActionVisual(
             direction = -1,
-            label = "Downvote",
+            label = UiText.Plain("Downvote"),
             palette = VoteColorPalette.RED_BLUE,
             mode = VoteControlMode.COMFORTABLE,
             enabled = true,

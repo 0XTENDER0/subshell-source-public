@@ -200,8 +200,9 @@ internal fun messageReplyErrorPresentation(
     canRefresh: Boolean = true,
 ): ErrorPresentation {
     // SUBSHELL_MESSAGES02C4R3R1_MESSAGE_REPLY_ERROR_PRESENTATION_PARITY_V1
-    val noun = if (directChat) "message" else "reply"
-    val nounTitle = if (directChat) UiText.Resource(R.string.error_write_message) else UiText.Resource(R.string.error_write_reply)
+    // TRANSLATE14_MESSAGE_AND_REPLY_ERRORS_ARE_WHOLE_SENTENCES_V1: a translation
+    // cannot inflect an English noun put into a sentence; one sentence per noun.
+    fun pick(message: Int, reply: Int): UiText = UiText.Resource(if (directChat) message else reply)
 
     // ISSUE303_AN_UNCLEAR_IMAGE_IS_NOT_CALLED_SENT_V1 (Pixel 11, 2026-11-14): an
     // image whose own send answer was unclear (no event id) said "Media sent;
@@ -254,8 +255,8 @@ internal fun messageReplyErrorPresentation(
 
     if (state.phase == MessageReplyPhase.OUTCOME_UNKNOWN) {
         return writeErrorPresentation(
-            title = UiText.Resource(R.string.error_write_may_have_been_sent, nounTitle),
-            message = UiText.Resource(R.string.error_write_reddit_may_have_received_this_refresh_the, noun),
+            title = pick(R.string.error_write_message_may_have_been_sent, R.string.error_write_reply_may_have_been_sent),
+            message = pick(R.string.error_write_may_have_received_message, R.string.error_write_may_have_received_reply),
             details = null,
             retryable = canRefresh,
             retryLabel = UiText.Resource(R.string.error_write_refresh),
@@ -285,7 +286,7 @@ internal fun messageReplyErrorPresentation(
         title = if (directChat) UiText.Resource(R.string.error_write_couldn_t_send_message) else UiText.Resource(R.string.error_write_couldn_t_send_reply),
         message = when (state.failureKind) {
             MessageReplyFailureKind.VALIDATION ->
-                UiText.Resource(R.string.error_write_review_the_and_try_again, noun)
+                pick(R.string.error_write_review_message, R.string.error_write_review_reply)
             MessageReplyFailureKind.CHAT_SESSION_REQUIRED ->
                 UiText.Resource(R.string.error_write_subshell_couldn_t_open_reddit_s_chat)
             MessageReplyFailureKind.CHAT_WEB_SIGN_IN_EXPIRED ->
@@ -303,15 +304,15 @@ internal fun messageReplyErrorPresentation(
             MessageReplyFailureKind.MEDIA_AUTHORIZATION_REQUIRED ->
                 UiText.Resource(R.string.error_write_reddit_media_access_is_required_to_send)
             MessageReplyFailureKind.AUTHORIZATION_REQUIRED ->
-                UiText.Resource(R.string.error_write_the_reddit_sign_in_for_this_account_2, noun)
+                pick(R.string.error_write_sign_in_before_message, R.string.error_write_sign_in_before_reply)
             MessageReplyFailureKind.RATE_LIMIT ->
-                UiText.Resource(R.string.error_write_reddit_asked_you_to_wait_before_sending, noun)
+                pick(R.string.error_write_wait_before_message, R.string.error_write_wait_before_reply)
             MessageReplyFailureKind.API ->
-                UiText.Resource(R.string.error_write_reddit_rejected_the, noun)
+                pick(R.string.error_write_rejected_message, R.string.error_write_rejected_reply)
             MessageReplyFailureKind.HTTP ->
-                UiText.Resource(R.string.error_write_reddit_rejected_the_request, noun)
+                pick(R.string.error_write_rejected_message_request, R.string.error_write_rejected_reply_request)
             MessageReplyFailureKind.TRANSPORT ->
-                UiText.Resource(R.string.error_write_subshell_couldn_t_reach_reddit_to_send, noun)
+                pick(R.string.error_write_could_not_reach_message, R.string.error_write_could_not_reach_reply)
             MessageReplyFailureKind.SESSION ->
                 UiText.Resource(R.string.error_write_the_reddit_sign_in_for_this_account)
             // LOWUI4 (OCB-171): not reached; MessageReplyCoordinator turns this
@@ -320,9 +321,9 @@ internal fun messageReplyErrorPresentation(
             MessageReplyFailureKind.OUTCOME_UNKNOWN ->
                 UiText.Resource(R.string.error_write_reddit_returned_a_send_result_subshell_couldn)
             MessageReplyFailureKind.UNAVAILABLE ->
-                UiText.Resource(R.string.error_write_sending_is_unavailable_for_this_conversation, nounTitle)
+                pick(R.string.error_write_message_sending_unavailable, R.string.error_write_reply_sending_unavailable)
             null ->
-                UiText.Resource(R.string.error_write_the_couldn_t_be_sent, noun)
+                pick(R.string.error_write_message_not_sent, R.string.error_write_reply_not_sent)
         },
         details = state.failureDetails,
         retryable = false,

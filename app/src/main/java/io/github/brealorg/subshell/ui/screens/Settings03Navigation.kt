@@ -120,26 +120,30 @@ internal fun settingsSectionVisible(
     }
 }
 
+// TRANSLATE14_SETTINGS_SECTION_TITLES_ARE_RESOURCE_IDS_V1: the mapping
+// compared shown (translated) titles with English words, so it missed in
+// every other language; it maps resource ids now.
+@androidx.annotation.StringRes
 internal fun settingsSectionTitle(
     destination: SettingsDestination,
-    legacySection: String,
-): String = when (destination) {
+    @androidx.annotation.StringRes legacySection: Int,
+): Int = when (destination) {
     SettingsDestination.APPEARANCE -> when (legacySection) {
-        "Appearance" -> "Theme & style"
-        "Accessibility" -> "Motion"
+        R.string.all_appearance -> R.string.set_section_theme_style
+        R.string.all_accessibility -> R.string.set_section_motion
         else -> legacySection
     }
     SettingsDestination.NAVIGATION -> when (legacySection) {
-        "Home & feeds" -> "Navigation bars"
-        "Navigation" -> "Controls & side menu"
+        R.string.all_home_feeds -> R.string.set_section_navigation_bars
+        R.string.all_navigation -> R.string.set_section_controls_side_menu
         else -> legacySection
     }
     SettingsDestination.FEEDS ->
-        if (legacySection == "Privacy") "Hidden communities" else "Feed & content"
+        if (legacySection == R.string.all_privacy) R.string.set_section_hidden_communities else R.string.set_section_feed_content
     SettingsDestination.ACCOUNTS ->
-        if (legacySection == "Reddit connection") "Connection" else legacySection
+        if (legacySection == R.string.all_reddit_connection) R.string.set_section_connection else legacySection
     SettingsDestination.ADVANCED ->
-        if (legacySection == "Developer states") "Developer" else legacySection
+        if (legacySection == R.string.all_developer_states) R.string.set_section_developer else legacySection
     else -> legacySection
 }
 

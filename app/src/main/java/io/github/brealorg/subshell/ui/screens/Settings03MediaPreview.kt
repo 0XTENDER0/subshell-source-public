@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
@@ -152,7 +153,7 @@ private fun UnifiedMediaPreviewSample(
 
     // LOWUI4_MEDIA_PREVIEW_USES_ITS_TESTED_RULES_V1 (OCB-261): the preview
     // renders through the tested label and caption rules (NEVER reads "Manual").
-    val autoplayLabel = mediaPreviewAutoplayLabel(videoAutoplay)
+    val autoplayLabel = mediaPreviewAutoplayLabel(videoAutoplay).asString()
     val timelineHeight = when {
         videoTimelineSize.name.contains("COMPACT", ignoreCase = true) -> 2.dp
         videoTimelineSize.name.contains("LARGE", ignoreCase = true) -> 6.dp
@@ -562,10 +563,10 @@ private fun FjordPreviewBackdrop(
 
 internal fun mediaPreviewAutoplayLabel(
     value: VideoAutoplay,
-): String = when (value) {
-    VideoAutoplay.ALWAYS -> "Auto"
-    VideoAutoplay.WIFI_ONLY -> "Wi-Fi"
-    VideoAutoplay.NEVER -> "Manual"
+): UiText = when (value) {
+    VideoAutoplay.ALWAYS -> UiText.Resource(R.string.set_autoplay_preview_auto)
+    VideoAutoplay.WIFI_ONLY -> UiText.Resource(R.string.set_autoplay_preview_wifi)
+    VideoAutoplay.NEVER -> UiText.Resource(R.string.set_autoplay_preview_manual)
 }
 
 internal fun mediaPreviewFullscreenCaptionVisible(

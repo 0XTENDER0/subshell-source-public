@@ -1,11 +1,14 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.ui.s
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import io.github.brealorg.subshell.ui.screens.formatRecentCommunityAge
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class CommunityRecentPersistenceTest {
     @Test
     fun openingCommunityRecordsNewestFirstAndPersistsByStableAccountId() {
@@ -164,11 +167,11 @@ class CommunityRecentPersistenceTest {
         val minute = 60_000L
         val now = 10L * 24L * 60L * minute
 
-        assertEquals("Just now", formatRecentCommunityAge(now - 30_000L, now))
-        assertEquals("18 min ago", formatRecentCommunityAge(now - 18L * minute, now))
-        assertEquals("3 h ago", formatRecentCommunityAge(now - 3L * 60L * minute, now))
-        assertEquals("Yesterday", formatRecentCommunityAge(now - 30L * 60L * minute, now))
-        assertEquals("3 d ago", formatRecentCommunityAge(now - 3L * 24L * 60L * minute, now))
+        assertEquals("Just now", formatRecentCommunityAge(now - 30_000L, now).s)
+        assertEquals("18 min ago", formatRecentCommunityAge(now - 18L * minute, now).s)
+        assertEquals("3 h ago", formatRecentCommunityAge(now - 3L * 60L * minute, now).s)
+        assertEquals("Yesterday", formatRecentCommunityAge(now - 30L * 60L * minute, now).s)
+        assertEquals("3 d ago", formatRecentCommunityAge(now - 3L * 24L * 60L * minute, now).s)
     }
 
 }

@@ -59,8 +59,8 @@ internal fun communityMuteStatusText(
     mute: CommunityMute,
     nowEpochMillis: Long,
 ): String {
-    val expiry = mute.expiresAtEpochMillis ?: return "Muted indefinitely"
-    if (expiry <= nowEpochMillis) return "Mute expired"
+    val expiry = mute.expiresAtEpochMillis ?: return context.getString(R.string.comp_muted_indefinitely)
+    if (expiry <= nowEpochMillis) return context.getString(R.string.comp_mute_expired)
     val formatted = DateUtils.formatDateTime(
         context,
         expiry,
@@ -69,25 +69,26 @@ internal fun communityMuteStatusText(
             DateUtils.FORMAT_SHOW_TIME or
             DateUtils.FORMAT_ABBREV_MONTH,
     )
-    return "Muted until $formatted"
+    return context.getString(R.string.comp_muted_until, formatted)
 }
 
+@androidx.compose.runtime.Composable
 internal fun communityMuteRemainingText(
     mute: CommunityMute,
     nowEpochMillis: Long,
 ): String {
-    val expiry = mute.expiresAtEpochMillis ?: return "Until you unmute it"
+    val expiry = mute.expiresAtEpochMillis ?: return stringResource(R.string.comp_mute_remaining_1)
     val remainingMillis = (expiry - nowEpochMillis).coerceAtLeast(0L)
     val totalMinutes = ((remainingMillis + 59_999L) / 60_000L).coerceAtLeast(1L)
     val days = totalMinutes / (24L * 60L)
     val hours = (totalMinutes % (24L * 60L)) / 60L
     val minutes = totalMinutes % 60L
     return when {
-        days > 0L && hours > 0L -> "${days}d ${hours}h remaining"
-        days > 0L -> "${days}d remaining"
-        hours > 0L && minutes > 0L -> "${hours}h ${minutes}m remaining"
-        hours > 0L -> "${hours}h remaining"
-        else -> "${minutes}m remaining"
+        days > 0L && hours > 0L -> stringResource(R.string.comp_mute_remaining_days_hours, days, hours)
+        days > 0L -> stringResource(R.string.comp_mute_remaining_days, days)
+        hours > 0L && minutes > 0L -> stringResource(R.string.comp_mute_remaining_hours_minutes, hours, minutes)
+        hours > 0L -> stringResource(R.string.comp_mute_remaining_hours, hours)
+        else -> stringResource(R.string.comp_mute_remaining_minutes, minutes)
     }
 }
 
@@ -200,9 +201,9 @@ fun CommunityMuteSheet(
                 .forEach { preset ->
                     ListItem(
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                        content = { Text(preset.label) },
+                        content = { Text(stringResource(preset.labelRes)) },
                         supportingContent = {
-                            Text(stringResource(R.string.comp_automatically_unmute_after, preset.label.lowercase()))
+                            preset.unmuteAfterRes?.let { Text(stringResource(it)) }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -226,7 +227,7 @@ fun CommunityMuteSheet(
 
             ListItem(
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                content = { Text(CommunityMutePreset.INDEFINITE.label) },
+                content = { Text(stringResource(CommunityMutePreset.INDEFINITE.labelRes)) },
                 supportingContent = { Text(stringResource(R.string.comp_keep_muted_until_you_unmute_it)) },
                 modifier = Modifier
                     .fillMaxWidth()

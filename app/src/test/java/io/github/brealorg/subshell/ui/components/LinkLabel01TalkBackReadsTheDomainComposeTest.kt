@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import android.graphics.Bitmap
 import androidx.compose.foundation.lazy.LazyColumn
@@ -110,12 +111,12 @@ class LinkLabel01TalkBackReadsTheDomainComposeTest {
 
     @Test
     fun otherPostsKeepTheirLabelAndALinkWithoutADomainNamesTheShortAddress() {
-        assertEquals("Link preview, fukurami.github.io", postMediaDescription(linkPost))
-        val noDomain = postMediaDescription(linkPost.copy(domain = null))
+        assertEquals("Link preview, fukurami.github.io", postMediaDescription(linkPost).s)
+        val noDomain = postMediaDescription(linkPost.copy(domain = null)).s
         assertFalse(noDomain, noDomain.contains(queryPart))
-        assertEquals("Link preview, https://example.org/a", postMediaDescription(linkPost.copy(domain = " ", mediaLabel = "https://example.org/a")))
-        assertEquals("url test again", postMediaDescription(linkPost.copy(domain = null, mediaLabel = "")))
-        assertEquals("Image", postMediaDescription(linkPost.copy(kind = PostKind.IMAGE, mediaLabel = "Image")))
-        assertEquals("url test again", postMediaDescription(linkPost.copy(kind = PostKind.TEXT, mediaLabel = "")))
+        assertEquals("Link preview, https://example.org/a", postMediaDescription(linkPost.copy(domain = " ", mediaLabel = "https://example.org/a")).s)
+        assertEquals("url test again", postMediaDescription(linkPost.copy(domain = null, mediaLabel = "")).s)
+        assertEquals("Image", postMediaDescription(linkPost.copy(kind = PostKind.IMAGE, mediaLabel = "Image")).s)
+        assertEquals("url test again", postMediaDescription(linkPost.copy(kind = PostKind.TEXT, mediaLabel = "")).s)
     }
 }

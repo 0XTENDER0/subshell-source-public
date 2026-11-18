@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.s
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -109,9 +110,9 @@ class Issue268YourReadingComposeTest {
 
     @Test
     fun durationsReadLikeAClock() {
-        assertEquals("under a minute", readingDurationLabel(59))
-        assertEquals("12 min", readingDurationLabel(12 * 60 + 30))
-        assertEquals("2 h", readingDurationLabel(120 * 60))
-        assertEquals("1 h 5 min", readingDurationLabel(65 * 60))
+        assertEquals("under a minute", readingDurationLabel(59).s)
+        assertEquals("12 min", readingDurationLabel(12 * 60 + 30).s)
+        assertEquals("2 h", readingDurationLabel(120 * 60).s)
+        assertEquals("1 h 5 min", readingDurationLabel(65 * 60).s)
     }
 }

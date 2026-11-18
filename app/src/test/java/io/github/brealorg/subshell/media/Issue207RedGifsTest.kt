@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.media
 
+import io.github.brealorg.subshell.ui.s
 import android.net.Uri
 import androidx.media3.datasource.DataSpec
 import io.github.brealorg.subshell.data.network.SubshellNetworkJson
@@ -125,7 +126,7 @@ class Issue207RedGifsTest {
                 ),
             ),
         )
-        assertEquals("Clip not available", copy.title)
+        assertEquals("Clip not available", copy.title.s)
     }
 
     @Test

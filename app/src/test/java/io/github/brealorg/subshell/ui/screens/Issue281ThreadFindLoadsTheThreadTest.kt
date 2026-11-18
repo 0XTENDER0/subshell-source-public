@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -110,12 +111,12 @@ class Issue281ThreadFindLoadsTheThreadTest {
         assertNull(threadFindNextMoreNode(thread, blocked = setOf("more_a", "more_root")))
         assertEquals(
             "Loading the rest of the thread · searched 2 of 17",
-            threadFindCoverageLabel(loadedComments = 2, totalComments = 17, loading = true),
+            threadFindCoverageLabel(loadedComments = 2, totalComments = 17, loading = true).s,
         )
         // Reddit's count is only the upper end; never fewer than what is loaded.
         assertEquals(
             "Searched 2 of 2 comments",
-            threadFindCoverageLabel(loadedComments = 2, totalComments = 1, loading = false),
+            threadFindCoverageLabel(loadedComments = 2, totalComments = 1, loading = false).s,
         )
     }
 

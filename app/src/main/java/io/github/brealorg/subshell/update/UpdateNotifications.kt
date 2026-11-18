@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.ui.UiText
 import androidx.compose.ui.res.stringResource
 import android.Manifest
 import android.app.NotificationChannel
@@ -43,10 +44,10 @@ internal object UpdateNotificationCenter {
         manager.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_ID,
-                "App updates",
+                appContext.getString(R.string.update_channel_name),
                 NotificationManager.IMPORTANCE_DEFAULT,
             ).apply {
-                description = "New subshell releases"
+                description = appContext.getString(R.string.update_channel_description)
             },
         )
     }
@@ -90,8 +91,8 @@ internal object UpdateNotificationCenter {
 
         val notification = NotificationCompat.Builder(appContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification_subshell)
-            .setContentTitle(updateNotificationTitle(release, currentVersionCode))
-            .setContentText(updateNotificationText(release, currentVersionCode))
+            .setContentTitle(updateNotificationTitle(release, currentVersionCode).resolve(appContext))
+            .setContentText(updateNotificationText(release, currentVersionCode).resolve(appContext))
             .setStyle(
                 NotificationCompat.BigTextStyle().bigText(
                     // UPDATE09_KNOWN_BAD_VERSION_ADVISORY_V1
@@ -142,16 +143,16 @@ internal fun appNotificationSettingsIntent(context: Context): Intent =
     Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
         .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
 
-internal fun updateNotificationTitle(release: UpdateManifestRelease, currentVersionCode: Int): String =
+internal fun updateNotificationTitle(release: UpdateManifestRelease, currentVersionCode: Int): UiText =
     if (release.advisoryFor(currentVersionCode) != null) {
-        "Known problem in your subshell version"
+        UiText.Resource(R.string.update_notification_known_problem)
     } else {
-        "subshell update available"
+        UiText.Resource(R.string.update_notification_available)
     }
 
-internal fun updateNotificationText(release: UpdateManifestRelease, currentVersionCode: Int): String =
+internal fun updateNotificationText(release: UpdateManifestRelease, currentVersionCode: Int): UiText =
     if (release.advisoryFor(currentVersionCode) != null) {
-        "${release.versionName} fixes it"
+        UiText.Resource(R.string.update_notification_fixes_it, release.versionName)
     } else {
-        "${release.versionName} is ready"
+        UiText.Resource(R.string.update_notification_ready, release.versionName)
     }

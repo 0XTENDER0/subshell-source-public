@@ -82,7 +82,7 @@ fun BackupFolderOnboarding(
         text = {
             if (failurePresentation == null) {
                 Text(
-                    "subshell already keeps automatic settings history on this device. Choose a folder outside the app so it survives uninstalling or clearing app data. We recommend creating a folder named subshell Backups in Documents.",
+                    stringResource(R.string.scr_subshell_already_keeps_automatic_settings_history),
                 )
             } else {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -93,7 +93,7 @@ fun BackupFolderOnboarding(
         },
         confirmButton = {
             TextButton(onClick = { folderLauncher.launch(null) }) {
-                Text(if (failurePresentation == null) "Choose backup folder" else "Try again")
+                Text(if (failurePresentation == null) stringResource(R.string.scr_choose_backup_folder) else stringResource(R.string.scr_try_again))
             }
         },
         dismissButton = {

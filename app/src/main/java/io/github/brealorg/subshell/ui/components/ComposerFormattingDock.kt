@@ -27,33 +27,33 @@ import io.github.brealorg.subshell.ui.symbols.Symbols
 
 private data class ComposerFormatAction(
     val action: MarkdownAction,
-    val label: String,
+    @androidx.annotation.StringRes val labelRes: Int,
     val icon: ImageVector,
 )
 
 private val composerFormatActions = listOf(
-    ComposerFormatAction(MarkdownAction.BOLD, "Bold", Symbols.FormatBold),
-    ComposerFormatAction(MarkdownAction.ITALIC, "Italic", Symbols.FormatItalic),
-    ComposerFormatAction(MarkdownAction.LINK, "Link", Symbols.Link),
-    ComposerFormatAction(MarkdownAction.CODE_BLOCK, "Code block", Symbols.Code),
-    ComposerFormatAction(MarkdownAction.QUOTE, "Quote", Symbols.FormatQuote),
+    ComposerFormatAction(MarkdownAction.BOLD, R.string.comp_format_bold, Symbols.FormatBold),
+    ComposerFormatAction(MarkdownAction.ITALIC, R.string.comp_format_italic, Symbols.FormatItalic),
+    ComposerFormatAction(MarkdownAction.LINK, R.string.comp_format_link, Symbols.Link),
+    ComposerFormatAction(MarkdownAction.CODE_BLOCK, R.string.comp_format_code_block, Symbols.Code),
+    ComposerFormatAction(MarkdownAction.QUOTE, R.string.comp_format_quote, Symbols.FormatQuote),
     ComposerFormatAction(
         MarkdownAction.BULLET_LIST,
-        "Bulleted list",
+        R.string.comp_format_bulleted_list,
         Symbols.FormatListBulleted,
     ),
     ComposerFormatAction(
         MarkdownAction.NUMBERED_LIST,
-        "Numbered list",
+        R.string.comp_format_numbered_list,
         Symbols.FormatListNumbered,
     ),
     ComposerFormatAction(
         MarkdownAction.STRIKETHROUGH,
-        "Strikethrough",
+        R.string.comp_format_strikethrough,
         Symbols.StrikethroughS,
     ),
-    ComposerFormatAction(MarkdownAction.INLINE_CODE, "Inline code", Symbols.Code),
-    ComposerFormatAction(MarkdownAction.SPOILER, "Spoiler", Symbols.VisibilityOff),
+    ComposerFormatAction(MarkdownAction.INLINE_CODE, R.string.comp_format_inline_code, Symbols.Code),
+    ComposerFormatAction(MarkdownAction.SPOILER, R.string.comp_format_spoiler, Symbols.VisibilityOff),
 )
 
 /** Undo and redo, then the first four formats; the rest go to "More formatting". */
@@ -67,6 +67,8 @@ internal const val COMPOSER_FORMATTING_VISIBLE_ITEMS = 6
  */
 @OptIn(ExperimentalFoundationApi::class)
 internal fun AppBarRowScope.composerFormattingItems(
+    // TRANSLATE14: the row's labels are read here (this scope is not composable).
+    resources: android.content.res.Resources,
     state: TextFieldState,
     enabled: Boolean,
     onFormat: (MarkdownAction) -> Unit,
@@ -78,7 +80,7 @@ internal fun AppBarRowScope.composerFormattingItems(
             state.undoState.undo()
         },
         icon = { Icon(Symbols.Undo, contentDescription = stringResource(R.string.comp_undo)) },
-        label = "Undo",
+        label = resources.getString(R.string.comp_undo),
         enabled = enabled && state.undoState.canUndo,
     )
     clickableItem(
@@ -87,7 +89,7 @@ internal fun AppBarRowScope.composerFormattingItems(
             state.undoState.redo()
         },
         icon = { Icon(Symbols.Redo, contentDescription = stringResource(R.string.comp_redo)) },
-        label = "Redo",
+        label = resources.getString(R.string.comp_redo),
         enabled = enabled && state.undoState.canRedo,
     )
     composerFormatActions.forEach { item ->
@@ -96,8 +98,8 @@ internal fun AppBarRowScope.composerFormattingItems(
                 onReturnToEditor()
                 onFormat(item.action)
             },
-            icon = { Icon(item.icon, contentDescription = item.label) },
-            label = item.label,
+            icon = { Icon(item.icon, contentDescription = resources.getString(item.labelRes)) },
+            label = resources.getString(item.labelRes),
             enabled = enabled,
         )
     }
@@ -131,6 +133,7 @@ fun ComposerFormattingDock(
         // bottom app bar, not the legacy background role with a 10 dp shadow.
         color = MaterialTheme.colorScheme.surfaceContainer,
     ) {
+        val formattingResources = androidx.compose.ui.platform.LocalResources.current
         AppBarRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -145,6 +148,7 @@ fun ComposerFormattingDock(
             maxItemCount = COMPOSER_FORMATTING_VISIBLE_ITEMS + 1,
         ) {
             composerFormattingItems(
+                resources = formattingResources,
                 state = state,
                 enabled = enabled,
                 onFormat = onFormat,

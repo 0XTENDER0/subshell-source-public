@@ -29,6 +29,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import io.github.brealorg.subshell.data.account.RedditCommunityWikiUiFailureKind
 import io.github.brealorg.subshell.data.account.RedditCommunityWikiUiState
@@ -62,7 +66,21 @@ internal fun communityWikiPageGroups(
     )
 }
 
-private fun communityWikiConfigurationPath(path: String): Boolean {
+internal const val WIKI_CONFIGURATION_TEXT_TEST_TAG = "wiki-configuration-text"
+
+/** The page (or the Wiki) on reddit.com, which shows Reddit's new Wiki. */
+internal fun communityWikiWebUrl(communityName: String, pagePath: String?): String =
+    "https://www.reddit.com/r/$communityName/wiki/" + (pagePath?.trim()?.trimStart('/') ?: "")
+
+@Composable
+private fun OpenWikiOnRedditButton(url: String) {
+    val context = LocalContext.current
+    TextButton(onClick = { openRedditPageInBrowser(context, url) }) {
+        Text(stringResource(R.string.comp_open_wiki_on_reddit))
+    }
+}
+
+internal fun communityWikiConfigurationPath(path: String): Boolean {
     val normalized = path.trim().lowercase()
     return normalized.startsWith("config/") ||
         normalized == "automoderator-schedule" ||
@@ -72,6 +90,8 @@ private fun communityWikiConfigurationPath(path: String): Boolean {
 
 internal fun LazyListScope.communityWikiItems(
     state: RedditCommunityWikiUiState,
+    // WIKI03_THE_NEW_WIKI_IS_NAMED_V1: for "Open on reddit.com".
+    communityName: String,
     matches: Boolean,
     selectedPagePath: String?,
     showConfigurationPages: Boolean,
@@ -109,6 +129,7 @@ internal fun LazyListScope.communityWikiItems(
         item("wiki-failure-${failure.name}") {
             CommunityWikiFailure(
                 kind = failure,
+                webUrl = communityWikiWebUrl(communityName, selectedPagePath),
                 httpStatusCode = state.failureHttpStatusCode,
                 details = state.failureDetails,
                 retryable = state.failureRetryable,
@@ -162,6 +183,9 @@ internal fun LazyListScope.communityWikiItems(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+                // WIKI03_THE_NEW_WIKI_IS_NAMED_V1: Reddit's API reads the old Wiki;
+                // a page edited on reddit.com after the Wiki moved can differ.
+                OpenWikiOnRedditButton(communityWikiWebUrl(communityName, page.path))
             }
         }
 
@@ -171,6 +195,19 @@ internal fun LazyListScope.communityWikiItems(
                     title = stringResource(R.string.comp_empty_wiki_page),
                     message = stringResource(R.string.all_reddit_returned_this_wiki_page_without_markdown),
                 )
+            } else if (communityWikiConfigurationPath(page.path)) {
+                // WIKI03_CONFIGURATION_PAGES_READ_AS_TEXT_V1: AutoModerator's YAML and the
+                // other config pages are code, not Markdown: as Markdown a "# comment"
+                // became a heading and the indentation was lost.
+                SelectionContainer {
+                    Text(
+                        text = page.markdown,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(WIKI_CONFIGURATION_TEXT_TEST_TAG),
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                    )
+                }
             } else {
                 MarkdownText(
                     text = page.markdown,
@@ -220,10 +257,12 @@ internal fun LazyListScope.communityWikiItems(
 
     if (groups.pages.isEmpty()) {
         item("wiki-readable-pages-empty") {
+            // WIKI03_THE_NEW_WIKI_IS_NAMED_V1: a community whose Wiki lives in Reddit's
+            // new Wiki shows only its configuration pages here (seen in r/subshell).
             CommunityWikiNotice(
                 title = stringResource(R.string.comp_no_general_wiki_pages),
-                message =
-                    stringResource(R.string.all_this_wiki_only_returned_configuration_or_moderation),
+                message = stringResource(R.string.comp_wiki_index_new_system),
+                action = { OpenWikiOnRedditButton(communityWikiWebUrl(communityName, null)) },
             )
         }
     } else {
@@ -355,7 +394,7 @@ private fun CommunityWikiAuthorization(
             )
             Text(
                 text =
-                    "Reddit requires separate permission to read community Wiki pages. This permission is read-only.",
+                    stringResource(R.string.comp_reddit_requires_separate_permission_to_read),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -397,6 +436,7 @@ private fun CommunityWikiLoading(label: String) {
 @Composable
 private fun CommunityWikiFailure(
     kind: RedditCommunityWikiUiFailureKind,
+    webUrl: String,
     httpStatusCode: Int?,
     // BLOCKPAGE02_SMALLER_READ_SURFACES_NAME_THE_BLOCK_PAGE_V1
     details: io.github.brealorg.subshell.data.error.FailureDetails?,
@@ -408,8 +448,8 @@ private fun CommunityWikiFailure(
     when (kind) {
         RedditCommunityWikiUiFailureKind.UNAVAILABLE -> {
             title = stringResource(R.string.comp_wiki_unavailable)
-            message =
-                stringResource(R.string.all2_this_community_wiki_is_unavailable_through_reddit)
+            // WIKI03_THE_NEW_WIKI_IS_NAMED_V1
+            message = stringResource(R.string.comp_wiki_page_new_system)
         }
         RedditCommunityWikiUiFailureKind.CLIENT_CONFIGURATION -> {
             title = stringResource(R.string.comp_wiki_unavailable)
@@ -425,7 +465,7 @@ private fun CommunityWikiFailure(
         }
         RedditCommunityWikiUiFailureKind.TRANSPORT -> {
             title = stringResource(R.string.comp_couldn_t_reach_reddit)
-            message = "subshell couldn't reach Reddit while loading this Wiki."
+            message = stringResource(R.string.comp_subshell_couldn_t_reach_reddit_while)
         }
         RedditCommunityWikiUiFailureKind.PROTOCOL -> {
             title = stringResource(R.string.comp_couldn_t_read_wiki)
@@ -434,13 +474,19 @@ private fun CommunityWikiFailure(
         }
     }
 
+    val openOnReddit = kind == RedditCommunityWikiUiFailureKind.UNAVAILABLE
     CommunityWikiNotice(
         title = title,
         message = message,
-        action = if (retryable && onRetry != null) {
+        action = if ((retryable && onRetry != null) || openOnReddit) {
             {
-                TextButton(onClick = onRetry) {
-                    Text(stringResource(R.string.comp_retry))
+                Row {
+                    if (retryable && onRetry != null) {
+                        TextButton(onClick = onRetry) {
+                            Text(stringResource(R.string.comp_retry))
+                        }
+                    }
+                    if (openOnReddit) OpenWikiOnRedditButton(webUrl)
                 }
             }
         } else {

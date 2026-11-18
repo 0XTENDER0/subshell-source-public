@@ -70,7 +70,7 @@ private fun feedsSettingsPreviewStatusLabel(
     FeedsSettingsPreviewFocus.UNREAD ->
         if (snapshot.showUnreadMarker) stringResource(R.string.all_unread_on) else stringResource(R.string.all_unread_off)
     FeedsSettingsPreviewFocus.NSFW ->
-        if (snapshot.showNsfwPosts) "NSFW shown" else "NSFW hidden"
+        if (snapshot.showNsfwPosts) stringResource(R.string.scr_nsfw_shown) else stringResource(R.string.scr_nsfw_hidden)
     FeedsSettingsPreviewFocus.MUTED_COMMUNITY ->
         stringResource(snapshot.mutedCommunityDirectViewMode.labelRes)
 }
@@ -255,7 +255,7 @@ private fun FeedsPreviewHomeCanvas(
                     style = MaterialTheme.typography.labelLarge,
                 )
                 Text(
-                    if (nsfwMode) "NSFW visibility" else stringResource(R.string.all_unread_marker),
+                    if (nsfwMode) stringResource(R.string.scr_nsfw_visibility) else stringResource(R.string.all_unread_marker),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -386,7 +386,7 @@ private fun FeedPreviewSuppressedPost() {
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             Text(
-                "NSFW post hidden",
+                stringResource(R.string.scr_nsfw_post_hidden),
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.SemiBold,
                 ),

@@ -269,7 +269,7 @@ private fun FailureDetailsTable(
             add(item.label to item.value)
         }
         if (details?.retryable == null) {
-            add(stringResource(R.string.all_retryable) to if (retryAvailable) "Yes" else stringResource(R.string.all_not_available))
+            add(stringResource(R.string.all_retryable) to if (retryAvailable) stringResource(R.string.all_yes) else stringResource(R.string.all_not_available))
         }
     }
 

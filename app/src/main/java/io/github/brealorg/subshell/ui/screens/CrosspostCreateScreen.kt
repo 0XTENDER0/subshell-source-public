@@ -254,7 +254,7 @@ internal fun CrosspostCreateScreen(
                     if (draft.community.isNotBlank()) {
                         TextButton(enabled = !editingBlocked, onClick = ::refreshPolicy) { Text(stringResource(R.string.scr_refresh_posting_requirements)) }
                     }
-                    if (snapshot?.status == ComposerPolicyStatus.LOADING) Text("Checking destination requirements…")
+                    if (snapshot?.status == ComposerPolicyStatus.LOADING) Text(stringResource(R.string.scr_checking_destination_requirements))
                     issue?.let { Text(it.message.asString(), color = MaterialTheme.colorScheme.onSurfaceVariant) }
                     if (
                         issue == null &&
@@ -323,7 +323,7 @@ internal fun CrosspostCreateScreen(
                         ) { Text(stringResource(R.string.scr_grant_post_flair_access)) }
                         policy.flairOptionsLoaded && (policy.flairOptions.isNotEmpty() || draft.flair != null) ->
                             TextButton(enabled = !editingBlocked, onClick = { flairSheet = true }) {
-                                Text(if (draft.flair == null) "Choose post flair" else "Change post flair")
+                                Text(if (draft.flair == null) stringResource(R.string.scr_choose_post_flair) else stringResource(R.string.scr_change_post_flair))
                             }
                         draft.community.isBlank() -> Text(stringResource(R.string.scr_choose_a_destination_first))
                         else -> Text(stringResource(R.string.scr_no_selectable_post_flair_loaded))
@@ -402,9 +402,13 @@ internal fun CrosspostCreateScreen(
                     draft.flair?.let { V4FlairPreview(it) }
                     // LOWUX3_CROSSPOST_SUMMARY_SAYS_ON_OR_OFF_V1 (OCB-210)
                     Text(
-                        "NSFW: ${if (draft.nsfw) "on" else "off"} · Spoiler: ${if (draft.spoiler) "on" else "off"}",
+                        stringResource(
+                            R.string.xpost_review_flags,
+                            stringResource(if (draft.nsfw) R.string.xpost_flag_on else R.string.xpost_flag_off),
+                            stringResource(if (draft.spoiler) R.string.xpost_flag_on else R.string.xpost_flag_off),
+                        ),
                     )
-                    Text("Reply notifications: ${if (draft.sendReplies) "on" else "off"}")
+                    Text(stringResource(if (draft.sendReplies) R.string.xpost_reply_notifications_on else R.string.xpost_reply_notifications_off))
                     Text(if (verifying) stringResource(R.string.all_rechecking_source_and_destination) else stringResource(R.string.all_publish_creates_a_new_reddit_post_linked))
                 }
             },

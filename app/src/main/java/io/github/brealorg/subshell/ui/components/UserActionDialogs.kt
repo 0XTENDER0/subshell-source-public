@@ -175,6 +175,7 @@ internal fun UserTagEditorFields(
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     row.forEach { option ->
                         val colors = userTagChipColors(option)
+                        val colorName = stringResource(userTagColorName(option))
                         val selected = option == color
                         // LOWUI7_TOUCH_TARGETS_ARE_48DP_V1 (OCB-165)
                         Box(
@@ -197,7 +198,7 @@ internal fun UserTagEditorFields(
                                     onClick = { onColorChange(option) },
                                 )
                                 .semantics {
-                                    contentDescription = userTagColorName(option)
+                                    contentDescription = colorName
                                 },
                         )
                     }
@@ -216,13 +217,14 @@ internal fun UserTagEditorFields(
     }
 }
 
-internal fun userTagColorName(color: UserTagColor): String = when (color) {
-    UserTagColor.GREY -> "Grey"
-    UserTagColor.RED -> "Red"
-    UserTagColor.ORANGE -> "Orange"
-    UserTagColor.YELLOW -> "Yellow"
-    UserTagColor.GREEN -> "Green"
-    UserTagColor.TEAL -> "Teal"
-    UserTagColor.BLUE -> "Blue"
-    UserTagColor.PURPLE -> "Purple"
+@androidx.annotation.StringRes
+internal fun userTagColorName(color: UserTagColor): Int = when (color) {
+    UserTagColor.GREY -> R.string.comp_tag_color_grey
+    UserTagColor.RED -> R.string.comp_tag_color_red
+    UserTagColor.ORANGE -> R.string.comp_tag_color_orange
+    UserTagColor.YELLOW -> R.string.comp_tag_color_yellow
+    UserTagColor.GREEN -> R.string.comp_tag_color_green
+    UserTagColor.TEAL -> R.string.comp_tag_color_teal
+    UserTagColor.BLUE -> R.string.comp_tag_color_blue
+    UserTagColor.PURPLE -> R.string.comp_tag_color_purple
 }

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.data.account
 
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.RedditCommentSort
 import io.github.brealorg.subshell.data.auth.reddit.mergeSubmittedCommentIntoThread
 import io.github.brealorg.subshell.model.Comment
@@ -11,6 +12,8 @@ import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class CommentWriteFlowPolicyTest {
     @Test
     fun requestRequiresCanonicalPinnedTextTarget() {
@@ -123,7 +126,7 @@ class CommentWriteFlowPolicyTest {
             failureKind = CommentWriteFailureKind.API,
         )
 
-        val message = commentWriteStatusMessage(state)
+        val message = commentWriteStatusMessage(state)?.s
         assertNotNull(message)
         assertTrue(message!!.contains("may have received"))
         assertTrue(message.contains("avoid a duplicate"))

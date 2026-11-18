@@ -90,9 +90,12 @@ class Backup02A3RestorePreviewTest {
         assertTrue(screen.contains("// BACKUP02A3_RICHER_RESTORE_PREVIEW_V1"))
         assertTrue(screen.contains("Settings will stay unchanged."))
         assertTrue(screen.contains("val communityDiffs = joinedCommunitiesRestoreDiff("))
-        assertTrue(screen.contains("\"u/\${diff.account}: +\${diff.added} / -\${diff.removed}"))
+        // TRANSLATE14: the per-account lines are whole-sentence resources now.
+        val rawScreen = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/BackupRestoreScreen.kt").readText()
+        assertTrue(rawScreen.contains("stringResource(R.string.backup_joined_diff_ends_empty, diff.account, diff.added, diff.removed)"))
+        assertTrue(rawScreen.contains("stringResource(R.string.backup_joined_diff_to, diff.account, diff.added, diff.removed, diff.targetCount)"))
         assertTrue(screen.contains("will end at 0 joined communities."))
-        assertTrue(screen.contains("\"u/\${diff.account}: set to 0 joined communities.\""))
+        assertTrue(rawScreen.contains("stringResource(R.string.backup_joined_diff_set_empty, diff.account)"))
         assertTrue(screen.contains("Joined communities will stay unchanged."))
         assertTrue(
             screen.contains(

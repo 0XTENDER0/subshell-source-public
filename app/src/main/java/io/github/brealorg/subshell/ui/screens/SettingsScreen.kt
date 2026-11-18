@@ -235,15 +235,22 @@ fun SettingsScreen(
     var mediaCacheStatus by remember { mutableStateOf<VideoMediaCacheStatus?>(null) }
     var mediaCacheReadFailed by remember { mutableStateOf(false) }
     var cacheClearInProgress by remember { mutableStateOf(false) }
-    var cacheOperationMessage by remember { mutableStateOf<String?>(null) }
+    var cacheOperationMessage by remember { mutableStateOf<UiText?>(null) }
+    // TRANSLATE14: the device-unlock prompts are read here, where text can be resolved.
+    val showHiddenFreelyTitle = stringResource(R.string.set_unlock_show_hidden_title)
+    val showHiddenFreelySubtitle = stringResource(R.string.set_unlock_show_hidden_subtitle)
+    val turnOffAppLockTitle = stringResource(R.string.set_unlock_turn_off_app_lock_title)
+    val turnOffAppLockSubtitle = stringResource(R.string.set_unlock_turn_off_app_lock_subtitle)
     var downloadDeleteConfirmationVisible by rememberSaveable { mutableStateOf(false) }
     var downloadDeleteInProgress by remember { mutableStateOf(false) }
-    var downloadOperationMessage by remember { mutableStateOf<String?>(null) }
+    var downloadOperationMessage by remember { mutableStateOf<UiText?>(null) }
     var redReaderConfigurationDialogVisible by remember { mutableStateOf(false) }
     var redReaderClientIdDraft by remember { mutableStateOf("") }
     var redReaderCompatibilityConfigured by remember { mutableStateOf(false) }
     var redReaderConfigurationBusy by remember { mutableStateOf(false) }
-    var redReaderOperationMessage by remember { mutableStateOf<String?>(null) }
+    var redReaderOperationMessage by remember { mutableStateOf<UiText?>(null) }
+    // TRANSLATE14: whether the message above is a failure (was read from its first word).
+    var redReaderOperationFailed by remember { mutableStateOf(false) }
     // ISSUE240_READER_EDITS_THE_REDDIT_API_VALUES_V1
     var redditApiValues by remember { mutableStateOf<RedditApiValues?>(null) }
     var redditApiValuesDraft by remember { mutableStateOf<RedditApiValuesDraft?>(null) }
@@ -1013,7 +1020,7 @@ fun SettingsScreen(
                     // re-enabled after a failed logout.
                     if (accountLogoutFailed) {
                         Text(
-                            "Couldn't log out of u/${activeProductAccount.username} on this device. Try again.",
+                            stringResource(R.string.set_could_not_log_out, activeProductAccount.username),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error,
                         )
@@ -1082,7 +1089,7 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     Text(
-                        "This explicit compatibility mode uses a locally supplied OAuth client ID. The value is encrypted in no-backup storage and is never added to saved setups.",
+                        stringResource(R.string.set_compatibility_mode_explained),
                     )
                     OutlinedTextField(
                         value = redReaderClientIdDraft,
@@ -1116,9 +1123,9 @@ fun SettingsScreen(
                     }
                     // LOWUX1_CLIENT_CONFIG_FAILURE_SHOWN_IN_THE_DIALOG_V1 (OCB-270): a
                     // failed save/remove was written only to the row behind the dialog.
-                    redReaderOperationMessage?.takeIf { message -> message.startsWith("Couldn") }?.let { message ->
+                    redReaderOperationMessage?.takeIf { redReaderOperationFailed }?.let { message ->
                         Text(
-                            message,
+                            message.asString(),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error,
                         )
@@ -1144,11 +1151,13 @@ fun SettingsScreen(
                                         result.onSuccess {
                                             redReaderConfigurationDialogVisible = false
                                             redReaderClientIdDraft = ""
+                                            redReaderOperationFailed = false
                                             redReaderOperationMessage =
-                                                "Reddit connection configuration saved"
+                                                UiText.Resource(R.string.set_connection_configuration_saved)
                                             onRedditConfigurationChanged()
                                         }.onFailure {
-                                            redReaderOperationMessage = "Couldn’t save compatibility configuration"
+                                            redReaderOperationFailed = true
+                                            redReaderOperationMessage = UiText.Resource(R.string.set_could_not_save_compatibility)
                                         }
                                     }
                                 }
@@ -1180,11 +1189,13 @@ fun SettingsScreen(
                                             redReaderCompatibilityConfigured = false
                                             redReaderConfigurationDialogVisible = false
                                             redReaderClientIdDraft = ""
+                                            redReaderOperationFailed = false
                                             redReaderOperationMessage =
-                                                "Reddit connection configuration removed"
+                                                UiText.Resource(R.string.set_connection_configuration_removed)
                                             onRedditConfigurationChanged()
                                         }.onFailure {
-                                            redReaderOperationMessage = "Couldn’t remove compatibility configuration"
+                                            redReaderOperationFailed = true
+                                            redReaderOperationMessage = UiText.Resource(R.string.set_could_not_remove_compatibility)
                                         }
                                     }
                                 }
@@ -1233,11 +1244,13 @@ fun SettingsScreen(
                                     redReaderCompatibilityConfigured = true
                                     redReaderConfigurationDialogVisible = false
                                     redReaderClientIdDraft = ""
+                                    redReaderOperationFailed = false
                                     redReaderOperationMessage =
-                                        "Reddit connection configuration saved"
+                                        UiText.Resource(R.string.set_connection_configuration_saved)
                                     onRedditConfigurationChanged()
                                 }.onFailure {
-                                    redReaderOperationMessage = "Couldn’t save compatibility configuration"
+                                    redReaderOperationFailed = true
+                                            redReaderOperationMessage = UiText.Resource(R.string.set_could_not_save_compatibility)
                                 }
                             }
                         }
@@ -1291,11 +1304,11 @@ fun SettingsScreen(
                                 mediaCacheStatus = clearResult.after
                                 mediaCacheReadFailed = false
                                 cacheOperationMessage =
-                                    if (clearResult.after.bytesUsed == 0L) "Cache cleared"
-                                    else "Cache cleared; active media cached data again"
+                                    if (clearResult.after.bytesUsed == 0L) UiText.Resource(R.string.set_cache_cleared)
+                                    else UiText.Resource(R.string.set_cache_cleared_cached_again)
                             }.onFailure {
                                 mediaCacheReadFailed = true
-                                cacheOperationMessage = "Couldn’t clear cache"
+                                cacheOperationMessage = UiText.Resource(R.string.set_could_not_clear_cache)
                             }
                             cacheClearInProgress = false
                         }
@@ -1321,7 +1334,7 @@ fun SettingsScreen(
             text = {
                 Text(
                     (legacyDownloadStatus?.let { legacyVideoDownloadSummary(it).asString() }?.let { "$it. " }.orEmpty()) +
-                        "Downloaded files and temporary files will be removed. The playback cache is separate and will not be cleared.",
+                        stringResource(R.string.set_downloads_will_be_removed),
                 )
             },
             confirmButton = {
@@ -1335,11 +1348,14 @@ fun SettingsScreen(
                                 runCatching { legacyDownloads.deleteAll() }
                             }
                             result.onSuccess { deleted ->
-                                downloadOperationMessage =
-                                    "Deleted ${deleted.videosRemoved} videos · " +
-                                        formatVideoDownloadBytes(deleted.bytesRemoved)
+                                downloadOperationMessage = UiText.Plural(
+                                    R.plurals.set_deleted_videos_with_size,
+                                    deleted.videosRemoved,
+                                    deleted.videosRemoved,
+                                    formatVideoDownloadBytes(deleted.bytesRemoved),
+                                )
                             }.onFailure {
-                                downloadOperationMessage = "Couldn’t delete downloads"
+                                downloadOperationMessage = UiText.Resource(R.string.set_could_not_delete_downloads)
                             }
                             legacyDownloadStatus = withContext(Dispatchers.IO) {
                                 runCatching { legacyDownloads.status() }.getOrNull()
@@ -1466,7 +1482,7 @@ fun SettingsScreen(
                 )
             ) {
                 item("accounts-title") {
-                    SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_accounts)))
+                    SettingsSection(stringResource(settingsSectionTitle(destination, R.string.all_accounts)))
                 }
                 if (searchResult.isItemVisible("accounts")) {
                     productAccounts.forEach { account ->
@@ -1582,7 +1598,7 @@ fun SettingsScreen(
                 )
             ) {
                 item("account-privacy-title") {
-                    SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_account_privacy)))
+                    SettingsSection(stringResource(settingsSectionTitle(destination, R.string.all_account_privacy)))
                 }
                 if (searchResult.isItemVisible("online-visibility")) {
                     item("online-visibility") {
@@ -1637,7 +1653,7 @@ fun SettingsScreen(
                         if (destination == SettingsDestination.FEEDS && query.isBlank()) {
                             stringResource(R.string.all_feeds)
                         } else {
-                            settingsSectionTitle(destination, stringResource(R.string.all_feed))
+                            stringResource(settingsSectionTitle(destination, R.string.all_feed))
                         },
                     )
                 }
@@ -1790,7 +1806,7 @@ fun SettingsScreen(
                     NavigationRow(
                         icon = Symbols.FilterAlt,
                         title = stringResource(R.string.set_content_filters),
-                        description = contentFilterSummary(state.contentFilters),
+                        description = contentFilterSummary(state.contentFilters).asString(),
                         onClick = {
                             openSettingsDestination(SettingsDestination.CONTENT_FILTERS)
                         },
@@ -1871,7 +1887,7 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("appearance-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_appearance))) }
+                item("appearance-title") { SettingsSection(stringResource(settingsSectionTitle(destination, R.string.all_appearance))) }
                 if (listOf("ui-size", "text-size", "vote-controls").any(searchResult::isItemVisible)) {
                     item("size-title") { SettingsSection(stringResource(R.string.all_size)) }
                 }
@@ -1994,7 +2010,7 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("home-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_home_feeds))) }
+                item("home-title") { SettingsSection(stringResource(settingsSectionTitle(destination, R.string.all_home_feeds))) }
                 if (searchResult.isItemVisible("top-bar-behavior")) item("top-bar-behavior") {
                     ValueSettingRow(
                         icon = Symbols.Home,
@@ -2032,7 +2048,7 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("navigation-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_navigation))) }
+                item("navigation-title") { SettingsSection(stringResource(settingsSectionTitle(destination, R.string.all_navigation))) }
                 if (query.isBlank() || searchResult.isItemVisible("tablet-layout-mode")) {
                     item("tablet-layout-mode") {
                         SettingsSegmentedChoice(
@@ -2261,7 +2277,7 @@ fun SettingsScreen(
                         if (destination == SettingsDestination.FEEDS && query.isBlank()) {
                             stringResource(R.string.all_privacy)
                         } else {
-                            settingsSectionTitle(destination, stringResource(R.string.all_privacy))
+                            stringResource(settingsSectionTitle(destination, R.string.all_privacy))
                         },
                     )
                 }
@@ -2288,8 +2304,8 @@ fun SettingsScreen(
                             } else {
                                 turnOffAfterDeviceUnlock(
                                     appLock = appLock,
-                                    title = "Show hidden communities freely",
-                                    subtitle = "Confirm your device unlock to stop protecting hidden community names",
+                                    title = showHiddenFreelyTitle,
+                                    subtitle = showHiddenFreelySubtitle,
                                 ) {
                                     state.updateRequireDeviceUnlockForHiddenSubscriptions(false)
                                 }
@@ -2319,8 +2335,8 @@ fun SettingsScreen(
                             } else {
                                 turnOffAfterDeviceUnlock(
                                     appLock = appLock,
-                                    title = "Turn off app lock",
-                                    subtitle = "Confirm your device unlock to stop locking subshell",
+                                    title = turnOffAppLockTitle,
+                                    subtitle = turnOffAppLockSubtitle,
                                 ) {
                                     appLock.onChange(appLock.settings.copy(enabled = false))
                                 }
@@ -2379,7 +2395,7 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("search-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_search))) }
+                item("search-title") { SettingsSection(stringResource(settingsSectionTitle(destination, R.string.all_search))) }
                 if (searchResult.isItemVisible("search-keyboard")) item("search-keyboard") {
                     ToggleRow(
                         icon = Symbols.Keyboard,
@@ -2515,7 +2531,7 @@ fun SettingsScreen(
                         icon = Symbols.ClosedCaption,
                         title = stringResource(R.string.set_subtitles),
                         description = stringResource(R.string.set_default_for_new_videos),
-                        value = state.videoSubtitleDefault.rowLabel,
+                        value = stringResource(state.videoSubtitleDefault.rowLabelRes),
                         onClick = { choiceDialogKey = "media-subtitle-default" },
                     )
                 }
@@ -2524,7 +2540,7 @@ fun SettingsScreen(
                         icon = Symbols.VolumeUp,
                         title = stringResource(R.string.set_audio_language),
                         description = stringResource(R.string.set_when_a_video_has_several),
-                        value = state.videoAudioDefault.rowLabel,
+                        value = stringResource(state.videoAudioDefault.rowLabelRes),
                         onClick = { choiceDialogKey = "media-audio-default" },
                     )
                 }
@@ -2533,7 +2549,7 @@ fun SettingsScreen(
                         icon = Symbols.Tune,
                         title = stringResource(R.string.set_playback_options_button),
                         description = stringResource(R.string.set_quality_audio_and_subtitles),
-                        value = state.playbackOptionsPlacement.rowLabel,
+                        value = stringResource(state.playbackOptionsPlacement.rowLabelRes),
                         onClick = { choiceDialogKey = "media-playback-options" },
                     )
                 }
@@ -2722,7 +2738,7 @@ fun SettingsScreen(
                                 RedditLinkHandlingStatus.ENABLED ->
                                     stringResource(R.string.all_enabled_supported_reddit_links_open_in_subshell)
                                 RedditLinkHandlingStatus.PARTIAL ->
-                                    "Partial · ${redditLinkHandlingState.selectedHostCount} of ${redditLinkHandlingState.supportedHostCount} domains selected"
+                                    stringResource(R.string.set_link_handling_partial, redditLinkHandlingState.selectedHostCount, redditLinkHandlingState.supportedHostCount)
                                 RedditLinkHandlingStatus.DISABLED ->
                                     stringResource(R.string.all_off_choose_subshell_for_supported_reddit_links)
                                 RedditLinkHandlingStatus.UNSUPPORTED ->
@@ -2758,7 +2774,7 @@ fun SettingsScreen(
                         description = when {
                             cacheClearInProgress -> stringResource(R.string.all_clearing_cached_media)
                             mediaCacheStatus != null && cacheOperationMessage != null ->
-                                "${cacheOperationMessage} · ${videoMediaCacheSummary(requireNotNull(mediaCacheStatus))}"
+                                "${cacheOperationMessage?.asString()} · ${videoMediaCacheSummary(requireNotNull(mediaCacheStatus))}"
                             mediaCacheStatus != null -> videoMediaCacheSummary(requireNotNull(mediaCacheStatus))
                             mediaCacheReadFailed -> stringResource(R.string.all_media_cache_size_is_unavailable)
                             else -> stringResource(R.string.all_checking_media_cache)
@@ -2802,7 +2818,7 @@ fun SettingsScreen(
                         title = stringResource(R.string.set_downloaded_videos),
                         description = when {
                             downloadDeleteInProgress -> stringResource(R.string.all_deleting_downloaded_videos)
-                            downloadOperationMessage != null -> downloadOperationMessage.orEmpty()
+                            downloadOperationMessage != null -> downloadOperationMessage?.asString().orEmpty()
                             else -> legacyDownloadStatus?.let { legacyVideoDownloadSummary(it).asString() }.orEmpty()
                         },
                     ) {
@@ -2827,7 +2843,7 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("accessibility-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_accessibility))) }
+                item("accessibility-title") { SettingsSection(stringResource(settingsSectionTitle(destination, R.string.all_accessibility))) }
                 if (searchResult.isItemVisible("reduced-motion")) item("reduced-motion") {
                     ToggleRow(
                         icon = Symbols.AccessibilityNew,
@@ -2854,7 +2870,7 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("developer-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_developer_states))) }
+                item("developer-title") { SettingsSection(stringResource(settingsSectionTitle(destination, R.string.all_developer_states))) }
                 if (searchResult.isItemVisible("feed-state")) item("feed-state") {
                     ValueSettingRow(
                         icon = Symbols.CloudOff,
@@ -2907,7 +2923,7 @@ fun SettingsScreen(
                         if (destination == SettingsDestination.COMMENTS && query.isBlank()) {
                             stringResource(R.string.all_comment_presentation)
                         } else {
-                            settingsSectionTitle(destination, stringResource(R.string.all_comments))
+                            stringResource(settingsSectionTitle(destination, R.string.all_comments))
                         },
                     )
                 }
@@ -2934,7 +2950,7 @@ fun SettingsScreen(
                         // ISSUE285_THREAD_COLOURS_ONLY_WITH_GUIDE_LINES_V1: the colours belong to Guide lines;
                         // with Parent connectors the row says so and does nothing, as Android's settings do.
                         description = if (state.commentHierarchyStyle == CommentHierarchyStyle.GUIDE_LINES) {
-                            "Colour the thread lines and give each top-level comment its own card"
+                            stringResource(R.string.set_thread_colours_description)
                         } else {
                             stringResource(R.string.all_needs_the_guide_lines_comment_hierarchy)
                         },
@@ -3102,27 +3118,21 @@ fun SettingsScreen(
                 val notificationTypeSummary = when {
                     !state.inboxNotificationsEnabled &&
                         notificationTypeCount == 0 ->
-                        "Notifications off · no types selected"
+                        UiText.Resource(R.string.set_notifications_off_none_selected)
 
                     !state.inboxNotificationsEnabled ->
-                        "Notifications off · $notificationTypeCount selected"
+                        UiText.Resource(R.string.set_notifications_off_n_selected, notificationTypeCount)
 
                     notificationTypeCount == 0 ->
-                        "No types enabled"
-
-                    notificationTypeCount == 1 ->
-                        "1 type enabled"
+                        UiText.Resource(R.string.set_no_notification_types)
 
                     else ->
-                        "$notificationTypeCount types enabled"
+                        UiText.Plural(R.plurals.set_notification_types_enabled, notificationTypeCount, notificationTypeCount)
                 }
 
                 item("notifications-title") {
                     SettingsSection(
-                        settingsSectionTitle(
-                            destination,
-                            stringResource(R.string.all_notifications),
-                        ),
+                        stringResource(settingsSectionTitle(destination, R.string.all_notifications)),
                     )
                 }
 
@@ -3161,7 +3171,7 @@ fun SettingsScreen(
                         NavigationRow(
                             icon = Symbols.Tune,
                             title = stringResource(R.string.set_notification_types),
-                            description = notificationTypeSummary,
+                            description = notificationTypeSummary.asString(),
                             onClick = {
                                 openSettingsDestination(
                                     SettingsDestination.NOTIFICATION_TYPES,
@@ -3181,15 +3191,15 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("reddit-connection-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_reddit_connection))) }
+                item("reddit-connection-title") { SettingsSection(stringResource(settingsSectionTitle(destination, R.string.all_reddit_connection))) }
                 if (searchResult.isItemVisible("redreader-compatibility")) item("redreader-compatibility") {
                     NavigationRow(
                         icon = Symbols.VpnKey,
                         title = stringResource(R.string.set_redreader_compatibility),
-                        description = redReaderOperationMessage ?: if (redReaderCompatibilityConfigured) {
+                        description = redReaderOperationMessage?.asString() ?: if (redReaderCompatibilityConfigured) {
                             stringResource(R.string.all_configured_locally_changes_apply_automatically)
                         } else {
-                            "Add a user-supplied OAuth client ID in encrypted no-backup storage"
+                            stringResource(R.string.set_add_oauth_client_id)
                         },
                         onClick = {
                             redReaderClientIdDraft = ""
@@ -3212,7 +3222,7 @@ fun SettingsScreen(
                 )
             ) {
                 item("diagnostics-title") {
-                    SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_diagnostics)))
+                    SettingsSection(stringResource(settingsSectionTitle(destination, R.string.all_diagnostics)))
                 }
                 if (searchResult.isItemVisible("diagnostics")) item("diagnostics") {
                     NavigationRow(
@@ -3235,7 +3245,7 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("backup-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_backup_restore))) }
+                item("backup-title") { SettingsSection(stringResource(settingsSectionTitle(destination, R.string.all_backup_restore))) }
                 if (searchResult.isItemVisible("backup")) item("backup") {
                     NavigationRow(
                         icon = Symbols.Backup,
@@ -3265,7 +3275,7 @@ fun SettingsScreen(
                     debug = BuildConfig.DEBUG,
                 )
             ) {
-                item("about-title") { SettingsSection(settingsSectionTitle(destination, stringResource(R.string.all_about))) }
+                item("about-title") { SettingsSection(stringResource(settingsSectionTitle(destination, R.string.all_about))) }
                 if (searchResult.isItemVisible("updates")) item("updates") {
                     NavigationRow(
                         icon = Symbols.Download,
@@ -3464,7 +3474,7 @@ private fun SettingsCodeFontDialog(
                                     ),
                                 )
                                 Text(
-                                    text = font.label,
+                                    text = stringResource(font.labelRes),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontFamily = font.fontFamily,
                                     ),
@@ -3673,9 +3683,8 @@ private fun DestructiveNavigationRow(
 // REDDITEXPORT01_EXPORT_YOUR_REDDIT_DATA_V1: what is exported, then how the
 // newest export of this account went; a tap while one runs does nothing.
 // REDDITEXPORT01_EXPORT_YOUR_REDDIT_DATA_V1: the tray shows it whole, without More.
-internal const val REDDIT_EXPORT_NOTICE_TITLE = "Exporting your Reddit data"
-internal const val REDDIT_EXPORT_NOTICE_MESSAGE =
-    "Takes a minute or two. The ZIP goes to Downloads and holds your private messages."
+internal val REDDIT_EXPORT_NOTICE_TITLE: UiText = UiText.Resource(R.string.export_notification_running)
+internal val REDDIT_EXPORT_NOTICE_MESSAGE: UiText = UiText.Resource(R.string.export_notice_message)
 
 @Composable
 internal fun RedditDataExportRow(
@@ -3688,9 +3697,9 @@ internal fun RedditDataExportRow(
         description = when (status) {
             null -> stringResource(R.string.all_saved_votes_your_posts_and_comments_communities)
             RedditDataExportStatus.Waiting -> stringResource(R.string.all_waiting_for_a_connection)
-            is RedditDataExportStatus.Running -> "Exporting… ${status.done} of ${status.total} lists"
-            is RedditDataExportStatus.Saved -> exportSavedText(status.location, status.items, status.incompleteLists)
-            is RedditDataExportStatus.Failed -> status.message
+            is RedditDataExportStatus.Running -> stringResource(R.string.export_running_row, status.done, status.total)
+            is RedditDataExportStatus.Saved -> exportSavedText(status.location, status.items, status.incompleteLists).asString()
+            is RedditDataExportStatus.Failed -> stringResource(status.reason.textRes)
         },
         onClick = {
             if (status != RedditDataExportStatus.Waiting && status !is RedditDataExportStatus.Running) onExport()
@@ -3756,6 +3765,7 @@ internal fun turnOffAfterDeviceUnlock(
     subtitle: String,
     turnOff: () -> Unit,
 ) {
+    // TRANSLATE14: callers pass resolved text (stringResource where they compose).
     if (appLock == null || !appLock.deviceUnlockAvailable) {
         turnOff()
         return
@@ -3784,7 +3794,7 @@ private fun OfflineImagesRow() {
         description = when (val used = bytes) {
             null -> stringResource(R.string.all_checking_saved_images)
             0L -> stringResource(R.string.all_no_images_saved_use_save_for_offline)
-            else -> "${android.text.format.Formatter.formatShortFileSize(context, used)} of images saved for offline reading"
+            else -> stringResource(R.string.set_offline_images_saved, android.text.format.Formatter.formatShortFileSize(context, used))
         },
     ) {
         TextButton(

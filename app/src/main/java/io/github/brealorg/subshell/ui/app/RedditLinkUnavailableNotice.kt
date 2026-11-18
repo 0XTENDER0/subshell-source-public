@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Composable
@@ -37,17 +38,17 @@ internal fun redditLinkUnavailablePresentation(
 ): ErrorPresentation = ErrorPresentation(
     kind = ErrorPresentationKind.DEGRADED,
     title = when (reason) {
-        RedditLinkUnavailableReason.UNSUPPORTED_LINK -> "Can't open this link here"
-        RedditLinkUnavailableReason.POST_UNAVAILABLE -> "Couldn't open this post"
-        RedditLinkUnavailableReason.SHARE_LINK_UNAVAILABLE -> "Couldn't open this shared link"
+        RedditLinkUnavailableReason.UNSUPPORTED_LINK -> UiText.Resource(R.string.app_link_unsupported)
+        RedditLinkUnavailableReason.POST_UNAVAILABLE -> UiText.Resource(R.string.app_link_post_unavailable)
+        RedditLinkUnavailableReason.SHARE_LINK_UNAVAILABLE -> UiText.Resource(R.string.app_link_share_unavailable)
     },
     message = when (reason) {
         RedditLinkUnavailableReason.UNSUPPORTED_LINK ->
-            "subshell doesn't support this kind of Reddit link"
+            UiText.Resource(R.string.app_link_unsupported_detail)
         RedditLinkUnavailableReason.POST_UNAVAILABLE ->
-            "It may have been removed, its community banned, or the connection failed"
+            UiText.Resource(R.string.app_link_post_unavailable_detail)
         RedditLinkUnavailableReason.SHARE_LINK_UNAVAILABLE ->
-            "Reddit didn't say where it leads, or the connection failed"
+            UiText.Resource(R.string.app_link_share_unavailable_detail)
     },
 )
 

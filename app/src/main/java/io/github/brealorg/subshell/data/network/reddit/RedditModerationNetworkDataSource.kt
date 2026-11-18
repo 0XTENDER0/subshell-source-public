@@ -65,8 +65,8 @@ internal class RedditModerationNetworkDataSource(
         communityName: String,
         list: RedditModeratorQueueList,
         after: String?,
-    ): NetworkResult<NetworkPage<RedditModeratorQueueItem>> =
-        httpClient.getJson(
+    ): NetworkResult<NetworkPage<RedditModeratorQueueItem>> {
+        val result = httpClient.getJson(
             request = redditModQueueRequest(communityName, after, list),
             deserializer = RedditReadListingDto.serializer(),
         ).map { listing ->
@@ -76,6 +76,24 @@ internal class RedditModerationNetworkDataSource(
                 nowEpochSeconds = System.currentTimeMillis() / 1_000L,
             )
         }
+        if (result !is NetworkResult.Success) return result
+        // ISSUE301C_A_FILTER_REASON_COMES_FROM_THE_MOD_LOG_V1: a failed log read
+        // leaves the page as Reddit sent it.
+        val items = moderatorQueueItemsWithFilterReasons(result.value.items, list) { moderator, logAfter ->
+            (
+                httpClient.getJson(
+                    request = redditModerationLogRequest(communityName, after = logAfter, moderator = moderator),
+                    deserializer = RedditModerationLogListingDto.serializer(),
+                ) as? NetworkResult.Success
+            )?.value?.data?.let { page ->
+                ModeratorLogPage(
+                    entries = page.children.mapNotNull { child -> child?.data },
+                    after = page.after,
+                )
+            }
+        }
+        return result.copy(value = result.value.copy(items = items))
+    }
 
     // MODERATION02A2_EXACT_REPORT_TARGET_READ_OUTSIDE_QUEUE_V1
     // ISSUE281_READS_AVOID_API_INFO_V1: read from the post's thread; the caller
@@ -260,6 +278,11 @@ internal fun moderatorQueueItemDetails(
         ?.contentOrNull
         .cleanQueueLabel()
     val heldByAutoModerator = moderatorQueueItemHeldByAutoModerator(extras.removedByCategory, bannedBy, extras.removed)
+    val heldByRedditFilter = !heldByAutoModerator && moderatorQueueItemHeldByRedditFilter(
+        removedByCategory = extras.removedByCategory,
+        bannedByReddit = (extras.bannedBy as? JsonPrimitive)?.let { value -> !value.isString && value.content == "true" } == true,
+        removed = extras.removed,
+    )
     val post = if (item.kind == RedditModeratorQueueKind.POST) {
         runCatching {
             json.decodeFromJsonElement(RedditThingDto.serializer(), child).data
@@ -294,6 +317,8 @@ internal fun moderatorQueueItemDetails(
             bannedBy ?: extras.modReasonBy.cleanQueueLabel()
         },
         heldByAutoModerator = heldByAutoModerator,
+        heldByRedditFilter = heldByRedditFilter,
+        createdEpochSeconds = extras.createdUtc?.toLong(),
     )
 }
 
@@ -303,9 +328,27 @@ internal fun moderatorQueueItemDetails(
  * `removed = false` (u/vpsj's post in r/indianrailways, 2026-11-14); a comment
  * has no category, so the name with `removed = false` counts too.
  */
-internal fun moderatorQueueItemHeldByAutoModerator(removedByCategory: String?, bannedBy: String?, removed: Boolean?): Boolean =
-    removedByCategory?.trim().equals("automod_filtered", ignoreCase = true) ||
-        (removed == false && bannedBy.equals("AutoModerator", ignoreCase = true))
+internal fun moderatorQueueItemHeldByAutoModerator(removedByCategory: String?, bannedBy: String?, removed: Boolean?): Boolean {
+    // ISSUE301F_A_POSTS_CATEGORY_DECIDES_V1: a post carries removed_by_category;
+    // an AutoModerator removal (not a filter) is "moderator" while `removed`
+    // can read false (fsvreddit's Spam Src Spotter, 2026-11-16), so the
+    // category decides wherever there is one.
+    val category = removedByCategory?.trim()?.takeIf(String::isNotEmpty)
+    if (category != null) return category.equals("automod_filtered", ignoreCase = true)
+    return removed == false && bannedBy.equals("AutoModerator", ignoreCase = true)
+}
+
+/**
+ * ISSUE301C_REDDIT_FILTER_HELD_IS_NAMED_V1, ISSUE301F_A_POSTS_CATEGORY_DECIDES_V1:
+ * Reddit's own filters (Crowd Control, ban evasion, harassment, …) hold a post
+ * with `removed_by_category = "reddit"`; a comment has no category and shows
+ * `banned_by = true` with `removed = false` (u/vpsj's comment).
+ */
+internal fun moderatorQueueItemHeldByRedditFilter(removedByCategory: String?, bannedByReddit: Boolean, removed: Boolean?): Boolean {
+    val category = removedByCategory?.trim()?.takeIf(String::isNotEmpty)
+    if (category != null) return category.equals("reddit", ignoreCase = true)
+    return removed == false && bannedByReddit
+}
 
 @Serializable
 internal data class RedditThingExtrasDto(

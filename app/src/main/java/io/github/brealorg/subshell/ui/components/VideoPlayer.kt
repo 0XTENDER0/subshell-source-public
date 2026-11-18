@@ -393,7 +393,7 @@ private fun VideoPosterFrame(
             localUri != null -> LocalUriMedia(
                 uri = localUri,
                 mimeType = post.localMediaMimeType,
-                contentDescription = post.mediaLabel,
+                contentDescription = mediaLabelShown(post.mediaLabel),
                 modifier = Modifier.fillMaxSize(),
             )
 
@@ -407,7 +407,7 @@ private fun VideoPosterFrame(
                     )
                     is RemoteMediaLoadResult.Ready -> Image(
                         bitmap = result.value.asImageBitmap(),
-                        contentDescription = post.mediaLabel,
+                        contentDescription = mediaLabelShown(post.mediaLabel),
                         contentScale = ContentScale.Fit,
                         modifier = Modifier.fillMaxSize(),
                     )
@@ -424,7 +424,7 @@ private fun VideoPosterFrame(
 
             remoteUri != null -> RemoteImage(
                 uri = remoteUri,
-                label = post.mediaLabel,
+                label = mediaLabelShown(post.mediaLabel),
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Fit,
                 aspectRatio = null,
@@ -434,7 +434,7 @@ private fun VideoPosterFrame(
             else -> presentationMediaResource(post.mediaAsset)?.let { posterResource ->
                 Image(
                     painter = painterResource(posterResource),
-                    contentDescription = post.mediaLabel,
+                    contentDescription = mediaLabelShown(post.mediaLabel),
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -679,10 +679,11 @@ fun LocalVideoPlayer(
         // covered); otherwise the poster alone, and a tap anywhere still plays it.
         val startsByItself = !fullscreen && !paneLeaving &&
             state.videoAutoplayAllowed && state.sensitiveMediaAutoplayAllowed(post)
+        val playVideoDescription = stringResource(R.string.comp_play_video)
         val frameModifier = if (startsByItself) {
             staticFrameModifier
                 .clickable(onClickLabel = stringResource(R.string.comp_play_video)) { state.playVideo(post.id) }
-                .semantics { contentDescription = "Play video" }
+                .semantics { contentDescription = playVideoDescription }
         } else {
             staticFrameModifier
         }
@@ -1019,6 +1020,12 @@ fun LocalVideoPlayer(
         visibilityModifier.fillMaxWidth().aspectRatio(aspectRatio)
     }
 
+    // TRANSLATE14: read here; the semantics block below is not composable.
+    val hideControlsLabel = stringResource(R.string.comp_hide_video_controls)
+    val showControlsLabel = stringResource(R.string.comp_show_video_controls)
+    val mediaActionsLabel = stringResource(R.string.comp_media_actions)
+    val showControlsShortLabel = stringResource(R.string.comp_show_controls)
+    val resetZoomLabel = stringResource(R.string.comp_reset_zoom)
     Box(
         playerFrameModifier
             .onSizeChanged { frameHeightPx = it.height }
@@ -1028,12 +1035,12 @@ fun LocalVideoPlayer(
             // clickable frame merged the title and times into its own node; the
             // frame now offers its actions without merging what it contains.
             .semantics {
-                onClick(label = if (showControls) "Hide video controls" else "Show video controls") {
+                onClick(label = if (showControls) hideControlsLabel else showControlsLabel) {
                     toggleControls()
                     true
                 }
                 if (longPress != null) {
-                    onLongClick(label = if (onLongPress != null) "Media actions" else "Show controls") {
+                    onLongClick(label = if (onLongPress != null) mediaActionsLabel else showControlsShortLabel) {
                         longPress()
                         true
                     }
@@ -1041,7 +1048,7 @@ fun LocalVideoPlayer(
                 // ISSUE231_PINCH_TO_ZOOM_VIDEOS_V1: zoom is touch-only; TalkBack can reset it.
                 if (videoZoomed) {
                     customActions = listOf(
-                        CustomAccessibilityAction(FULLSCREEN_VIDEO_RESET_ZOOM_LABEL) {
+                        CustomAccessibilityAction(resetZoomLabel) {
                             videoZoom = FullscreenVideoZoom()
                             true
                         },
@@ -1431,14 +1438,14 @@ fun LocalVideoPlayer(
                 if (fullscreen) {
                     Column(Modifier.weight(1f)) {
                         Text(
-                            text = post.title,
+                            text = mediaPostTitleShown(post),
                             color = Color.White,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
-                            text = post.mediaLabel,
+                            text = mediaLabelShown(post.mediaLabel),
                             color = Color.White.copy(alpha = 0.78f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -1710,17 +1717,18 @@ fun LocalVideoPlayer(
                                             val shared = mediaActions.share()
                                             mediaSharing = false
                                             if (!shared) {
-                                                errorHost?.reportMediaActionFailure(
-                                                    title = "Could not share",
-                                                    message = "This media could not be prepared for sharing",
-                                                )
+                                                errorHost?.reportMediaShareFailure()
                                             }
                                         }
                                     },
                                 )
                                 PlaybackActionRow(
                                     title = stringResource(R.string.comp_download),
-                                    summary = mediaDownload ?: stringResource(R.string.all_save_to_downloads),
+                                    summary = if (mediaDownload == VIDEO_DOWNLOAD_SAVING) {
+                                        stringResource(R.string.comp_saving_ellipsis)
+                                    } else {
+                                        mediaDownload ?: stringResource(R.string.all_save_to_downloads)
+                                    },
                                     busy = mediaDownload == VIDEO_DOWNLOAD_SAVING,
                                     enabled = !mediaSharing && mediaDownload == null,
                                     onClick = {
@@ -1728,13 +1736,10 @@ fun LocalVideoPlayer(
                                         mediaActionScope.launch {
                                             val destination = mediaActions.download()
                                             if (destination != null) {
-                                                mediaDownload = "Saved to ${mediaDownloadFolder(destination)}"
+                                                mediaDownload = context.getString(R.string.comp_saved_to_folder, mediaDownloadFolder(destination))
                                                 delay(MEDIA_DOWNLOAD_SAVED_VISIBLE_MS)
                                             } else {
-                                                errorHost?.reportMediaActionFailure(
-                                                    title = "Could not download",
-                                                    message = "This media could not be saved",
-                                                )
+                                                errorHost?.reportMediaDownloadFailure()
                                             }
                                             mediaDownload = null
                                         }
@@ -1805,7 +1810,8 @@ fun LocalVideoPlayer(
 }
 
 private const val DOUBLE_TAP_SEEK_HINT_MS = 700L
-private const val VIDEO_DOWNLOAD_SAVING = "Saving…"
+/** A marker, not text: the row shows comp_saving_ellipsis for it. */
+private const val VIDEO_DOWNLOAD_SAVING = "\u0000saving"
 private val VIDEO_CENTER_BUTTON_SIZE = 58.dp
 private const val VIDEO_CENTER_BUTTON_SCRIM_ALPHA = 0.72f
 private const val VIDEO_CHROME_BUTTON_ALPHA = 0.92f
@@ -1853,6 +1859,7 @@ internal fun tabletopControlsAlignment(foldTopPx: Float, heightPx: Float): BiasA
 
 internal const val INLINE_VIDEO_SURFACE_TEST_TAG = "inline-video-surface"
 internal const val FULLSCREEN_VIDEO_FRAME_TEST_TAG = "fullscreen-video-frame"
+/** The English text of `comp_reset_zoom`, for tests. */
 internal const val FULLSCREEN_VIDEO_RESET_ZOOM_LABEL = "Reset zoom"
 
 internal fun boundedInlineVideoAspectRatio(aspectRatio: Float): Float =

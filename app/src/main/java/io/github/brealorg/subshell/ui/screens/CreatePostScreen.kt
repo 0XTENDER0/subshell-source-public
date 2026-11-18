@@ -115,6 +115,7 @@ internal fun TextPostWriteStatus(
     }
 }
 
+@androidx.compose.runtime.Composable
 internal fun textPostWriteStatusMessage(state: TextPostWriteUiState): String? {
     if (state.validationIssues.isNotEmpty()) return null
     return when (state.phase) {
@@ -122,60 +123,61 @@ internal fun textPostWriteStatusMessage(state: TextPostWriteUiState): String? {
         TextPostWritePhase.SUCCEEDED,
         -> null
         TextPostWritePhase.AUTHORIZATION_REQUIRED ->
-            "Post access is required for this account."
+            stringResource(R.string.scr_post_write_1)
         TextPostWritePhase.AUTHORIZING ->
-            "Preparing Reddit authorization…"
+            stringResource(R.string.scr_post_write_2)
         TextPostWritePhase.AWAITING_CALLBACK ->
-            "Waiting for Reddit authorization…"
+            stringResource(R.string.scr_post_write_3)
         TextPostWritePhase.SENDING ->
-            "Posting to Reddit…"
+            stringResource(R.string.scr_post_write_4)
         TextPostWritePhase.RECONCILING ->
-            "Checking Reddit for the submitted post…"
+            stringResource(R.string.scr_post_write_5)
         TextPostWritePhase.OUTCOME_UNKNOWN ->
-            "Couldn't confirm whether Reddit created this post. Check your profile before trying again to avoid a duplicate."
+            stringResource(R.string.scr_post_write_6)
         TextPostWritePhase.FAILED -> textPostWriteFailureMessage(state)
     }
 }
 
+@androidx.compose.runtime.Composable
 private fun textPostWriteFailureMessage(state: TextPostWriteUiState): String =
     when (state.failureKind) {
         TextPostWriteFailureKind.CONFIGURATION ->
-            "Post publishing is not configured for this account."
+            stringResource(R.string.scr_post_write_failed_1)
         TextPostWriteFailureKind.ACCOUNT_CHANGED ->
-            "The active account changed. Review the draft before posting."
+            stringResource(R.string.scr_post_write_failed_2)
         TextPostWriteFailureKind.BROWSER_LAUNCH ->
-            "Reddit authorization could not be opened."
+            stringResource(R.string.scr_post_write_failed_3)
         TextPostWriteFailureKind.CALLBACK ->
-            "Reddit authorization could not be completed."
+            stringResource(R.string.scr_post_write_failed_4)
         TextPostWriteFailureKind.AUTHORIZATION ->
-            "Post access was not granted."
+            stringResource(R.string.scr_post_write_failed_5)
         TextPostWriteFailureKind.SESSION ->
-            "The Reddit session could not be refreshed."
+            stringResource(R.string.scr_post_write_failed_6)
         TextPostWriteFailureKind.RATE_LIMIT -> state.retryAfterMs
             ?.let { delayMs ->
-                "Reddit asked you to wait about ${((delayMs + 999L) / 1_000L)} seconds."
+                stringResource(R.string.scr_post_write_failed_7, ((delayMs + 999L) / 1_000L))
             }
-            ?: "Reddit asked you to wait before posting again."
+            ?: stringResource(R.string.scr_post_write_failed_8)
         TextPostWriteFailureKind.COMMUNITY_UNAVAILABLE ->
-            "This community is unavailable."
+            stringResource(R.string.scr_post_write_failed_9)
         TextPostWriteFailureKind.PERMISSION ->
-            "This account cannot post in this community."
+            stringResource(R.string.scr_post_write_failed_10)
         TextPostWriteFailureKind.SUBMISSION_RESTRICTED ->
-            "This community is not accepting this post."
+            stringResource(R.string.scr_post_write_failed_11)
         TextPostWriteFailureKind.CHALLENGE_REQUIRED ->
-            "Reddit requires an additional verification step."
+            stringResource(R.string.scr_post_write_failed_12)
         TextPostWriteFailureKind.VALIDATION ->
-            "The post could not be published. Review the highlighted field."
+            stringResource(R.string.scr_post_write_failed_13)
         TextPostWriteFailureKind.API ->
-            "Reddit rejected the post."
+            stringResource(R.string.scr_post_write_failed_14)
         TextPostWriteFailureKind.HTTP,
         TextPostWriteFailureKind.TRANSPORT,
-        -> "The post could not be sent."
+        -> stringResource(R.string.scr_post_write_failed_15)
         TextPostWriteFailureKind.ALREADY_SUBMITTING ->
-            "This post is already being published."
+            stringResource(R.string.scr_post_write_failed_16)
         TextPostWriteFailureKind.NOT_POSTED ->
-            "Reddit doesn't show this post. You can post it again."
+            stringResource(R.string.scr_post_write_failed_17)
         TextPostWriteFailureKind.EARLIER_POST_UNCONFIRMED ->
-            "Reddit may have received an earlier post from this account. Check it before posting this one."
-        null -> "The post could not be published."
+            stringResource(R.string.scr_post_write_failed_18)
+        null -> stringResource(R.string.scr_post_write_failed_19)
     }

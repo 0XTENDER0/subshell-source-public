@@ -1,6 +1,8 @@
 package io.github.brealorg.subshell.ui.screens
 
 import io.github.brealorg.subshell.R
+import io.github.brealorg.subshell.ui.UiText
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.selection.toggleable
@@ -120,7 +122,11 @@ fun BackupRestoreScreen(
     // LOWUX3_RESTORE_PREVIEW_NAMES_ACCOUNTS_V1 (OCB-176): per-account modules
     // are keyed by stable id ("reddit:native_production:…"); the preview names
     // the account instead.
-    val restoreAccountLabel: (String) -> String = { key -> restorePreviewAccountLabel(key, state.accountSessions) }
+    val unknownAccount = stringResource(R.string.backup_another_account)
+    val thisDevice = stringResource(R.string.backup_this_device)
+    val restoreAccountLabel: (String) -> String = { key ->
+        if (key == RESTORE_THIS_DEVICE_KEY) thisDevice else restorePreviewAccountLabel(key, state.accountSessions, unknownAccount)
+    }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     // ISSUE89_BACKUP_SCREEN_READS_OFF_MAIN_V1: listSnapshots() decodes every
@@ -170,7 +176,8 @@ fun BackupRestoreScreen(
     var failureOperation by remember { mutableStateOf<BackupFailureOperation?>(null) }
     var failureDetails by remember { mutableStateOf<FailureDetails?>(null) }
     var saveDialogVisible by remember { mutableStateOf(false) }
-    var saveName by remember { mutableStateOf("My backup") }
+    val defaultSaveName = stringResource(R.string.backup_default_name)
+    var saveName by remember { mutableStateOf(defaultSaveName) }
     var renameTarget by remember { mutableStateOf<SettingsSnapshot?>(null) }
     var renameValue by remember { mutableStateOf("") }
     var deleteTarget by remember { mutableStateOf<SettingsSnapshot?>(null) }
@@ -239,11 +246,11 @@ fun BackupRestoreScreen(
     }
 
     // A privacy-sensitive switch also decides whether a restore applies the data.
-    fun recordBackupChoice(enabled: Boolean, subject: String) {
+    fun recordBackupChoice(enabled: Boolean, @androidx.annotation.StringRes backedUp: Int, @androidx.annotation.StringRes leftOut: Int) {
         val notice = if (enabled) {
-            BackupNotice("$subject will be backed up", "New backups hold them, and a restore brings them back.")
+            BackupNotice(UiText.Resource(backedUp), UiText.Resource(R.string.backup_notice_backed_up_detail))
         } else {
-            BackupNotice("$subject are left out", "New backups leave them out, and a restore leaves yours as they are.")
+            BackupNotice(UiText.Resource(leftOut), UiText.Resource(R.string.backup_notice_left_out_detail))
         }
         if (automaticHistory) {
             val currentPortable = state.capturePortableBackupState()
@@ -291,8 +298,8 @@ fun BackupRestoreScreen(
                 val connection = repository.connectFolder(uri)
                 when {
                     connection.isProtected && connection.importedSnapshots > 0 ->
-                        BackupNotice("Backup folder connected", "Found ${connection.importedSnapshots} backups in it.")
-                    connection.isProtected -> BackupNotice("Backup folder connected", "New backups are copied to it.")
+                        BackupNotice(UiText.Resource(R.string.backup_notice_folder_connected), UiText.Plural(R.plurals.backup_notice_found_in_folder, connection.importedSnapshots, connection.importedSnapshots))
+                    connection.isProtected -> BackupNotice(UiText.Resource(R.string.backup_notice_folder_connected), UiText.Resource(R.string.backup_notice_copied_to_folder))
                     else -> throw BackupFailureException(
                         connection.failureDetails ?: FailureDetails(
                             retryable = true,
@@ -317,7 +324,7 @@ fun BackupRestoreScreen(
                 requireNotNull(context.contentResolver.openOutputStream(uri, "wt")) {
                     "Could not open the selected location"
                 }.bufferedWriter().use { it.write(json) }
-                BackupNotice("Backup exported", "${snapshotName.orEmpty()} is saved as a file.")
+                BackupNotice(UiText.Resource(R.string.backup_notice_exported), UiText.Resource(R.string.backup_notice_saved_as_file, snapshotName.orEmpty()))
             }
         } else if (uri != null) {
             // The picker made the file but nothing says what to write: remove it.
@@ -349,7 +356,7 @@ fun BackupRestoreScreen(
                     failureOperation = null
                     failureDetails = null
                     backupTab = BackupListTab.YOURS
-                    showNotice(BackupNotice("Added ${imported.displayName()}", "It's under Your backups."))
+                    showNotice(BackupNotice(UiText.Resource(R.string.backup_notice_added, imported.displayName()), UiText.Resource(R.string.backup_notice_under_your_backups)))
                     restoreTarget = pendingRestoreOf(imported)
                 }.onFailure { error ->
                     reportFailure(BackupFailureOperation.IMPORT, error)
@@ -387,7 +394,7 @@ fun BackupRestoreScreen(
                     onSync = {
                         runInBackground(BackupFailureOperation.SYNC) {
                             if (repository.syncNow()) {
-                                BackupNotice("Backup folder is up to date", "Every backup is copied to it.")
+                                BackupNotice(UiText.Resource(R.string.backup_notice_folder_up_to_date), UiText.Resource(R.string.backup_notice_every_backup_copied))
                             } else {
                                 throw BackupFailureException(
                                     repository.status().failureDetails ?: FailureDetails(
@@ -401,7 +408,7 @@ fun BackupRestoreScreen(
                     onDisconnect = {
                         runInBackground(BackupFailureOperation.SYNC) {
                             repository.disconnectFolder()
-                            BackupNotice("Stopped copying to the backup folder", "The backups already in it were kept.")
+                            BackupNotice(UiText.Resource(R.string.backup_notice_stopped_copying), UiText.Resource(R.string.backup_notice_folder_backups_kept))
                         }
                     },
                 )
@@ -452,12 +459,12 @@ fun BackupRestoreScreen(
                             stringResource(R.string.all_communities),
                             stringResource(R.string.all_joined_favorites_and_favorite_custom_feeds_for),
                         )
-                        BackupIncludedRow("Saved searches and new-post notifications", stringResource(R.string.all_for_each_account))
+                        BackupIncludedRow(stringResource(R.string.scr_saved_searches_and_new_post_notifications), stringResource(R.string.all_for_each_account))
                     }
                 }
             }
 
-            item("privacy-sensitive-title") { BackupSubsectionTitle("Privacy-sensitive backup data") }
+            item("Privacy-sensitive backup data") { BackupSubsectionTitle(stringResource(R.string.scr_privacy_sensitive_backup_data)) }
             item("privacy-sensitive-backup") {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -470,7 +477,7 @@ fun BackupRestoreScreen(
                             onCheckedChange = { enabled ->
                                 includeHiddenCommunities = enabled
                                 repository.setHiddenCommunitiesBackupEnabled(enabled)
-                                recordBackupChoice(enabled, "Hidden communities")
+                                recordBackupChoice(enabled, R.string.backup_notice_hidden_communities_backed_up, R.string.backup_notice_hidden_communities_left_out)
                             },
                             title = stringResource(R.string.scr_hidden_communities),
                         )
@@ -479,7 +486,7 @@ fun BackupRestoreScreen(
                             onCheckedChange = { enabled ->
                                 includeCommunityMutes = enabled
                                 repository.setCommunityMutesBackupEnabled(enabled)
-                                recordBackupChoice(enabled, "Muted communities")
+                                recordBackupChoice(enabled, R.string.backup_notice_muted_communities_backed_up, R.string.backup_notice_muted_communities_left_out)
                             },
                             title = stringResource(R.string.scr_muted_communities),
                             description = stringResource(R.string.scr_timed_mutes_keep_their_end_time),
@@ -489,7 +496,7 @@ fun BackupRestoreScreen(
                             onCheckedChange = { enabled ->
                                 includePostComposerDrafts = enabled
                                 repository.setPostComposerDraftsBackupEnabled(enabled)
-                                recordBackupChoice(enabled, "Post drafts")
+                                recordBackupChoice(enabled, R.string.backup_notice_post_drafts_backed_up, R.string.backup_notice_post_drafts_left_out)
                             },
                             title = stringResource(R.string.scr_post_drafts),
                             description = stringResource(R.string.scr_text_and_link_drafts_images_stay_on),
@@ -500,7 +507,7 @@ fun BackupRestoreScreen(
                             onCheckedChange = { enabled ->
                                 includeModeratorSavedResponses = enabled
                                 repository.setModeratorSavedResponsesBackupEnabled(enabled)
-                                recordBackupChoice(enabled, "Saved moderator responses")
+                                recordBackupChoice(enabled, R.string.backup_notice_moderator_responses_backed_up, R.string.backup_notice_moderator_responses_left_out)
                             },
                             title = stringResource(R.string.scr_saved_moderator_responses),
                             description = stringResource(R.string.scr_shared_by_every_account_on_this_device),
@@ -511,7 +518,7 @@ fun BackupRestoreScreen(
                             onCheckedChange = { enabled ->
                                 includeUserTags = enabled
                                 repository.setUserTagsBackupEnabled(enabled)
-                                recordBackupChoice(enabled, "Private notes & tags")
+                                recordBackupChoice(enabled, R.string.backup_notice_notes_and_tags_backed_up, R.string.backup_notice_notes_and_tags_left_out)
                             },
                             title = stringResource(R.string.scr_private_notes_tags),
                             description = stringResource(R.string.scr_the_notes_and_tags_you_put_on),
@@ -534,7 +541,7 @@ fun BackupRestoreScreen(
                     )
                     Spacer(Modifier.width(16.dp))
                     Text(
-                        "Never backed up: sign-ins and your Reddit Client ID (sign in again after restoring), cached posts, history and posts saved for offline.",
+                        stringResource(R.string.scr_never_backed_up_sign_ins_and),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -579,10 +586,10 @@ fun BackupRestoreScreen(
                                         val currentPortable = state.capturePortableBackupState()
                                         runInBackground(BackupFailureOperation.SAVE) {
                                             recordPortableChange(currentPortable)
-                                            BackupNotice("Automatic backups are on", "A backup is made after you change a setting.")
+                                            BackupNotice(UiText.Resource(R.string.backup_notice_automatic_on), UiText.Resource(R.string.backup_notice_automatic_on_detail))
                                         }
                                     } else {
-                                        showNotice(BackupNotice("Automatic backups are off", "The ones already made were kept."))
+                                        showNotice(BackupNotice(UiText.Resource(R.string.backup_notice_automatic_off), UiText.Resource(R.string.backup_notice_automatic_off_detail)))
                                     }
                                 },
                                 title = stringResource(R.string.scr_back_up_automatically),
@@ -603,7 +610,7 @@ fun BackupRestoreScreen(
                                 } else {
                                     runInBackground(BackupFailureOperation.DELETE) {
                                         repository.setAutomaticHistoryRetention(retention)
-                                        BackupNotice("Keeping the newest ${retention.label.lowercase()}", "Of the backups made automatically.")
+                                        BackupNotice(keepingNewest(retention), UiText.Resource(RetentionKind.AUTOMATIC_HISTORY.detailRes))
                                     }
                                 }
                             },
@@ -629,7 +636,7 @@ fun BackupRestoreScreen(
                                 } else {
                                     runInBackground(BackupFailureOperation.DELETE) {
                                         repository.setSafetySnapshotRetention(retention)
-                                        BackupNotice("Keeping the newest ${retention.label.lowercase()}", "Of the backups made before a restore.")
+                                        BackupNotice(keepingNewest(retention), UiText.Resource(RetentionKind.SAFETY_SNAPSHOTS.detailRes))
                                     }
                                 }
                             },
@@ -677,7 +684,7 @@ fun BackupRestoreScreen(
                         onRestore = { restoreTarget = pendingRestoreOf(snapshot) },
                         onExport = {
                             pendingExportId = snapshot.id
-                            pendingExportName = snapshot.displayName()
+                            pendingExportName = snapshot.displayName().resolve(context)
                             exportLauncher.launch(snapshot.exportFileName())
                         },
                         onRename = if (snapshot.kind == SnapshotKind.MANUAL) {
@@ -748,10 +755,10 @@ fun BackupRestoreScreen(
                         currentSavedSearches,
                         currentWatchedCommunities,
                     )
-                    BackupNotice("Backed up", "It's under Your backups as ${saved.name}.")
+                    BackupNotice(UiText.Resource(R.string.backup_notice_backed_up), UiText.Resource(R.string.backup_notice_under_your_backups_as, saved.name))
                 }
                 saveDialogVisible = false
-                saveName = "My backup"
+                saveName = defaultSaveName
             },
         )
     }
@@ -767,7 +774,7 @@ fun BackupRestoreScreen(
                 val name = renameValue
                 runInBackground(BackupFailureOperation.RENAME) {
                     val renamed = repository.renameSnapshot(snapshot.id, name)
-                    BackupNotice("Renamed", "It's now called ${renamed.name}.")
+                    BackupNotice(UiText.Resource(R.string.backup_notice_renamed), UiText.Resource(R.string.backup_notice_now_called, renamed.name))
                 }
                 renameTarget = null
             },
@@ -781,8 +788,7 @@ fun BackupRestoreScreen(
         )
         val changedLabel = when (changedSettings) {
             0 -> stringResource(R.string.all_settings_will_stay_unchanged)
-            1 -> "1 setting will change."
-            else -> "$changedSettings settings will change."
+            else -> pluralStringResource(R.plurals.backup_settings_will_change, changedSettings, changedSettings)
         }
         val communityDiffs = joinedCommunitiesRestoreDiff(
             current = request.currentJoinedCommunityIdsByAccount,
@@ -843,7 +849,7 @@ fun BackupRestoreScreen(
 
         AlertDialog(
             onDismissRequest = { restoreTarget = null },
-            title = { Text(stringResource(R.string.scr_restore, request.snapshot.displayName())) },
+            title = { Text(stringResource(R.string.scr_restore, request.snapshot.displayName().asString())) },
             text = {
                 Column {
                     Text(changedLabel)
@@ -867,11 +873,11 @@ fun BackupRestoreScreen(
                             communityDiffs.forEach { diff ->
                                 val detail = when {
                                     diff.clearsAllCurrent ->
-                                        "u/${diff.account}: +${diff.added} / -${diff.removed} — will end at 0 joined communities."
+                                        stringResource(R.string.backup_joined_diff_ends_empty, diff.account, diff.added, diff.removed)
                                     diff.establishesExplicitEmpty ->
-                                        "u/${diff.account}: set to 0 joined communities."
+                                        stringResource(R.string.backup_joined_diff_set_empty, diff.account)
                                     else ->
-                                        "u/${diff.account}: +${diff.added} / -${diff.removed} → ${diff.targetCount} joined."
+                                        stringResource(R.string.backup_joined_diff_to, diff.account, diff.added, diff.removed, diff.targetCount)
                                 }
                                 Text(
                                     detail,
@@ -908,7 +914,7 @@ fun BackupRestoreScreen(
                         diffs = hiddenCommunityDiffs,
                         enabled = includeHiddenCommunities,
                         disabledMessage =
-                            "In this backup, but turned off under Privacy-sensitive backup data, so it stays as it is.",
+                            stringResource(R.string.scr_in_this_backup_but_turned_off),
                     )
                     Spacer(Modifier.size(8.dp))
                     PortableValuesRestorePreview(
@@ -918,7 +924,7 @@ fun BackupRestoreScreen(
                         diffs = communityMuteDiffs,
                         enabled = includeCommunityMutes,
                         disabledMessage =
-                            "In this backup, but turned off under Privacy-sensitive backup data, so it stays as it is.",
+                            stringResource(R.string.scr_in_this_backup_but_turned_off),
                     )
                     if (!legacyCommunityMutes && includeCommunityMutes) {
                         Text(
@@ -935,7 +941,7 @@ fun BackupRestoreScreen(
                         diffs = postComposerDraftDiffs,
                         enabled = includePostComposerDrafts,
                         disabledMessage =
-                            "In this backup, but turned off under Privacy-sensitive backup data, so it stays as it is.",
+                            stringResource(R.string.scr_in_this_backup_but_turned_off),
                     )
                     if (!legacyPostComposerDrafts && includePostComposerDrafts) {
                         Text(
@@ -952,7 +958,7 @@ fun BackupRestoreScreen(
                         diffs = moderatorSavedResponseDiffs,
                         enabled = includeModeratorSavedResponses,
                         disabledMessage =
-                            "In this backup, but turned off under Privacy-sensitive backup data, so it stays as it is.",
+                            stringResource(R.string.scr_in_this_backup_but_turned_off),
                     )
                     Spacer(Modifier.size(8.dp))
                     PortableValuesRestorePreview(
@@ -962,7 +968,7 @@ fun BackupRestoreScreen(
                         diffs = userTagDiffs,
                         enabled = includeUserTags,
                         disabledMessage =
-                            "In this backup, but turned off under Privacy-sensitive backup data, so it stays as it is.",
+                            stringResource(R.string.scr_in_this_backup_but_turned_off),
                     )
                     Spacer(Modifier.size(8.dp))
                     PortableValuesRestorePreview(
@@ -984,7 +990,7 @@ fun BackupRestoreScreen(
                     )
                     Spacer(Modifier.size(10.dp))
                     Text(
-                        "subshell backs up your current setup first, so you can undo this.",
+                        stringResource(R.string.scr_subshell_backs_up_your_current_setup),
                     )
                 }
             },
@@ -1058,7 +1064,7 @@ fun BackupRestoreScreen(
                                         refresh()
                                         failureOperation = null
                                         failureDetails = null
-                                        showNotice(BackupNotice("Restored ${target.displayName()}", "Your setup before it is under Undo."))
+                                        showNotice(BackupNotice(UiText.Resource(R.string.backup_notice_restored, target.displayName()), UiText.Resource(R.string.backup_notice_restored_detail)))
                                     }.onFailure { error ->
                                         reportFailure(BackupFailureOperation.RESTORE, error)
                                     }
@@ -1077,20 +1083,19 @@ fun BackupRestoreScreen(
     }
 
     retentionChangeTarget?.let { request ->
-        val subject = when (request.kind) {
-            RetentionKind.AUTOMATIC_HISTORY -> "automatic backups"
-            RetentionKind.SAFETY_SNAPSHOTS -> "backups made before a restore"
-        }
         val unaffected = when (request.kind) {
             RetentionKind.AUTOMATIC_HISTORY -> stringResource(R.string.all_your_backups_and_the_ones_made_before)
             RetentionKind.SAFETY_SNAPSHOTS -> stringResource(R.string.all_your_backups_and_automatic_backups_stay)
         }
         AlertDialog(
             onDismissRequest = { retentionChangeTarget = null },
-            title = { Text(stringResource(R.string.scr_keep_only, request.target.label.lowercase())) },
+            title = { Text(pluralStringResource(R.plurals.backup_keep_only, request.target.limit ?: 0, request.target.limit ?: 0)) },
             text = {
                 Text(
-                    stringResource(R.string.all2_older_over_this_limit_are_deleted_from, subject, unaffected),
+                    when (request.kind) {
+                        RetentionKind.AUTOMATIC_HISTORY -> stringResource(R.string.backup_retention_older_automatic, unaffected)
+                        RetentionKind.SAFETY_SNAPSHOTS -> stringResource(R.string.backup_retention_older_safety, unaffected)
+                    },
                 )
             },
             confirmButton = {
@@ -1105,7 +1110,7 @@ fun BackupRestoreScreen(
                                 RetentionKind.SAFETY_SNAPSHOTS ->
                                     repository.setSafetySnapshotRetention(pending.target)
                             }
-                            BackupNotice("Keeping the newest ${pending.target.label.lowercase()}", "Of the backups ${pending.kind.messageLabel}.")
+                            BackupNotice(keepingNewest(pending.target), UiText.Resource(pending.kind.detailRes))
                         }
                     },
                     colors = ButtonDefaults.textButtonColors(
@@ -1122,17 +1127,16 @@ fun BackupRestoreScreen(
     if (deleteAllDialogVisible) {
         val total = snapshots.size
         val automaticHistoryNote = if (automaticHistory) {
-            " New automatic backups are made after your next settings change."
+            stringResource(R.string.backup_delete_all_automatic_on)
         } else {
-            " Automatic backups are off."
+            stringResource(R.string.backup_delete_all_automatic_off)
         }
         AlertDialog(
             onDismissRequest = { deleteAllDialogVisible = false },
             title = { Text(stringResource(R.string.scr_delete_all_backups_2, total)) },
             text = {
                 Text(
-                    "This removes your backups, automatic backups and the ones made before a restore from this device and the backup folder." +
-                        automaticHistoryNote,
+                    stringResource(R.string.error_join_sentences, stringResource(R.string.backup_delete_all_explained), automaticHistoryNote),
                 )
             },
             confirmButton = {
@@ -1141,7 +1145,7 @@ fun BackupRestoreScreen(
                         deleteAllDialogVisible = false
                         runInBackground(BackupFailureOperation.DELETE) {
                             val deleted = repository.deleteAllSnapshots()
-                            BackupNotice(if (deleted == 1) "Deleted 1 backup" else "Deleted $deleted backups", "They're gone from this device and the backup folder.")
+                            BackupNotice(UiText.Plural(R.plurals.backup_notice_deleted_count, deleted, deleted), UiText.Resource(R.string.backup_notice_deleted_many_detail))
                         }
                     },
                     colors = ButtonDefaults.textButtonColors(
@@ -1158,16 +1162,16 @@ fun BackupRestoreScreen(
     deleteTarget?.let { snapshot ->
         AlertDialog(
             onDismissRequest = { deleteTarget = null },
-            title = { Text(stringResource(R.string.scr_delete, snapshot.displayName())) },
+            title = { Text(stringResource(R.string.scr_delete, snapshot.displayName().asString())) },
             text = { Text(stringResource(R.string.scr_it_s_removed_from_this_device_and)) },
             confirmButton = {
                 TextButton(
                     onClick = {
                         runInBackground(BackupFailureOperation.DELETE) {
                             if (repository.deleteSnapshot(snapshot.id)) {
-                                BackupNotice("Deleted ${snapshot.displayName()}", "It's gone from this device and the backup folder.")
+                                BackupNotice(UiText.Resource(R.string.backup_notice_deleted_one, snapshot.displayName()), UiText.Resource(R.string.backup_notice_deleted_one_detail))
                             } else {
-                                BackupNotice("Nothing to delete", "That backup no longer exists.")
+                                BackupNotice(UiText.Resource(R.string.backup_notice_nothing_to_delete), UiText.Resource(R.string.backup_notice_no_longer_exists))
                             }
                         }
                         deleteTarget = null
@@ -1323,7 +1327,7 @@ private fun BackupProtectionCard(
                     Text(stringResource(R.string.scr_choose_backup_folder))
                 }
                 Text(
-                    "For example, create Documents/subshell Backups in the folder picker.",
+                    stringResource(R.string.scr_for_example_create_documents_subshell_backups),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 36.dp),
@@ -1350,7 +1354,7 @@ private fun BackupRetentionRow(
         modifier = Modifier.fillMaxWidth(),
     ) {
         OutlinedTextField(
-            value = retention.label,
+            value = stringResource(retention.labelRes),
             onValueChange = {},
             readOnly = true,
             singleLine = true,
@@ -1369,7 +1373,7 @@ private fun BackupRetentionRow(
                     // ISSUE219_RETENTION_MENU_SAYS_WHICH_IS_SELECTED_V1: the check icon
                     // has no description; the item itself carries the selection.
                     modifier = Modifier.semantics { selected = option == retention },
-                    text = { Text(option.label) },
+                    text = { Text(stringResource(option.labelRes)) },
                     trailingIcon = {
                         if (option == retention) {
                             Icon(
@@ -1452,7 +1456,7 @@ private fun BackupIncludedRow(title: String, description: String) {
     )
 }
 
-private data class BackupNotice(val title: String, val detail: String)
+private data class BackupNotice(val title: UiText, val detail: UiText)
 
 private enum class BackupListTab(@androidx.annotation.StringRes val labelRes: Int) {
     YOURS( io.github.brealorg.subshell.R.string.backup_list_tab_yours),
@@ -1461,8 +1465,8 @@ private enum class BackupListTab(@androidx.annotation.StringRes val labelRes: In
 }
 
 // Automatic backups were named "Automatic settings history" when they were made.
-private fun SettingsSnapshot.displayName(): String =
-    if (kind == SnapshotKind.CHANGE) "Automatic backup" else name
+private fun SettingsSnapshot.displayName(): UiText =
+    if (kind == SnapshotKind.CHANGE) UiText.Resource(R.string.scr_automatic_backup) else UiText.Plain(name)
 
 @Composable
 private fun EmptySnapshots(icon: ImageVector, title: String, description: String) {
@@ -1518,13 +1522,13 @@ private fun SnapshotCard(
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        snapshot.displayName(),
+                        snapshot.displayName().asString(),
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        "$formattedDate · subshell ${snapshot.appVersion}",
+                        stringResource(R.string.backup_date_version, formattedDate, snapshot.appVersion),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -1606,10 +1610,15 @@ private fun NameDialog(
     )
 }
 
-private enum class RetentionKind(val messageLabel: String) {
-    AUTOMATIC_HISTORY("made automatically"),
-    SAFETY_SNAPSHOTS("made before a restore"),
+private enum class RetentionKind(@androidx.annotation.StringRes val detailRes: Int) {
+    AUTOMATIC_HISTORY(R.string.backup_notice_of_automatic),
+    SAFETY_SNAPSHOTS(R.string.backup_notice_of_safety),
 }
+
+/** TRANSLATE14_BACKUP_NOTICES_ARE_WHOLE_SENTENCES_V1 */
+private fun keepingNewest(retention: BackupRetention): UiText =
+    retention.limit?.let { limit -> UiText.Plural(R.plurals.backup_notice_keeping_newest, limit, limit) }
+        ?: UiText.Resource(R.string.backup_notice_keeping_every)
 
 private data class PendingRetentionChange(
     val kind: RetentionKind,
@@ -1631,19 +1640,21 @@ private data class PendingRestore(
     val currentWatchedCommunityNamesByAccount: Map<String, Set<String>>,
 )
 
-// BACKUP04A4: device-wide module, shown as one row.
+// BACKUP04A4: device-wide module, shown as one row (named by restoreAccountLabel).
+internal const val RESTORE_THIS_DEVICE_KEY = "This device"
+
 internal fun portableModeratorSavedResponsesRestoreDiff(
     current: List<PortableModeratorSavedResponse>,
     target: List<PortableModeratorSavedResponse>?,
 ): List<PortableValuesRestoreAccountDiff> = portableValuesRestoreDiff(
     current = mapOf(
-        "This device" to current.mapTo(linkedSetOf()) { response ->
+        RESTORE_THIS_DEVICE_KEY to current.mapTo(linkedSetOf()) { response ->
             "${response.id}|${response.updatedAtEpochMs}|${response.title}|${response.body}"
         },
     ),
     target = target?.let { responses ->
         mapOf(
-            "This device" to responses.mapTo(linkedSetOf()) { response ->
+            RESTORE_THIS_DEVICE_KEY to responses.mapTo(linkedSetOf()) { response ->
                 "${response.id}|${response.updatedAtEpochMs}|${response.title}|${response.body}"
             },
         )
@@ -1759,7 +1770,7 @@ private fun PortableValuesRestorePreview(
         )
         !enabled -> Text(
             disabledMessage
-                ?: "This privacy-sensitive module is disabled and will be kept unchanged.",
+                ?: stringResource(R.string.scr_this_privacy_sensitive_module_is_disabled),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -1770,13 +1781,18 @@ private fun PortableValuesRestorePreview(
         )
         else -> {
             diffs.take(6).forEach { diff ->
+                val who = if (diff.account == RESTORE_THIS_DEVICE_KEY) {
+                    stringResource(R.string.backup_this_device)
+                } else {
+                    accountLabel(diff.account)
+                }
                 val summary = when {
                     diff.clearsAllCurrent ->
-                        "${accountLabel(diff.account)}: clear ${diff.currentCount} current"
+                        stringResource(R.string.backup_diff_clear_current, who, diff.currentCount ?: 0)
                     diff.establishesExplicitEmpty ->
-                        "${accountLabel(diff.account)}: establish explicit empty"
+                        stringResource(R.string.backup_diff_explicit_empty, who)
                     else ->
-                        "${accountLabel(diff.account)}: +${diff.added} / -${diff.removed}"
+                        stringResource(R.string.backup_diff_added_removed, who, diff.added, diff.removed)
                 }
                 Text(
                     summary,
@@ -1790,7 +1806,7 @@ private fun PortableValuesRestorePreview(
             }
             if (diffs.size > 6) {
                 Text(
-                    "…and ${diffs.size - 6} more accounts",
+                    pluralStringResource(R.plurals.backup_more_accounts, diffs.size - 6, diffs.size - 6),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -1864,11 +1880,11 @@ private fun SettingsSnapshot.exportFileName(): String {
 }
 
 /** "u/name" for an account key (stable id or username), "another account" when unknown here. */
-internal fun restorePreviewAccountLabel(key: String, sessions: List<AccountSessionSummary>): String {
+internal fun restorePreviewAccountLabel(key: String, sessions: List<AccountSessionSummary>, unknownAccount: String): String {
     sessions.firstOrNull { session -> session.stableId == key }?.let { session -> return "u/${session.username}" }
     sessions.firstOrNull { session -> session.username.equals(key, ignoreCase = true) }
         ?.let { session -> return "u/${session.username}" }
-    return if (':' in key) "another account" else "u/$key"
+    return if (':' in key) unknownAccount else "u/$key"
 }
 
 // ISSUE219_BACKUP_SWITCH_ROWS_ARE_LABELLED_V1: the whole row is the switch

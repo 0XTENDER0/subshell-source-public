@@ -56,7 +56,8 @@ class CommentSave01A31CommentOverflowIconSystemPolicyTest {
         assertTrue(row.contains("text = { Text(\"Share comment\") }"))
         assertTrue(row.contains("imageVector = Symbols.Share"))
         // ISSUE300_ONE_COPY_ENTRY_OPENS_A_SHEET_V1: "Copy text" became "Copy…" (a sheet).
-        assertTrue(row.contains("text = { Text(COPY_MENU_ENTRY_LABEL) }"))
+        // TRANSLATE14: the label became a string resource (Copy… in English).
+        assertTrue(row.contains("text = { Text(stringResource(COPY_MENU_ENTRY_LABEL)) }"))
         assertTrue(row.contains("imageVector = Symbols.ContentCopy"))
         // ISSUE295_MENU_OFFERS_ONLY_WHAT_THE_CARD_DOES_NOT_V1: a tap on the
         // comment collapses it; the menu no longer repeats it.

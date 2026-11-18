@@ -415,7 +415,7 @@ private fun RedditOnboardingIntro(
     )
 
     Text(
-        "Reddit sign-in cannot start until subshell has a Client ID. You only need to set this up once for this subshell installation.",
+        stringResource(R.string.scr_reddit_sign_in_cannot_start_until),
         color =
             MaterialTheme.colorScheme
                 .onSurfaceVariant,
@@ -460,14 +460,14 @@ private fun RedditOnboardingIntro(
                         Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
-                        "Setup required before sign-in",
+                        stringResource(R.string.scr_setup_required_before_sign_in),
                         style =
                             MaterialTheme.typography
                                 .titleMedium,
                     )
 
                     Text(
-                        "subshell cannot create this Client ID for you. Use RedReader once to get the value Reddit assigns.",
+                        stringResource(R.string.scr_subshell_cannot_create_this_client_id),
                         color =
                             MaterialTheme.colorScheme
                                 .onSurfaceVariant,
@@ -476,15 +476,15 @@ private fun RedditOnboardingIntro(
             }
 
             Text(
-                "1. Open RedReader and sign in to Reddit.",
+                stringResource(R.string.scr_1_open_redreader_and_sign_in),
             )
 
             Text(
-                "2. Open Reddit's authorization email and find App ID.",
+                stringResource(R.string.scr_2_open_reddit_s_authorization_email),
             )
 
             Text(
-                "3. Paste that App ID into subshell. Then sign in here.",
+                stringResource(R.string.scr_3_paste_that_app_id_into),
             )
         }
     }
@@ -504,7 +504,7 @@ private fun RedditOnboardingIntro(
     }
 
     Text(
-        "Your Client ID is kept in encrypted no-backup storage on this device and isn't included in subshell settings backups.",
+        stringResource(R.string.scr_your_client_id_is_kept_in),
         style =
             MaterialTheme.typography.bodySmall,
         color =
@@ -586,7 +586,7 @@ private fun RedditClientIdGuide(
         number = "2",
         title = stringResource(R.string.scr_sign_in_to_reddit_in_redreader),
         body =
-            "Complete RedReader's normal Reddit sign-in and authorize it when Reddit asks.",
+            stringResource(R.string.scr_complete_redreader_s_normal_reddit_sign),
     )
 
     SetupStep(
@@ -645,7 +645,7 @@ private fun RedditAuthorizationEmailExample() {
                 Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                "EXAMPLE ONLY — NOT A REAL EMAIL",
+                stringResource(R.string.scr_example_only_not_a_real_email),
                 style =
                     MaterialTheme.typography
                         .labelLarge,
@@ -716,7 +716,7 @@ private fun RedditAuthorizationEmailExample() {
                     )
 
                     Text(
-                        "your Client ID appears here",
+                        stringResource(R.string.scr_your_client_id_appears_here),
                         color =
                             MaterialTheme.colorScheme
                                 .primary,
@@ -822,6 +822,7 @@ private fun RedditClientIdEntry(
     var failureMessage by remember {
         mutableStateOf<String?>(null)
     }
+    val couldNotSaveClientId = stringResource(R.string.scr_subshell_couldn_t_save_the_client)
 
     // ISSUE240_ONBOARDING_EDITS_THE_REDDIT_API_VALUES_V1: a fresh install can
     // sign in even after Reddit or RedReader changed these; saved with the ID.
@@ -926,7 +927,7 @@ private fun RedditClientIdEntry(
 
                 else ->
                     Text(
-                        "Stored locally in encrypted no-backup storage.",
+                        stringResource(R.string.scr_stored_locally_in_encrypted_no_backup),
                     )
             }
         },
@@ -973,7 +974,7 @@ private fun RedditClientIdEntry(
                 )
 
                 Text(
-                    "Only change these if sign-in stopped working or you were told to. Wrong values break sign-in.",
+                    stringResource(R.string.scr_only_change_these_if_sign_in),
                     style =
                         MaterialTheme.typography
                             .bodySmall,
@@ -1060,8 +1061,7 @@ private fun RedditClientIdEntry(
                         draft = ""
                         onSaved()
                     }.onFailure {
-                        failureMessage =
-                            "subshell couldn't save the Client ID."
+                        failureMessage = couldNotSaveClientId
                     }
                 }
             }
@@ -1108,7 +1108,7 @@ private fun RedditOnboardingReady(
     )
 
     Text(
-        "Your Client ID is configured. subshell can now open Reddit sign-in.",
+        stringResource(R.string.scr_your_client_id_is_configured_subshell),
         color =
             MaterialTheme.colorScheme
                 .onSurfaceVariant,
@@ -1267,41 +1267,42 @@ private fun RedditOnboardingReady(
     }
 }
 
+@Composable
 private fun redditConnectStatus(
     state: ConnectAccountUiState,
 ): String = when (state.phase) {
     ConnectAccountPhase.UNAVAILABLE ->
-        "The Reddit connection isn't available with the current local configuration."
+        stringResource(R.string.scr_connect_status_unavailable)
 
     ConnectAccountPhase.IDLE ->
-        "No Reddit account is connected yet."
+        stringResource(R.string.scr_connect_status_idle)
 
     ConnectAccountPhase.LAUNCHING ->
-        "Opening Reddit sign-in…"
+        stringResource(R.string.scr_connect_status_launching)
 
     ConnectAccountPhase.AWAITING_CALLBACK ->
-        "Finish signing in to Reddit, then return to subshell."
+        stringResource(R.string.scr_connect_status_awaiting)
 
     ConnectAccountPhase.EXCHANGING ->
-        "Completing Reddit authorization…"
+        stringResource(R.string.scr_connect_status_exchanging)
 
     ConnectAccountPhase.RESOLVING_IDENTITY ->
-        "Loading your Reddit account…"
+        stringResource(R.string.scr_connect_status_resolving)
 
     ConnectAccountPhase.SYNCING_REDDIT_FEED ->
-        "Preparing your Reddit account…"
+        stringResource(R.string.scr_connect_status_syncing)
 
     ConnectAccountPhase.CONNECTED ->
-        "Reddit connected. Finishing setup…"
+        stringResource(R.string.scr_connect_status_connected)
 
     ConnectAccountPhase.CANCELLED ->
-        "Reddit sign-in was cancelled. Nothing was changed."
+        stringResource(R.string.scr_connect_status_cancelled)
 
     ConnectAccountPhase.ERROR ->
         if (state.retryable) {
-            "Reddit sign-in didn't finish. You can try again."
+            stringResource(R.string.scr_connect_status_error_retry)
         } else {
-            "The Reddit connection couldn't be completed. Review the Client ID."
+            stringResource(R.string.scr_connect_status_error_client_id)
         }
 }
 
@@ -1389,7 +1390,7 @@ private fun RedditOnboardingConnected(
             Spacer(Modifier.height(10.dp))
 
             Text(
-                "subshell will use this Reddit account for your feeds, communities, Inbox, profile and supported account actions.",
+                stringResource(R.string.scr_subshell_will_use_this_reddit_account),
                 color =
                     MaterialTheme.colorScheme
                         .onSurfaceVariant,
@@ -1492,7 +1493,7 @@ internal fun RedditLinkHandlingOnboardingScreen(
                         style = MaterialTheme.typography.titleSmall,
                     )
                     Text(
-                        "1. Turn on Open supported links.\n2. Select the Reddit addresses you want subshell to open.",
+                        stringResource(R.string.scr_1_turn_on_open_supported_links),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
@@ -1506,7 +1507,7 @@ internal fun RedditLinkHandlingOnboardingScreen(
             if (state.status == RedditLinkHandlingStatus.PARTIAL) {
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    "${state.selectedHostCount} of ${state.supportedHostCount} supported Reddit domains are currently selected.",
+                    stringResource(R.string.onb_domains_selected, state.selectedHostCount, state.supportedHostCount),
                     color = MaterialTheme.colorScheme.primary,
                 )
             }

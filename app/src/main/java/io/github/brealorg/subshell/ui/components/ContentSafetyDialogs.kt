@@ -55,7 +55,6 @@ import io.github.brealorg.subshell.ui.symbols.Symbols
 @Composable
 internal @OptIn(ExperimentalMaterial3Api::class)
 fun RedditContentReportDialog(
-    targetLabel: String,
     communityName: String,
     targetKind: RedditReportTargetKind,
     state: SubshellState,
@@ -100,9 +99,9 @@ ModalBottomSheet(
                     Icon(Symbols.Flag, contentDescription = null, modifier = Modifier.padding(12.dp))
                 }
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(stringResource(R.string.comp_report, targetLabel), style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(if (targetKind == RedditReportTargetKind.COMMENT) R.string.comp_report_comment_title else R.string.comp_report_post_title), style = MaterialTheme.typography.headlineSmall)
                     Text(
-                        stringResource(R.string.all_tell_reddit_why_this_should_be_reported, targetLabel),
+                        stringResource(if (targetKind == RedditReportTargetKind.COMMENT) R.string.all_report_why_comment else R.string.all_report_why_post),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -140,7 +139,7 @@ ModalBottomSheet(
                     ) {
                         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(stringResource(R.string.comp_couldn_t_load_report_reasons), style = MaterialTheme.typography.titleMedium)
-                            Text("subshell won't guess whether r/$communityName accepts custom reports.")
+                            Text(stringResource(R.string.comp_subshell_won_t_guess_whether_r, communityName))
                             TextButton(onClick = { state.ensureReportReasonPolicy(communityName, force = true) }) {
                                 Text(stringResource(R.string.comp_retry))
                             }
@@ -201,7 +200,7 @@ ModalBottomSheet(
                         } else {
                             Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
                                 Text(
-                                    if (policy.freeFormReportsKnown) "r/$communityName accepts only its listed report reasons."
+                                    if (policy.freeFormReportsKnown) stringResource(R.string.comp_r_accepts_only_its_listed_report, communityName)
                                     else stringResource(R.string.all_reddit_didn_t_confirm_that_r_accepts, communityName),
                                     modifier = Modifier.padding(14.dp),
                                     style = MaterialTheme.typography.bodySmall,
@@ -211,7 +210,7 @@ ModalBottomSheet(
                         }
                         if (policy.options.isEmpty() && !policy.freeFormReportsAllowed) {
                             Text(
-                                stringResource(R.string.all_no_safe_report_reason_is_available_from, targetLabel),
+                                stringResource(if (targetKind == RedditReportTargetKind.COMMENT) R.string.all_report_no_reason_comment else R.string.all_report_no_reason_post),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )

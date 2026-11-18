@@ -261,8 +261,38 @@ internal fun profileLibraryTabForDestination(tab: Int): Int = when (tab) {
     else -> 1
 }
 
+@Composable
 private fun profileDestinationLabel(tab: Int): String =
-    PROFILE_OWN_DESTINATION_LABELS.getOrElse(tab) { "Posts" }
+    profileTabText(PROFILE_OWN_DESTINATION_LABELS.getOrElse(tab) { PROFILE_OWN_DESTINATION_LABELS[PROFILE_POSTS_TAB] })
+
+/**
+ * TRANSLATE14_PROFILE_TAB_KEYS_ARE_SHOWN_TRANSLATED_V1: the English tab names in the
+ * lists above are keys (tests and the process restore count them); this is what
+ * the reader sees. Text that is not a key comes back unchanged.
+ */
+@Composable
+internal fun profileTabText(key: String): String = when (key) {
+    "Posts" -> stringResource(R.string.scr_profile_tab_posts)
+    "Comments" -> stringResource(R.string.scr_profile_tab_comments)
+    "Saved" -> stringResource(R.string.scr_profile_tab_saved)
+    "Upvotes" -> stringResource(R.string.scr_profile_tab_upvotes)
+    "Downvotes" -> stringResource(R.string.scr_profile_tab_downvotes)
+    "Hidden" -> stringResource(R.string.scr_profile_tab_hidden)
+    "Blocked" -> stringResource(R.string.scr_profile_tab_blocked)
+    "Drafts" -> stringResource(R.string.scr_profile_tab_drafts)
+    "Reading" -> stringResource(R.string.scr_profile_tab_reading)
+    "Library" -> stringResource(R.string.scr_profile_tab_library)
+    else -> key
+}
+
+/** The empty local history tab, as whole sentences per tab. */
+@Composable
+private fun localHistoryEmpty(tab: Int): Pair<String, String> = when (tab) {
+    PROFILE_SAVED_TAB -> stringResource(R.string.scr_local_empty_saved_title) to stringResource(R.string.scr_local_empty_saved)
+    PROFILE_UPVOTES_TAB -> stringResource(R.string.scr_local_empty_upvotes_title) to stringResource(R.string.scr_local_empty_upvotes)
+    PROFILE_DOWNVOTES_TAB -> stringResource(R.string.scr_local_empty_downvotes_title) to stringResource(R.string.scr_local_empty_downvotes)
+    else -> stringResource(R.string.scr_local_empty_hidden_title) to stringResource(R.string.scr_local_empty_hidden)
+}
 
 private fun profileDestinationIcon(tab: Int): ImageVector = when (tab) {
     PROFILE_POSTS_TAB -> Symbols.Article
@@ -335,7 +365,7 @@ fun UserProfileScreen(
         Column(modifier = modifier.fillMaxSize().padding(24.dp)) {
             Text(stringResource(R.string.scr_this_user_can_t_be_shown), style = MaterialTheme.typography.titleMedium)
             Text(
-                "u/$username isn't a valid Reddit username.",
+                stringResource(R.string.scr_u_isn_t_a_valid_reddit, username),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -1606,7 +1636,7 @@ fun UserProfileScreen(
                                     if (profileUnavailable) {
                                         stringResource(R.string.all_unavailable_on_reddit)
                                     } else {
-                                        "Redditor for ${user.accountAge}"
+                                        stringResource(R.string.profile_redditor_for, accountAgeText(user.accountAge))
                                     },
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1614,7 +1644,7 @@ fun UserProfileScreen(
                             }
                         }
                         Text(
-                            if (profileUnavailable) "" else user.description,
+                            if (profileUnavailable) "" else io.github.brealorg.subshell.ui.state.identityDescriptionShown(user.description),
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1638,17 +1668,17 @@ fun UserProfileScreen(
                         ) {
                             ProfileStat(
                                 if (profileUnavailable) "—" else user.karma.removeSuffix(" karma"),
-                                "karma",
+                                stringResource(R.string.profile_stat_karma),
                                 Modifier.padding(horizontal = 8.dp),
                             )
                             ProfileStat(
-                                if (profileUnavailable) "—" else user.accountAge,
-                                "account age",
+                                if (profileUnavailable) "—" else accountAgeText(user.accountAge),
+                                stringResource(R.string.profile_stat_account_age),
                                 Modifier.padding(horizontal = 8.dp),
                             )
                             ProfileStat(
                                 if (profileUnavailable) "—" else followerCountLabel(user.followers, following),
-                                "followers",
+                                stringResource(R.string.profile_stat_followers),
                                 Modifier.padding(horizontal = 8.dp),
                             )
                         }
@@ -1733,8 +1763,8 @@ fun UserProfileScreen(
                                 val presentation = when {
                                     activeRedditFeedState.inProgress ->
                                         ProfileEmptyPresentation(
-                                            title = stringResource(R.string.scr_loading_posts),
-                                            description = stringResource(R.string.scr_fetching_submitted_posts_for_u, username),
+                                            title = io.github.brealorg.subshell.ui.UiText.Resource(R.string.scr_loading_posts),
+                                            description = io.github.brealorg.subshell.ui.UiText.Resource(R.string.scr_fetching_submitted_posts_for_u, username),
                                         )
                                     knownPublicPostActivity ->
                                         profilePrivacyEmptyPresentation()
@@ -1745,8 +1775,8 @@ fun UserProfileScreen(
                                         )
                                 }
                                 EmptyProfileTab(
-                                    presentation.title,
-                                    presentation.description,
+                                    presentation.title.asString(),
+                                    presentation.description.asString(),
                                 )
                             }
                         } else {
@@ -1826,8 +1856,8 @@ fun UserProfileScreen(
                                         )
                                     }
                                     EmptyProfileTab(
-                                        presentation.title,
-                                        presentation.description,
+                                        presentation.title.asString(),
+                                        presentation.description.asString(),
                                     )
                                 }
 
@@ -2000,10 +2030,10 @@ fun UserProfileScreen(
                 } else {
                     if (historyPosts.isEmpty()) {
                         item("no-history-$tab") {
-                            val label = profileDestinationLabel(tab)
+                            val (emptyTitle, emptyMessage) = localHistoryEmpty(tab)
                             EmptyProfileTab(
-                                "No ${label.lowercase()}",
-                                "No ${label.lowercase()} posts are available in this local account.",
+                                emptyTitle,
+                                emptyMessage,
                             )
                         }
                     } else {
@@ -2056,20 +2086,20 @@ fun UserProfileScreen(
                                         )
                                     activeRedditAccountHistoryState.inProgress ->
                                         EmptyProfileTab(
-                                            "Loading ${authenticatedRedditAccountHistoryKind.activityLabel.lowercase()}…",
+                                            stringResource(authenticatedRedditAccountHistoryKind.loadingTitleRes),
                                             stringResource(R.string.all_fetching_reddit_account_history_for_u, username),
                                         )
                                     else ->
                                         EmptyProfileTab(
-                                            "No ${authenticatedRedditAccountHistoryKind.activityLabel.lowercase()} posts",
-                                            authenticatedRedditAccountHistoryKind.emptyActivityMessage,
+                                            stringResource(authenticatedRedditAccountHistoryKind.emptyTitleRes),
+                                            stringResource(authenticatedRedditAccountHistoryKind.emptyActivityMessageRes),
                                         )
                                 }
                             } else {
-                                val label = profileDestinationLabel(tab)
+                                val (emptyTitle, emptyMessage) = localHistoryEmpty(tab)
                                 EmptyProfileTab(
-                                    "No ${label.lowercase()}",
-                                    "No ${label.lowercase()} posts are available in this local account.",
+                                    emptyTitle,
+                                    emptyMessage,
                                 )
                             }
                         }
@@ -2127,7 +2157,7 @@ fun UserProfileScreen(
                             item("blocked-accounts-loading") {
                                 EmptyProfileTab(
                                     stringResource(R.string.all_loading_blocked_accounts),
-                                    "Fetching your authoritative blocked-account list from Reddit.",
+                                    stringResource(R.string.scr_fetching_your_authoritative_blocked_account_list),
                                 )
                             }
                         }
@@ -2388,7 +2418,7 @@ private fun OwnProfileDestinationStrip(
                             ),
                         )
                     },
-                    text = { Text(label, maxLines = 1) },
+                    text = { Text(profileTabText(label), maxLines = 1) },
                     icon = {
                         Icon(
                             imageVector = when (section) {
@@ -2443,7 +2473,7 @@ private fun OwnProfileDestinationStrip(
                         LeadingIconTab(
                             selected = true,
                             onClick = onClick,
-                            text = { Text(label, maxLines = 1) },
+                            text = { Text(profileTabText(label), maxLines = 1) },
                             icon = icon,
                         )
                     } else {
@@ -2486,7 +2516,7 @@ private fun ProfileDestinationStrip(
                 LeadingIconTab(
                     selected = selected,
                     onClick = { onSelect(index) },
-                    text = { Text(label, maxLines = 1) },
+                    text = { Text(profileTabText(label), maxLines = 1) },
                     icon = icon,
                     unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -2554,12 +2584,12 @@ internal fun BlockedAccountsError(
         ContentSafetyFailureKind.AUTHORIZATION ->
             stringResource(R.string.all_reddit_authorization_is_required_to_read_blocked)
         ContentSafetyFailureKind.HTTP ->
-            state.statusCode?.let { "Reddit rejected the blocked-account request. HTTP $it" }
-                ?: "Reddit rejected the blocked-account request."
+            state.statusCode?.let { stringResource(R.string.scr_reddit_rejected_the_blocked_account_request, it) }
+                ?: stringResource(R.string.scr_reddit_rejected_the_blocked_account_request_2)
         ContentSafetyFailureKind.TRANSPORT ->
             stringResource(R.string.all_couldn_t_reach_reddit_to_load_blocked)
         ContentSafetyFailureKind.PROTOCOL ->
-            "Reddit returned an unexpected blocked-account response."
+            stringResource(R.string.scr_reddit_returned_an_unexpected_blocked_account)
         else ->
             stringResource(R.string.all_blocked_accounts_couldn_t_be_loaded_from)
     }
@@ -2610,7 +2640,7 @@ private fun ProfileDraftCard(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
-                    draft.title.ifBlank { "Untitled ${draft.type.label.lowercase()} post" },
+                    draft.title.ifBlank { stringResource(draft.type.untitledRes) },
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -2622,7 +2652,7 @@ private fun ProfileDraftCard(
                                 ?.let { "r/$it" }
                                 ?: stringResource(R.string.all_no_community_selected),
                         )
-                        append(" · ${draft.type.label}")
+                        append(" · ${stringResource(draft.type.labelRes)}")
                         draft.flair?.text?.takeIf(String::isNotBlank)?.let { flair ->
                             append(" · $flair")
                         }
@@ -2705,26 +2735,43 @@ internal fun upvotedPostsForProfile(
         emptyList()
     }
 
-private val RedditAccountHistoryKind.activityLabel: String
+// TRANSLATE14: whole sentences per kind instead of a lowercased label in a frame.
+private val RedditAccountHistoryKind.loadingTitleRes: Int
     get() = when (this) {
-        RedditAccountHistoryKind.UPVOTED -> "Upvoted"
-        RedditAccountHistoryKind.DOWNVOTED -> "Downvoted"
-        RedditAccountHistoryKind.HIDDEN -> "Hidden"
-        RedditAccountHistoryKind.COMMENTS -> "Comments"
-        RedditAccountHistoryKind.SAVED_POSTS -> "Saved posts"
-        RedditAccountHistoryKind.SAVED_COMMENTS -> "Saved comments"
+        RedditAccountHistoryKind.UPVOTED -> R.string.scr_history_loading_upvoted
+        RedditAccountHistoryKind.DOWNVOTED -> R.string.scr_history_loading_downvoted
+        RedditAccountHistoryKind.HIDDEN -> R.string.scr_history_loading_hidden
+        RedditAccountHistoryKind.COMMENTS -> R.string.scr_history_loading_comments
+        RedditAccountHistoryKind.SAVED_POSTS -> R.string.scr_history_loading_saved_posts
+        RedditAccountHistoryKind.SAVED_COMMENTS -> R.string.scr_history_loading_saved_comments
     }
 
-private val RedditAccountHistoryKind.emptyActivityMessage: String
+private val RedditAccountHistoryKind.emptyTitleRes: Int
     get() = when (this) {
-        RedditAccountHistoryKind.UPVOTED ->
-            "No upvoted Reddit posts are available for this account."
-        RedditAccountHistoryKind.DOWNVOTED ->
-            "No downvoted Reddit posts are available for this account."
-        RedditAccountHistoryKind.HIDDEN ->
-            "No hidden Reddit posts are available for this account."
-        else ->
-            "No Reddit account history items are available."
+        RedditAccountHistoryKind.UPVOTED -> R.string.scr_history_empty_upvoted
+        RedditAccountHistoryKind.DOWNVOTED -> R.string.scr_history_empty_downvoted
+        RedditAccountHistoryKind.HIDDEN -> R.string.scr_history_empty_hidden
+        RedditAccountHistoryKind.COMMENTS -> R.string.scr_history_empty_comments
+        RedditAccountHistoryKind.SAVED_POSTS -> R.string.scr_history_empty_saved_posts
+        RedditAccountHistoryKind.SAVED_COMMENTS -> R.string.scr_history_empty_saved_comments
+    }
+
+private val RedditAccountHistoryKind.emptyActivityMessageRes: Int
+    get() = when (this) {
+        RedditAccountHistoryKind.UPVOTED -> R.string.scr_history_none_upvoted
+        RedditAccountHistoryKind.DOWNVOTED -> R.string.scr_history_none_downvoted
+        RedditAccountHistoryKind.HIDDEN -> R.string.scr_history_none_hidden
+        else -> R.string.scr_history_none
+    }
+
+private val RedditAccountHistoryKind.permissionRes: Int
+    get() = when (this) {
+        RedditAccountHistoryKind.UPVOTED -> R.string.scr_history_permission_upvoted
+        RedditAccountHistoryKind.DOWNVOTED -> R.string.scr_history_permission_downvoted
+        RedditAccountHistoryKind.HIDDEN -> R.string.scr_history_permission_hidden
+        RedditAccountHistoryKind.COMMENTS -> R.string.scr_history_permission_comments
+        RedditAccountHistoryKind.SAVED_POSTS -> R.string.scr_history_permission_saved_posts
+        RedditAccountHistoryKind.SAVED_COMMENTS -> R.string.scr_history_permission_saved_comments
     }
 
 @Composable
@@ -2803,7 +2850,7 @@ private fun AccountHistoryStatus(
                     state.authorizing ->
                         stringResource(R.string.all_waiting_for_reddit_authorization)
                     state.authorizationRequired ->
-                        "Reddit needs history permission before subshell can load ${kind.activityLabel.lowercase()} activity for this account."
+                        stringResource(kind.permissionRes)
                     state.failureKind != null ->
                         state.failureKind.accountHistoryFailureMessage(state.failureDetails?.httpStatusCode).asString()
                     else ->
@@ -3067,22 +3114,20 @@ internal fun ProfileComment(
 }
 
 internal data class ProfileEmptyPresentation(
-    val title: String,
-    val description: String,
+    val title: io.github.brealorg.subshell.ui.UiText,
+    val description: io.github.brealorg.subshell.ui.UiText,
 )
 
 internal fun profileUnavailablePresentation(): ProfileEmptyPresentation =
     ProfileEmptyPresentation(
-        title = "Profile unavailable",
-        description =
-            "This Reddit profile could not be found. The account may have been deleted, suspended, or otherwise unavailable.",
+        title = io.github.brealorg.subshell.ui.UiText.Resource(R.string.scr_profile_unavailable),
+        description = io.github.brealorg.subshell.ui.UiText.Resource(R.string.scr_profile_unavailable_detail),
     )
 
 internal fun profilePrivacyEmptyPresentation(): ProfileEmptyPresentation =
     ProfileEmptyPresentation(
-        title = "Profile privacy may be enabled",
-        description =
-            "This user may have enabled Reddit's profile privacy settings. Some posts and comments can be hidden from their profile while remaining visible elsewhere on Reddit.",
+        title = io.github.brealorg.subshell.ui.UiText.Resource(R.string.scr_profile_privacy),
+        description = io.github.brealorg.subshell.ui.UiText.Resource(R.string.scr_profile_privacy_detail),
     )
 
 internal fun publicProfileEmptyPresentation(
@@ -3091,13 +3136,13 @@ internal fun publicProfileEmptyPresentation(
 ): ProfileEmptyPresentation = when (activity) {
     ProfileActivityEvidence.POST ->
         ProfileEmptyPresentation(
-            title = "No public profile posts",
-            description = "No public posts are currently available on u/$username's profile.",
+            title = io.github.brealorg.subshell.ui.UiText.Resource(R.string.scr_profile_no_public_posts),
+            description = io.github.brealorg.subshell.ui.UiText.Resource(R.string.scr_profile_no_public_posts_detail, username),
         )
     ProfileActivityEvidence.COMMENT ->
         ProfileEmptyPresentation(
-            title = "No public profile comments",
-            description = "No public comments are currently available on u/$username's profile.",
+            title = io.github.brealorg.subshell.ui.UiText.Resource(R.string.scr_profile_no_public_comments),
+            description = io.github.brealorg.subshell.ui.UiText.Resource(R.string.scr_profile_no_public_comments_detail, username),
         )
 }
 
@@ -3177,4 +3222,21 @@ private fun EmptyProfileTab(title: String, description: String) {
 internal fun followerCountLabel(baseCount: String, following: Boolean): String {
     if (!following) return baseCount
     return baseCount.toIntOrNull()?.plus(1)?.toString() ?: baseCount
+}
+
+// TRANSLATE14_ACCOUNT_AGE_IS_SHOWN_THROUGH_PLURALS_V1: the data layer stores the
+// age as a compact code ("9y", "5mo", "3d"; also in the cache codec, unchanged);
+// it is read here into a translated plural. Anything else is shown as stored.
+private val ACCOUNT_AGE_CODE = Regex("""^(\d+)(y|mo|d)$""")
+
+@Composable
+internal fun accountAgeText(stored: String): String {
+    val match = ACCOUNT_AGE_CODE.matchEntire(stored.trim()) ?: return stored
+    val count = match.groupValues[1].toIntOrNull() ?: return stored
+    val plural = when (match.groupValues[2]) {
+        "y" -> R.plurals.profile_age_years
+        "mo" -> R.plurals.profile_age_months
+        else -> R.plurals.profile_age_days
+    }
+    return pluralStringResource(plural, count, count)
 }

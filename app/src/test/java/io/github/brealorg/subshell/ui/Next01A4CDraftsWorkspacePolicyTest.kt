@@ -5,6 +5,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class Next01A4CDraftsWorkspacePolicyTest {
     @Test
     fun draftsWorkspaceRequiresExpandedSplitSupportedOriginAndTabSeven() {
@@ -82,7 +84,7 @@ class Next01A4CDraftsWorkspacePolicyTest {
     fun draftsWorkspacePlaceholderIsStable() {
         assertEquals(
             "Select a draft",
-            YOU_DRAFTS_WORKSPACE_PLACEHOLDER,
+            YOU_DRAFTS_WORKSPACE_PLACEHOLDER.s,
         )
     }
 }

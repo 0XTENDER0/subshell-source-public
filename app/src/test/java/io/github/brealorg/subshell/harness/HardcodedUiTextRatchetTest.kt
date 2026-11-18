@@ -33,6 +33,20 @@ class HardcodedUiTextRatchetTest {
     private val literal = Regex(""""([^"\\\n]*+(?:\\.[^"\\\n]*+)*+)"""")
     private val prose = Regex("""[A-Z][a-z].*""")
     private val codeLike = Regex("""[a-z]+[_/.:-][a-z]|^[A-Z]{2,}$""")
+
+    // TRANSLATE14_SHORT_TEMPLATES_COUNT_TOO_V1: "Mute ${state.subredditLabel(name)}" and
+    // "${hidden.size} hidden" escaped the count (the template looked like code, or the text
+    // did not start with a capital), and the nb build showed them in English. Templates are
+    // replaced by a placeholder before the code check, and a count followed by a word counts.
+    private val template = Regex("""\$\{[^}]*\}|\$[A-Za-z_][A-Za-z0-9_]*""")
+    private val countThenWord = Regex("""\u0000[ ·]+[a-z]{3,}[a-z ]*""")
+
+    private fun looksLikeText(text: String): Boolean {
+        val stripped = template.replace(text, "\u0000")
+        if (text.length >= 4 && prose.matches(text) && !codeLike.containsMatchIn(stripped)) return true
+        return countThenWord.matches(stripped)
+    }
+
     private val excluded = listOf(
         "DiagnosticsScreen", "RedditApiValuesEditor", "SensitiveMediaLab", "Terminal",
         "/data/", "/ui/error/", "UiText.kt", "Symbols.kt", "SettingsSearchIndex.kt",
@@ -62,7 +76,7 @@ class HardcodedUiTextRatchetTest {
                 if (skipLine.containsMatchIn(line) || line.contains("R.string")) return@forEach
                 literal.findAll(line).forEach { match ->
                     val text = match.groupValues[1]
-                    if (text.length >= 4 && prose.matches(text) && !codeLike.containsMatchIn(text)) count++
+                    if (looksLikeText(text)) count++
                 }
             }
             if (count > 0) counts[relative] = count

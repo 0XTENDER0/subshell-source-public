@@ -7,7 +7,6 @@ import io.github.brealorg.subshell.data.privateprefs.SealedKeysPreferences
 import io.github.brealorg.subshell.data.privateprefs.SealedStartup
 import io.github.brealorg.subshell.inbox.NotificationLaunchKey
 import io.github.brealorg.subshell.shortcuts.LAUNCHER_SHORTCUTS_PREFERENCES
-import io.github.brealorg.subshell.ui.RedditExternalPollHandoffStore
 import io.github.brealorg.subshell.ui.RedditLinkHandlingPromptStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -19,7 +18,7 @@ internal const val SUBSHELL_PREFERENCES = "subshell_preferences"
 
 /**
  * STRICTMODE02_PREFERENCES_LOAD_BEFORE_THE_FIRST_FRAME_V1 (#243): the files the
- * first screen reads (settings, the device file, the poll handoff, launcher
+ * first screen reads (settings, the device file, launcher
  * shortcuts, the review nudge, the notification launch key, the backup
  * repository with its folder) are opened and read into memory on IO once per
  * process, and the launch intent's handling and AccountDirectoryGate wait for
@@ -40,7 +39,6 @@ internal object StartupPreferences {
             listOf(
                 SUBSHELL_PREFERENCES,
                 RedditLinkHandlingPromptStore.DEVICE_PREFERENCES_NAME,
-                RedditExternalPollHandoffStore.PREFERENCES_NAME,
                 LAUNCHER_SHORTCUTS_PREFERENCES,
                 NUDGE_PREFERENCES,
                 NotificationLaunchKey.PREFERENCES,

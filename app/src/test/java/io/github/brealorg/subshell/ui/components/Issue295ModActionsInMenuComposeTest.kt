@@ -62,9 +62,9 @@ class Issue295ModActionsInMenuComposeTest {
         assertEquals("t1_def", request?.thingFullname)
         assertEquals(RedditModeratorAction.SPAM, request?.action)
         assertNull(moderatorQuickActionRequest(owner, ModeratorReportTarget("t3_abc"), RedditModeratorAction.APPROVE))
-        assertEquals("Post removed", moderatorQuickActionSuccessTitle(request!!.copy(thingFullname = "t3_x", action = RedditModeratorAction.REMOVE)))
-        assertEquals("Comment marked as spam", moderatorQuickActionSuccessTitle(request))
-        assertEquals("Comment approved", moderatorQuickActionSuccessTitle(request.copy(action = RedditModeratorAction.APPROVE)))
+        assertEquals("Post removed", moderatorQuickActionSuccessTitle(request!!.copy(thingFullname = "t3_x", action = RedditModeratorAction.REMOVE)).s)
+        assertEquals("Comment marked as spam", moderatorQuickActionSuccessTitle(request).s)
+        assertEquals("Comment approved", moderatorQuickActionSuccessTitle(request.copy(action = RedditModeratorAction.APPROVE)).s)
     }
 
     @Test

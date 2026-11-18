@@ -98,6 +98,7 @@ private fun SearchInputSurface(
     containerColor: Color,
     fieldModifier: Modifier,
 ) {
+    val searchDescription = stringResource(R.string.scr_search)
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = SearchBarDefaults.inputFieldShape,
@@ -115,7 +116,7 @@ private fun SearchInputSurface(
             enabled = enabled,
             modifier = fieldModifier
                 .fillMaxWidth()
-                .semantics { contentDescription = "Search" },
+                .semantics { contentDescription = searchDescription },
             textStyle = MaterialTheme.typography.bodyLarge,
             placeholder = {
                 Text(placeholder, maxLines = 1, overflow = TextOverflow.Ellipsis)

@@ -99,10 +99,7 @@ internal fun RemoteMediaActionsSheet(
                     mediaActionScope.launch {
                         val shared = shareRemoteMedia(context, target.uri, target.format, target.stableName)
                         if (!shared) {
-                            errorHost?.reportMediaActionFailure(
-                                title = "Could not share",
-                                message = "This media could not be prepared for sharing",
-                            )
+                            errorHost?.reportMediaShareFailure()
                         }
                     }
                 },
@@ -123,10 +120,7 @@ internal fun RemoteMediaActionsSheet(
                             )
                             delay(MEDIA_DOWNLOAD_SAVED_VISIBLE_MS)
                         } else {
-                            errorHost?.reportMediaActionFailure(
-                                title = "Could not download",
-                                message = "This media could not be saved",
-                            )
+                            errorHost?.reportMediaDownloadFailure()
                         }
                         download = null
                         onDismiss()

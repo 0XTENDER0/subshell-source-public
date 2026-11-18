@@ -68,10 +68,19 @@ internal data class UpdatesScreenState(
     val install: UpdateInstallState = UpdateInstallState.Idle,
 )
 
+// TRANSLATE14_UPDATE_CHECK_MESSAGES_ARE_SHOWN_TRANSLATED_V1: the state keeps
+// these English keys (tests read them); the screen shows the resource.
 internal const val UPDATES_CHECK_FAILED = "Couldn't reach the update information. Try again later."
 internal const val UPDATES_UP_TO_DATE = "You have the latest version."
 internal const val UPDATE_WAITING_FOR_YOU = "Android is waiting for you to confirm the update."
 internal const val UPDATES_OFF_IN_THIS_BUILD = "Update checks are off in this build."
+
+@Composable
+private fun updatesMessageShown(message: String): String = when (message) {
+    UPDATES_CHECK_FAILED -> stringResource(R.string.upd_couldn_t_reach_the_update_information)
+    UPDATES_UP_TO_DATE -> stringResource(R.string.upd_you_have_the_latest_version)
+    else -> message
+}
 
 @Composable
 internal fun UpdatesScreen(
@@ -244,7 +253,7 @@ internal fun UpdatesContent(
             if (!state.runtimeEnabled) {
                 item("off") {
                     Text(
-                        UPDATES_OFF_IN_THIS_BUILD,
+                        stringResource(R.string.upd_update_checks_are_off_in_this),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -272,7 +281,7 @@ internal fun UpdatesContent(
                     }
                     state.checkMessage?.let { message ->
                         Text(
-                            message,
+                            updatesMessageShown(message),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -311,7 +320,7 @@ private fun AvailableRelease(
             modifier = Modifier.fillMaxWidth().padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text("subshell ${release.versionName} is available", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.upd_subshell_is_available, release.versionName), style = MaterialTheme.typography.titleMedium)
             Text(release.headline, style = MaterialTheme.typography.bodyMedium)
             release.highlights.forEach { highlight ->
                 Text("• $highlight", style = MaterialTheme.typography.bodyMedium)
@@ -338,12 +347,12 @@ private fun AvailableRelease(
                 }
                 is UpdateInstallState.Installing ->
                     Text(
-                        if (install.waitingForYou) UPDATE_WAITING_FOR_YOU else stringResource(R.string.all2_android_is_installing_the_update),
+                        if (install.waitingForYou) stringResource(R.string.upd_android_is_waiting_for_you_to) else stringResource(R.string.all2_android_is_installing_the_update),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 is UpdateInstallState.Failed ->
                     Text(
-                        install.message,
+                        install.message.asString(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error,
                     )
@@ -373,11 +382,12 @@ private fun UpdateInstallState.versionCode(): Int? = when (this) {
     UpdateInstallState.Idle -> null
 }
 
+@Composable
 internal fun updateDownloadProgressText(state: UpdateInstallState.Downloading): String {
     fun mb(bytes: Long) = String.format(Locale.ROOT, "%.1f", bytes / (1024.0 * 1024.0))
     return if (state.total > 0L) {
-        "Downloading… ${mb(state.downloaded)} of ${mb(state.total)} MB"
+        stringResource(R.string.update_downloading_of, mb(state.downloaded), mb(state.total))
     } else {
-        "Downloading…"
+        stringResource(R.string.update_downloading)
     }
 }

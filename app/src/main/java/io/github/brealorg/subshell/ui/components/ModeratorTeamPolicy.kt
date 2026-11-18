@@ -78,19 +78,21 @@ internal fun moderatorTeamIsCurrentUser(username: String, activeUsername: String
         ignoreCase = true,
     )
 
-internal fun moderatorTeamPermissionLabels(permissions: List<String>): List<String> =
+internal fun moderatorTeamPermissionLabels(permissions: List<String>): List<io.github.brealorg.subshell.ui.UiText> =
     permissions.map { it.trim() }.filter(String::isNotEmpty).distinct().map { permission ->
-        when (permission) {
-            "all" -> "All permissions"
-            "access" -> "Access"
-            "config" -> "Configuration"
-            "flair" -> "Flair"
-            "mail" -> "Modmail"
-            "posts" -> "Posts"
-            "wiki" -> "Wiki"
+        val res = when (permission) {
+            "all" -> io.github.brealorg.subshell.R.string.comp_mod_permission_all
+            "access" -> io.github.brealorg.subshell.R.string.comp_mod_permission_access
+            "config" -> io.github.brealorg.subshell.R.string.comp_mod_permission_config
+            "flair" -> io.github.brealorg.subshell.R.string.comp_mod_permission_flair
+            "mail" -> io.github.brealorg.subshell.R.string.comp_mod_permission_mail
+            "posts" -> io.github.brealorg.subshell.R.string.comp_mod_permission_posts
+            "wiki" -> io.github.brealorg.subshell.R.string.comp_mod_permission_wiki
             // Unknown server codes stay visible; they do not grant inferred powers.
-            else -> permission
+            else -> null
         }
+        res?.let { io.github.brealorg.subshell.ui.UiText.Resource(it) }
+            ?: io.github.brealorg.subshell.ui.UiText.Plain(permission)
     }
 
 // MODERATION02A5A5_EXPLICIT_FULL_PERMISSION_INVITE_GATE_V1

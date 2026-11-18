@@ -8,7 +8,12 @@ import io.github.brealorg.subshell.ui.components.mediaDownloadTitle
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class MediaDownloadTest {
     private fun item(id: String) = GalleryItem(id = id, label = id, format = MediaFormat.IMAGE)
 
@@ -41,15 +46,15 @@ class MediaDownloadTest {
 
     @Test
     fun titlesAndDetails() {
-        assertEquals("Saving", mediaDownloadTitle(MediaDownloadUiState.Saving(0, 1)))
-        assertEquals("Saving 3 of 12", mediaDownloadTitle(MediaDownloadUiState.Saving(3, 12)))
-        assertEquals("Saved", mediaDownloadTitle(MediaDownloadUiState.Saved(1, 1, "Downloads/subshell")))
-        assertEquals("Saved 12 items", mediaDownloadTitle(MediaDownloadUiState.Saved(12, 12, "Downloads/subshell")))
-        assertEquals("Saved 11 of 12", mediaDownloadTitle(MediaDownloadUiState.Saved(11, 12, "Downloads/subshell")))
-        assertEquals("In Downloads/subshell", mediaDownloadDetail(MediaDownloadUiState.Saved(12, 12, "Downloads/subshell")))
+        assertEquals("Saving", mediaDownloadTitle(MediaDownloadUiState.Saving(0, 1)).s)
+        assertEquals("Saving 3 of 12", mediaDownloadTitle(MediaDownloadUiState.Saving(3, 12)).s)
+        assertEquals("Saved", mediaDownloadTitle(MediaDownloadUiState.Saved(1, 1, "Downloads/subshell")).s)
+        assertEquals("Saved 12 items", mediaDownloadTitle(MediaDownloadUiState.Saved(12, 12, "Downloads/subshell")).s)
+        assertEquals("Saved 11 of 12", mediaDownloadTitle(MediaDownloadUiState.Saved(11, 12, "Downloads/subshell")).s)
+        assertEquals("In Downloads/subshell", mediaDownloadDetail(MediaDownloadUiState.Saved(12, 12, "Downloads/subshell")).s)
         assertEquals(
             "In Downloads/subshell · 1 could not be saved",
-            mediaDownloadDetail(MediaDownloadUiState.Saved(11, 12, "Downloads/subshell")),
+            mediaDownloadDetail(MediaDownloadUiState.Saved(11, 12, "Downloads/subshell")).s,
         )
     }
 }

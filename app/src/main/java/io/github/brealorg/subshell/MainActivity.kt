@@ -77,7 +77,6 @@ import io.github.brealorg.subshell.ui.legacyStorageWritePermissionNeeded
 import io.github.brealorg.subshell.ui.RedditLinkHandlingPromptStore
 import io.github.brealorg.subshell.ui.RedditLinkHandlingState
 import io.github.brealorg.subshell.ui.RedditLinkHandlingStatus
-import io.github.brealorg.subshell.ui.RedditExternalPollHandoffStore
 import io.github.brealorg.subshell.ui.openRedditLinkHandlingSettings
 import io.github.brealorg.subshell.ui.readRedditLinkHandlingState
 import io.github.brealorg.subshell.ui.redditViewIntentLaunchOrNull
@@ -527,7 +526,7 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
             lifecycleScope.launch {
                 val runtime = AuthRuntimePreparation.obtain(applicationContext)
                 // STRICTMODE02_PREFERENCES_LOAD_BEFORE_THE_FIRST_FRAME_V1 (#243):
-                // the launch intent's handling reads the poll handoff file.
+                // the launch intent's handling reads the start-up preference files.
                 StartupPreferences.await(applicationContext)
                 authRuntimeForTheViewModel = runtime
                 authConnectViewModel
@@ -1085,6 +1084,8 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
             recentsCardHiddenBySecureFlag = false
             window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
+        // ISSUE308_REDDIT_LINKS_STAY_OFF_UNTIL_THE_READER_RETURNS_V1
+        io.github.brealorg.subshell.ui.components.redditLinksBackOnReturn(this)
         refreshRedditLinkHandlingState()
     }
 
@@ -1604,20 +1605,6 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
         delivery: String,
     ): Boolean {
         val rawUri = candidate?.dataString
-        if (RedditExternalPollHandoffStore(this).consumeIfMatching(rawUri)) {
-            candidate?.data = null
-            if (BuildConfig.DEBUG) {
-                Log.d(
-                    "SubshellDeepLink",
-                    "phase=external_poll_rebound_suppressed delivery=$delivery uri=$rawUri",
-                )
-            }
-            window.decorView.post {
-                moveTaskToBack(true)
-            }
-            return true
-        }
-
         val target = redditViewIntentLaunchOrNull(
             action = candidate?.action,
             rawUri = rawUri,

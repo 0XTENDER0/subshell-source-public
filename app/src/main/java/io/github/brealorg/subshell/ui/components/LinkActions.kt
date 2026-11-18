@@ -199,9 +199,10 @@ internal fun LinkCardSurface(
 }
 
 /** The host of [link] without "www.", for the card's first line. */
+@Composable
 internal fun linkDomain(link: String): String =
     runCatching { java.net.URI(link).host }.getOrNull()?.removePrefix("www.")?.takeIf { it.isNotBlank() }
-        ?: "External link"
+        ?: stringResource(R.string.all_external_link)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -275,7 +276,7 @@ internal fun shareLinkAddress(context: Context, link: String, notices: io.github
         putExtra(Intent.EXTRA_TEXT, link)
     }
     runCatching {
-        context.startActivity(Intent.createChooser(send, "Share link"))
+        context.startActivity(Intent.createChooser(send, context.getString(R.string.comp_share_link)))
     }.onFailure {
         notices.noticeFailure(UiText.Resource(R.string.nt_couldn_t_share_the_link), UiText.Resource(R.string.nt_no_app_on_this_device_can_share))
     }
@@ -288,5 +289,5 @@ internal fun copyLinkAddress(context: Context, link: String, notices: io.github.
         return
     }
     clipboard.setPrimaryClip(ClipData.newPlainText("Link", link))
-    notices.noticeCopied("Link")
+    notices.noticeCopied(io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.nt_copied_what_link))
 }

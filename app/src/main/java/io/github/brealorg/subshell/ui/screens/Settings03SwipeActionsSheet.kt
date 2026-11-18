@@ -236,6 +236,7 @@ private fun SwipeSummaryRow(
     expanded: Boolean,
     onClick: () -> Unit,
 ) {
+    val expandedState = if (expanded) stringResource(R.string.composer_state_expanded) else stringResource(R.string.composer_state_collapsed)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -246,7 +247,7 @@ private fun SwipeSummaryRow(
                 role = Role.Button,
                 onClick = onClick,
             )
-            .semantics { stateDescription = if (expanded) "Expanded" else "Collapsed" }
+            .semantics { stateDescription = expandedState }
             .defaultMinSize(minHeight = 52.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

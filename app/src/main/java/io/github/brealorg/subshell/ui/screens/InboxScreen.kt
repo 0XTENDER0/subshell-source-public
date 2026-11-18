@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.pluralStringResource
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.material3.ButtonDefaults
@@ -1087,13 +1089,13 @@ fun InboxScreen(
                                 val statusText = when (selectedModSection) {
                                     InboxModSection.QUEUE -> moderationCommunityCountLabel(
                                         redditModerationState.moderatedCommunities.size,
-                                    )
+                                    ).asString()
                                     InboxModSection.MODMAIL -> when {
                                         !modmailStateMatches -> stringResource(R.string.all_modmail)
                                         redditModmailState.mailCommunities.isNotEmpty() ->
                                             modmailCommunityCountLabel(
                                                 redditModmailState.mailCommunities.size,
-                                            )
+                                            ).asString()
                                         redditModmailState.loaded -> stringResource(R.string.all_no_communities_with_mail_permission)
                                         else -> stringResource(R.string.all_modmail)
                                     }
@@ -1645,7 +1647,7 @@ fun InboxScreen(
                     if (showUndoClear) {
                         stringResource(R.string.all_activity_cleared)
                     } else {
-                        "${undoDismissedIdList.size} dismissed"
+                        pluralStringResource(R.plurals.scr_inbox_dismissed, undoDismissedIdList.size, undoDismissedIdList.size)
                     },
                 )
             }
@@ -1675,15 +1677,11 @@ internal fun inboxTabUnreadCounts(
     return InboxTabUnreadCounts(activity = activity, messages = messages)
 }
 
-internal fun moderationCommunityCountLabel(count: Int): String = when (count) {
-    1 -> "Across 1 moderated community"
-    else -> "Across $count moderated communities"
-}
+internal fun moderationCommunityCountLabel(count: Int): UiText =
+    UiText.Plural(R.plurals.scr_across_moderated_communities, count, count)
 
-internal fun modmailCommunityCountLabel(count: Int): String = when (count) {
-    1 -> "Modmail for 1 community"
-    else -> "Modmail for $count communities"
-}
+internal fun modmailCommunityCountLabel(count: Int): UiText =
+    UiText.Plural(R.plurals.scr_modmail_for_communities, count, count)
 
 private fun InboxPrimaryTab.workspaceIcon(): ImageVector = when (this) {
     InboxPrimaryTab.ACTIVITY -> Symbols.AlternateEmail
@@ -1825,23 +1823,25 @@ private fun InboxTab(
     )
 }
 
+@androidx.compose.runtime.Composable
 private fun inboxOperationalStatusLabel(
     authenticated: Boolean,
     liveStateMatches: Boolean,
     liveState: RedditInboxUiState,
 ): String? {
     if (!authenticated) return null
-    if (!liveStateMatches) return "Loading Inbox…"
+    if (!liveStateMatches) return stringResource(R.string.scr_inboxOperationalStatusLabel_1)
     return when {
-        liveState.authorizing -> "Waiting for Reddit authorization…"
-        liveState.authorizationRequired -> "Inbox permission required"
-        liveState.loading && !liveState.loaded -> "Loading Inbox…"
-        liveState.failureKind != null && liveState.items.isNotEmpty() -> "Showing saved Inbox"
-        liveState.failureKind != null -> "Inbox unavailable"
+        liveState.authorizing -> stringResource(R.string.scr_inboxOperationalStatusLabel_2)
+        liveState.authorizationRequired -> stringResource(R.string.scr_inboxOperationalStatusLabel_3)
+        liveState.loading && !liveState.loaded -> stringResource(R.string.scr_inboxOperationalStatusLabel_4)
+        liveState.failureKind != null && liveState.items.isNotEmpty() -> stringResource(R.string.scr_inboxOperationalStatusLabel_5)
+        liveState.failureKind != null -> stringResource(R.string.scr_inboxOperationalStatusLabel_6)
         else -> null
     }
 }
 
+@androidx.compose.runtime.Composable
 private fun inboxEmptyLabel(
     authenticated: Boolean,
     filter: InboxFilter,
@@ -1849,13 +1849,13 @@ private fun inboxEmptyLabel(
     liveState: RedditInboxUiState,
 ): String {
     if (!authenticated) {
-        return if (filter == InboxFilter.UNREAD) "Nothing unread here." else "No local items for this filter."
+        return if (filter == InboxFilter.UNREAD) stringResource(R.string.scr_inboxEmptyLabel_1) else stringResource(R.string.scr_inboxEmptyLabel_2)
     }
-    if (!liveStateMatches || liveState.loading && !liveState.loaded) return "Loading Inbox…"
+    if (!liveStateMatches || liveState.loading && !liveState.loaded) return stringResource(R.string.scr_inboxEmptyLabel_3)
     if (liveState.authorizationRequired) {
-        return "Allow Inbox read access to load Reddit activity and messages."
+        return stringResource(R.string.scr_inboxEmptyLabel_4)
     }
-    return if (filter == InboxFilter.UNREAD) "Nothing unread here." else "No Reddit items for this filter."
+    return if (filter == InboxFilter.UNREAD) stringResource(R.string.scr_inboxEmptyLabel_5) else stringResource(R.string.scr_inboxEmptyLabel_6)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -1870,6 +1870,7 @@ private fun ActivityRow(
     onOpen: () -> Unit,
     onLongPress: () -> Unit,
 ) {
+    val readStateLabel = stringResource(if (read) R.string.scr_inbox_read else R.string.scr_inbox_unread)
     val hapticFeedback = LocalHapticFeedback.current
     val selectLabel = stringResource(R.string.scr_select_activity)
     val user = state.userFor(item.sender)
@@ -1895,7 +1896,7 @@ private fun ActivityRow(
                 // LOWUI7_READ_STATE_ON_THE_FOCUSED_ROW_V1 (OCB-224): on the
                 // clickable node TalkBack focuses, not the outer Surface.
                 .semantics {
-                    stateDescription = if (read) "Read" else "Unread"
+                    stateDescription = readStateLabel
                     // ISSUE306_INBOX_ROWS_TELL_TALKBACK_ABOUT_SELECTION_V1 (#306)
                     if (selectionMode) this.selected = selected
                 }
@@ -2111,6 +2112,7 @@ private fun InboxMessageRow(
     read: Boolean,
     onOpen: () -> Unit,
 ) {
+    val readStateLabel = stringResource(if (read) R.string.scr_inbox_read else R.string.scr_inbox_unread)
     val user = state.userFor(item.sender)
     val avatarUri = user.avatarImageUri
         ?.trim()
@@ -2121,7 +2123,7 @@ private fun InboxMessageRow(
             .fillMaxWidth()
             // A11Y01A1_INBOX_MESSAGE_READ_STATE_SEMANTICS_V1
             .semantics {
-                stateDescription = if (read) "Read" else "Unread"
+                stateDescription = readStateLabel
             }
             .padding(horizontal = 4.dp, vertical = 4.dp),
         shape = MaterialTheme.shapes.large,
@@ -2157,7 +2159,7 @@ private fun InboxMessageRow(
             supportingContent = {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
-                        text = inboxMessageSubjectLabel(item),
+                        text = inboxMessageSubjectLabel(item).asString(),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = if (read) FontWeight.Normal else FontWeight.Medium,
                         color = if (read) {
@@ -2277,11 +2279,11 @@ private fun InboxItem.activityActorUsername(): String? = sender
             !username.equals("reddit", ignoreCase = true)
     }
 
-internal fun inboxMessageSubjectLabel(item: InboxItem): String =
+internal fun inboxMessageSubjectLabel(item: InboxItem): UiText =
     if (item.title.trim().equals("[direct chat room]", ignoreCase = true)) {
-        "Direct chat"
+        UiText.Resource(R.string.scr_inbox_direct_chat)
     } else {
-        item.title.ifBlank { "Message" }
+        item.title.takeIf(String::isNotBlank)?.let(UiText::Plain) ?: UiText.Resource(R.string.scr_inbox_message)
     }
 
 private fun InboxItem.inboxMessageIdentityUsername(): String? {
@@ -2296,12 +2298,13 @@ private fun InboxItem.inboxMessageIdentityUsername(): String? {
         }
 }
 
+@androidx.compose.runtime.Composable
 private fun InboxItem.activityVerbLabel(): String = when (kind) {
-    ActivityKind.REPLY -> "Replied to your comment"
-    ActivityKind.POST_REPLY -> "Replied to your post"
-    ActivityKind.MENTION -> "Mentioned you"
-    ActivityKind.MOD -> title.ifBlank { "Reddit activity" }
-    ActivityKind.MESSAGE -> "Message"
+    ActivityKind.REPLY -> stringResource(R.string.scr_activityVerbLabel_1)
+    ActivityKind.POST_REPLY -> stringResource(R.string.scr_activityVerbLabel_2)
+    ActivityKind.MENTION -> stringResource(R.string.scr_activityVerbLabel_3)
+    ActivityKind.MOD -> title.ifBlank { stringResource(R.string.scr_activityVerbLabel_4) }
+    ActivityKind.MESSAGE -> stringResource(R.string.scr_activityVerbLabel_5)
 }
 
 private fun InboxItem.activityContextLabel(): String? {
@@ -2532,6 +2535,7 @@ private fun OpeningTargetOverlay(
     opening: Boolean,
     content: @Composable () -> Unit,
 ) {
+    val openingDescription = stringResource(R.string.scr_inbox_opening)
     Box {
         content()
         if (opening) {
@@ -2539,7 +2543,7 @@ private fun OpeningTargetOverlay(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .semantics { contentDescription = "Opening" },
+                    .semantics { contentDescription = openingDescription },
             )
         }
     }

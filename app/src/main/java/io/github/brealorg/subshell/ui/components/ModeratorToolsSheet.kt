@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.material3.FilterChip
@@ -203,6 +204,19 @@ fun ModeratorToolsSheet(
         },
         sheetState = sheetState,
     ) {
+        // MODTOOLSBACK01_BACK_STEPS_INSIDE_THE_SHEET_V1: a tool's Back is handled
+        // inside the sheet's content (as WIKI02). Through confirmValueChange alone,
+        // M3's predictive Back shrank the sheet, the veto kept it open and it
+        // stayed shrunk at the root (Pixel 11, 2026-11-16; the Back that seemed
+        // lost). A running write keeps the tool open, as before.
+        androidx.activity.compose.BackHandler(
+            enabled = workspaceBusy.busy ||
+                workspaceDestination != ModeratorToolsWorkspaceDestination.ROOT,
+        ) {
+            if (!workspaceBusy.busy) {
+                returnToRoot(workspaceDestination)
+            }
+        }
         // ISSUE295_QUEUE_USES_THE_SHEET_V1: the sheet is its own window, so the
         // app's tray (moderator action notices, Retry) is drawn here too while
         // it is open; the same state, so a notice shows once and goes once.
@@ -495,30 +509,35 @@ fun ModeratorToolsSheet(
 internal fun removalPartialSuccessMessage(
     reasonWarning: Boolean,
     messageOutcome: RedditRemovalStepOutcome,
-): String {
-    val parts = buildList {
-        if (reasonWarning) add("the removal reason or mod note could not be confirmed")
-        if (messageOutcome == RedditRemovalStepOutcome.FAILED) add("the removal message was not sent")
-    }
-    return "Reddit removed the item, but " + parts.joinToString(" and ") + "."
+): UiText {
+    // TRANSLATE14: one whole sentence per combination.
+    val messageFailed = messageOutcome == RedditRemovalStepOutcome.FAILED
+    return UiText.Resource(
+        when {
+            reasonWarning && messageFailed -> R.string.comp_removal_partial_both
+            reasonWarning -> R.string.comp_removal_partial_reason
+            messageFailed -> R.string.comp_removal_partial_message
+            else -> R.string.comp_removal_done
+        },
+    )
 }
 
 /** What a failed approve, remove or spam says, in the queue and from the ⋮ menu. */
-internal fun moderatorActionFailureMessage(uiState: RedditModeratorActionUiState): String =
+internal fun moderatorActionFailureMessage(uiState: RedditModeratorActionUiState): UiText =
     when {
         uiState.failureKind == RedditModeratorActionFailureKind.AUTHORIZATION &&
             uiState.httpStatusCode == 403 ->
-            "Reddit denied this moderation action. Your moderator role may not include the required Posts permission."
+            UiText.Resource(R.string.comp_mod_action_failure_1)
         uiState.failureKind == RedditModeratorActionFailureKind.OUTCOME_UNKNOWN ->
-            "The outcome could not be confirmed. The mod queue is being refreshed from Reddit before you act again."
+            UiText.Resource(R.string.comp_mod_action_failure_2)
         uiState.failureKind == RedditModeratorActionFailureKind.SESSION ->
-            "The Reddit sign-in for this account needs attention."
+            UiText.Resource(R.string.comp_mod_action_failure_3)
         uiState.failureKind == RedditModeratorActionFailureKind.TRANSPORT ->
-            "subshell couldn't reach Reddit for this moderation action."
+            UiText.Resource(R.string.comp_mod_action_failure_transport)
         uiState.failureKind == RedditModeratorActionFailureKind.HTTP ->
-            "Reddit rejected this moderation action."
+            UiText.Resource(R.string.comp_mod_action_failure_4)
         else ->
-            "This moderation action couldn't be completed."
+            UiText.Resource(R.string.comp_mod_action_failure_5)
     }
 
 @Composable
@@ -745,34 +764,38 @@ private fun RemovalReasonRow(
 }
 
 // ISSUE295_REMOVED_CONTENT_LISTS_V1: what each list is, in the sheet's words.
+@androidx.compose.runtime.Composable
 internal fun moderatorQueueListTitle(list: RedditModeratorQueueList): String = when (list) {
-    RedditModeratorQueueList.QUEUE -> "Mod queue"
-    RedditModeratorQueueList.REMOVED -> "Removed"
-    RedditModeratorQueueList.EDITED -> "Edited"
-    RedditModeratorQueueList.UNMODERATED -> "Unmoderated"
+    RedditModeratorQueueList.QUEUE -> stringResource(R.string.comp_mod_queue_list_title_1)
+    RedditModeratorQueueList.REMOVED -> stringResource(R.string.comp_mod_queue_list_title_2)
+    RedditModeratorQueueList.EDITED -> stringResource(R.string.comp_mod_queue_list_title_3)
+    RedditModeratorQueueList.UNMODERATED -> stringResource(R.string.comp_mod_queue_list_title_4)
 }
 
+@androidx.compose.runtime.Composable
 internal fun moderatorQueueListDescription(list: RedditModeratorQueueList): String = when (list) {
     RedditModeratorQueueList.QUEUE ->
-        "Review reported posts and comments, then approve, remove, or mark them as spam."
+        stringResource(R.string.comp_mod_queue_list_description_1)
     RedditModeratorQueueList.REMOVED ->
-        "Posts and comments removed by moderators or Reddit's filters. Approve puts one back."
+        stringResource(R.string.comp_mod_queue_list_description_2)
     RedditModeratorQueueList.EDITED ->
-        "Posts and comments edited after they were posted."
+        stringResource(R.string.comp_mod_queue_list_description_3)
     RedditModeratorQueueList.UNMODERATED ->
-        "Posts no moderator has approved or removed yet."
+        stringResource(R.string.comp_mod_queue_list_description_4)
 }
 
+@androidx.compose.runtime.Composable
 internal fun moderatorQueueListEmptyTitle(list: RedditModeratorQueueList): String = when (list) {
-    RedditModeratorQueueList.QUEUE -> "Mod queue is clear"
-    RedditModeratorQueueList.REMOVED -> "Nothing removed"
-    RedditModeratorQueueList.EDITED -> "Nothing edited"
-    RedditModeratorQueueList.UNMODERATED -> "Nothing unmoderated"
+    RedditModeratorQueueList.QUEUE -> stringResource(R.string.comp_mod_queue_list_empty_title_1)
+    RedditModeratorQueueList.REMOVED -> stringResource(R.string.comp_mod_queue_list_empty_title_2)
+    RedditModeratorQueueList.EDITED -> stringResource(R.string.comp_mod_queue_list_empty_title_3)
+    RedditModeratorQueueList.UNMODERATED -> stringResource(R.string.comp_mod_queue_list_empty_title_4)
 }
 
+@androidx.compose.runtime.Composable
 internal fun moderatorQueueListEmptyMessage(list: RedditModeratorQueueList): String = when (list) {
-    RedditModeratorQueueList.QUEUE -> "Reddit returned no posts or comments requiring review."
-    RedditModeratorQueueList.REMOVED -> "Reddit returned no removed posts or comments."
-    RedditModeratorQueueList.EDITED -> "Reddit returned no edited posts or comments."
-    RedditModeratorQueueList.UNMODERATED -> "Reddit returned no posts waiting for a moderator."
+    RedditModeratorQueueList.QUEUE -> stringResource(R.string.comp_mod_queue_list_empty_message_1)
+    RedditModeratorQueueList.REMOVED -> stringResource(R.string.comp_mod_queue_list_empty_message_2)
+    RedditModeratorQueueList.EDITED -> stringResource(R.string.comp_mod_queue_list_empty_message_3)
+    RedditModeratorQueueList.UNMODERATED -> stringResource(R.string.comp_mod_queue_list_empty_message_4)
 }

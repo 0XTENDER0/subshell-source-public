@@ -189,10 +189,9 @@ data class ContentFilters(
     }
 }
 
-fun contentFilterSummary(filters: ContentFilters): String = when (filters.size) {
-    0 -> "No active filters"
-    1 -> "1 active filter · hidden locally"
-    else -> "${filters.size} active filters · hidden locally"
+fun contentFilterSummary(filters: ContentFilters): UiText = when (filters.size) {
+    0 -> UiText.Resource(R.string.scr_no_active_filters)
+    else -> UiText.Plural(R.plurals.filters_active_hidden_locally, filters.size, filters.size)
 }
 
 private fun encodeContentFilterEntries(entries: Set<String>): String =

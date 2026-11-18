@@ -230,12 +230,12 @@ internal fun PostsWidgetBody(
             onClick = actionStartActivity(actions.openApp()),
         )
         is PostsWidgetContent.NotStored -> WidgetMessage(
-            title = content.source.label,
-            message = context.getString(R.string.widget_posts_not_stored, content.source.label),
+            title = content.source.label(context),
+            message = context.getString(R.string.widget_posts_not_stored, content.source.label(context)),
             onClick = actionStartActivity(actions.openSource(content.source)),
         )
         is PostsWidgetContent.Shown -> WidgetFrame(
-            title = content.source.label,
+            title = content.source.label(context),
             badge = null,
             onHeaderClick = actionStartActivity(actions.openSource(content.source)),
         ) {
@@ -343,6 +343,7 @@ private fun WidgetHint(text: String) {
 @Composable
 private fun InboxWidgetRowView(row: InboxWidgetRow, age: String?, onClick: Action) {
     val unreadPrefix = LocalContext.current.getString(R.string.widget_inbox_unread_prefix)
+    val title = if (row.title == WIDGET_UNTITLED_MESSAGE) LocalContext.current.getString(R.string.widget_message) else row.title
     Column(GlanceModifier.fillMaxWidth().padding(bottom = 4.dp)) {
         Column(
             GlanceModifier
@@ -354,7 +355,7 @@ private fun InboxWidgetRowView(row: InboxWidgetRow, age: String?, onClick: Actio
                 .semantics {
                     contentDescription = buildString {
                         if (row.unread) append(unreadPrefix)
-                        append(row.sender).append(". ").append(row.title).append(". ").append(row.preview)
+                        append(row.sender).append(". ").append(title).append(". ").append(row.preview)
                     }
                 },
         ) {
@@ -388,7 +389,7 @@ private fun InboxWidgetRowView(row: InboxWidgetRow, age: String?, onClick: Actio
                 }
             }
             Text(
-                text = row.title,
+                text = title,
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurface,
                     fontSize = 13.sp,

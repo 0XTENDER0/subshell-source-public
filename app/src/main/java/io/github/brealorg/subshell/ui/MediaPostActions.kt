@@ -93,7 +93,7 @@ private fun sendShareableMedia(context: Context, media: ShareableMedia): Boolean
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
     return runCatching {
-        context.startActivity(Intent.createChooser(send, "Share media"))
+        context.startActivity(Intent.createChooser(send, context.getString(io.github.brealorg.subshell.R.string.feed_share_media)))
         true
     }.getOrDefault(false)
 }

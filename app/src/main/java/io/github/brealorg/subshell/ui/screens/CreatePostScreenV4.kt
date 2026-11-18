@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.pluralStringResource
 import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
@@ -626,7 +627,7 @@ fun CreatePostScreen(
             ) ?: run {
                 // ISSUE100_POST_REQUEST_FAILURE_VISIBLE_V1: Post used to do
                 // nothing at all here.
-                preflightFailureMessage = COMPOSER_REQUEST_UNBUILDABLE_MESSAGE
+                preflightFailureMessage = context.getString(COMPOSER_REQUEST_UNBUILDABLE_MESSAGE)
                 return
             }
             onResetTextPostWriteState()
@@ -715,7 +716,7 @@ fun CreatePostScreen(
                             pendingPreflightRequestKey = null
                             awaitingPreflightAuthorization = false
                             preflightFailureMessage =
-                                "Posting access is required to check community rules"
+                                context.getString(R.string.composer_posting_access_required)
                             return@LaunchedEffect
                         }
                         val launched = onAuthorizeComposerPostRequirements(
@@ -727,7 +728,7 @@ fun CreatePostScreen(
                         } else {
                             pendingPreflightRequestKey = null
                             preflightFailureMessage =
-                                "Posting access is required to check community rules"
+                                context.getString(R.string.composer_posting_access_required)
                         }
                     }
 
@@ -779,7 +780,7 @@ fun CreatePostScreen(
             )
             if (refreshedFlair == null) {
                 update { it.copy(flair = null) }
-                flairNotice = "This flair is no longer available."
+                flairNotice = context.getString(R.string.composer_flair_no_longer_available)
             } else if (refreshedFlair != selectedFlair) {
                 update { it.copy(flair = refreshedFlair) }
             }
@@ -1854,10 +1855,11 @@ private fun V4CommunityOptionRow(
     }
 }
 
+@Composable
 private fun v4CompactMemberCount(value: Long): String = when {
-    value >= 1_000_000L -> "${value / 100_000L / 10.0}M members"
-    value >= 1_000L -> "${value / 100L / 10.0}K members"
-    else -> "$value members"
+    value >= 1_000_000L -> stringResource(R.string.comm_members_text, "${value / 100_000L / 10.0}M")
+    value >= 1_000L -> stringResource(R.string.comm_members_text, "${value / 100L / 10.0}K")
+    else -> pluralStringResource(R.plurals.comm_members_count, value.toInt(), value.toInt())
 }
 
 @Composable
@@ -2148,7 +2150,7 @@ private fun V4FlairChoiceChip(
         selected = selected,
         onClick = onClick,
         label = {
-            if (flair == null) Text("No flair") else V4FlairLabel(flair)
+            if (flair == null) Text(stringResource(R.string.scr_no_flair)) else V4FlairLabel(flair)
         },
         leadingIcon = when {
             selected -> {
@@ -2479,7 +2481,7 @@ private fun V4CompactLinkPreview(state: V4LinkPreviewState) {
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         Text(
-                            "${metadata.displayHost} · Preview found",
+                            stringResource(R.string.post_preview_found, metadata.displayHost),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                             maxLines = 1,
@@ -2579,9 +2581,9 @@ private fun V4MediaSection(
                 Icon(Symbols.PermMedia, contentDescription = null)
                 Text(
                     when {
-                        media.size > 1 -> "Gallery · ${media.size} items"
-                        video != null -> if (videoAsGif) "GIF" else "Video"
-                        else -> media.singleOrNull()?.kind?.label ?: stringResource(R.string.all_media)
+                        media.size > 1 -> pluralStringResource(R.plurals.post_gallery_items, media.size, media.size)
+                        video != null -> stringResource(if (videoAsGif) R.string.media_label_gif else R.string.media_label_video)
+                        else -> media.singleOrNull()?.kind?.labelRes?.let { stringResource(it) } ?: stringResource(R.string.all_media)
                     },
                     modifier = Modifier.weight(1f).padding(start = 10.dp),
                     style = MaterialTheme.typography.titleSmall,
@@ -2628,7 +2630,7 @@ private fun V4MediaSection(
                             LocalUriMedia(
                                 uri = item.uri,
                                 mimeType = item.mimeType,
-                                contentDescription = stringResource(R.string.sw_of, item.kind.label, index + 1, media.size),
+                                contentDescription = stringResource(R.string.sw_of, stringResource(item.kind.labelRes), index + 1, media.size),
                                 modifier = Modifier.fillMaxSize(),
                             )
                         }
@@ -2658,7 +2660,7 @@ private fun V4MediaSection(
                                     Icon(
                                         Symbols.Delete,
                                         // COMPOSER12_LABELLED_SWITCHES_V1: names what is removed.
-                                        contentDescription = composerMediaRemoveLabel(item, index),
+                                        contentDescription = composerMediaRemoveLabel(item, index).asString(),
                                         tint = Color.White,
                                     )
                                 }
@@ -2751,7 +2753,7 @@ private fun V4MediaSection(
                                 },
                                 modifier = Modifier.padding(horizontal = 14.dp),
                             ) {
-                                Text("+ Add link")
+                                Text(stringResource(R.string.scr_add_link_2))
                             }
                         }
                     }
@@ -3286,12 +3288,14 @@ private fun V4PostOptions(
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
+        val expandedState = stringResource(R.string.composer_state_expanded)
+        val collapsedState = stringResource(R.string.composer_state_collapsed)
         Column {
             // ISSUE219_EXPANDABLE_ROWS_SAY_THEIR_STATE_V1
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .semantics { stateDescription = if (expanded) "Expanded" else "Collapsed" },
+                    .semantics { stateDescription = if (expanded) expandedState else collapsedState },
                 color = Color.Transparent,
                 onClick = onExpandedChange,
             ) {
@@ -3438,10 +3442,10 @@ internal fun composerMediaWithPasted(
 }
 
 // COMPOSER12_LABELLED_SWITCHES_V1: the remove action names the attachment.
-internal fun composerMediaRemoveLabel(item: ComposerMediaAttachment, index: Int): String = when {
-    item.isComposerVideoSource() -> "Remove video"
-    item.kind == ComposerMediaKind.GIF -> "Remove GIF ${index + 1}"
-    else -> "Remove image ${index + 1}"
+internal fun composerMediaRemoveLabel(item: ComposerMediaAttachment, index: Int): UiText = when {
+    item.isComposerVideoSource() -> UiText.Resource(R.string.composer_remove_video)
+    item.kind == ComposerMediaKind.GIF -> UiText.Resource(R.string.composer_remove_gif_n, index + 1)
+    else -> UiText.Resource(R.string.composer_remove_image_n, index + 1)
 }
 
 // COMPOSER13_BODY_SYNC_ECHO_V1
@@ -3464,8 +3468,8 @@ internal fun restoredPreflightMinimumRevision(
     savedMinimumRevision: Long,
 ): Long = if (savedProcessToken == currentProcessToken) savedMinimumRevision else 0L
 
-internal const val COMPOSER_REQUEST_UNBUILDABLE_MESSAGE =
-    "This post can't be sent as it is. Check its link and attachments."
+@androidx.annotation.StringRes
+internal val COMPOSER_REQUEST_UNBUILDABLE_MESSAGE: Int = R.string.composer_request_unbuildable
 
 // LOWUI1_GALLERY_PAGE_KEYS_UNIQUE_V1 (OCB-315): a draft saved before COMPOSER08
 // can hold the same image twice; a repeat gets its own key instead of crashing
@@ -3492,7 +3496,7 @@ private fun ViewportErrorHostState.presentGalleryFull(leftOut: Int) {
         presentation = ErrorPresentation(
             kind = ErrorPresentationKind.DEGRADED,
             title = UiText.Resource(R.string.ep_a_gallery_holds_20_photos),
-            message = UiText.Plain(if (leftOut == 1) "1 photo was left out." else "$leftOut photos were left out."),
+            message = UiText.Plural(R.plurals.post_photos_left_out, leftOut, leftOut),
         ),
         failureDetails = null,
         onRetry = null,

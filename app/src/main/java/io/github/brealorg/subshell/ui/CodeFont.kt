@@ -8,12 +8,12 @@ import androidx.compose.ui.text.font.FontWeight
 import io.github.brealorg.subshell.R
 
 enum class CodeFont(
-    val label: String,
+    @androidx.annotation.StringRes val labelRes: Int,
     val typefaceName: String,
 ) {
-    JETBRAINS_MONO("Balanced", "JetBrains Mono"),
-    IOSEVKA("Narrow", "Iosevka"),
-    RECURSIVE_MONO_CASUAL("Casual", "Recursive Mono Casual"),
+    JETBRAINS_MONO(R.string.code_font_balanced, "JetBrains Mono"),
+    IOSEVKA(R.string.code_font_narrow, "Iosevka"),
+    RECURSIVE_MONO_CASUAL(R.string.code_font_casual, "Recursive Mono Casual"),
 }
 
 val CodeFont.fontFamily: FontFamily

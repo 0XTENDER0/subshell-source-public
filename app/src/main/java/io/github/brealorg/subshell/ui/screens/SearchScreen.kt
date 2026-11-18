@@ -1240,7 +1240,7 @@ fun SearchScreen(
             if (showWorkspaceControls) {
                 SearchWorkspaceTopBar(
                     query = state.searchQuery,
-                    hint = state.currentSearchHint,
+                    hint = state.currentSearchHint.asString(),
                     focusRequester = focusRequester,
                     onQueryChange = { updated ->
                         state.updateSearchQuery(
@@ -2018,7 +2018,7 @@ private fun SearchContextFilters(
                 FilterChip(
                     selected = state.searchArea == area,
                     onClick = { onAreaSelected(area) },
-                    label = { Text(state.searchAreaLabel(area)) },
+                    label = { Text(state.searchAreaLabel(area).asString()) },
                 )
             }
         }

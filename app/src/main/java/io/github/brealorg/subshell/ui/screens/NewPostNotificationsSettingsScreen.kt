@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.pluralStringResource
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
@@ -74,7 +75,7 @@ internal fun NewPostNotificationsSettingsScreen(
                 ) {
                     NotificationTypeRow(
                         title = stringResource(R.string.sw_also_new_comments),
-                        description = "A notification for each new comment in these communities. Your own posts and comments never notify you.",
+                        description = stringResource(R.string.scr_a_notification_for_each_new_comment),
                         checked = state.notifyNewComments,
                         enabled = state.communityPostNotificationsAvailable,
                         onCheckedChange = state::updateNotifyNewComments,
@@ -115,15 +116,16 @@ internal fun NewPostNotificationsSettingsScreen(
     }
 }
 
+@Composable
 internal fun newPostNotificationsExplanation(available: Boolean, empty: Boolean): String = when {
-    !available -> "Sign in to a Reddit account to get notifications about new posts."
-    empty -> "No communities yet. Open a community and choose ⋮ › Notify about new posts."
-    else -> "A notification for each new post, checked every 15 minutes. Add a community from its ⋮ menu; up to $MAX_WATCHED_COMMUNITIES."
+    !available -> stringResource(R.string.set_new_posts_sign_in)
+    empty -> stringResource(R.string.set_new_posts_none_yet)
+    else -> stringResource(R.string.set_new_posts_explained, MAX_WATCHED_COMMUNITIES)
 }
 
 /** The summary under Settings › Notifications › New posts. */
+@Composable
 internal fun newPostNotificationsSummary(count: Int): String = when (count) {
-    0 -> "Off for every community"
-    1 -> "1 community"
-    else -> "$count communities"
+    0 -> stringResource(R.string.set_new_posts_off)
+    else -> pluralStringResource(R.plurals.set_new_posts_communities, count, count)
 }

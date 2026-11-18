@@ -95,7 +95,7 @@ class Issue45UpdateConfirmationTest {
         assertEquals(3, opened.size)
 
         UpdateInstallCoordinator.installerAnswered(PackageInstaller.STATUS_FAILURE_ABORTED)
-        assertEquals(UpdateInstallState.Failed(255, "The update wasn't installed."), UpdateInstallCoordinator.state.value)
+        assertEquals(UpdateInstallState.Failed(255, io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.update_install_aborted)), UpdateInstallCoordinator.state.value)
         assertFalse(UpdateInstallCoordinator.showConfirmation(context, launch = launch))
     }
 
@@ -127,7 +127,7 @@ class Issue45UpdateConfirmationTest {
         UpdateInstallCoordinator.installerAnswered(PackageInstaller.STATUS_PENDING_USER_ACTION, prompt, 8)
         assertEquals(UpdateInstallState.Installing(255, waitingForYou = true), UpdateInstallCoordinator.state.value)
         UpdateInstallCoordinator.installerAnswered(PackageInstaller.STATUS_FAILURE_ABORTED, answeredSession = 8)
-        assertEquals(UpdateInstallState.Failed(255, "The update wasn't installed."), UpdateInstallCoordinator.state.value)
+        assertEquals(UpdateInstallState.Failed(255, io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.update_install_aborted)), UpdateInstallCoordinator.state.value)
     }
 
     @Test

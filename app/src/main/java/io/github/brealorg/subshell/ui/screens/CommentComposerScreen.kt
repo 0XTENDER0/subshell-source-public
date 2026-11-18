@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
@@ -110,7 +111,7 @@ internal fun CommentComposerScreen(
     }
     val mediaPolicy = commentMediaPolicies[commentMediaPolicyKey(state.activeAccountId, post.community)]
         .takeIf { authenticated }
-    val mediaBlockedMessage = media?.let { attached -> commentMediaNotAllowedMessage(attached, mediaPolicy) }
+    val mediaBlockedMessage = media?.let { attached -> commentMediaNotAllowedMessage(attached, mediaPolicy)?.asString() }
         .takeIf { authenticated }
     val remoteMediaBlocked = mediaBlockedMessage != null
     // ISSUE229_MENTION_AUTOCOMPLETE_V1: the thread's people first, then the
@@ -292,9 +293,9 @@ internal fun CommentComposerScreen(
                 interactionActionsAtStart = composerActionsAtStart,
                 inputLocked = requestInFlight,
                 contextLabel = if (target.isPostTarget) {
-                    "Commenting on r/${post.community} · ${post.title}"
+                    stringResource(R.string.scr_commenting_on, post.community, post.title)
                 } else {
-                    "Replying to u/${target.parentAuthor ?: "unknown"} · ${post.title}"
+                    stringResource(R.string.scr_replying_to_u_title, target.parentAuthor ?: "unknown", post.title)
                 },
                 onDismissContext = onClose,
                 focusRequester = focusRequester,
@@ -302,9 +303,9 @@ internal fun CommentComposerScreen(
                 sendContentDescription = if (target.isPostTarget) stringResource(R.string.all_post_comment) else stringResource(R.string.all_post_reply),
                 mentions = mentions,
                 longReplyTitle = if (target.isPostTarget) {
-                    "Comment on r/${post.community}"
+                    stringResource(R.string.scr_comment_on, post.community)
                 } else {
-                    "Reply to u/${target.parentAuthor ?: "unknown"}"
+                    stringResource(R.string.scr_reply_to_u_title, target.parentAuthor ?: "unknown")
                 },
                 quote = if (target.isPostTarget) {
                     post.title
@@ -411,10 +412,10 @@ private fun CommentWriteStatus(
     val message = when {
         !authenticated -> null
         mediaBlocked -> mediaBlockedMessage
-        requestUnbuildable -> COMMENT_REQUEST_UNBUILDABLE_MESSAGE
+        requestUnbuildable -> stringResource(COMMENT_REQUEST_UNBUILDABLE_MESSAGE)
         targetUnavailable ->
             stringResource(R.string.all_this_comment_target_is_unavailable)
-        else -> commentWriteStatusMessage(writeState)
+        else -> commentWriteStatusMessage(writeState)?.asString()
     } ?: return
 
     Column(
@@ -470,67 +471,67 @@ private fun CommentWriteStatus(
     }
 }
 
-internal fun commentWriteStatusMessage(state: CommentWriteUiState): String? =
+internal fun commentWriteStatusMessage(state: CommentWriteUiState): UiText? =
     when (state.phase) {
         CommentWritePhase.IDLE,
         CommentWritePhase.SUCCEEDED,
         -> null
         CommentWritePhase.AUTHORIZATION_REQUIRED ->
-            "Comment access is required for this account."
+            UiText.Resource(R.string.scr_comment_write_1)
         CommentWritePhase.AUTHORIZING ->
-            "Preparing Reddit authorization…"
+            UiText.Resource(R.string.scr_comment_write_2)
         CommentWritePhase.AWAITING_CALLBACK ->
-            "Waiting for Reddit authorization…"
+            UiText.Resource(R.string.scr_comment_write_3)
         CommentWritePhase.SENDING ->
-            "Posting comment…"
+            UiText.Resource(R.string.scr_comment_write_4)
         CommentWritePhase.OUTCOME_UNKNOWN ->
-            "Reddit may have received this comment. Check the thread before trying again to avoid a duplicate."
+            UiText.Resource(R.string.scr_comment_write_5)
         CommentWritePhase.FAILED -> commentWriteFailureMessage(state)
     }
 
-private fun commentWriteFailureMessage(state: CommentWriteUiState): String =
+private fun commentWriteFailureMessage(state: CommentWriteUiState): UiText =
     when (state.failureKind) {
         CommentWriteFailureKind.CONFIGURATION ->
-            "Comment posting is not configured for this account."
+            UiText.Resource(R.string.scr_comment_write_6)
         CommentWriteFailureKind.ACCOUNT_CHANGED ->
-            "The active account changed. Review the draft before posting."
+            UiText.Resource(R.string.scr_comment_write_7)
         CommentWriteFailureKind.BROWSER_LAUNCH ->
-            "Reddit authorization could not be opened."
+            UiText.Resource(R.string.scr_comment_write_8)
         CommentWriteFailureKind.CALLBACK ->
-            "Reddit authorization could not be completed."
+            UiText.Resource(R.string.scr_comment_write_9)
         CommentWriteFailureKind.AUTHORIZATION ->
-            "Comment access was not granted."
+            UiText.Resource(R.string.scr_comment_write_10)
         CommentWriteFailureKind.SESSION ->
-            "The Reddit session could not be refreshed."
+            UiText.Resource(R.string.scr_comment_write_11)
         CommentWriteFailureKind.RATE_LIMIT -> state.retryAfterMs
             ?.let { delayMs ->
-                "Reddit asked you to wait about ${((delayMs + 999L) / 1_000L)} seconds."
+                UiText.Resource(R.string.scr_comment_write_12, (delayMs + 999L) / 1_000L)
             }
-            ?: "Reddit asked you to wait before posting again."
+            ?: UiText.Resource(R.string.scr_comment_write_13)
         CommentWriteFailureKind.PARENT_UNAVAILABLE ->
-            "This thread can no longer accept replies."
+            UiText.Resource(R.string.scr_comment_write_14)
         CommentWriteFailureKind.PERMISSION ->
-            "This account cannot comment in this community."
+            UiText.Resource(R.string.scr_comment_write_15)
         CommentWriteFailureKind.VALIDATION ->
-            "The comment could not be posted. Review the text and try again."
+            UiText.Resource(R.string.scr_comment_write_16)
         CommentWriteFailureKind.NOT_POSTED ->
-            "Reddit doesn't show this comment. You can send it again."
+            UiText.Resource(R.string.scr_comment_write_17)
         CommentWriteFailureKind.MEDIA_NOT_ALLOWED ->
-            "This community doesn't allow this kind of image in comments. Remove it to send the text."
+            UiText.Resource(R.string.scr_comment_write_18)
         CommentWriteFailureKind.MEDIA_TOO_LARGE ->
-            "This image is too large to post. Choose a smaller one."
+            UiText.Resource(R.string.scr_comment_write_19)
         CommentWriteFailureKind.MEDIA_UNSUPPORTED ->
-            "This image type can't be posted. Choose a JPEG, PNG, WebP, or GIF."
+            UiText.Resource(R.string.scr_comment_write_20)
         CommentWriteFailureKind.MEDIA_UNAVAILABLE ->
-            "This image can no longer be read. Choose it again."
+            UiText.Resource(R.string.scr_comment_write_21)
         CommentWriteFailureKind.API ->
-            "Reddit rejected the comment."
+            UiText.Resource(R.string.scr_comment_write_22)
         CommentWriteFailureKind.HTTP,
         CommentWriteFailureKind.TRANSPORT,
-        -> "The comment could not be sent."
+        -> UiText.Resource(R.string.scr_comment_write_23)
         CommentWriteFailureKind.ALREADY_SUBMITTING ->
-            "This comment is already being posted."
-        null -> "The comment could not be posted."
+            UiText.Resource(R.string.scr_comment_write_24)
+        null -> UiText.Resource(R.string.scr_comment_write_25)
     }
 
 // COMPOSER10_COMMENT_MEDIA_RULES_V1: why an attached image/GIF cannot be sent
@@ -538,17 +539,16 @@ private fun commentWriteFailureMessage(state: CommentWriteUiState): String =
 internal fun commentMediaNotAllowedMessage(
     media: ComposerMediaAttachment,
     policy: CommentMediaPolicy?,
-): String? {
+): UiText? {
     policy ?: return null
     val gif = media.kind == ComposerMediaKind.GIF
     val allowed = if (gif) policy.gifsAllowed else policy.imagesAllowed
     if (allowed) return null
-    val noun = if (gif) "GIFs" else "images"
-    return "This community doesn't allow $noun in comments. Remove it to send the text."
+    return UiText.Resource(if (gif) R.string.scr_comment_no_gifs_allowed else R.string.scr_comment_no_images_allowed)
 }
 
-internal const val COMMENT_REQUEST_UNBUILDABLE_MESSAGE =
-    "This reply can't be sent as it is. Check its text and image."
+@androidx.annotation.StringRes
+internal val COMMENT_REQUEST_UNBUILDABLE_MESSAGE: Int = R.string.scr_comment_request_unbuildable
 
 private fun List<Comment>.findComment(id: String?): Comment? {
     if (id == null) return null

@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.s
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import io.github.brealorg.subshell.harness.readSourceText
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.ui.unit.LayoutDirection
@@ -14,6 +18,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue16SwipeActionsPolicyTest {
     @Test
     fun swipeActionsAreOnByDefaultWithUsefulMappingsReady() {
@@ -56,19 +62,19 @@ class Issue16SwipeActionsPolicyTest {
     fun affordanceLabelsDescribeTheExistingMutationSemantics() {
         assertEquals(
             "Remove upvote",
-            postSwipeActionLabel(PostSwipeAction.UPVOTE, vote = 1, saved = false, hidden = false),
+            postSwipeActionLabel(PostSwipeAction.UPVOTE, vote = 1, saved = false, hidden = false).s,
         )
         assertEquals(
             "Unsave",
-            postSwipeActionLabel(PostSwipeAction.SAVE, vote = 0, saved = true, hidden = false),
+            postSwipeActionLabel(PostSwipeAction.SAVE, vote = 0, saved = true, hidden = false).s,
         )
         assertEquals(
             "Unhide",
-            postSwipeActionLabel(PostSwipeAction.HIDE, vote = 0, saved = false, hidden = true),
+            postSwipeActionLabel(PostSwipeAction.HIDE, vote = 0, saved = false, hidden = true).s,
         )
         assertEquals(
             "Remove downvote",
-            commentSwipeActionLabel(CommentSwipeAction.DOWNVOTE, vote = -1),
+            commentSwipeActionLabel(CommentSwipeAction.DOWNVOTE, vote = -1).s,
         )
     }
 

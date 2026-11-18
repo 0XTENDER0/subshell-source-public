@@ -57,7 +57,7 @@ fun MutedCommunityDirectViewLivePreview(
 ) {
     // LOWUI7_PREVIEWS_ARE_ONE_DESCRIBED_IMAGE_V1 (OCB-156): the mock screen
     // is read as one description, not as fake content.
-    val previewDescription = "Preview: ${stringResource(mode.descriptionRes)}"
+    val previewDescription = stringResource(R.string.comp_preview_of, stringResource(mode.descriptionRes))
     Surface(
         modifier = modifier.clearAndSetSemantics {
             contentDescription = previewDescription

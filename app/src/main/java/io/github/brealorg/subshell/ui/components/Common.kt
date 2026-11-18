@@ -880,12 +880,13 @@ private fun HeaderAccountMenu(
     onExpandedChange: (Boolean) -> Unit,
     state: SubshellState,
 ) {
+    val accountMenuDescription = stringResource(R.string.comp_account_menu)
     Box {
         IconButton(onClick = { onExpandedChange(true) }) {
             SnooAvatar(
                 Modifier
                     .size(34.dp)
-                    .semantics { contentDescription = "Account menu" },
+                    .semantics { contentDescription = accountMenuDescription },
             )
         }
         DropdownMenu(
@@ -1116,7 +1117,7 @@ fun PostCard(
             groups = listOf(
                 listOfNotNull(
                     SheetAction(
-                        if (bodyEditEntryMode == PostBodyEditEntryMode.PROBE) "Edit body (test)" else "Edit post",
+                        if (bodyEditEntryMode == PostBodyEditEntryMode.PROBE) stringResource(R.string.comp_edit_body_test) else stringResource(R.string.scr_edit_post),
                         Symbols.Edit,
                     ) {
                         if (onEditPost != null) {
@@ -1198,7 +1199,7 @@ fun PostCard(
                                     state.effectivePostFollowed(
                                         post,
                                     ),
-                                ),
+                                ).asString(),
                             )
                         },
                         enabled =
@@ -1310,9 +1311,9 @@ fun PostCard(
                     text = {
                         Text(
                             if (communityMuted) {
-                                "Unmute ${state.subredditLabel(post.community)}"
+                                stringResource(R.string.comm_unmute_name, state.subredditLabel(post.community))
                             } else {
-                                "Mute ${state.subredditLabel(post.community)}…"
+                                stringResource(R.string.comm_mute_name_more, state.subredditLabel(post.community))
                             },
                         )
                     },
@@ -1329,7 +1330,7 @@ fun PostCard(
                 // ISSUE300_ONE_COPY_ENTRY_OPENS_A_SHEET_V1: Copy text, Select text,
                 // the post's link and the links in it, in one sheet.
                 DropdownMenuItem(
-                    text = { Text(COPY_MENU_ENTRY_LABEL) },
+                    text = { Text(stringResource(COPY_MENU_ENTRY_LABEL)) },
                     onClick = {
                         overflowExpanded = false
                         copySheetVisible = true
@@ -1508,11 +1509,12 @@ fun PostCard(
                                 )
                                 if (shouldShowUnreadMarker(state.showUnreadMarker, read)) {
                                     Spacer(Modifier.width(6.dp))
+                                    val unreadDescription = stringResource(R.string.feed_unread_post)
                                     Box(
                                         Modifier
                                             .size(6.dp)
                                             .background(MaterialTheme.colorScheme.primary, CircleShape)
-                                            .semantics { contentDescription = "Unread post" },
+                                            .semantics { contentDescription = unreadDescription },
                                     )
                                 }
                             }
@@ -1543,7 +1545,7 @@ fun PostCard(
                                     }
                                 },
                                 onClickLabel = flairSearch?.let {
-                                    "Search ${state.subredditLabel(post.community)} for this flair"
+                                    stringResource(R.string.comm_search_flair, state.subredditLabel(post.community))
                                 },
                             )
                         }
@@ -1636,7 +1638,6 @@ fun PostCard(
     }
     if (reportDialogVisible) {
         RedditContentReportDialog(
-            targetLabel = "post",
             communityName = post.community,
             targetKind = RedditReportTargetKind.POST,
             state = state,
@@ -1883,7 +1884,7 @@ internal fun VoteControl(
             ) {
                 Icon(
                     imageVector = voteStateIcon(1, mode, voted = vote == 1),
-                    contentDescription = if (vote == 1) "Remove upvote" else "Upvote",
+                    contentDescription = if (vote == 1) stringResource(R.string.feed_action_remove_upvote) else stringResource(R.string.feed_action_upvote),
                     modifier = Modifier.size(iconSize),
                     tint = upvoteTint,
                 )
@@ -1903,7 +1904,7 @@ internal fun VoteControl(
             ) {
                 Icon(
                     imageVector = voteStateIcon(-1, mode, voted = vote == -1),
-                    contentDescription = if (vote == -1) "Remove downvote" else "Downvote",
+                    contentDescription = if (vote == -1) stringResource(R.string.feed_action_remove_downvote) else stringResource(R.string.feed_action_downvote),
                     modifier = Modifier.size(iconSize),
                     tint = downvoteTint,
                 )

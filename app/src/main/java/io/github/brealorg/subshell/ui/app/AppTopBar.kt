@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
@@ -134,8 +135,8 @@ internal fun AppTopBar(
                 } else {
                     MainScreenHeader(
                         title = state.selectedSubreddit?.let(state::subredditLabel)
-                            ?: activeCustomFeed?.let { feed -> "Feed: ${feed.displayName}" }
-                            ?: if (state.destination == MainDestination.HOME) stringResource(state.feedSource.labelRes) else state.destination.label,
+                            ?: activeCustomFeed?.let { feed -> stringResource(R.string.top_bar_custom_feed, feed.displayName) }
+                            ?: if (state.destination == MainDestination.HOME) stringResource(state.feedSource.labelRes) else stringResource(state.destination.labelRes),
                         state = state,
                         feedSort = if (
                             state.destination == MainDestination.HOME &&
@@ -180,8 +181,8 @@ internal fun AppTopBar(
                                         includeNsfw = state.showNsfwPosts,
                                     )
                                     userNotices.noticeInfo(
-                                        "Saving for offline",
-                                        "The top $OFFLINE_SAVE_POST_COUNT posts, their comments and images download in the background",
+                                        UiText.Resource(R.string.offline_saving_title),
+                                        UiText.Resource(R.string.offline_saving, OFFLINE_SAVE_POST_COUNT),
                                     )
                                 }
                             },

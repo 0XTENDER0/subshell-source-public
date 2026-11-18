@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.data.network.reddit
 
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.ui.components.modmailMessageAuthorLabel
 import io.github.brealorg.subshell.ui.components.modmailMessageSemanticRole
 import kotlinx.serialization.json.Json
@@ -8,6 +9,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class Modmail03A1R2HiddenAuthorProjectionTest {
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -54,7 +57,7 @@ class Modmail03A1R2HiddenAuthorProjectionTest {
         assertEquals("brealorg", message.authorName)
         assertEquals("r/subshell", modmailMessageAuthorLabel(message, "subshell"))
         assertTrue(
-            requireNotNull(modmailMessageSemanticRole(message))
+            requireNotNull(modmailMessageSemanticRole(message)).s
                 .contains("u/brealorg · hidden from participant"),
         )
     }

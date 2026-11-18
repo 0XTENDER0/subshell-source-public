@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.test.core.app.ApplicationProvider
 import io.github.brealorg.subshell.data.account.RedditModeratorActionUiState
+import io.github.brealorg.subshell.data.account.RedditModeratorHeldReason
 import io.github.brealorg.subshell.data.account.RedditModeratorQueueItem
 import io.github.brealorg.subshell.data.account.RedditModeratorQueueItemDetails
 import io.github.brealorg.subshell.data.account.RedditModeratorQueueKind
@@ -80,12 +81,12 @@ class Issue301QueueCardComposeTest {
                 details = RedditModeratorQueueItemDetails(ageLabel = "2m", snippet = "Just testing."),
             ),
         )
-        assertEquals(1, shown(HELD_FOR_REVIEW_LABEL))
-        assertEquals(1, shown(HELD_WITHOUT_REPORTS_EXPLANATION))
-        assertEquals(0, shown(HELD_BY_AUTOMODERATOR_EXPLANATION))
+        assertEquals(1, shown("Held for review"))
+        assertEquals(1, shown("Held by Reddit's filters or post guidance."))
+        assertEquals(0, shown("Held by AutoModerator."))
         assertEquals(0, shown("No reports returned"))
         assertEquals(1, shown("Just testing."))
-        assertEquals(1, shown("r/subshell · u/newcomer · 2m"))
+        assertEquals(1, shown("r/subshell · 2m · u/newcomer"))
     }
 
     @Test
@@ -113,7 +114,7 @@ class Issue301QueueCardComposeTest {
         assertEquals(1, shown("Reported: Spam"))
         assertEquals(1, shown("On: Subshell 1.0.2 is out"))
         assertEquals(1, shown("2 reports"))
-        assertEquals(0, shown(HELD_FOR_REVIEW_LABEL))
+        assertEquals(0, shown("Held for review"))
         assertEquals(
             1,
             composeRule.onAllNodes(hasTestTag(POST_THUMBNAIL_TEST_TAG), useUnmergedTree = true).fetchSemanticsNodes().size,
@@ -134,17 +135,53 @@ class Issue301QueueCardComposeTest {
     @Test
     fun anItemAutoModeratorHeldNamesAutoModeratorInTheQueue() {
         show(autoModHeld)
-        assertEquals(1, shown(HELD_FOR_REVIEW_LABEL))
-        assertEquals(1, shown(HELD_BY_AUTOMODERATOR_EXPLANATION))
-        assertEquals(0, shown(HELD_WITHOUT_REPORTS_EXPLANATION))
+        assertEquals(1, shown("Held for review"))
+        assertEquals(1, shown("Held by AutoModerator."))
+        assertEquals(0, shown("Held by Reddit's filters or post guidance."))
         assertEquals(0, shown("Removed by AutoModerator"))
     }
 
     @Test
     fun anItemAutoModeratorHeldNamesAutoModeratorInRemoved() {
         show(autoModHeld, showsReportCount = false)
-        assertEquals(1, shown(HELD_BY_AUTOMODERATOR_EXPLANATION))
-        assertEquals(0, shown(HELD_FOR_REVIEW_LABEL))
+        assertEquals(1, shown("Held by AutoModerator."))
+        assertEquals(0, shown("Held for review"))
         assertEquals(0, shown("Removed by AutoModerator"))
+    }
+
+    // ISSUE301C_A_FILTER_REASON_COMES_FROM_THE_MOD_LOG_V1: the filter's words from the mod log.
+    @Test
+    fun anItemRedditsFilterHeldShowsTheReasonFromTheModLog() {
+        show(
+            RedditModeratorQueueItem(
+                fullname = "t1_19soq6ozp73yb",
+                kind = RedditModeratorQueueKind.COMMENT,
+                communityName = "indianrailways",
+                author = "traveller",
+                summary = "A comment the filter held.",
+                reportDetails = RedditModeratorReportDetails(userReports = emptyList(), moderatorReports = emptyList(), totalCount = 0),
+                details = RedditModeratorQueueItemDetails(
+                    heldByRedditFilter = true,
+                    heldReason = RedditModeratorHeldReason(byAutoModerator = false, reason = "Identified by the abuse and harassment filter"),
+                ),
+            ),
+        )
+        assertEquals(1, shown("Held for review"))
+        assertEquals(1, shown("Held by Reddit's filters: Identified by the abuse and harassment filter"))
+        assertEquals(0, shown("Held by Reddit's filters."))
+    }
+
+    @Test
+    fun anItemAutoModeratorHeldShowsItsRuleReasonInRemoved() {
+        show(
+            autoModHeld.copy(
+                details = autoModHeld.details.copy(
+                    heldReason = RedditModeratorHeldReason(byAutoModerator = true, reason = "Review image comment: meme/reaction or genuine image"),
+                ),
+            ),
+            showsReportCount = false,
+        )
+        assertEquals(1, shown("Held by AutoModerator: Review image comment: meme/reaction or genuine image"))
+        assertEquals(0, shown("Held by AutoModerator."))
     }
 }

@@ -98,6 +98,7 @@ internal fun FeedPostLayoutContent(
     }
 }
 
+@Composable
 private fun feedPostAccessibilityActions(
     post: Post,
     state: SubshellState,
@@ -106,13 +107,13 @@ private fun feedPostAccessibilityActions(
     onComments: () -> Unit,
 ): List<CustomAccessibilityAction> = buildList {
     if (state.postVoteControlEnabled(post)) {
-        add(CustomAccessibilityAction(if (vote == 1) "Remove upvote" else "Upvote") { state.vote(post, 1); true })
-        add(CustomAccessibilityAction(if (vote == -1) "Remove downvote" else "Downvote") { state.vote(post, -1); true })
+        add(CustomAccessibilityAction(stringResource(if (vote == 1) R.string.feed_action_remove_upvote else R.string.feed_action_upvote)) { state.vote(post, 1); true })
+        add(CustomAccessibilityAction(stringResource(if (vote == -1) R.string.feed_action_remove_downvote else R.string.feed_action_downvote)) { state.vote(post, -1); true })
     }
     if (state.postSaveControlEnabled(post)) {
-        add(CustomAccessibilityAction(if (saved) "Unsave" else "Save") { state.toggleSaved(post); true })
+        add(CustomAccessibilityAction(stringResource(if (saved) R.string.feed_action_unsave else R.string.feed_action_save)) { state.toggleSaved(post); true })
     }
-    add(CustomAccessibilityAction("Comments") { onComments(); true })
+    add(CustomAccessibilityAction(stringResource(R.string.feed_action_comments)) { onComments(); true })
 }
 
 @Composable
@@ -315,11 +316,12 @@ private fun PostMetaLine(post: Post, state: SubshellState, read: Boolean) {
         )
         if (shouldShowUnreadMarker(state.showUnreadMarker, read)) {
             Spacer(Modifier.width(6.dp))
+            val unreadDescription = stringResource(R.string.feed_unread_post)
             Box(
                 Modifier
                     .size(6.dp)
                     .background(MaterialTheme.colorScheme.primary, CircleShape)
-                    .semantics { contentDescription = "Unread post" },
+                    .semantics { contentDescription = unreadDescription },
             )
         }
         postLabels(post, showRemoved = postShowsRemoved(post, LocalModeratorQuickActions.current)).forEach { label ->
@@ -428,7 +430,7 @@ internal fun PostThumbnail(post: Post, state: SubshellState, modifier: Modifier 
     val hidden = sensitive && !revealed && mode == SensitiveMediaPreviewMode.HIDE_PREVIEW
     val coverOnly = sensitive && !revealed && mode == SensitiveMediaPreviewMode.LOAD_ON_TAP
     // LINKLABEL01_TALKBACK_READS_THE_DOMAIN_NOT_THE_ADDRESS_V1
-    val label = postMediaDescription(post)
+    val label = postMediaDescription(post).asString()
     val uriHandler = LocalUriHandler.current
     val cleanLinks = LocalCleanLinks.current
     // A tap on a still opens what Large's media opens; a post kind without
@@ -452,7 +454,7 @@ internal fun PostThumbnail(post: Post, state: SubshellState, modifier: Modifier 
                         onClickLabel = when {
                             hidden -> stringResource(R.string.all_open_hidden_media)
                             sensitive && !revealed -> stringResource(R.string.all_show_sensitive_media)
-                            post.kind == PostKind.LINK -> "Open link"
+                            post.kind == PostKind.LINK -> stringResource(R.string.feed_open_link)
                             else -> stringResource(R.string.all_open_media)
                         },
                         role = Role.Button,

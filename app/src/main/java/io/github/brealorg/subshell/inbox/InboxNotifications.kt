@@ -447,11 +447,11 @@ internal object InboxNotificationCenter {
             )
                 .setSmallIcon(R.drawable.ic_notification_subshell)
                 .setContentTitle("subshell")
-                .setContentText("New Reddit Modmail")
+                .setContentText(appContext.getString(R.string.notif_new_modmail))
                 .build()
-            val title = "Modmail · r/${event.communityName}"
+            val title = appContext.getString(R.string.notif_modmail_in, event.communityName)
             val content = event.preview.ifBlank {
-                event.subject.ifBlank { "Open the Modmail conversation" }
+                event.subject.ifBlank { appContext.getString(R.string.notif_open_modmail_conversation) }
             }
             val builder = NotificationCompat.Builder(
                 appContext,
@@ -473,7 +473,7 @@ internal object InboxNotificationCenter {
             if (hideContent) {
                 builder
                     .setContentTitle("subshell")
-                    .setContentText("New Reddit Modmail")
+                    .setContentText(appContext.getString(R.string.notif_new_modmail))
                     .setStyle(null)
             }
 
@@ -689,7 +689,7 @@ internal object InboxNotificationCenter {
                     intent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                 )
-                val text = if (modmail) "New Reddit Modmail" else "New Reddit Inbox activity"
+                val text = appContext.getString(if (modmail) R.string.notif_new_modmail else R.string.notif_new_inbox_activity)
                 val publicVersion = NotificationCompat.Builder(appContext, INBOX_NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_notification_subshell)
                     .setContentTitle("subshell")

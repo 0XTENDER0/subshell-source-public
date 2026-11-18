@@ -145,7 +145,7 @@ internal fun AppLockScreen(onUnlock: () -> Unit) {
             )
             Spacer(Modifier.size(16.dp))
             Text(
-                "subshell is locked",
+                stringResource(R.string.lock_subshell_is_locked),
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
             )

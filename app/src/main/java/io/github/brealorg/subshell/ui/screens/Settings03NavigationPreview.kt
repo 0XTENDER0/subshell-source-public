@@ -581,9 +581,9 @@ private fun CommunityDiscoveryPreviewSnapshot(
                 ) {
                     Text(
                         if (layout == CommunityDiscoveryLayout.CAROUSEL) {
-                            "⌕  Search communities"
+                            stringResource(R.string.scr_search_communities_2)
                         } else {
-                            "⌕  Search by name or topic"
+                            stringResource(R.string.scr_search_by_name_or_topic)
                         },
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -720,6 +720,7 @@ private fun NavigationPhoneSnapshot(
     val bottomVisible = navigationPreviewChromeVisible(bottomBarBehavior, scrolling)
     val interactionVisible = navigationPreviewInteractionVisible(scrolling)
 
+    val previewDescription = stringResource(R.string.set_navigation_preview)
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -727,7 +728,7 @@ private fun NavigationPhoneSnapshot(
             // LOWUI7_LABELS_SAY_WHAT_A_CONTROL_DOES_V1 (OCB-264): one button that
             // says what it shows and what a tap does; the drawing is decoration.
             .clickable(onClickLabel = stringResource(R.string.sw_replay_preview), role = Role.Button, onClick = onReplay)
-            .clearAndSetSemantics { contentDescription = "Navigation preview" },
+            .clearAndSetSemantics { contentDescription = previewDescription },
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainer,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),

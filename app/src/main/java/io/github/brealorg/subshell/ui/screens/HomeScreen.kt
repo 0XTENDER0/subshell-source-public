@@ -830,7 +830,7 @@ fun HomeScreen(
                                 } else if (authenticatedHomeWithoutSubscriptions) {
                                     stringResource(R.string.all_your_home_feed_is_empty)
                                 } else if (nsfwPreferenceHidesAllPosts) {
-                                    "NSFW posts are hidden"
+                                    stringResource(R.string.scr_nsfw_posts_are_hidden)
                                 } else if (communityMutesHideAllPosts) {
                                     stringResource(R.string.all_muted_communities_fill_this_page)
                                 } else if (contentFiltersHideAllPosts) {
@@ -871,7 +871,7 @@ fun HomeScreen(
                                 } else if (authenticated && state.feedSource == FeedSource.SAVED) {
                                     stringResource(R.string.all_save_a_post_and_it_will_appear)
                                 } else if (successfulEmptyRedditListing) {
-                                    "$activeRedditListingLabel returned an empty listing. Try another sort or time period."
+                                    stringResource(R.string.feed_listing_empty, activeRedditListingLabel)
                                 } else if (authenticatedRedditFeed && (activeRedditFeedState.inProgress || !storedFeedRead)) {
                                     stringResource(R.string.all_the_first_page_is_on_its_way)
                                 } else if (authenticated) {

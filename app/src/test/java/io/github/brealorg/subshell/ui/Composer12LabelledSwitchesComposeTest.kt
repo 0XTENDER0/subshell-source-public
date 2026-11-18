@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
@@ -63,8 +64,8 @@ class Composer12LabelledSwitchesComposeTest {
         val video = ComposerMediaAttachment("content://v/1", "video/mp4", ComposerMediaKind.VIDEO)
         val gif = ComposerMediaAttachment("content://g/1", "image/gif", ComposerMediaKind.GIF)
         val image = ComposerMediaAttachment("content://i/1", "image/png", ComposerMediaKind.IMAGE)
-        assertEquals("Remove video", composerMediaRemoveLabel(video, 0))
-        assertEquals("Remove GIF 2", composerMediaRemoveLabel(gif, 1))
-        assertEquals("Remove image 3", composerMediaRemoveLabel(image, 2))
+        assertEquals("Remove video", composerMediaRemoveLabel(video, 0).s)
+        assertEquals("Remove GIF 2", composerMediaRemoveLabel(gif, 1).s)
+        assertEquals("Remove image 3", composerMediaRemoveLabel(image, 2).s)
     }
 }

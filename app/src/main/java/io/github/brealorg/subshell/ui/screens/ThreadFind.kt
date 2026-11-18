@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.UiText
 import io.github.brealorg.subshell.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -61,6 +62,7 @@ internal data class ThreadFindRequest(val query: String, val opOnly: Boolean) {
 }
 
 internal const val THREAD_FIND_OP_ONLY_LABEL = "OP"
+/** English text of `scr_only_op_s_comments`, for tests. */
 internal const val THREAD_FIND_OP_ONLY_DESCRIPTION = "Only OP's comments"
 
 /** Ids of loaded comments whose text matches [query], in thread order. */
@@ -138,12 +140,12 @@ internal fun threadFindNextMoreNode(comments: List<Comment>, blocked: Set<String
  * whole thread is (Reddit's count includes removed comments, so it is only
  * the upper end).
  */
-internal fun threadFindCoverageLabel(loadedComments: Int, totalComments: Int, loading: Boolean): String {
+internal fun threadFindCoverageLabel(loadedComments: Int, totalComments: Int, loading: Boolean): UiText {
     val total = maxOf(totalComments, loadedComments)
     return if (loading) {
-        "Loading the rest of the thread · searched $loadedComments of $total"
+        UiText.Resource(R.string.thread_find_loading_rest, loadedComments, total)
     } else {
-        "Searched $loadedComments of $total comments"
+        UiText.Plural(R.plurals.thread_find_searched, total, loadedComments, total)
     }
 }
 
@@ -163,10 +165,10 @@ internal fun threadFindCountLabel(active: Int, size: Int): String = when {
     else -> "–/$size"
 }
 
-internal fun threadFindCountDescription(active: Int, size: Int): String = when {
-    size == 0 -> "No matches"
-    active in 0 until size -> "Match ${active + 1} of $size"
-    else -> "$size matches"
+internal fun threadFindCountDescription(active: Int, size: Int): UiText = when {
+    size == 0 -> UiText.Resource(R.string.thread_find_no_matches)
+    active in 0 until size -> UiText.Resource(R.string.thread_find_match_of, active + 1, size)
+    else -> UiText.Plural(R.plurals.thread_find_matches, size, size)
 }
 
 /**
@@ -178,6 +180,7 @@ internal fun threadFindCountDescription(active: Int, size: Int): String = when {
 internal fun threadFindNeedsHeaderAtTop(firstVisibleItemIndex: Int, commentControlsIndex: Int): Boolean =
     firstVisibleItemIndex < commentControlsIndex
 
+/** English text of `scr_find_in_thread`, for tests. */
 internal const val THREAD_FIND_OPEN_LABEL = "Find in thread"
 
 @Composable
@@ -198,6 +201,8 @@ internal fun ThreadFindBar(
     opOnly: Boolean = false,
     onOpOnlyChange: (Boolean) -> Unit = {},
 ) {
+    val findInThreadLabel = stringResource(R.string.scr_find_in_thread)
+    val opOnlyDescription = stringResource(R.string.scr_only_op_s_comments)
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
     Column(modifier = modifier.fillMaxWidth()) {
@@ -211,12 +216,12 @@ internal fun ThreadFindBar(
             SubshellSearchField(
                 query = query,
                 onQueryChange = onQueryChange,
-                placeholder = THREAD_FIND_OPEN_LABEL,
+                placeholder = findInThreadLabel,
                 modifier = Modifier.weight(1f),
                 // LOWUI7_LABELS_SAY_WHAT_A_CONTROL_DOES_V1 (OCB-279): named also once text is typed.
                 fieldModifier = Modifier
                     .focusRequester(focusRequester)
-                    .semantics { contentDescription = THREAD_FIND_OPEN_LABEL },
+                    .semantics { contentDescription = findInThreadLabel },
                 onSearch = { onSearch() },
             )
             if (countLabel != null) {
@@ -250,7 +255,7 @@ internal fun ThreadFindBar(
                 selected = opOnly,
                 onClick = { onOpOnlyChange(!opOnly) },
                 label = { Text(THREAD_FIND_OP_ONLY_LABEL) },
-                modifier = Modifier.semantics { contentDescription = THREAD_FIND_OP_ONLY_DESCRIPTION },
+                modifier = Modifier.semantics { contentDescription = opOnlyDescription },
                 leadingIcon = if (opOnly) {
                     { Icon(Symbols.Check, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }
                 } else {
