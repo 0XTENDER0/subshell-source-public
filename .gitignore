@@ -10,3 +10,7 @@ local.properties
 .externalNativeBuild/
 **/.externalNativeBuild/
 __pycache__/
+/.vs/slnx.sqlite
+/gradle/gradle-daemon-jvm.properties
+/gradlew.bat
+.vs/
