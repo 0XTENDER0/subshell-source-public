@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.ui.symbols.Symbols
 import java.io.File
 import org.junit.Assert.assertEquals
@@ -17,7 +18,7 @@ class MaterialSymbols01Test {
     @Test
     fun noAppSourceUsesTheOldMaterialIcons() {
         val offenders = File(root, "app/src/main/java").walkTopDown()
-            .filter { it.extension == "kt" && it.readText().contains("androidx.compose.material.icons") }
+            .filter { it.extension == "kt" && it.readSourceText().contains("androidx.compose.material.icons") }
             .map { it.relativeTo(root).path }
             .toList()
         assertEquals(emptyList<String>(), offenders)

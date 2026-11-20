@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.ui.theme.AppTextScale
 import io.github.brealorg.subshell.ui.theme.AppUiScale
 import io.github.brealorg.subshell.backup.PortableCommunityMute
@@ -240,11 +242,11 @@ internal fun accountSessionForPersistence(
     }
 }
 
-enum class MainDestination(val label: String) {
-    HOME("Home"),
-    SUBS("Communities"),
-    INBOX("Inbox"),
-    YOU("You"),
+enum class MainDestination(val label: String, @androidx.annotation.StringRes val labelRes: Int) {
+    HOME("Home", io.github.brealorg.subshell.R.string.nav_home),
+    SUBS("Communities", io.github.brealorg.subshell.R.string.nav_communities),
+    INBOX("Inbox", io.github.brealorg.subshell.R.string.nav_inbox),
+    YOU("You", io.github.brealorg.subshell.R.string.nav_you),
 }
 
 // LOWUI4_LIBRARY_RETIRED_V1 (OCB-225): nothing opened LIBRARY since the You
@@ -257,35 +259,35 @@ enum class SecondaryDestination {
     NEW_MESSAGE,
 }
 
-enum class FeedSort(val label: String) {
-    BEST("Best"),
-    HOT("Hot"),
-    NEW("New"),
-    RISING("Rising"),
-    TOP("Top"),
-    CONTROVERSIAL("Controversial"),
+enum class FeedSort(@androidx.annotation.StringRes val labelRes: Int) {
+    BEST(io.github.brealorg.subshell.R.string.sort_feed_best),
+    HOT(io.github.brealorg.subshell.R.string.sort_feed_hot),
+    NEW(io.github.brealorg.subshell.R.string.sort_feed_new),
+    RISING(io.github.brealorg.subshell.R.string.sort_feed_rising),
+    TOP(io.github.brealorg.subshell.R.string.sort_feed_top),
+    CONTROVERSIAL(io.github.brealorg.subshell.R.string.sort_feed_controversial),
 }
 
-enum class CommunitySort(val label: String) {
-    HOT("Hot"),
-    NEW("New"),
-    RISING("Rising"),
-    TOP("Top"),
-    CONTROVERSIAL("Controversial"),
+enum class CommunitySort(@androidx.annotation.StringRes val labelRes: Int) {
+    HOT(io.github.brealorg.subshell.R.string.sort_community_hot),
+    NEW(io.github.brealorg.subshell.R.string.sort_community_new),
+    RISING(io.github.brealorg.subshell.R.string.sort_community_rising),
+    TOP(io.github.brealorg.subshell.R.string.sort_community_top),
+    CONTROVERSIAL(io.github.brealorg.subshell.R.string.sort_community_controversial),
 }
 
-enum class FeedSource(val label: String) {
-    HOME("Home"),
-    POPULAR("Popular"),
-    ALL("All"),
-    SAVED("Saved"),
+enum class FeedSource(@androidx.annotation.StringRes val labelRes: Int) {
+    HOME(io.github.brealorg.subshell.R.string.source_feed_home),
+    POPULAR(io.github.brealorg.subshell.R.string.source_feed_popular),
+    ALL(io.github.brealorg.subshell.R.string.source_feed_all),
+    SAVED(io.github.brealorg.subshell.R.string.source_feed_saved),
 }
 
-enum class SearchScope(val label: String) {
-    ALL("All"),
-    POSTS("Posts"),
-    COMMUNITIES("Communities"),
-    USERS("People"),
+enum class SearchScope(@androidx.annotation.StringRes val labelRes: Int) {
+    ALL(io.github.brealorg.subshell.R.string.scope_search_all),
+    POSTS(io.github.brealorg.subshell.R.string.scope_search_posts),
+    COMMUNITIES(io.github.brealorg.subshell.R.string.scope_search_communities),
+    USERS(io.github.brealorg.subshell.R.string.scope_search_users),
 }
 
 enum class SearchArea {
@@ -294,27 +296,27 @@ enum class SearchArea {
     CURRENT_COMMUNITY,
 }
 
-enum class CommentActionPlacement(val label: String) {
-    LEFT("Left"),
-    BALANCED("Balanced"),
-    RIGHT("Right"),
+enum class CommentActionPlacement(@androidx.annotation.StringRes val labelRes: Int) {
+    LEFT( io.github.brealorg.subshell.R.string.comment_action_placement_left),
+    BALANCED( io.github.brealorg.subshell.R.string.comment_action_placement_balanced),
+    RIGHT( io.github.brealorg.subshell.R.string.comment_action_placement_right),
 }
 
-enum class CommentTimeFormat(val label: String, val example: String) {
-    RELATIVE("Relative", "2h"),
-    LOCAL_24_HOUR("24-hour", "20:20"),
-    LOCAL_12_HOUR("12-hour", "8:20 PM"),
+enum class CommentTimeFormat(@androidx.annotation.StringRes val labelRes: Int, val example: String) {
+    RELATIVE( io.github.brealorg.subshell.R.string.comment_time_format_relative, "2h"),
+    LOCAL_24_HOUR( io.github.brealorg.subshell.R.string.comment_time_format_local_24_hour, "20:20"),
+    LOCAL_12_HOUR( io.github.brealorg.subshell.R.string.comment_time_format_local_12_hour, "8:20 PM"),
 }
 
-enum class SubredditLabelStyle(val label: String, val example: String) {
-    MODERN("Modern", "r/linux"),
-    CLASSIC("Classic", "/r/linux"),
-    PLAIN("Plain", "linux"),
+enum class SubredditLabelStyle(@androidx.annotation.StringRes val labelRes: Int, val example: String) {
+    MODERN( io.github.brealorg.subshell.R.string.subreddit_label_style_modern, "r/linux"),
+    CLASSIC( io.github.brealorg.subshell.R.string.subreddit_label_style_classic, "/r/linux"),
+    PLAIN( io.github.brealorg.subshell.R.string.subreddit_label_style_plain, "linux"),
 }
 
-enum class ChromeBehavior(val label: String) {
-    ALWAYS_SHOW("Always show"),
-    HIDE_ON_SCROLL("Hide on scroll"),
+enum class ChromeBehavior(@androidx.annotation.StringRes val labelRes: Int) {
+    ALWAYS_SHOW( io.github.brealorg.subshell.R.string.chrome_behavior_always_show),
+    HIDE_ON_SCROLL( io.github.brealorg.subshell.R.string.chrome_behavior_hide_on_scroll),
 }
 
 internal fun videoAutoplayAllows(setting: VideoAutoplay, unmetered: Boolean): Boolean = when (setting) {
@@ -323,26 +325,26 @@ internal fun videoAutoplayAllows(setting: VideoAutoplay, unmetered: Boolean): Bo
     VideoAutoplay.NEVER -> false
 }
 
-enum class VideoAutoplay(val label: String) {
-    ALWAYS("Always"),
-    WIFI_ONLY("Wi-Fi only"),
-    NEVER("Never"),
+enum class VideoAutoplay(@androidx.annotation.StringRes val labelRes: Int) {
+    ALWAYS( io.github.brealorg.subshell.R.string.video_autoplay_always),
+    WIFI_ONLY( io.github.brealorg.subshell.R.string.video_autoplay_wifi_only),
+    NEVER( io.github.brealorg.subshell.R.string.video_autoplay_never),
 }
 
-enum class VideoQuality(val label: String) {
-    HIGH("High"),
-    MEDIUM("Medium"),
-    LOW("Low"),
+enum class VideoQuality(@androidx.annotation.StringRes val labelRes: Int) {
+    HIGH( io.github.brealorg.subshell.R.string.video_quality_high),
+    MEDIUM( io.github.brealorg.subshell.R.string.video_quality_medium),
+    LOW( io.github.brealorg.subshell.R.string.video_quality_low),
 }
 
 // VIDEO04_PLAYBACK_OPTIONS_PLACEMENT_V1 (#227, owner): where the playback options
 // button shows; post and full screen by default, a reader may widen or narrow it.
 // VIDEO05_SETTING_ROWS_SHOW_SHORT_VALUES_V1: the row shows a short value so its
 // description keeps its width (device: one word per line); the dialog says it all.
-enum class PlaybackOptionsPlacement(val label: String, val rowLabel: String) {
-    POST_AND_FULLSCREEN("Post and full screen", "Post + full screen"),
-    FULLSCREEN_ONLY("Full screen only", "Full screen"),
-    EVERYWHERE("Feed, post and full screen", "Everywhere"),
+enum class PlaybackOptionsPlacement(@androidx.annotation.StringRes val labelRes: Int, @androidx.annotation.StringRes val rowLabelRes: Int) {
+    POST_AND_FULLSCREEN( io.github.brealorg.subshell.R.string.playback_options_placement_post_and_fullscreen, io.github.brealorg.subshell.R.string.row_label_post_and_full_screen),
+    FULLSCREEN_ONLY( io.github.brealorg.subshell.R.string.playback_options_placement_fullscreen_only, io.github.brealorg.subshell.R.string.row_label_full_screen),
+    EVERYWHERE( io.github.brealorg.subshell.R.string.playback_options_placement_everywhere, io.github.brealorg.subshell.R.string.row_label_everywhere),
 }
 
 internal fun videoPictureInPictureAllowed(
@@ -375,35 +377,35 @@ internal fun playbackOptionsButtonShown(
 
 // VIDEO05_PLAYBACK_DEFAULTS_IN_SETTINGS_V1 (#227, owner): Settings holds the
 // defaults; the playback options panel overrides them for one video only.
-enum class VideoSubtitleDefault(val label: String, val rowLabel: String) {
-    OFF("Off", "Off"),
-    WHEN_MARKED("Auto · when the video marks them", "Auto"),
-    SYSTEM_CAPTIONS("Follow Android caption settings", "System"),
+enum class VideoSubtitleDefault(@androidx.annotation.StringRes val labelRes: Int, @androidx.annotation.StringRes val rowLabelRes: Int) {
+    OFF( io.github.brealorg.subshell.R.string.video_subtitle_default_off, io.github.brealorg.subshell.R.string.row_label_off),
+    WHEN_MARKED( io.github.brealorg.subshell.R.string.video_subtitle_default_when_marked, io.github.brealorg.subshell.R.string.row_label_auto),
+    SYSTEM_CAPTIONS( io.github.brealorg.subshell.R.string.video_subtitle_default_system_captions, io.github.brealorg.subshell.R.string.row_label_system),
 }
 
-enum class VideoAudioDefault(val label: String, val rowLabel: String) {
-    VIDEO_DEFAULT("The video's own", "Video's own"),
-    DEVICE_LANGUAGE("Your device language", "Device"),
+enum class VideoAudioDefault(@androidx.annotation.StringRes val labelRes: Int, @androidx.annotation.StringRes val rowLabelRes: Int) {
+    VIDEO_DEFAULT( io.github.brealorg.subshell.R.string.video_audio_default_video_default, io.github.brealorg.subshell.R.string.row_label_videos_own),
+    DEVICE_LANGUAGE( io.github.brealorg.subshell.R.string.video_audio_default_device_language, io.github.brealorg.subshell.R.string.row_label_device),
 }
 
 enum class VideoTimelineSize(
-    val label: String,
+    @androidx.annotation.StringRes val labelRes: Int,
     val trackHeightDp: Int,
     val restingThumbDiameterDp: Int,
     val scrubbingThumbDiameterDp: Int,
     val touchTargetHeightDp: Int,
 ) {
-    COMPACT("Thin", 3, 10, 14, 48),
-    STANDARD("Standard", 4, 12, 16, 48),
-    LARGE("Large", 6, 16, 20, 48),
+    COMPACT( io.github.brealorg.subshell.R.string.video_timeline_size_compact, 3, 10, 14, 48),
+    STANDARD( io.github.brealorg.subshell.R.string.video_timeline_size_standard, 4, 12, 16, 48),
+    LARGE( io.github.brealorg.subshell.R.string.video_timeline_size_large, 6, 16, 20, 48),
 }
 
-enum class FeedPreviewState(val label: String) {
-    CONTENT("Content"),
-    LOADING("Loading"),
-    OFFLINE("Offline"),
-    ERROR("Error"),
-    EMPTY("Empty"),
+enum class FeedPreviewState(@androidx.annotation.StringRes val labelRes: Int) {
+    CONTENT( io.github.brealorg.subshell.R.string.feed_preview_state_content),
+    LOADING( io.github.brealorg.subshell.R.string.feed_preview_state_loading),
+    OFFLINE( io.github.brealorg.subshell.R.string.feed_preview_state_offline),
+    ERROR( io.github.brealorg.subshell.R.string.feed_preview_state_error),
+    EMPTY( io.github.brealorg.subshell.R.string.feed_preview_state_empty),
 }
 
 private data class VideoSurfaceVisibility(
@@ -777,6 +779,10 @@ class SubshellState(
     initialFeedSort: FeedSort = FeedSort.BEST,
     initialCommentHierarchyStyle: CommentHierarchyStyle = CommentHierarchyStyle.GUIDE_LINES,
     initialCommentThreadColours: CommentThreadColours = CommentThreadColours.OFF,
+    initialCommentIndentSize: CommentIndentSize = CommentIndentSize.NORMAL,
+    initialCommentRailFromParent: Boolean = true,
+    initialCleanLinks: Boolean = true,
+    initialShownLanguages: Set<String> = emptySet(),
     initialSwipeActionsEnabled: Boolean = false,
     initialPostSwipeLeftAction: PostSwipeAction = DefaultSubshellSettings.postSwipeLeftAction,
     initialPostSwipeRightAction: PostSwipeAction = DefaultSubshellSettings.postSwipeRightAction,
@@ -975,6 +981,10 @@ class SubshellState(
     initialResumeFeedPosition: Boolean = false,
     initialResumeFeedPositionAge: FeedPositionAge = FeedPositionAge.TWELVE_HOURS,
     initialResumeFeedPositionStart: FeedPositionStart = FeedPositionStart.SHOW_STORED,
+    // ISSUE302_START_FEED_V1 / ISSUE300_DEFAULT_FEED_SORT_V1
+    initialStartFeed: StartFeed = StartFeed.HOME,
+    initialDefaultFeedSort: FeedSort = FeedSort.BEST,
+    initialDefaultCommunitySort: CommunitySort = CommunitySort.HOT,
     feedPositionFile: FeedPositionFile? = null,
     private val clock: () -> Long = System::currentTimeMillis,
 ) {
@@ -1045,8 +1055,16 @@ class SubshellState(
     var focusedCommentId by mutableStateOf(initialFocusedCommentId)
     var postVisitId by mutableIntStateOf(initialPostVisitId.coerceAtLeast(0))
         private set
-    var feedSort by mutableStateOf(initialFeedSort)
-    var feedSource by mutableStateOf(FeedSource.HOME)
+    // ISSUE302_START_FEED_V1 + FEEDSORT_REMEMBER_V1 (fork): a start without a restored route opens
+    // the chosen start feed; the sort is the one last chosen when "remember" is on, else the default sort.
+    private val startingFeedSort: FeedSort =
+        if (initialRememberFeedSort) {
+            normalizedFeedSort(initialStartFeed.source, initialFeedSort)
+        } else {
+            startFeedSort(initialStartFeed.source, initialDefaultFeedSort)
+        }
+    var feedSort by mutableStateOf(startingFeedSort)
+    var feedSource by mutableStateOf(initialStartFeed.source)
     var hideReadPosts by mutableStateOf(false)
         private set
     var searchVisible by mutableStateOf(false)
@@ -1110,6 +1128,10 @@ class SubshellState(
         initialShowCreateButton = initialShowCreateButton,
         initialCommentHierarchyStyle = initialCommentHierarchyStyle,
         initialCommentThreadColours = initialCommentThreadColours,
+        initialCommentIndentSize = initialCommentIndentSize,
+        initialCommentRailFromParent = initialCommentRailFromParent,
+        initialCleanLinks = initialCleanLinks,
+        initialShownLanguages = initialShownLanguages,
         initialSwipeActionsEnabled = initialSwipeActionsEnabled,
         initialPostSwipeLeftAction = initialPostSwipeLeftAction,
         initialPostSwipeRightAction = initialPostSwipeRightAction,
@@ -1137,6 +1159,9 @@ class SubshellState(
         initialResumeFeedPosition = initialResumeFeedPosition,
         initialResumeFeedPositionAge = initialResumeFeedPositionAge,
         initialResumeFeedPositionStart = initialResumeFeedPositionStart,
+        initialStartFeed = initialStartFeed,
+        initialDefaultFeedSort = initialDefaultFeedSort,
+        initialDefaultCommunitySort = initialDefaultCommunitySort,
         initialPostLayout = initialPostLayout,
         initialListThumbnailSide = initialListThumbnailSide,
         initialCommunityDiscoveryLayout = initialCommunityDiscoveryLayout,
@@ -1258,6 +1283,14 @@ class SubshellState(
     var showCreateButton by settings::showCreateButton
     var commentThreadColours by settings::commentThreadColours
         private set
+    var commentIndentSize by settings::commentIndentSize
+        private set
+    var commentRailFromParent by settings::commentRailFromParent
+        private set
+    var cleanLinks by settings::cleanLinks
+        private set
+    var shownLanguages by settings::shownLanguages
+        private set
 
     /**
      * ISSUE285_THREAD_COLOURS_ONLY_WITH_GUIDE_LINES_V1: the colours and the card belong to the guide
@@ -1358,6 +1391,9 @@ class SubshellState(
         private set
     var resumeFeedPositionStart by settings::resumeFeedPositionStart
         private set
+    val startFeed: StartFeed get() = settings.startFeed
+    val defaultFeedSort: FeedSort get() = settings.defaultFeedSort
+    val defaultCommunitySort: CommunitySort get() = settings.defaultCommunitySort
     var postLayout by settings::postLayout
         private set
     var listThumbnailSide by settings::listThumbnailSide
@@ -1508,14 +1544,14 @@ class SubshellState(
             ?: if (processSnapshotRejected) {
                 SubshellRouteStack.forDestination(
                     destination = MainDestination.HOME,
-                    source = FeedSource.HOME,
-                    sort = initialFeedSort,
+                    source = initialStartFeed.source,
+                    sort = startingFeedSort,
                 )
             } else {
                 SubshellRouteStack.restored(
                     destination = initialDestination,
-                    source = FeedSource.HOME,
-                    sort = initialFeedSort,
+                    source = initialStartFeed.source,
+                    sort = startingFeedSort,
                     selectedCommunity = selectedSubreddit,
                     communitySort = initialCommunitySort,
                     postRoute = selectedPost?.let { post ->
@@ -1711,6 +1747,7 @@ class SubshellState(
             backgroundResumeWasManual = navigationLifecycleMediaWasManual,
             messageConversationDrafts = inboxActivity.messageConversationDraftsForSnapshot(),
             messageConversationMedia = inboxActivity.messageConversationMediaForSnapshot(),
+            modmailDrafts = inboxActivity.modmailDraftsForSnapshot(),
             settledOverrides = if (activeAccountIsAuthenticated) {
                 SettledAccountOverrides(
                     accountStableId = activeAccountId,
@@ -2033,6 +2070,7 @@ class SubshellState(
         restoredProcessSnapshot?.let { snapshot ->
             inboxActivity.restoreMessageConversationDrafts(snapshot.messageConversationDrafts)
             inboxActivity.restoreMessageConversationMedia(snapshot.messageConversationMedia)
+            inboxActivity.restoreModmailDrafts(snapshot.modmailDrafts)
             snapshot.settledOverrides
                 ?.takeIf { overrides -> overrides.accountStableId == activeAccountId }
                 ?.let { overrides ->
@@ -2268,6 +2306,18 @@ class SubshellState(
 
     fun updateResumeFeedPositionStart(start: FeedPositionStart) {
         settings.updateResumeFeedPositionStart(start)
+    }
+
+    fun updateStartFeed(feed: StartFeed) {
+        settings.updateStartFeed(feed)
+    }
+
+    fun updateDefaultFeedSort(sort: FeedSort) {
+        settings.updateDefaultFeedSort(sort)
+    }
+
+    fun updateDefaultCommunitySort(sort: CommunitySort) {
+        settings.updateDefaultCommunitySort(sort)
     }
 
     internal fun appendPostPaging(queryKey: RepositoryQueryKey) {
@@ -2660,7 +2710,7 @@ class SubshellState(
     fun commentsForPost(post: Post): List<Comment> =
         repository.commentsForPost(post.id).itemsOrEmpty()
 
-    val postComposerValidationMessage: String?
+    val postComposerValidationMessage: UiText?
         get() = if (activeAccountIsAuthenticated) {
             validateRemoteTextPostComposerDraft(postComposerDraft)
         } else {
@@ -2676,18 +2726,19 @@ class SubshellState(
     val canNavigateBack: Boolean
         get() = routeStack.canPop
 
-    val currentSearchHint: String
+    // TRANSLATE14: search texts are UiText; the screen resolves them.
+    val currentSearchHint: UiText
         get() = when (searchArea) {
             SearchArea.ALL_SUBSHELL -> if (activeAccountIsAuthenticated) {
-                "Search Reddit"
+                UiText.Resource(R.string.search_hint_reddit)
             } else {
-                "Search subshell"
+                UiText.Resource(R.string.search_hint_subshell)
             }
-            SearchArea.MY_COMMUNITIES -> "Search my communities"
-            SearchArea.CURRENT_COMMUNITY -> searchOriginCommunity?.let { "Search r/$it" } ?: "Search subshell"
+            SearchArea.MY_COMMUNITIES -> UiText.Resource(R.string.search_hint_my_communities)
+            SearchArea.CURRENT_COMMUNITY -> searchOriginCommunity?.let { UiText.Resource(R.string.search_hint_community, it) } ?: UiText.Resource(R.string.search_hint_subshell)
         }
 
-    val currentSearchAreaLabel: String
+    val currentSearchAreaLabel: UiText
         get() = searchAreaLabel(searchArea)
 
     val availableSearchAreas: List<SearchArea>
@@ -2736,19 +2787,18 @@ class SubshellState(
     fun applyAuthenticatedMainFeedLanding(source: FeedSource) {
         require(
             source == FeedSource.HOME ||
-                source == FeedSource.POPULAR,
+                source == FeedSource.POPULAR ||
+                source == FeedSource.ALL,
         ) {
-            "Authenticated account landing must use Home or Popular"
+            "Authenticated account landing must use Home, Popular or All"
         }
         feedSource = source
-        // FEEDSORT_REMEMBER_V1 (fork): the landing used to put Best (Hot for Popular) back at
-        // every start; with the setting on the sort the reader chose stays.
+        // ISSUE300_DEFAULT_FEED_SORT_V1 + FEEDSORT_REMEMBER_V1 (fork): with "remember" on the sort the
+        // reader chose stays; otherwise the default sort applies (Best for Home, Hot for Popular/All).
         feedSort = if (rememberFeedSort) {
             normalizedFeedSort(source, feedSort)
-        } else if (source == FeedSource.HOME) {
-            FeedSort.BEST
         } else {
-            FeedSort.HOT
+            startFeedSort(source, defaultFeedSort)
         }
         navigate(MainDestination.HOME)
     }
@@ -3640,7 +3690,11 @@ class SubshellState(
                 openSearch(refocus = false)
                 if (target.community == null) updateSearchArea(SearchArea.ALL_SUBSHELL)
                 updateSearchQuery(target.query)
-                submitSearch()
+                updateSearchOrder(target.order ?: RedditSearchOrder.DEFAULT)
+                // ISSUE294_A_SEARCH_FROM_A_LINK_OR_FLAIR_LOADS_V1: only the search
+                // screen sends a search to Reddit; it takes this request once and
+                // loads, instead of showing "Search is ready" until a tap.
+                if (submitSearch() != null) searchLoadRequestAccountId = activeAccountId
                 true
             }
             is RedditTarget.Post -> {
@@ -3888,12 +3942,16 @@ class SubshellState(
         return consumedPostEntryVisitIds.add(visitId)
     }
 
-    fun requestPostManage(postId: String) {
-        uiRequests.requestPostManage(postId)
+    fun requestPostManage(postId: String, asModerator: Boolean = false) {
+        uiRequests.requestPostManage(postId, asModerator)
     }
 
     fun consumePostManageRequest(postId: String): Boolean =
         uiRequests.consumePostManageRequest(postId)
+
+    /** ISSUE295_MODERATOR_SETS_POST_FLAIR_V1: read before consuming the request. */
+    val postManageRequestedAsModerator: Boolean
+        get() = uiRequests.pendingPostManageAsModerator
 
     fun requestPostDelete(postId: String) {
         uiRequests.requestPostDelete(postId)
@@ -3962,6 +4020,30 @@ class SubshellState(
             routedPostsByVisitId[visitId]?.let { post ->
                 routedPostsByVisitId[visitId] = updated(post)
             }
+        }
+        selectedPost = selectedPost?.let(::updated)
+        selectedMediaPost = selectedMediaPost?.let(::updated)
+        storeEditedPost(postId, ::updated)
+    }
+
+    /**
+     * ISSUE295_REMOVED_POST_IS_MARKED_V1: Reddit confirmed that a moderator
+     * removed (or approved, which restores) this post; every loaded feed, the
+     * open post and the store show it at once.
+     */
+    fun applyModeratedPostRemoved(postId: String, removed: Boolean) {
+        val normalizedPostId = normalizedPostIdentity(postId)
+        if (normalizedPostId.isEmpty()) return
+
+        fun updated(post: Post): Post =
+            if (normalizedPostIdentity(post.id) == normalizedPostId) post.copy(removed = removed) else post
+
+        postPagingSnapshots.keys.toList().forEach { queryKey ->
+            val snapshot = postPagingSnapshots[queryKey] ?: return@forEach
+            postPagingSnapshots[queryKey] = snapshot.copy(items = snapshot.items.map(::updated))
+        }
+        routedPostsByVisitId.keys.toList().forEach { visitId ->
+            routedPostsByVisitId[visitId]?.let { post -> routedPostsByVisitId[visitId] = updated(post) }
         }
         selectedPost = selectedPost?.let(::updated)
         selectedMediaPost = selectedMediaPost?.let(::updated)
@@ -4293,20 +4375,20 @@ class SubshellState(
         refreshCurrentRouteSnapshot()
     }
 
-    fun searchAreaLabel(area: SearchArea): String = when (area) {
-        SearchArea.ALL_SUBSHELL -> if (activeAccountIsAuthenticated) "All Reddit" else "All subshell"
-        SearchArea.MY_COMMUNITIES -> "My communities"
-        SearchArea.CURRENT_COMMUNITY -> searchOriginCommunity?.let { "r/$it" } ?: "This community"
+    fun searchAreaLabel(area: SearchArea): UiText = when (area) {
+        SearchArea.ALL_SUBSHELL -> UiText.Resource(if (activeAccountIsAuthenticated) R.string.search_area_all_reddit else R.string.search_area_all_subshell)
+        SearchArea.MY_COMMUNITIES -> UiText.Resource(R.string.search_area_my_communities)
+        SearchArea.CURRENT_COMMUNITY -> searchOriginCommunity?.let { UiText.Plain("r/$it") } ?: UiText.Resource(R.string.search_area_this_community)
     }
 
-    fun searchAreaDescription(area: SearchArea): String = when (area) {
+    fun searchAreaDescription(area: SearchArea): UiText = when (area) {
         SearchArea.ALL_SUBSHELL -> if (activeAccountIsAuthenticated) {
-            "Reddit posts, communities and people"
+            UiText.Resource(R.string.search_area_desc_reddit)
         } else {
-            "Posts, communities and people"
+            UiText.Resource(R.string.search_area_desc_subshell)
         }
-        SearchArea.MY_COMMUNITIES -> "Communities you joined"
-        SearchArea.CURRENT_COMMUNITY -> "This community"
+        SearchArea.MY_COMMUNITIES -> UiText.Resource(R.string.search_area_desc_my_communities)
+        SearchArea.CURRENT_COMMUNITY -> UiText.Resource(R.string.search_area_this_community)
     }
 
     fun matchesSearchArea(communityName: String): Boolean = when (searchArea) {
@@ -4316,6 +4398,19 @@ class SubshellState(
                 community.id in joinedCommunityIds
         }
         SearchArea.CURRENT_COMMUNITY -> searchOriginCommunity?.equals(communityName, ignoreCase = true) == true
+    }
+
+    private var searchLoadRequestAccountId by mutableStateOf<String?>(null)
+
+    /** A search opened from a link or a flair waits for the search screen to load it. */
+    internal val searchLoadRequested: Boolean
+        get() = searchLoadRequestAccountId != null
+
+    /** Taken once; false when the account changed since the request. */
+    internal fun takeSearchLoadRequest(): Boolean {
+        val requestedFor = searchLoadRequestAccountId ?: return false
+        searchLoadRequestAccountId = null
+        return requestedFor == activeAccountId
     }
 
     fun submitSearch(): String? {
@@ -4467,6 +4562,20 @@ class SubshellState(
         inboxItemId: String,
     ): ComposerMediaAttachment? = inboxActivity.messageConversationMedia(accountStableId, inboxItemId)
 
+    fun modmailDraft(
+        accountStableId: String,
+        conversationId: String,
+    ): io.github.brealorg.subshell.data.account.RedditModmailDraft? =
+        inboxActivity.modmailDraft(accountStableId, conversationId)
+
+    fun updateModmailDraft(
+        accountStableId: String,
+        conversationId: String,
+        draft: io.github.brealorg.subshell.data.account.RedditModmailDraft,
+    ) {
+        inboxActivity.updateModmailDraft(accountStableId, conversationId, draft)
+    }
+
     fun updateMessageConversationMedia(
         accountStableId: String,
         inboxItemId: String,
@@ -4559,6 +4668,7 @@ class SubshellState(
                 sort = preferredCommunitySort(
                     communitySortPreferences,
                     normalizedName,
+                    defaultCommunitySort,
                 ),
             ),
         )
@@ -4585,7 +4695,7 @@ class SubshellState(
                 // A link's sort (REDDITURL01_COMMUNITY_SORT_LINK_V1) applies
                 // to this visit only; it is not stored as the preference.
                 sort = sort ?: if (switchingCommunity) {
-                    preferredCommunitySort(communitySortPreferences, normalizedName)
+                    preferredCommunitySort(communitySortPreferences, normalizedName, defaultCommunitySort)
                 } else {
                     communitySort
                 },
@@ -5017,8 +5127,7 @@ class SubshellState(
             event = "feed_playback_request",
             mediaId = mediaId,
             transitionId = activeVideoTransitionId,
-            details = "action=${if (playNow) "play" else if (manuallyPausedNow) "paused" else "revoked"} " +
-                "selected=${activeVideoMediaId ?: "none"}",
+            details = "action=${if (playNow) "play" else if (manuallyPausedNow) "paused" else "revoked"} selected=${activeVideoMediaId ?: "none"}",
         )
         when {
             playNow || manuallyPausedNow -> onApply(playNow, activeVideoTransitionId)
@@ -5951,6 +6060,58 @@ class SubshellState(
         settings.updateCommentThreadColours(colours)
     }
 
+    fun updateCommentIndentSize(size: CommentIndentSize) {
+        settings.updateCommentIndentSize(size)
+    }
+
+    fun updateCleanLinks(enabled: Boolean) {
+        settings.updateCleanLinks(enabled)
+    }
+
+    fun updateCommentRailFromParent(enabled: Boolean) {
+        settings.updateCommentRailFromParent(enabled)
+    }
+
+    fun updateShownLanguages(languages: Set<String>) {
+        settings.updateShownLanguages(languages)
+        io.github.brealorg.subshell.language.ContentLanguages.shownLanguages = shownLanguages
+    }
+
+    // ISSUE293_LANGUAGE_FILTER_V1: bumped when the device has told more
+    // languages, so a list already on screen (read before the filter was on,
+    // or from the cache) is filtered as soon as its languages are known.
+    internal var languageDetectionRevision by mutableIntStateOf(0)
+        private set
+
+    /** Tells the language of shown items not yet known; nothing while the filter is off. */
+    internal suspend fun detectLanguages(entries: List<Pair<String, String>>) {
+        if (shownLanguages.isEmpty() || entries.isEmpty()) return
+        val languages = io.github.brealorg.subshell.language.ContentLanguages
+        languages.shownLanguages = shownLanguages
+        val unknown = entries.filterNot { (key, _) -> languages.told(key) }
+        if (unknown.isEmpty()) return
+        languages.detectAll(unknown)
+        languageDetectionRevision++
+    }
+
+    /** ISSUE293_LANGUAGE_FILTER_V1: a community the device knows is in a language the reader left out. */
+    internal fun languageHidesCommunity(name: String): Boolean =
+        languageDetectionRevision >= 0 && io.github.brealorg.subshell.language.languageHides(
+            io.github.brealorg.subshell.language.ContentLanguages.detected(
+                io.github.brealorg.subshell.language.communityLanguageKey(name),
+            ),
+            shownLanguages,
+        )
+
+    /** ISSUE293_LANGUAGE_FILTER_V1: the same for a search result, by its title. */
+    internal fun languageHidesSearchPost(post: Post): Boolean =
+        languageDetectionRevision >= 0 && io.github.brealorg.subshell.language.languageHides(
+            io.github.brealorg.subshell.language.ContentLanguages.detected(
+                io.github.brealorg.subshell.language.postLanguageKey(post.id),
+            ),
+            shownLanguages,
+        )
+
     fun updateSwipeActionsEnabled(enabled: Boolean) {
         settings.updateSwipeActionsEnabled(enabled)
     }
@@ -6389,6 +6550,10 @@ class SubshellState(
         searchBarHeader = searchBarHeader,
         showCreateButton = showCreateButton,
         commentThreadColours = commentThreadColours,
+        commentIndentSize = commentIndentSize,
+        commentRailFromParent = commentRailFromParent,
+        cleanLinks = cleanLinks,
+        shownLanguages = shownLanguages,
         swipeActionsEnabled = swipeActionsEnabled,
         postSwipeLeftAction = postSwipeLeftAction,
         postSwipeRightAction = postSwipeRightAction,
@@ -6424,6 +6589,9 @@ class SubshellState(
         resumeFeedPosition = resumeFeedPosition,
         resumeFeedPositionAge = resumeFeedPositionAge,
         resumeFeedPositionStart = resumeFeedPositionStart,
+        startFeed = startFeed,
+        defaultFeedSort = defaultFeedSort,
+        defaultCommunitySort = defaultCommunitySort,
         postLayout = postLayout,
         listThumbnailSide = listThumbnailSide,
         mutedCommunityDirectViewMode = mutedCommunityDirectViewMode,
@@ -6491,6 +6659,10 @@ class SubshellState(
         searchBarHeader = settings.searchBarHeader
         showCreateButton = settings.showCreateButton
         commentThreadColours = settings.commentThreadColours
+        commentIndentSize = settings.commentIndentSize
+        commentRailFromParent = settings.commentRailFromParent
+        cleanLinks = settings.cleanLinks
+        shownLanguages = settings.shownLanguages
         // ISSUE71_RESTORE_APPLIES_COMMENT_COLLAPSE_MODE_V1: the only setting a
         // restore wrote to disk but left stale in the live state.
         commentCollapseMode = settings.commentCollapseMode
@@ -6521,8 +6693,13 @@ class SubshellState(
         contentFilters = settings.contentFilters
         communitySortPreferences = settings.communitySortPreferences
         listingTimePeriod = settings.listingTimePeriod
+        // ISSUE302_START_FEED_V1 / ISSUE300_DEFAULT_FEED_SORT_V1: before the community sort
+        // below, which falls back to the restored default.
+        this.settings.startFeed = settings.startFeed
+        this.settings.defaultFeedSort = settings.defaultFeedSort
+        this.settings.defaultCommunitySort = settings.defaultCommunitySort
         selectedSubreddit?.let { communityName ->
-            communitySort = preferredCommunitySort(communitySortPreferences, communityName)
+            communitySort = preferredCommunitySort(communitySortPreferences, communityName, defaultCommunitySort)
         }
         drawerCommunitiesMode = settings.drawerCommunitiesMode
         drawerRecentCommunities = settings.drawerRecentCommunities

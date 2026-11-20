@@ -1,5 +1,10 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.ui.s
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import io.github.brealorg.subshell.ui.CommentSwipeAction
 import io.github.brealorg.subshell.ui.VoteColorPalette
 import io.github.brealorg.subshell.ui.VoteControlMode
@@ -17,6 +22,8 @@ import org.junit.Test
  * so they follow "Vote colours" and "Vote controls" and do not depend on the
  * theme's colour scheme.
  */
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue39SwipeVoteStyleTest {
     @Test
     fun redAndBlueGivesRedUpvoteAndBlueDownvoteSwipes() {
@@ -79,7 +86,7 @@ class Issue39SwipeVoteStyleTest {
             voteControlMode = VoteControlMode.COMPACT,
         )!!
 
-        assertEquals("Downvote", down.label)
+        assertEquals("Downvote", down.label.s)
         assertEquals(SubshellVoteDown, down.containerColor)
         assertEquals(Symbols.ArrowDownward, down.icon)
         assertEquals(VoteSwipeContentColor, down.contentColor)
@@ -99,7 +106,7 @@ class Issue39SwipeVoteStyleTest {
         mode: VoteControlMode,
     ) = voteSwipeActionVisual(
         direction = direction,
-        label = "label",
+        label = UiText.Plain("label"),
         palette = palette,
         mode = mode,
         enabled = true,

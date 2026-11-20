@@ -61,7 +61,7 @@ class Step3BackupRetentionComposeTest {
         composeRule.onAllNodes(hasScrollToNodeAction()).onFirst().performScrollToNode(chooser)
 
         composeRule.onNode(chooser).performClick()
-        composeRule.onAllNodesWithText(BackupRetention.FIVE.label).onLast().performClick()
+        composeRule.onAllNodesWithText("5 backups").onLast().performClick()
         composeRule.waitForIdle()
         assertTrue(composeRule.onAllNodesWithText("Keep only 5 backups?").fetchSemanticsNodes().isNotEmpty())
         composeRule.onNodeWithText("Cancel").performClick()
@@ -69,7 +69,7 @@ class Step3BackupRetentionComposeTest {
         assertEquals(BackupRetention.TEN, repository.automaticHistoryRetention())
 
         composeRule.onNode(chooser).performClick()
-        composeRule.onNodeWithText(BackupRetention.TWENTY.label).performClick()
+        composeRule.onNodeWithText("20 backups").performClick()
         composeRule.waitUntil(timeoutMillis = 5_000) {
             repository.automaticHistoryRetention() == BackupRetention.TWENTY
         }

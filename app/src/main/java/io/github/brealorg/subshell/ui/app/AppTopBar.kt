@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -85,13 +88,13 @@ internal fun AppTopBar(
                 if (selection != null) {
                     TopAppBar(
                         title = {
-                            Text("${selection.selectedCount} selected")
+                            Text(stringResource(R.string.selection_count, selection.selectedCount))
                         },
                         navigationIcon = {
                             IconButton(onClick = selection.onClose) {
                                 Icon(
                                     Symbols.Close,
-                                    contentDescription = "Exit selection",
+                                    contentDescription = stringResource(R.string.selection_exit),
                                 )
                             }
                         },
@@ -102,13 +105,13 @@ internal fun AppTopBar(
                             ) {
                                 Icon(
                                     Symbols.DoneAll,
-                                    contentDescription = "Mark selected activity as read",
+                                    contentDescription = stringResource(R.string.selection_mark_read),
                                 )
                             }
                             IconButton(onClick = selection.onDismiss) {
                                 Icon(
                                     Symbols.VisibilityOff,
-                                    contentDescription = "Dismiss selected activity",
+                                    contentDescription = stringResource(R.string.selection_dismiss),
                                 )
                             }
                             IconButton(onClick = selection.onSelectAll) {
@@ -117,9 +120,9 @@ internal fun AppTopBar(
                                     contentDescription = if (
                                         selection.allVisibleSelected
                                     ) {
-                                        "Deselect all activity"
+                                        stringResource(R.string.all_deselect_all_activity)
                                     } else {
-                                        "Select all activity"
+                                        stringResource(R.string.all_select_all_activity)
                                     },
                                 )
                             }
@@ -132,8 +135,8 @@ internal fun AppTopBar(
                 } else {
                     MainScreenHeader(
                         title = state.selectedSubreddit?.let(state::subredditLabel)
-                            ?: activeCustomFeed?.let { feed -> "Feed: ${feed.displayName}" }
-                            ?: if (state.destination == MainDestination.HOME) state.feedSource.label else state.destination.label,
+                            ?: activeCustomFeed?.let { feed -> stringResource(R.string.top_bar_custom_feed, feed.displayName) }
+                            ?: if (state.destination == MainDestination.HOME) stringResource(state.feedSource.labelRes) else stringResource(state.destination.labelRes),
                         state = state,
                         feedSort = if (
                             state.destination == MainDestination.HOME &&
@@ -178,8 +181,8 @@ internal fun AppTopBar(
                                         includeNsfw = state.showNsfwPosts,
                                     )
                                     userNotices.noticeInfo(
-                                        "Saving for offline",
-                                        "The top $OFFLINE_SAVE_POST_COUNT posts, their comments and images download in the background",
+                                        UiText.Resource(R.string.offline_saving_title),
+                                        UiText.Resource(R.string.offline_saving, OFFLINE_SAVE_POST_COUNT),
                                     )
                                 }
                             },
@@ -189,9 +192,9 @@ internal fun AppTopBar(
                             { state.openSearch() }
                         },
                         searchContentDescription = if (subsCommunityActions) {
-                            "Search communities"
+                            stringResource(R.string.all_search_communities)
                         } else {
-                            "Search"
+                            stringResource(R.string.all_search)
                         },
                         // ISSUE234_LAYOUT_CHOICE_BESIDE_THE_FEED_V1: Home and its custom feeds.
                         postLayoutButton = state.destination == MainDestination.HOME &&

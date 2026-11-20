@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,7 +58,7 @@ internal fun FeedSource.toRedditMainFeedOrNull(): RedditMainFeed? = when (this) 
 
 internal fun FeedSource.requireRedditMainFeed(): RedditMainFeed =
     requireNotNull(toRedditMainFeedOrNull()) {
-        "$label is not a live Reddit main feed"
+        "$name is not a live Reddit main feed"
     }
 
 internal fun communityPostFeedQueryKey(
@@ -332,9 +333,7 @@ internal fun ObserveLiveFeedAutoAppend(
                 governor.markRequested(contentToken, visibleItemCount)
                 uiDebugLog(
                     LIVE_FEED_LOG_TAG,
-                    "governor automatic reason=${decision.reason.name.lowercase()} " +
-                        "request=${decision.requestNumber} delay=${decision.delayMillis}ms " +
-                        "loaded=$loadedItemCount visible=$visibleItemCount",
+                    "governor automatic reason=${decision.reason.name.lowercase()} request=${decision.requestNumber} delay=${decision.delayMillis}ms loaded=$loadedItemCount visible=$visibleItemCount",
                 )
                 currentOnAppend()
             }

@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -69,13 +71,8 @@ internal fun CommunityRouteHost(
     val redditModerationState = redditModeration.redditModerationState
     val onLoadRedditModQueue = redditModeration.onLoadRedditModQueue
     val onAppendRedditModQueue = redditModeration.onAppendRedditModQueue
+    val onSelectRedditModQueueList = redditModeration.onSelectRedditModQueueList
     val moderationActionState = redditModeration.moderationActionState
-    val onModerateRedditQueueItem = redditModeration.onModerateRedditQueueItem
-    val onRetryRedditModerationAction = redditModeration.onRetryRedditModerationAction
-    val onAuthorizeRedditModerationAction = redditModeration.onAuthorizeRedditModerationAction
-    val removalReasonState = redditModeration.removalReasonState
-    val onLoadRedditRemovalReasons = redditModeration.onLoadRedditRemovalReasons
-    val onAuthorizeRedditRemovalReasons = redditModeration.onAuthorizeRedditRemovalReasons
     val customFeedsState = customFeeds.customFeedsState
     val customFeedPostsState = customFeeds.customFeedPostsState
     val onRequestHiddenSubscriptionsUnlock = customFeeds.onRequestHiddenSubscriptionsUnlock
@@ -124,7 +121,7 @@ internal fun CommunityRouteHost(
             // NEXT01A5_SUBSCRIPTIONS_COMMUNITY_ROUTE_TWO_PANE_V1
             ExpandedListDetailSurface(
                 scaffoldPadding = padding,
-                listTitle = "Communities",
+                listTitle = stringResource(R.string.all_communities),
                 listSubtitle = null,
                 listContent = { listModifier ->
                     CommunitiesScreen(
@@ -210,15 +207,8 @@ internal fun CommunityRouteHost(
                             onLoadRedditModQueue,
                         onAppendRedditModQueue =
                             onAppendRedditModQueue,
+                        onSelectRedditModQueueList = onSelectRedditModQueueList,
                         moderationActionState = moderationActionState,
-                        onModerateRedditQueueItem = onModerateRedditQueueItem,
-                        onRetryRedditModerationAction = onRetryRedditModerationAction,
-                        onAuthorizeRedditModerationAction =
-                            onAuthorizeRedditModerationAction,
-                        removalReasonState = removalReasonState,
-                        onLoadRedditRemovalReasons = onLoadRedditRemovalReasons,
-                        onAuthorizeRedditRemovalReasons =
-                            onAuthorizeRedditRemovalReasons,
                         communityMembershipState =
                             communityMembershipState,
                         onChangeCommunityMembership =
@@ -269,15 +259,8 @@ internal fun CommunityRouteHost(
                     onLoadRedditModQueue,
                 onAppendRedditModQueue =
                     onAppendRedditModQueue,
+                onSelectRedditModQueueList = onSelectRedditModQueueList,
                 moderationActionState = moderationActionState,
-                onModerateRedditQueueItem = onModerateRedditQueueItem,
-                onRetryRedditModerationAction = onRetryRedditModerationAction,
-                onAuthorizeRedditModerationAction =
-                    onAuthorizeRedditModerationAction,
-                removalReasonState = removalReasonState,
-                onLoadRedditRemovalReasons = onLoadRedditRemovalReasons,
-                onAuthorizeRedditRemovalReasons =
-                    onAuthorizeRedditRemovalReasons,
                 communityMembershipState =
                     communityMembershipState,
                 onChangeCommunityMembership =

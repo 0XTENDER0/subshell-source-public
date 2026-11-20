@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.state
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.mutableStateMapOf
 import io.github.brealorg.subshell.data.IdentityMetadataRepository
 import io.github.brealorg.subshell.data.RepositoryResult
@@ -20,6 +22,25 @@ import kotlinx.coroutines.withContext
  * public-profile activity evidence. Extracted verbatim from SubshellState,
  * which owns one instance and delegates to it; behaviour is unchanged.
  */
+// TRANSLATE14_IDENTITY_PLACEHOLDERS_ARE_SHOWN_TRANSLATED_V1: stored English
+// placeholders, shown through identityDescriptionShown.
+internal const val IDENTITY_LIVE_COMMUNITY_DESCRIPTION = "Live Reddit community"
+internal const val IDENTITY_COMMUNITY_PREVIEW_DESCRIPTION = "Public community preview."
+internal const val IDENTITY_PROFILE_PREVIEW_DESCRIPTION = "Public profile preview."
+
+internal fun identityDescriptionText(stored: String): io.github.brealorg.subshell.ui.UiText = when (stored) {
+    IDENTITY_LIVE_COMMUNITY_DESCRIPTION ->
+        io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.identity_live_community)
+    IDENTITY_COMMUNITY_PREVIEW_DESCRIPTION ->
+        io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.identity_community_preview)
+    IDENTITY_PROFILE_PREVIEW_DESCRIPTION ->
+        io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.identity_profile_preview)
+    else -> io.github.brealorg.subshell.ui.UiText.Plain(stored)
+}
+
+@androidx.compose.runtime.Composable
+internal fun identityDescriptionShown(stored: String): String = identityDescriptionText(stored).asString()
+
 internal class IdentityMetadataState(
     private val repository: SubshellRepository,
     private val identityMetadataRepository: IdentityMetadataRepository?,
@@ -62,7 +83,7 @@ internal class IdentityMetadataState(
             Community(
                 id = "live:$normalizedName",
                 name = normalizedName,
-                description = "Live Reddit community",
+                description = IDENTITY_LIVE_COMMUNITY_DESCRIPTION,
                 members = "Reddit",
                 accent = 0xFFFF8A3D,
             )
@@ -90,7 +111,7 @@ internal class IdentityMetadataState(
             } ?: Community(
                 id = "remote:$key",
                 name = displayName,
-                description = "Public community preview.",
+                description = IDENTITY_COMMUNITY_PREVIEW_DESCRIPTION,
                 members = "—",
                 accent = 0xFF6750A4L,
             )
@@ -110,7 +131,7 @@ internal class IdentityMetadataState(
                 repository.user(username).valueOrNull()
             } ?: UserFixture(
                 username = username.trim().ifBlank { "unknown" },
-                description = "Public profile preview.",
+                description = IDENTITY_PROFILE_PREVIEW_DESCRIPTION,
                 karma = "—",
             )
         ).also { user ->

@@ -87,8 +87,8 @@ class MainRouteHostComposeTest {
         // You: the own-content tab strip.
         state.navigate(MainDestination.YOU)
         composeRule.waitForIdle()
-        assertTrue(count(youContentWorkspaceLabel(0)) >= 1)
-        assertTrue(count(youContentWorkspaceLabel(1)) >= 1)
+        assertTrue(count(youContentWorkspaceLabel(0).s) >= 1)
+        assertTrue(count(youContentWorkspaceLabel(1).s) >= 1)
 
         state.navigate(MainDestination.HOME)
         composeRule.waitForIdle()

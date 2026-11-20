@@ -8,11 +8,16 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Issue #41: a Reddit link Subshell cannot route becomes a launch, so the
  * app can say so; links to other sites are still left alone.
  */
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue41RedditLinkNoticeTest {
     @Test
     fun anUnsupportedRedditLinkStillBecomesALaunch() {
@@ -52,11 +57,11 @@ class Issue41RedditLinkNoticeTest {
         }
         assertEquals(
             "Can't open this link here",
-            redditLinkUnavailablePresentation(RedditLinkUnavailableReason.UNSUPPORTED_LINK).title,
+            redditLinkUnavailablePresentation(RedditLinkUnavailableReason.UNSUPPORTED_LINK).title.s,
         )
         assertEquals(
             "Couldn't open this post",
-            redditLinkUnavailablePresentation(RedditLinkUnavailableReason.POST_UNAVAILABLE).title,
+            redditLinkUnavailablePresentation(RedditLinkUnavailableReason.POST_UNAVAILABLE).title.s,
         )
     }
 

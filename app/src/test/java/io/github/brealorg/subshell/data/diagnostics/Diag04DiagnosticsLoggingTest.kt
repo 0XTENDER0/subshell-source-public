@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.data.diagnostics
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.backup.toBackupFailureDetails
 import io.github.brealorg.subshell.data.error.FailureDetails
 import io.github.brealorg.subshell.data.error.LocalFailureKind
@@ -268,7 +269,7 @@ class Diag04DiagnosticsLoggingTest {
         val literal = Regex("""(?:scopeKey|diagnosticScopeKey)\s*=\s*"([^"]+)"""")
         val keys = sourceRoot.walkTopDown()
             .filter { it.isFile && it.extension == "kt" }
-            .flatMap { file -> literal.findAll(file.readText()).map { it.groupValues[1] } }
+            .flatMap { file -> literal.findAll(file.readSourceText()).map { it.groupValues[1] } }
             .toSet()
         assertTrue("found ${keys.size}", keys.size >= 20)
         val missing = keys.filter { key -> diagnosticActionForScope(key.substringBefore('$')) == null }

@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,11 +52,11 @@ internal fun PostFlairPickerSheet(
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text("Choose post flair", style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.scr_choose_post_flair), style = MaterialTheme.typography.headlineSmall)
             if (options.isEmpty()) {
                 Text(
-                    if (required) "This community requires flair, but no selectable flair was returned."
-                    else "No post flair is available for this community.",
+                    if (required) stringResource(R.string.all_this_community_requires_flair_but_no_selectable)
+                    else stringResource(R.string.all_no_post_flair_is_available_for_this),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
@@ -65,7 +67,7 @@ internal fun PostFlairPickerSheet(
                         color = MaterialTheme.colorScheme.surfaceContainer,
                         onClick = onRemove,
                     ) {
-                        Text("No flair", modifier = Modifier.padding(14.dp), fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.scr_no_flair), modifier = Modifier.padding(14.dp), fontWeight = FontWeight.Medium)
                     }
                 }
                 options.forEach { option ->
@@ -89,7 +91,7 @@ internal fun PostFlairPickerSheet(
                         Column(Modifier.padding(14.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    option.text.ifBlank { "Editable flair" },
+                                    option.text.ifBlank { stringResource(R.string.all_editable_flair) },
                                     modifier = Modifier.weight(1f),
                                     fontWeight = FontWeight.Medium,
                                 )
@@ -104,9 +106,9 @@ internal fun PostFlairPickerSheet(
                                         if (it.length <= COMPOSER_FLAIR_TEXT_MAX_LENGTH) editedText = it
                                     },
                                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                                    label = { Text("Flair text") },
+                                    label = { Text(stringResource(R.string.scr_flair_text)) },
                                     supportingText = {
-                                        Text("${editedText.length} / $COMPOSER_FLAIR_TEXT_MAX_LENGTH")
+                                        Text(stringResource(R.string.scr_text, editedText.length, COMPOSER_FLAIR_TEXT_MAX_LENGTH))
                                     },
                                     singleLine = true,
                                 )

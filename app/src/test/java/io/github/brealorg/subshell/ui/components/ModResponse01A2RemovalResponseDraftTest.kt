@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.account.RedditModeratorQueueKind
 import io.github.brealorg.subshell.data.account.RedditRemovalMessage
 import io.github.brealorg.subshell.data.account.RedditRemovalMessageType
@@ -11,17 +12,55 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class ModResponse01A2RemovalResponseDraftTest {
     private val reason = RedditRemovalReason(id = "r1", title = "Rule 1", message = "Please read rule 1.")
 
+    // MODRESPONSE02_PICKING_A_REASON_TURNS_THE_MESSAGE_ON_V1 (successor of
+    // "a selected reason alone never sends")
     @Test
-    fun offByDefaultAndNothingIsSentUntilTheModeratorTurnsItOn() {
+    fun offWithoutAReasonAndOnOnceAReasonWithAMessageIsPicked() {
         val draft = RemovalResponseDraft()
         assertFalse(draft.enabled)
+        draft.prefillFrom(null)
+        assertFalse(draft.enabled)
+        assertNull(draft.toMessageOrNull(null))
+
         draft.prefillFrom(reason)
-        assertEquals("Please read rule 1.", draft.body)
-        assertNull("a selected reason alone never sends", draft.toMessageOrNull(reason))
+        assertTrue("a reason with a message switches the message on", draft.enabled)
+        assertEquals(
+            RedditRemovalMessage(RedditRemovalMessageType.PRIVATE, "Please read rule 1.", "Rule 1"),
+            draft.toMessageOrNull(reason),
+        )
         assertFalse(draft.blocksConfirm)
+
+        draft.prefillFrom(null)
+        assertFalse("No removal reason switches it off again", draft.enabled)
+        draft.prefillFrom(RedditRemovalReason(id = "r3", title = "Spam", message = "  "))
+        assertFalse("a reason without a message leaves it off", draft.enabled)
+    }
+
+    @Test
+    fun theModeratorsOwnChoiceIsNeverMovedByTheReason() {
+        val off = RemovalResponseDraft()
+        off.prefillFrom(reason)
+        off.setEnabledByModerator(false)
+        off.prefillFrom(RedditRemovalReason(id = "r2", title = "Rule 2", message = "Rule 2 text"))
+        assertFalse(off.enabled)
+        assertNull(off.toMessageOrNull(reason))
+
+        val on = RemovalResponseDraft()
+        on.setEnabledByModerator(true)
+        on.prefillFrom(reason)
+        on.prefillFrom(null)
+        assertTrue(on.enabled)
+
+        val written = RemovalResponseDraft()
+        written.prefillFrom(reason)
+        written.edit("My own words")
+        written.prefillFrom(null)
+        assertTrue("a written message stays on", written.enabled)
     }
 
     @Test
@@ -43,7 +82,7 @@ class ModResponse01A2RemovalResponseDraftTest {
     @Test
     fun enabledDraftBuildsTheMessageWithTheReasonTitleAndDefaultsToPrivate() {
         val draft = RemovalResponseDraft()
-        draft.enabled = true
+        draft.setEnabledByModerator(true)
         assertEquals(RedditRemovalMessageType.PRIVATE, draft.type)
         assertTrue("empty body blocks confirm", draft.blocksConfirm)
         assertNull(draft.toMessageOrNull(reason))
@@ -77,15 +116,15 @@ class ModResponse01A2RemovalResponseDraftTest {
     fun presentationCopyMatchesRedditSemantics() {
         assertEquals(
             "Reddit posts it as a distinguished, stickied comment.",
-            removalResponseTypeDescription(RedditRemovalMessageType.PUBLIC, RedditModeratorQueueKind.POST),
+            removalResponseTypeDescription(RedditRemovalMessageType.PUBLIC, RedditModeratorQueueKind.POST).s,
         )
         assertEquals(
             "Reddit posts it as a distinguished reply.",
-            removalResponseTypeDescription(RedditRemovalMessageType.PUBLIC_AS_SUBREDDIT, RedditModeratorQueueKind.COMMENT),
+            removalResponseTypeDescription(RedditRemovalMessageType.PUBLIC_AS_SUBREDDIT, RedditModeratorQueueKind.COMMENT).s,
         )
         assertEquals(
             "Sent from the subreddit's modmail.",
-            removalResponseTypeDescription(RedditRemovalMessageType.PRIVATE_EXPOSED, RedditModeratorQueueKind.POST),
+            removalResponseTypeDescription(RedditRemovalMessageType.PRIVATE_EXPOSED, RedditModeratorQueueKind.POST).s,
         )
         assertEquals(4, RedditRemovalMessageType.entries.map(::removalResponseTypeLabel).distinct().size)
     }
@@ -94,15 +133,15 @@ class ModResponse01A2RemovalResponseDraftTest {
     fun partialSuccessNoticeNamesEveryFailedStep() {
         assertEquals(
             "Reddit removed the item, but the removal message was not sent.",
-            removalPartialSuccessMessage(reasonWarning = false, messageOutcome = RedditRemovalStepOutcome.FAILED),
+            removalPartialSuccessMessage(reasonWarning = false, messageOutcome = RedditRemovalStepOutcome.FAILED).s,
         )
         assertEquals(
             "Reddit removed the item, but the removal reason or mod note could not be confirmed and the removal message was not sent.",
-            removalPartialSuccessMessage(reasonWarning = true, messageOutcome = RedditRemovalStepOutcome.FAILED),
+            removalPartialSuccessMessage(reasonWarning = true, messageOutcome = RedditRemovalStepOutcome.FAILED).s,
         )
         assertEquals(
             "Reddit removed the item, but the removal reason or mod note could not be confirmed.",
-            removalPartialSuccessMessage(reasonWarning = true, messageOutcome = RedditRemovalStepOutcome.SENT),
+            removalPartialSuccessMessage(reasonWarning = true, messageOutcome = RedditRemovalStepOutcome.SENT).s,
         )
     }
 }

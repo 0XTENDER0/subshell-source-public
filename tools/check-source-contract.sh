@@ -415,7 +415,9 @@ if [[ ! -f "$ROOT/app/src/main/java/${SUBSHELL_PKG_DIR}/media/VideoDownloadStore
    rg -Fq 'LOWUI4C_LEGACY_DOWNLOADS_CAN_ONLY_BE_DELETED_V1' "$ROOT/app/src/main/java/${SUBSHELL_PKG_DIR}/media/LegacyVideoDownloads.kt" &&
    rg -Fq 'fun deleteAll(): LegacyVideoDownloadDeleteResult' "$ROOT/app/src/main/java/${SUBSHELL_PKG_DIR}/media/LegacyVideoDownloads.kt" &&
    rg -Fq 'LOWUI4C_VIDEO_STREAMS_ONLY_V1' "$ROOT/app/src/main/java/${SUBSHELL_PKG_DIR}/media/VideoPlayback.kt" &&
-   rg -Fq 'title = { Text("Delete all downloaded videos?") }' "$ROOT/app/src/main/java/${SUBSHELL_PKG_DIR}/ui/screens/SettingsScreen.kt" &&
+   { rg -Fq 'title = { Text("Delete all downloaded videos?") }' "$ROOT/app/src/main/java/${SUBSHELL_PKG_DIR}/ui/screens/SettingsScreen.kt" ||
+     { rg -Fq 'title = { Text(stringResource(R.string.set_delete_all_downloaded_videos)) }' "$ROOT/app/src/main/java/${SUBSHELL_PKG_DIR}/ui/screens/SettingsScreen.kt" &&
+       rg -Fq '<string name="set_delete_all_downloaded_videos">Delete all downloaded videos?</string>' "$ROOT/app/src/main/res/values/strings.xml"; }; } &&
    rg -Fq 'oldDownloadsAreCountedAndDeleted' "$ROOT/app/src/test/java/${SUBSHELL_PKG_DIR}/media/LowUi4cLegacyVideoDownloadsTest.kt"; then
     pass MEDIA05_DOWNLOAD_SYSTEM_RETIRED_LEGACY_DELETE_KEPT
 else
@@ -457,8 +459,14 @@ HOME_SCREEN_FILE="$ROOT/app/src/main/java/${SUBSHELL_PKG_DIR}/ui/screens/HomeScr
 
 # ISSUE270: the screen's actions are "Back up now" and "Restore from file"
 # (were "Save current setup" and "Import backup file").
-if rg -Fq 'title = "Back up now"' "$BACKUP_SCREEN" &&
-   rg -Fq 'title = "Restore from file"' "$BACKUP_SCREEN" &&
+# TRANSLATE04: the two titles are string resources now (scr_back_up_now,
+# scr_restore_from_file in strings.xml); either spelling satisfies the contract.
+if { rg -Fq 'title = "Back up now"' "$BACKUP_SCREEN" ||
+     { rg -Fq 'title = stringResource(R.string.scr_back_up_now)' "$BACKUP_SCREEN" &&
+       rg -Fq '<string name="scr_back_up_now">Back up now</string>' "$ROOT/app/src/main/res/values/strings.xml"; }; } &&
+   { rg -Fq 'title = "Restore from file"' "$BACKUP_SCREEN" ||
+     { rg -Fq 'title = stringResource(R.string.scr_restore_from_file)' "$BACKUP_SCREEN" &&
+       rg -Fq '<string name="scr_restore_from_file">Restore from file</string>' "$ROOT/app/src/main/res/values/strings.xml"; }; } &&
    rg -Fq 'Restore' "$BACKUP_SCREEN" &&
    rg -Fq 'Before restoring' "$BACKUP_STORE" &&
    rg -Fq 'RECENT_CHANGE_SNAPSHOT_LIMIT = 20' "$BACKUP_MODEL" &&
@@ -497,7 +505,8 @@ done
 
 # The product name is lowercase "subshell" (owner, #223); the launcher label
 # comes from app_name, which no test reads.
-if rg -q '<string name="app_name">subshell</string>' "$ROOT/app/src/main/res/values/strings.xml"; then
+# TRANSLATE00: app_name is marked translatable="false" (the name is never translated).
+if rg -q '<string name="app_name"( translatable="false")?>subshell</string>' "$ROOT/app/src/main/res/values/strings.xml"; then
     pass LOWERCASE_PRODUCT_NAME
 else
     fail LOWERCASE_PRODUCT_NAME

@@ -60,6 +60,7 @@ internal fun RootBackHandlers(
             accountStableId = state.activeAccountId,
             authenticated = state.activeAccountIsAuthenticated,
             subscriptions = redditSubscriptionsState,
+            startFeed = state.startFeed,
         ),
     )
     BackHandler(

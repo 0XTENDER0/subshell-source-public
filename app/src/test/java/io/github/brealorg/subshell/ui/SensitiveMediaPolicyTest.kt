@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import io.github.brealorg.subshell.data.SampleData
 import io.github.brealorg.subshell.model.PostKind
 import org.junit.Assert.assertFalse
@@ -7,6 +10,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// TRANSLATE08: reads string resources (enum labels), so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class SensitiveMediaPolicyTest {
     private val nsfwPost = SampleData.posts.single { it.id == "nsfw-cable-horror" }
     private val spoilerPost = SampleData.posts.single { it.id == "spoiler-rack" }

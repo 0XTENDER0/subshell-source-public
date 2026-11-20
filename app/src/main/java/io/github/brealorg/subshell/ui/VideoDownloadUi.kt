@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
 import io.github.brealorg.subshell.media.LegacyVideoDownloadStatus
 import java.util.Locale
 
@@ -34,7 +35,9 @@ fun formatVideoDownloadBytes(bytes: Long): String {
 private fun roundedSize(value: Double): Double =
     if (value < 10.0) Math.round(value * 10.0) / 10.0 else Math.round(value).toDouble()
 
-internal fun legacyVideoDownloadSummary(status: LegacyVideoDownloadStatus): String {
-    val videos = if (status.videoCount == 1) "1 downloaded video" else "${status.videoCount} downloaded videos"
-    return "$videos · ${formatVideoDownloadBytes(status.videoBytes)}"
-}
+internal fun legacyVideoDownloadSummary(status: LegacyVideoDownloadStatus): UiText =
+    UiText.Resource(
+        R.string.video_download_summary,
+        UiText.Plural(R.plurals.downloaded_videos, status.videoCount, status.videoCount),
+        formatVideoDownloadBytes(status.videoBytes),
+    )

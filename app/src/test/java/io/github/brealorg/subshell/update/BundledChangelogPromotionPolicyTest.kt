@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.data.network.SubshellNetworkJson
 import java.io.File
 import kotlinx.serialization.decodeFromString
@@ -22,7 +23,7 @@ class BundledChangelogPromotionPolicyTest {
         .resolve("app/src/main/assets/changelog/releases.json")
 
     private val document: UpdateChangelogDocument by lazy {
-        SubshellNetworkJson.providerJson.decodeFromString<UpdateChangelogDocument>(asset.readText())
+        SubshellNetworkJson.providerJson.decodeFromString<UpdateChangelogDocument>(asset.readSourceText())
     }
 
     @Test

@@ -1,11 +1,15 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.pm.ActivityInfo
 import io.github.brealorg.subshell.media.findActivity
 import androidx.compose.ui.semantics.onClick
 import io.github.brealorg.subshell.ui.app.rememberPredictiveRouteBackState
 import io.github.brealorg.subshell.ui.app.PredictiveRouteBackHandler
 import io.github.brealorg.subshell.ui.components.commentMediaStableName
+import io.github.brealorg.subshell.ui.components.mediaLabelShown
+import io.github.brealorg.subshell.ui.components.mediaPostTitleShown
 import io.github.brealorg.subshell.ui.components.rememberAccessibleAutoHideMillis
 import io.github.brealorg.subshell.ui.downloadRemoteMedia
 import io.github.brealorg.subshell.ui.mediaActionScope
@@ -14,7 +18,8 @@ import androidx.compose.runtime.Stable
 import io.github.brealorg.subshell.ui.symbols.Symbols
 import kotlinx.coroutines.launch
 import io.github.brealorg.subshell.ui.error.LocalViewportErrorHostState
-import io.github.brealorg.subshell.ui.components.reportMediaActionFailure
+import io.github.brealorg.subshell.ui.components.reportMediaDownloadFailure
+import io.github.brealorg.subshell.ui.components.reportMediaShareFailure
 import io.github.brealorg.subshell.ui.components.MEDIA_DOWNLOAD_SAVED_VISIBLE_MS
 import io.github.brealorg.subshell.ui.components.MediaDownloadUiState
 import io.github.brealorg.subshell.ui.mediaDownloadFolder
@@ -124,6 +129,7 @@ fun MediaViewerScreen(
     // untouched (only drawing changes during the gesture).
     val viewerBack = rememberPredictiveRouteBackState()
     PredictiveRouteBackHandler(enabled = true, state = viewerBack, onBack = onBack)
+    val toggleControlsLabel = stringResource(R.string.scr_show_or_hide_controls)
     // LOWUI5_VIEWER_BACK_SEEN_AT_START_AND_END_V1 (OCB-226): the gesture's
     // progress changes every frame; the controls only need started/ended.
     val viewerBackInProgress by remember(viewerBack) { derivedStateOf { viewerBack.gestureInProgress() } }
@@ -213,7 +219,7 @@ fun MediaViewerScreen(
                     allowed = { !mediaZoomed.value },
                     onClose = onBack,
                 )
-                .semantics { onClick(label = VIEWER_TOGGLE_CONTROLS_LABEL) { toggleControls(); true } },
+                .semantics { onClick(label = toggleControlsLabel) { toggleControls(); true } },
         ) {
             when (post.kind) {
                 PostKind.IMAGE -> ZoomableImage(
@@ -232,7 +238,7 @@ fun MediaViewerScreen(
                     if (gifUri != null) {
                         RemoteGifMedia(
                             uri = gifUri,
-                            label = post.mediaLabel,
+                            label = mediaLabelShown(post.mediaLabel),
                             playing = true,
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Fit,
@@ -242,7 +248,7 @@ fun MediaViewerScreen(
                     } else {
                         GifMedia(
                             asset = post.mediaAsset,
-                            label = post.mediaLabel,
+                            label = mediaLabelShown(post.mediaLabel),
                             playing = true,
                             modifier = Modifier.fillMaxSize(),
                         )
@@ -256,7 +262,7 @@ fun MediaViewerScreen(
                     onZoomedChange = { mediaZoomed.value = it },
                 )
                 else -> Text(
-                    "This post has no full-screen media.",
+                    stringResource(R.string.scr_this_post_has_no_full_screen),
                     modifier = Modifier.align(Alignment.Center).padding(24.dp),
                     color = Color.White,
                 )
@@ -264,11 +270,12 @@ fun MediaViewerScreen(
         }
         FullscreenMediaTopChrome(
             visible = controlsVisible && !viewerBackInProgress,
-            title = post.title,
+            title = mediaPostTitleShown(post),
             supportingText = if (post.kind == PostKind.GALLERY) {
                 "${state.selectedMediaIndex + 1} / ${post.gallery.size}"
             } else {
-                post.mediaLabel
+                // LINKLABEL01: a link's label is its whole address; show it short.
+                io.github.brealorg.subshell.model.UrlCleaner.cardLabel(post.mediaLabel)
             },
             onBack = onBack,
             modifier = Modifier.align(Alignment.TopCenter),
@@ -331,7 +338,7 @@ private fun MediaViewerActionButtons(
     val errorHost = LocalViewportErrorHostState.current
     FullscreenChromeAction(
         icon = Symbols.Share,
-        contentDescription = "Share media",
+        contentDescription = stringResource(R.string.scr_share_media),
         busy = state.sharing,
         enabled = !state.busy,
         onClick = {
@@ -340,10 +347,7 @@ private fun MediaViewerActionButtons(
                 val shared = share()
                 state.sharing = false
                 if (!shared) {
-                    errorHost?.reportMediaActionFailure(
-                        title = "Could not share",
-                        message = "This media could not be prepared for sharing",
-                    )
+                    errorHost?.reportMediaShareFailure()
                 }
             }
         },
@@ -351,7 +355,7 @@ private fun MediaViewerActionButtons(
     val saved = state.download is MediaDownloadUiState.Saved
     FullscreenChromeAction(
         icon = if (saved) Symbols.Check else Symbols.Download,
-        contentDescription = if (saved) "Saved" else "Download",
+        contentDescription = if (saved) stringResource(R.string.all_saved) else stringResource(R.string.all_download),
         busy = state.download is MediaDownloadUiState.Saving,
         enabled = !state.busy,
         onClick = {
@@ -366,10 +370,7 @@ private fun MediaViewerActionButtons(
                     )
                     delay(MEDIA_DOWNLOAD_SAVED_VISIBLE_MS)
                 } else {
-                    errorHost?.reportMediaActionFailure(
-                        title = "Could not download",
-                        message = "This media could not be saved",
-                    )
+                    errorHost?.reportMediaDownloadFailure()
                 }
                 state.download = null
             }
@@ -417,6 +418,7 @@ fun CommentMediaViewerScreen(
     // ISSUE27_PREDICTIVE_MEDIA_BACK_V1 (see MediaViewerScreen).
     val viewerBack = rememberPredictiveRouteBackState()
     PredictiveRouteBackHandler(enabled = true, state = viewerBack, onBack = onBack)
+    val toggleControlsLabel = stringResource(R.string.scr_show_or_hide_controls)
     // LOWUI5_VIEWER_BACK_SEEN_AT_START_AND_END_V1 (OCB-226): the gesture's
     // progress changes every frame; the controls only need started/ended.
     val viewerBackInProgress by remember(viewerBack) { derivedStateOf { viewerBack.gestureInProgress() } }
@@ -448,7 +450,7 @@ fun CommentMediaViewerScreen(
                 .predictiveMediaContent(viewerBack, reduceMotion)
                 // SWIPEUP_MEDIA_V1 (fork)
                 .swipeUpToClose(enabled = closeOnSwipeDown, allowed = { !commentMediaZoomed }, onClose = onBack)
-                .semantics { onClick(label = VIEWER_TOGGLE_CONTROLS_LABEL) { toggleControls(); true } },
+                .semantics { onClick(label = toggleControlsLabel) { toggleControls(); true } },
         ) {
             ZoomableContent(
                 key = "comment-media-$uri",
@@ -458,7 +460,7 @@ fun CommentMediaViewerScreen(
             ) {
                 RemoteImage(
                     uri = uri,
-                    label = "Comment image",
+                    label = stringResource(R.string.scr_comment_image),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Fit,
                     aspectRatio = null,
@@ -470,7 +472,7 @@ fun CommentMediaViewerScreen(
 
         FullscreenMediaTopChrome(
             visible = controlsVisible && !viewerBackInProgress,
-            title = "Comment image",
+            title = stringResource(R.string.scr_comment_image),
             supportingText = null,
             onBack = onBack,
             modifier = Modifier.align(Alignment.TopCenter),
@@ -534,7 +536,7 @@ private fun FullscreenMediaTopChrome(
                 ) {
                     Icon(
                         Symbols.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(R.string.scr_back),
                     )
                 }
                 Column(
@@ -769,7 +771,7 @@ private fun GalleryViewerMedia(
                 io.github.brealorg.subshell.ui.components.LocalUriMedia(
                     uri = item.localMediaUri,
                     mimeType = item.localMediaMimeType,
-                    contentDescription = item.label,
+                    contentDescription = mediaLabelShown(item.label),
                     modifier = Modifier.fillMaxSize(),
                     onSourceAspectRatioChanged = { sourceAspectRatio = it },
                 )
@@ -786,7 +788,7 @@ private fun GalleryViewerMedia(
             ) {
                 RemoteMedia(
                     uri = imageUri,
-                    label = item.label,
+                    label = mediaLabelShown(item.label),
                     format = item.format,
                     playing = playing,
                     modifier = Modifier.fillMaxSize(),
@@ -802,7 +804,7 @@ private fun GalleryViewerMedia(
         item.format == MediaFormat.IMAGE -> {
             ZoomableAsset(
                 asset = item.asset,
-                label = item.label,
+                label = mediaLabelShown(item.label),
                 onTap = onTap,
                 onZoomChanged = onZoomChanged,
             )
@@ -812,7 +814,7 @@ private fun GalleryViewerMedia(
             io.github.brealorg.subshell.ui.components.LocalUriMedia(
                 uri = item.localMediaUri,
                 mimeType = item.localMediaMimeType,
-                contentDescription = item.label,
+                contentDescription = mediaLabelShown(item.label),
                 modifier = Modifier
                     .fillMaxSize()
                     .pointerInput(item.id) {
@@ -824,7 +826,7 @@ private fun GalleryViewerMedia(
         imageUri != null -> {
             RemoteMedia(
                 uri = imageUri,
-                label = item.label,
+                label = mediaLabelShown(item.label),
                 format = item.format,
                 playing = playing,
                 modifier = Modifier
@@ -841,7 +843,7 @@ private fun GalleryViewerMedia(
 
         item.format == MediaFormat.GIF -> GifMedia(
             asset = item.asset,
-            label = item.label,
+            label = mediaLabelShown(item.label),
             playing = playing,
             modifier = Modifier
                 .fillMaxSize()
@@ -854,7 +856,7 @@ private fun GalleryViewerMedia(
             val resource = mediaResource(item.asset) ?: return
             Image(
                 painter = painterResource(resource),
-                contentDescription = item.label,
+                contentDescription = mediaLabelShown(item.label),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxSize()
@@ -879,7 +881,7 @@ private fun ZoomableImage(post: Post, onTap: () -> Unit, onZoomChanged: (Boolean
         ) {
             RemoteImage(
                 uri = imageUri,
-                label = post.mediaLabel,
+                label = mediaLabelShown(post.mediaLabel),
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Fit,
                 aspectRatio = null,
@@ -888,7 +890,7 @@ private fun ZoomableImage(post: Post, onTap: () -> Unit, onZoomChanged: (Boolean
             )
         }
     } else {
-        ZoomableAsset(post.mediaAsset, post.mediaLabel, onTap, onZoomChanged = onZoomChanged)
+        ZoomableAsset(post.mediaAsset, mediaLabelShown(post.mediaLabel), onTap)
     }
 }
 
@@ -1071,7 +1073,6 @@ internal fun clampZoomTranslation(
 
 private const val FULLSCREEN_ZOOM_PAN_THRESHOLD = 1.01f
 private const val IMAGE_CONTROLS_AUTO_HIDE_MS = 2_500L
-internal const val VIEWER_TOGGLE_CONTROLS_LABEL = "Show or hide controls"
 
 /** The media viewer's chrome buttons: the old 94 % surfaceContainerHigh circle, now with M3 states. */
 @Composable

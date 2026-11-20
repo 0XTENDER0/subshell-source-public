@@ -65,7 +65,7 @@ class SubshellAppDraftsWorkspaceComposeTest {
         composeRule.setContent {
             SubshellApp(videoPlaybackCoordinator = testVideoPlaybackCoordinator(context), state = state)
         }
-        composeRule.onNodeWithText(YOU_DRAFTS_WORKSPACE_PLACEHOLDER).assertIsDisplayed()
+        composeRule.onNodeWithText(YOU_DRAFTS_WORKSPACE_PLACEHOLDER.s).assertIsDisplayed()
         // #224 (adapt-07): the Drafts tab names the list; no second pane header.
         composeRule.onAllNodesWithText("Drafts").assertCountEquals(1)
 

@@ -150,7 +150,7 @@ internal class RedditChatMatrixStartWriter(
         val webTokenResult = when (val result = tokenProvider.token()) {
             is RedditChatWebTokenResult.Success -> result
             RedditChatWebTokenResult.NoRedditWebSession,
-            RedditChatWebTokenResult.Failed,
+            is RedditChatWebTokenResult.Failed,
             -> return failed("web_session", DirectChatStartFailureKind.SESSION)
         }
         val webToken = webTokenResult.token
@@ -701,6 +701,7 @@ internal fun directChatStartFailureKindForMediaReply(
     MessageReplyFailureKind.MEDIA_UNAVAILABLE ->
         DirectChatStartFailureKind.MEDIA_UNAVAILABLE
     MessageReplyFailureKind.CHAT_SESSION_REQUIRED,
+    MessageReplyFailureKind.CHAT_WEB_SIGN_IN_EXPIRED,
     MessageReplyFailureKind.MEDIA_AUTHORIZATION_REQUIRED,
     MessageReplyFailureKind.AUTHORIZATION_REQUIRED,
     MessageReplyFailureKind.SESSION,

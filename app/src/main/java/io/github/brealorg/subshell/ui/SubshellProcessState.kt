@@ -39,6 +39,9 @@ internal data class SubshellProcessSnapshot(
     val messageConversationDrafts: Map<String, String> = emptyMap(),
     val messageConversationMedia: Map<String, ComposerMediaAttachment> = emptyMap(),
     val settledOverrides: SettledAccountOverrides? = null,
+    // ISSUE304_MODMAIL_DRAFT_SURVIVES_CLOSING_V1: an unsent modmail reply, its
+    // mode and identity, by the inbox state's key.
+    val modmailDrafts: Map<String, io.github.brealorg.subshell.data.account.RedditModmailDraft> = emptyMap(),
 )
 
 // RECREATE01_SETTLED_VOTES_SURVIVE_RECREATION_V1 (#241): the votes and saves
@@ -170,6 +173,7 @@ internal fun encodeSubshellProcessSnapshot(snapshot: SubshellProcessSnapshot): S
     }
     records += encodeMessageDraftRecords(snapshot.messageConversationDrafts)
     records += encodeMessageMediaRecords(snapshot.messageConversationMedia)
+    records += encodeModmailDraftRecords(snapshot.modmailDrafts)
     snapshot.settledOverrides?.let { overrides -> records += encodeSettledOverrideRecords(overrides) }
     records += snapshotRecord(
         "MEDIA_STATE",
@@ -211,6 +215,7 @@ internal fun decodeSubshellProcessSnapshot(
         val mediaState = decodeMediaState(records, catalog)
         val messageDrafts = decodeMessageDrafts(records)
         val messageMedia = decodeMessageMedia(records)
+        val modmailDrafts = decodeModmailDrafts(records)
         val settledOverrides = decodeSettledOverrides(records)
 
         SubshellProcessSnapshot(
@@ -226,6 +231,7 @@ internal fun decodeSubshellProcessSnapshot(
             messageConversationDrafts = messageDrafts,
             messageConversationMedia = messageMedia,
             settledOverrides = settledOverrides,
+            modmailDrafts = modmailDrafts,
         )
     }.getOrNull()
 }
@@ -1069,6 +1075,47 @@ private fun decodeMessageDrafts(records: List<SnapshotRecord>): Map<String, Stri
             if (key.length + text.length > remaining) return@forEach
             remaining -= key.length + text.length
             put(key, text)
+        }
+    }
+}
+
+// ISSUE304_MODMAIL_DRAFT_SURVIVES_CLOSING_V1: key, text, internal note,
+// reply as the subreddit; within their own budget, a draft past it left out.
+private fun encodeModmailDraftRecords(
+    drafts: Map<String, io.github.brealorg.subshell.data.account.RedditModmailDraft>,
+): List<String> {
+    var remaining = SUBSHELL_PROCESS_SNAPSHOT_MAX_MESSAGE_DRAFT_CHARS
+    return drafts.toSortedMap().mapNotNull { (key, draft) ->
+        if (key.length + draft.text.length > remaining) return@mapNotNull null
+        remaining -= key.length + draft.text.length
+        snapshotRecord(
+            "MODMAIL_DRAFT",
+            key,
+            draft.text,
+            draft.internalNote.toString(),
+            draft.replyAsSubreddit.toString(),
+        )
+    }
+}
+
+private fun decodeModmailDrafts(
+    records: List<SnapshotRecord>,
+): Map<String, io.github.brealorg.subshell.data.account.RedditModmailDraft> {
+    var remaining = SUBSHELL_PROCESS_SNAPSHOT_MAX_MESSAGE_DRAFT_CHARS
+    return buildMap {
+        records.filter { record -> record.kind == "MODMAIL_DRAFT" }.forEach { record ->
+            val key = record.fields.getOrNull(0)?.takeIf(String::isNotBlank) ?: return@forEach
+            val text = record.fields.getOrNull(1).orEmpty()
+            if (key.length + text.length > remaining) return@forEach
+            remaining -= key.length + text.length
+            put(
+                key,
+                io.github.brealorg.subshell.data.account.RedditModmailDraft(
+                    text = text,
+                    internalNote = record.fields.getOrNull(2) == "true",
+                    replyAsSubreddit = record.fields.getOrNull(3) != "false",
+                ),
+            )
         }
     }
 }

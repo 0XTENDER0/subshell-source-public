@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.media
 
+import io.github.brealorg.subshell.R
+import io.github.brealorg.subshell.ui.UiText
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -104,7 +106,7 @@ internal fun videoSourceFailure(
     )
 }
 
-internal data class VideoPlaybackErrorCopy(val title: String, val message: String)
+internal data class VideoPlaybackErrorCopy(val title: UiText, val message: UiText)
 
 internal fun videoPlaybackErrorCopy(
     errorCode: Int?,
@@ -118,10 +120,23 @@ internal fun videoPlaybackErrorCopy(
         .distinct()
         .filter { it != result.title }
     return if (earlierTitles.isEmpty()) result else result.copy(
-        message = result.message + "\nOther source attempts: " +
-            earlierTitles.take(3).joinToString("; ") +
-            if (earlierTitles.size > 3) "; …" else "",
+        message = otherSourceAttempts(result.message, earlierTitles),
     )
+}
+
+// TRANSLATE14: up to three earlier titles, then "…" when there were more.
+private fun otherSourceAttempts(message: UiText, titles: List<UiText>): UiText {
+    val shown = titles.take(3)
+    val res = when (shown.size) {
+        1 -> R.string.video_err_other_source_attempts_1
+        2 -> R.string.video_err_other_source_attempts_2
+        else -> if (titles.size > 3) {
+            R.string.video_err_other_source_attempts_more
+        } else {
+            R.string.video_err_other_source_attempts_3
+        }
+    }
+    return UiText.Resource(res, message, *shown.toTypedArray())
 }
 
 private fun videoSourceErrorCopy(
@@ -158,59 +173,54 @@ private fun videoSourceErrorCopy(
             else -> null
         }
         val message = when (status) {
-            401 -> "This video cannot be played.\nThe server requires authentication for this video resource."
-            403 -> "Access denied by server."
-            404 -> "This video cannot be played.\nThe requested video resource could not be found."
-            408 -> "This video could not be loaded.\nThe server timed out while receiving the request."
-            410 -> "This video is no longer available from the server."
-            416 -> "This video cannot be played.\nThe server could not provide the requested part of the video."
-            429 -> "This video could not be loaded right now.\nThe server received too many requests. Try again later."
-            451 -> "This video cannot be played.\nThe server reports that access is restricted for legal reasons."
-            500 -> "This video could not be loaded.\nThe server encountered an internal error."
-            502 -> "This video could not be loaded.\nA server gateway received an invalid upstream response."
-            503 -> "The video service is temporarily unavailable.\nTry again later."
-            504 -> "This video could not be loaded.\nA server gateway did not receive an upstream response in time."
-            else -> "This video cannot be played.\nThe video request returned an unexpected HTTP response."
+            401 -> UiText.Resource(R.string.video_err_msg_this_video_cannot_be_played_nthe_server)
+            403 -> UiText.Resource(R.string.video_err_msg_access_denied_by_server)
+            404 -> UiText.Resource(R.string.video_err_msg_this_video_cannot_be_played_nthe_request)
+            408 -> UiText.Resource(R.string.video_err_msg_this_video_could_not_be_loaded_nthe_serv)
+            410 -> UiText.Resource(R.string.video_err_msg_this_video_is_no_longer_available_from_t)
+            416 -> UiText.Resource(R.string.video_err_msg_this_video_cannot_be_played_nthe_server_2)
+            429 -> UiText.Resource(R.string.video_err_msg_this_video_could_not_be_loaded_right_now)
+            451 -> UiText.Resource(R.string.video_err_msg_this_video_cannot_be_played_nthe_server_3)
+            500 -> UiText.Resource(R.string.video_err_msg_this_video_could_not_be_loaded_nthe_serv_2)
+            502 -> UiText.Resource(R.string.video_err_msg_this_video_could_not_be_loaded_na_server)
+            503 -> UiText.Resource(R.string.video_err_msg_the_video_service_is_temporarily_unavail)
+            504 -> UiText.Resource(R.string.video_err_msg_this_video_could_not_be_loaded_na_server_2)
+            else -> UiText.Resource(R.string.video_err_msg_this_video_cannot_be_played_nthe_video_r)
         }
         return VideoPlaybackErrorCopy(
-            title = "HTTP $status" + (reason?.let { " · $it" } ?: ""),
+            // HTTP reason phrases are technical labels and stay English.
+            title = UiText.Plain("HTTP $status" + (reason?.let { " · $it" } ?: "")),
             message = message,
         )
     }
     val kind = failure?.transportKind
     return when {
         kind == VideoFailureTransportKind.CLIP_UNAVAILABLE ->
-            VideoPlaybackErrorCopy("Clip not available", "This clip was removed or is no longer available.")
+            VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_clip_not_available), UiText.Resource(R.string.video_err_msg_this_clip_was_removed_or_is_no_longer_av))
         kind == VideoFailureTransportKind.PROVIDER_OFF ->
-            VideoPlaybackErrorCopy("RedGIFs playback is off", "Turn on Show NSFW posts to play RedGIFs clips in the app.")
+            VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_redgifs_playback_is_off), UiText.Resource(R.string.video_err_msg_turn_on_show_nsfw_posts_to_play_redgifs))
         kind == VideoFailureTransportKind.TIMEOUT || errorCode == 2002 ->
-            VideoPlaybackErrorCopy("Connection timed out", "The video server did not respond in time. Try again.")
+            VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_connection_timed_out), UiText.Resource(R.string.video_err_msg_the_video_server_did_not_respond_in_time))
         kind == VideoFailureTransportKind.DNS ->
-            VideoPlaybackErrorCopy("DNS lookup failed", "The video server's address could not be resolved. Check your connection and try again.")
+            VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_dns_lookup_failed), UiText.Resource(R.string.video_err_msg_the_video_server_s_address_could_not_be))
         kind == VideoFailureTransportKind.TLS ->
-            VideoPlaybackErrorCopy("TLS connection failed", "A secure connection to the video server could not be established.")
+            VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_tls_connection_failed), UiText.Resource(R.string.video_err_msg_a_secure_connection_to_the_video_server))
         kind == VideoFailureTransportKind.CONNECTION ->
-            VideoPlaybackErrorCopy("Connection failed", "The video server could not be reached. Check your connection and try again.")
-        errorCode == 2004 -> VideoPlaybackErrorCopy(
-            "Media3 2004 · HTTP request failed",
-            "This video cannot be played.\nThe HTTP response status was not available in the playback error.",
-        )
-        errorCode == 2005 -> VideoPlaybackErrorCopy("Media3 2005 · File not found", "The requested video file could not be found.")
-        errorCode == 2006 -> VideoPlaybackErrorCopy("Media3 2006 · No permission", "Permission to read this video resource was denied.")
-        errorCode == 2007 -> VideoPlaybackErrorCopy("Media3 2007 · Cleartext not permitted", "This video uses an insecure connection that the app does not allow.")
-        errorCode == 2008 -> VideoPlaybackErrorCopy("Media3 2008 · Read position out of range", "The requested position is outside the available video data.")
+            VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_connection_failed), UiText.Resource(R.string.video_err_msg_the_video_server_could_not_be_reached_ch))
+        errorCode == 2004 -> VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_media3_2004_http_request_failed), UiText.Resource(R.string.video_err_msg_this_video_cannot_be_played_nthe_http_re))
+        errorCode == 2005 -> VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_media3_2005_file_not_found), UiText.Resource(R.string.video_err_msg_the_requested_video_file_could_not_be_fo))
+        errorCode == 2006 -> VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_media3_2006_no_permission), UiText.Resource(R.string.video_err_msg_permission_to_read_this_video_resource_w))
+        errorCode == 2007 -> VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_media3_2007_cleartext_not_permitted), UiText.Resource(R.string.video_err_msg_this_video_uses_an_insecure_connection_t))
+        errorCode == 2008 -> VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_media3_2008_read_position_out_of_range), UiText.Resource(R.string.video_err_msg_the_requested_position_is_outside_the_av))
         errorCode != null && errorCode in 3000..3999 ->
-            VideoPlaybackErrorCopy("Media3 $errorCode · Source parsing failed", "This video cannot be played.\nThe video source returned data the player could not parse.")
+            VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_media3_n_source_parsing_failed, errorCode), UiText.Resource(R.string.video_err_msg_this_video_cannot_be_played_nthe_video_s))
         errorCode != null && errorCode in 4000..4999 ->
-            VideoPlaybackErrorCopy("Media3 $errorCode · Decoding failed", "This video cannot be played.\nThe device could not decode this video format.")
+            VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_media3_n_decoding_failed, errorCode), UiText.Resource(R.string.video_err_msg_this_video_cannot_be_played_nthe_device))
         errorCode != null && errorCode in 5000..5999 ->
-            VideoPlaybackErrorCopy("Media3 $errorCode · Audio output failed", "This video cannot be played.\nPlayback failed while using the device audio output.")
+            VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_media3_n_audio_output_failed, errorCode), UiText.Resource(R.string.video_err_msg_this_video_cannot_be_played_nplayback_fa))
         errorCode != null && errorCode in 6000..6999 ->
-            VideoPlaybackErrorCopy("Media3 $errorCode · Protected playback failed", "This video cannot be played.\nThe protected video session could not be opened.")
-        errorCode != null -> VideoPlaybackErrorCopy(
-            "Media3 $errorCode · Playback error",
-            "This video cannot be played.\nThe player could not complete playback.",
-        )
-        else -> VideoPlaybackErrorCopy("Playback error", "This video cannot be played.\nNo further error details were available.")
+            VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_media3_n_protected_playback_failed, errorCode), UiText.Resource(R.string.video_err_msg_this_video_cannot_be_played_nthe_protect))
+        errorCode != null -> VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_media3_n_playback_error, errorCode), UiText.Resource(R.string.video_err_msg_this_video_cannot_be_played_nthe_player))
+        else -> VideoPlaybackErrorCopy(UiText.Resource(R.string.video_err_title_playback_error), UiText.Resource(R.string.video_err_msg_this_video_cannot_be_played_nno_further))
     }
 }

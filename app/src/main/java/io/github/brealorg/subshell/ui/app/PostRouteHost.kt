@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -129,14 +131,9 @@ internal fun PostRouteHost(
     val redditModerationState = redditModeration.redditModerationState
     val onLoadRedditModQueue = redditModeration.onLoadRedditModQueue
     val onAppendRedditModQueue = redditModeration.onAppendRedditModQueue
+    val onSelectRedditModQueueList = redditModeration.onSelectRedditModQueueList
     val onResolveRedditModerationTarget = redditModeration.onResolveRedditModerationTarget
     val moderationActionState = redditModeration.moderationActionState
-    val onModerateRedditQueueItem = redditModeration.onModerateRedditQueueItem
-    val onRetryRedditModerationAction = redditModeration.onRetryRedditModerationAction
-    val onAuthorizeRedditModerationAction = redditModeration.onAuthorizeRedditModerationAction
-    val removalReasonState = redditModeration.removalReasonState
-    val onLoadRedditRemovalReasons = redditModeration.onLoadRedditRemovalReasons
-    val onAuthorizeRedditRemovalReasons = redditModeration.onAuthorizeRedditRemovalReasons
     val redditInboxState = redditInbox.redditInboxState
     val onLoadRedditInbox = redditInbox.onLoadRedditInbox
     val onAppendRedditInbox = redditInbox.onAppendRedditInbox
@@ -175,6 +172,8 @@ internal fun PostRouteHost(
     val onRefreshRedditCommentsPreservingFocusedTarget = redditComments.onRefreshRedditCommentsPreservingFocusedTarget
     val onLoadFocusedRedditComment = redditComments.onLoadFocusedRedditComment
     val onLoadMoreRedditComments = redditComments.onLoadMoreRedditComments
+    val onLoadMoreRedditCommentsFromEnd = redditComments.onLoadMoreRedditCommentsFromEnd
+    val onLoadMoreRedditCommentsTogether = redditComments.onLoadMoreRedditCommentsTogether
     val commentWriteState = commentMutations.commentWriteState
     val onSubmitComment = commentMutations.onSubmitComment
     val onAuthorizeCommentWrite = commentMutations.onAuthorizeCommentWrite
@@ -285,6 +284,8 @@ internal fun PostRouteHost(
                         onLoadFocusedRedditComment =
                             onLoadFocusedRedditComment,
                         onLoadMoreRedditComments = onLoadMoreRedditComments,
+                        onLoadMoreRedditCommentsFromEnd = onLoadMoreRedditCommentsFromEnd,
+                        onLoadMoreRedditCommentsTogether = onLoadMoreRedditCommentsTogether,
                         onFocusedCommentLandingVerified = { verifiedCommentId ->
                             state.consumeInboxReadReceipt(
                                 postId = post.id,
@@ -394,9 +395,9 @@ internal fun PostRouteHost(
             when {
                 homeListDetail -> ExpandedListDetailSurface(
                     scaffoldPadding = padding,
-                    listTitle = "Home",
+                    listTitle = stringResource(R.string.all_home),
                     listSubtitle =
-                        "${state.feedSource.label} · ${state.feedSort.label}",
+                        "${stringResource(state.feedSource.labelRes)} · ${stringResource(state.feedSort.labelRes)}",
                     listContent = { listModifier ->
                         HomeScreen(
                             modifier = listModifier,
@@ -483,20 +484,9 @@ internal fun PostRouteHost(
                                     onLoadRedditModQueue,
                                 onAppendRedditModQueue =
                                     onAppendRedditModQueue,
+                                onSelectRedditModQueueList = onSelectRedditModQueueList,
                                 moderationActionState =
                                     moderationActionState,
-                                onModerateRedditQueueItem =
-                                    onModerateRedditQueueItem,
-                                onRetryRedditModerationAction =
-                                    onRetryRedditModerationAction,
-                                onAuthorizeRedditModerationAction =
-                                    onAuthorizeRedditModerationAction,
-                                removalReasonState =
-                                    removalReasonState,
-                                onLoadRedditRemovalReasons =
-                                    onLoadRedditRemovalReasons,
-                                onAuthorizeRedditRemovalReasons =
-                                    onAuthorizeRedditRemovalReasons,
                                 communityMembershipState =
                                     communityMembershipState,
                                 onChangeCommunityMembership =
@@ -519,7 +509,7 @@ internal fun PostRouteHost(
                     // NEXT01A2_SEARCH_POST_TWO_PANE_V1
                     ExpandedListDetailSurface(
                         scaffoldPadding = padding,
-                        listTitle = "Search",
+                        listTitle = stringResource(R.string.all_search),
                         listSubtitle =
                             "“${searchOrigin.query}”",
                         listContent = { listModifier ->
@@ -560,7 +550,7 @@ internal fun PostRouteHost(
                         listSubtitle =
                             youContentWorkspaceLabel(
                                 userContentTab,
-                            ),
+                            ).asString(),
                         listContent = { listModifier ->
                             mainYouProfileContent(
                                 userOrigin.username,
@@ -594,7 +584,7 @@ internal fun PostRouteHost(
                         listSubtitle =
                             youContentWorkspaceLabel(
                                 userContentTab,
-                            ),
+                            ).asString(),
                         listContent = { listModifier ->
                             publicUserProfileContent(
                                 userOrigin.username,
@@ -633,8 +623,8 @@ internal fun PostRouteHost(
 
                 inboxListDetail -> ExpandedListDetailSurface(
                     scaffoldPadding = padding,
-                    listTitle = "Inbox",
-                    listSubtitle = "Activity, messages & moderation",
+                    listTitle = stringResource(R.string.all_inbox),
+                    listSubtitle = stringResource(R.string.all_activity_messages_moderation),
                     listContent = { listModifier ->
                         InboxScreen(
                             modmailThreadFillsTheScreen = false,
@@ -656,12 +646,6 @@ internal fun PostRouteHost(
                             onResolveRedditModerationTarget =
                                 onResolveRedditModerationTarget,
                             moderationActionState = moderationActionState,
-                            onModerateRedditQueueItem = onModerateRedditQueueItem,
-                            onRetryRedditModerationAction = onRetryRedditModerationAction,
-                            onAuthorizeRedditModerationAction = onAuthorizeRedditModerationAction,
-                            removalReasonState = removalReasonState,
-                            onLoadRedditRemovalReasons = onLoadRedditRemovalReasons,
-                            onAuthorizeRedditRemovalReasons = onAuthorizeRedditRemovalReasons,
                             redditModmailState = redditModmailState,
                             onLoadRedditModmail = onLoadRedditModmail,
                             onAppendRedditModmail = onAppendRedditModmail,

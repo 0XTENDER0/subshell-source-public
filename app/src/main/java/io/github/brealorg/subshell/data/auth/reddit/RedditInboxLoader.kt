@@ -22,6 +22,7 @@ import io.github.brealorg.subshell.data.network.reddit.REDDIT_INBOX_MAX_PAGE_SIZ
 import io.github.brealorg.subshell.data.network.reddit.RedditInboxNetworkDataSource
 import io.github.brealorg.subshell.data.network.reddit.RedditInboxTargetNetworkDataSource
 import io.github.brealorg.subshell.model.InboxItem
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -292,6 +293,15 @@ internal class RedditInboxLoader(
         when (val result = targetSource(session.tokens.accessToken).post(normalizedPostId)) {
             is NetworkResult.Success -> {
                 val post = result.value ?: return@withContext AuthenticatedRedditInboxTargetResult.NotFound
+                // LINKEDPOST01_A_POST_OPENED_FROM_A_LINK_IS_STORED_V1: the post a link,
+                // notification, Inbox item, search hit or queue item opens is stored, so
+                // the restore after process death finds it. A failed write only costs that.
+                try {
+                    cacheStore.storeLinkedPost(accountStableId, post)
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                }
                 AuthenticatedRedditInboxTargetResult.Loaded(
                     post = post,
                     fromCache = false,

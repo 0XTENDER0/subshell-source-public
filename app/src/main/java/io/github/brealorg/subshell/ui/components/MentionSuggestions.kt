@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -133,12 +135,13 @@ private fun MentionSuggestionRow(
     avatarUri: String?,
     onPick: () -> Unit,
 ) {
+    val mentionDescription = stringResource(R.string.comp_mention_user, username)
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 48.dp)
             .clickable(role = Role.Button, onClick = onPick)
-            .semantics { contentDescription = "Mention u/$username" }
+            .semantics { contentDescription = mentionDescription }
             .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),

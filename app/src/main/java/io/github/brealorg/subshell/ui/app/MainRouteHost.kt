@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -162,12 +164,6 @@ internal fun MainRouteHost(
     val onAppendRedditModQueue = redditModeration.onAppendRedditModQueue
     val onResolveRedditModerationTarget = redditModeration.onResolveRedditModerationTarget
     val moderationActionState = redditModeration.moderationActionState
-    val onModerateRedditQueueItem = redditModeration.onModerateRedditQueueItem
-    val onRetryRedditModerationAction = redditModeration.onRetryRedditModerationAction
-    val onAuthorizeRedditModerationAction = redditModeration.onAuthorizeRedditModerationAction
-    val removalReasonState = redditModeration.removalReasonState
-    val onLoadRedditRemovalReasons = redditModeration.onLoadRedditRemovalReasons
-    val onAuthorizeRedditRemovalReasons = redditModeration.onAuthorizeRedditRemovalReasons
     val redditInboxState = redditInbox.redditInboxState
     val onLoadRedditInbox = redditInbox.onLoadRedditInbox
     val onAppendRedditInbox = redditInbox.onAppendRedditInbox
@@ -322,7 +318,7 @@ Box(
                             // M3224_ONE_TITLE_PER_PANE_V1 (#224): the top bar already names the destination.
                             showListHeader = false,
 scaffoldPadding = padding,
-                            listTitle = "Communities",
+                            listTitle = stringResource(R.string.all_communities),
                             listSubtitle = null,
                             listContent = { listModifier ->
                             CommunitiesScreen(
@@ -378,7 +374,7 @@ scaffoldPadding = padding,
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Text(
-                                        text = "Select a community",
+                                        text = stringResource(R.string.scr_select_a_community),
                                         style = MaterialTheme.typography.titleMedium,
                                         color =
                                             MaterialTheme.colorScheme.onSurfaceVariant,
@@ -486,16 +482,6 @@ scaffoldPadding = padding,
                             onResolveRedditModerationTarget =
                                 onResolveRedditModerationTarget,
                             moderationActionState = moderationActionState,
-                            onModerateRedditQueueItem = onModerateRedditQueueItem,
-                            onRetryRedditModerationAction =
-                                onRetryRedditModerationAction,
-                            onAuthorizeRedditModerationAction =
-                                onAuthorizeRedditModerationAction,
-                            removalReasonState = removalReasonState,
-                            onLoadRedditRemovalReasons =
-                                onLoadRedditRemovalReasons,
-                            onAuthorizeRedditRemovalReasons =
-                                onAuthorizeRedditRemovalReasons,
                             redditModmailState = redditModmailState,
                             onLoadRedditModmail = onLoadRedditModmail,
                             onAppendRedditModmail = onAppendRedditModmail,
@@ -530,8 +516,8 @@ scaffoldPadding = padding,
                         // M3224_ONE_TITLE_PER_PANE_V1 (#224): the top bar already names the destination.
                         showListHeader = false,
 scaffoldPadding = padding,
-                        listTitle = "Inbox",
-                        listSubtitle = "Activity",
+                        listTitle = stringResource(R.string.all_inbox),
+                        listSubtitle = stringResource(R.string.all_activity),
                         listContent = { listModifier ->
                             mainInboxContent(
                                 listModifier,
@@ -549,7 +535,7 @@ scaffoldPadding = padding,
                                     Alignment.Center,
                             ) {
                                 Text(
-                                    text = "Select activity",
+                                    text = stringResource(R.string.scr_select_activity),
                                     style =
                                         MaterialTheme.typography.titleMedium,
                                     color =
@@ -570,8 +556,8 @@ scaffoldPadding = padding,
                         // M3224_ONE_TITLE_PER_PANE_V1 (#224): the top bar already names the destination.
                         showListHeader = false,
 scaffoldPadding = padding,
-                        listTitle = "Inbox",
-                        listSubtitle = "Messages",
+                        listTitle = stringResource(R.string.all_inbox),
+                        listSubtitle = stringResource(R.string.all_messages),
                         listContent = { listModifier ->
                             mainInboxContent(
                                 listModifier,
@@ -589,7 +575,7 @@ scaffoldPadding = padding,
                                     Alignment.Center,
                             ) {
                                 Text(
-                                    text = "Select a conversation",
+                                    text = stringResource(R.string.scr_select_a_conversation),
                                     style =
                                         MaterialTheme.typography.titleMedium,
                                     color =
@@ -611,8 +597,8 @@ scaffoldPadding = padding,
                         // M3224_ONE_TITLE_PER_PANE_V1 (#224): the top bar already names the destination.
                         showListHeader = false,
 scaffoldPadding = padding,
-                        listTitle = "Inbox",
-                        listSubtitle = "Mod · Queue",
+                        listTitle = stringResource(R.string.all_inbox),
+                        listSubtitle = stringResource(R.string.all_mod_queue),
                         listContent = { listModifier ->
                             mainInboxContent(
                                 listModifier,
@@ -630,7 +616,7 @@ scaffoldPadding = padding,
                                     Alignment.Center,
                             ) {
                                 Text(
-                                    text = "Select a queue item",
+                                    text = stringResource(R.string.scr_select_a_queue_item),
                                     style =
                                         MaterialTheme.typography.titleMedium,
                                     color =
@@ -645,8 +631,8 @@ scaffoldPadding = padding,
                         // M3224_ONE_TITLE_PER_PANE_V1 (#224): the top bar already names the destination.
                         showListHeader = false,
 scaffoldPadding = padding,
-                        listTitle = "Inbox",
-                        listSubtitle = "Mod · Modmail",
+                        listTitle = stringResource(R.string.all_inbox),
+                        listSubtitle = stringResource(R.string.all_mod_modmail),
                         listContent = { listModifier ->
                             mainInboxContent(
                                 listModifier,
@@ -770,7 +756,7 @@ scaffoldPadding = padding,
                                     ) {
                                         Text(
                                             text =
-                                                "Loading conversation…",
+                                                stringResource(R.string.all_loading_conversation_2),
                                             style =
                                                 MaterialTheme.typography
                                                     .titleMedium,
@@ -790,7 +776,7 @@ scaffoldPadding = padding,
                                     ) {
                                         Text(
                                             text =
-                                                "Select a Modmail conversation",
+                                                stringResource(R.string.all_select_a_modmail_conversation),
                                             style =
                                                 MaterialTheme.typography
                                                     .titleMedium,
@@ -866,7 +852,7 @@ scaffoldPadding = padding,
                         listSubtitle =
                             youContentWorkspaceLabel(
                                 selectedYouContentTab,
-                            ),
+                            ).asString(),
                         listContent = { listModifier ->
                             mainYouProfileContent(
                                 state.activeAccountUsername,
@@ -888,7 +874,7 @@ scaffoldPadding = padding,
                                     text =
                                         youContentWorkspacePlaceholder(
                                             selectedYouContentTab,
-                                        ),
+                                        ).asString(),
                                     style =
                                         MaterialTheme.typography
                                             .titleMedium,
@@ -905,7 +891,7 @@ scaffoldPadding = padding,
                         showListHeader = false,
 scaffoldPadding = padding,
                         listTitle = "You",
-                        listSubtitle = "Blocked",
+                        listSubtitle = stringResource(R.string.all_blocked),
                         listContent = { listModifier ->
                             mainYouProfileContent(
                                 state.activeAccountUsername,
@@ -932,7 +918,7 @@ scaffoldPadding = padding,
                             ) {
                                 Text(
                                     text =
-                                        YOU_BLOCKED_WORKSPACE_PLACEHOLDER,
+                                        YOU_BLOCKED_WORKSPACE_PLACEHOLDER.asString(),
                                     style =
                                         MaterialTheme.typography
                                             .titleMedium,
@@ -951,7 +937,7 @@ scaffoldPadding = padding,
                         showListHeader = false,
 scaffoldPadding = padding,
                         listTitle = "You",
-                        listSubtitle = "Drafts",
+                        listSubtitle = stringResource(R.string.all_drafts),
                         listContent = { listModifier ->
                             mainYouProfileContent(
                                 state.activeAccountUsername,
@@ -974,7 +960,7 @@ scaffoldPadding = padding,
                             ) {
                                 Text(
                                     text =
-                                        YOU_DRAFTS_WORKSPACE_PLACEHOLDER,
+                                        YOU_DRAFTS_WORKSPACE_PLACEHOLDER.asString(),
                                     style =
                                         MaterialTheme.typography
                                             .titleMedium,

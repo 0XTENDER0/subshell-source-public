@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -86,11 +89,11 @@ internal fun MediaSettingsPreview(
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     Text(
-                        "Live preview",
+                        stringResource(R.string.all_live_preview),
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        "Media, fullscreen playback and gestures. Tap to toggle controls.",
+                        stringResource(R.string.all_media_fullscreen_playback_and_gestures_tap_to),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -100,7 +103,7 @@ internal fun MediaSettingsPreview(
                     color = MaterialTheme.colorScheme.surfaceContainerHighest,
                 ) {
                     Text(
-                        if (viewerControlsVisible) "Controls · On" else "Controls · Off",
+                        if (viewerControlsVisible) stringResource(R.string.all_controls_on) else stringResource(R.string.all_controls_off),
                         modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -150,7 +153,7 @@ private fun UnifiedMediaPreviewSample(
 
     // LOWUI4_MEDIA_PREVIEW_USES_ITS_TESTED_RULES_V1 (OCB-261): the preview
     // renders through the tested label and caption rules (NEVER reads "Manual").
-    val autoplayLabel = mediaPreviewAutoplayLabel(videoAutoplay)
+    val autoplayLabel = mediaPreviewAutoplayLabel(videoAutoplay).asString()
     val timelineHeight = when {
         videoTimelineSize.name.contains("COMPACT", ignoreCase = true) -> 2.dp
         videoTimelineSize.name.contains("LARGE", ignoreCase = true) -> 6.dp
@@ -228,7 +231,7 @@ private fun UnifiedMediaPreviewSample(
                                     tint = Color.White,
                                 )
                                 Text(
-                                    "Tap to load",
+                                    stringResource(R.string.all_tap_to_load),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = Color.White,
                                 )
@@ -254,7 +257,7 @@ private fun UnifiedMediaPreviewSample(
                                 tint = Color.White.copy(alpha = 0.82f),
                             )
                             Text(
-                                "Preview hidden",
+                                stringResource(R.string.all_preview_hidden),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color.White.copy(alpha = 0.82f),
                             )
@@ -282,7 +285,7 @@ private fun UnifiedMediaPreviewSample(
                 ) {
                     GestureZoneHint(
                         icon = Symbols.Brightness6,
-                        label = "Brightness",
+                        label = stringResource(R.string.set_brightness),
                         alpha = brightnessAlpha,
                         modifier = Modifier
                             .weight(1f)
@@ -290,7 +293,7 @@ private fun UnifiedMediaPreviewSample(
                     )
                     GestureZoneHint(
                         icon = Symbols.VolumeUp,
-                        label = "Volume",
+                        label = stringResource(R.string.set_volume),
                         alpha = volumeAlpha,
                         modifier = Modifier
                             .weight(1f)
@@ -307,7 +310,7 @@ private fun UnifiedMediaPreviewSample(
                         color = Color.Black.copy(alpha = 0.72f),
                     ) {
                         Text(
-                            "Video",
+                            stringResource(R.string.all_video),
                             modifier = Modifier.padding(
                                 horizontal = 7.dp,
                                 vertical = 3.dp,
@@ -331,7 +334,7 @@ private fun UnifiedMediaPreviewSample(
                         color = Color.Black.copy(alpha = 0.70f),
                     ) {
                         Text(
-                            "Evening light over the fjord",
+                            stringResource(R.string.all_evening_light_over_the_fjord),
                             modifier = Modifier.padding(
                                 horizontal = 9.dp,
                                 vertical = 4.dp,
@@ -411,7 +414,7 @@ private fun UnifiedMediaPreviewSample(
             exit = fadeOut(animationSpec = tween(110)),
         ) {
             Text(
-                "Evening light over the fjord",
+                stringResource(R.string.all_evening_light_over_the_fjord),
                 modifier = Modifier.padding(horizontal = 2.dp),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -560,10 +563,10 @@ private fun FjordPreviewBackdrop(
 
 internal fun mediaPreviewAutoplayLabel(
     value: VideoAutoplay,
-): String = when (value) {
-    VideoAutoplay.ALWAYS -> "Auto"
-    VideoAutoplay.WIFI_ONLY -> "Wi-Fi"
-    VideoAutoplay.NEVER -> "Manual"
+): UiText = when (value) {
+    VideoAutoplay.ALWAYS -> UiText.Resource(R.string.set_autoplay_preview_auto)
+    VideoAutoplay.WIFI_ONLY -> UiText.Resource(R.string.set_autoplay_preview_wifi)
+    VideoAutoplay.NEVER -> UiText.Resource(R.string.set_autoplay_preview_manual)
 }
 
 internal fun mediaPreviewFullscreenCaptionVisible(

@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -47,9 +49,11 @@ internal fun canonicalRedditCommentUrl(post: Post, commentId: String): String {
     return redditWebUrl(commentPath)
 }
 
-internal fun externalPostUrl(post: Post): String? = post.externalUrl
+internal fun externalPostUrl(post: Post, cleanLinks: Boolean = false): String? = post.externalUrl
     ?.trim()
     ?.takeIf(String::isNotBlank)
+    // CLEANURL02_CLEAN_LINKS_SETTING_V1: the post keeps the original address; only what is opened is cleaned.
+    ?.let { url -> if (cleanLinks) io.github.brealorg.subshell.model.UrlCleaner.clean(url) else url }
     ?.takeIf { url -> webSchemeOrNull(url) != null }
 
 private fun webSchemeOrNull(value: String): String? = runCatching {
@@ -76,22 +80,10 @@ internal fun sharePostLink(context: Context, post: Post, notices: ViewportErrorH
         putExtra(Intent.EXTRA_TEXT, url)
     }
     runCatching {
-        context.startActivity(Intent.createChooser(send, "Share post"))
+        context.startActivity(Intent.createChooser(send, context.getString(R.string.sysact_share_post)))
     }.onFailure {
-        notices.noticeFailure("Couldn't share this post", "No app on this device can share it")
+        notices.noticeFailure(UiText.Resource(R.string.sysact_couldn_t_share_this_post), UiText.Resource(R.string.sysact_no_app_on_this_device_can_share))
     }
-}
-
-internal fun copyPostLink(context: Context, post: Post, notices: ViewportErrorHostState?) {
-    val clipboard = context.getSystemService(ClipboardManager::class.java)
-    if (clipboard == null) {
-        notices.noticeFailure("Couldn't copy the link", "The clipboard is unavailable")
-        return
-    }
-    clipboard.setPrimaryClip(
-        ClipData.newPlainText("Reddit post link", canonicalRedditPostUrl(post)),
-    )
-    notices.noticeCopied("Link")
 }
 
 internal fun shareCommentLink(context: Context, post: Post, commentId: String, notices: ViewportErrorHostState?) {
@@ -101,9 +93,9 @@ internal fun shareCommentLink(context: Context, post: Post, commentId: String, n
         putExtra(Intent.EXTRA_TEXT, canonicalRedditCommentUrl(post, commentId))
     }
     runCatching {
-        context.startActivity(Intent.createChooser(send, "Share comment"))
+        context.startActivity(Intent.createChooser(send, context.getString(R.string.sysact_share_comment)))
     }.onFailure {
-        notices.noticeFailure("Couldn't share this comment", "No app on this device can share it")
+        notices.noticeFailure(UiText.Resource(R.string.sysact_couldn_t_share_this_comment), UiText.Resource(R.string.sysact_no_app_on_this_device_can_share))
     }
 }
 
@@ -126,9 +118,9 @@ internal fun shareCustomFeedLink(context: Context, feed: CustomFeedSummary, noti
         putExtra(Intent.EXTRA_TEXT, url)
     }
     runCatching {
-        context.startActivity(Intent.createChooser(send, "Share feed"))
+        context.startActivity(Intent.createChooser(send, context.getString(R.string.sysact_share_feed)))
     }.onFailure {
-        notices.noticeFailure("Couldn't share this feed", "No app on this device can share it")
+        notices.noticeFailure(UiText.Resource(R.string.sysact_couldn_t_share_this_feed), UiText.Resource(R.string.sysact_no_app_on_this_device_can_share))
     }
 }
 
@@ -136,9 +128,9 @@ internal fun copyCustomFeedLink(context: Context, feed: CustomFeedSummary, notic
     val url = canonicalRedditCustomFeedUrl(feed) ?: return
     val clipboard = context.getSystemService(ClipboardManager::class.java)
     if (clipboard == null) {
-        notices.noticeFailure("Couldn't copy the link", "The clipboard is unavailable")
+        notices.noticeFailure(UiText.Resource(R.string.sysact_couldn_t_copy_the_link), UiText.Resource(R.string.sysact_the_clipboard_is_unavailable))
         return
     }
-    clipboard.setPrimaryClip(ClipData.newPlainText("Reddit custom feed link", url))
-    notices.noticeCopied("Link")
+    clipboard.setPrimaryClip(ClipData.newPlainText(context.getString(R.string.ui_reddit_custom_feed_link), url))
+    notices.noticeCopied(io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.nt_copied_what_link))
 }

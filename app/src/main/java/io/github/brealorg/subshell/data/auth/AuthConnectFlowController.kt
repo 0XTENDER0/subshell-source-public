@@ -43,6 +43,17 @@ internal interface AuthConnectFlow {
         accountStableId: String,
     ): AuthBrowserLaunchResult
 
+    /**
+     * ISSUE303B_CHAT_SIGN_IN_AGAIN_REAUTHENTICATES_A_SIGNED_IN_ACCOUNT_V1:
+     * Direct Chat needs Reddit's web sign-in, which can expire while the
+     * OAuth grant is still good, so the account still reads as signed in.
+     * Chat's "Sign in again" starts the same reauthentication for that
+     * account; every other caller keeps the REAUTHENTICATION_REQUIRED guard.
+     */
+    suspend fun beginWebSignInAgain(
+        accountStableId: String,
+    ): AuthBrowserLaunchResult = AuthBrowserLaunchResult.NotStarted
+
     suspend fun browserLaunchFailed()
 
     suspend fun cancel()
@@ -128,6 +139,26 @@ internal class ConfiguredAuthConnectFlowController(
 
     override suspend fun beginReauthentication(
         accountStableId: String,
+    ): AuthBrowserLaunchResult =
+        reauthenticate(
+            accountStableId = accountStableId,
+            acceptedStates = setOf(AccountSessionState.REAUTHENTICATION_REQUIRED),
+        )
+
+    override suspend fun beginWebSignInAgain(
+        accountStableId: String,
+    ): AuthBrowserLaunchResult =
+        reauthenticate(
+            accountStableId = accountStableId,
+            acceptedStates = setOf(
+                AccountSessionState.REAUTHENTICATION_REQUIRED,
+                AccountSessionState.CONNECTED,
+            ),
+        )
+
+    private suspend fun reauthenticate(
+        accountStableId: String,
+        acceptedStates: Set<AccountSessionState>,
     ): AuthBrowserLaunchResult {
         if (mutableUiState.value.inProgress) {
             return AuthBrowserLaunchResult.NotStarted
@@ -137,8 +168,7 @@ internal class ConfiguredAuthConnectFlowController(
             .firstOrNull { candidate ->
                 candidate.stableId == pinnedAccountId &&
                     candidate.source == AccountSessionSource.AUTHENTICATED &&
-                    candidate.state ==
-                    AccountSessionState.REAUTHENTICATION_REQUIRED
+                    candidate.state in acceptedStates
             } ?: return AuthBrowserLaunchResult.NotStarted
 
         // LAUNCHING first: a second tap while the store work runs finds it in progress.

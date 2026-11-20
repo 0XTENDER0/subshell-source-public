@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -222,8 +224,8 @@ internal fun FindTheResumedFeedPlace(
         state.endFeedPositionFind(scrollKey, outcome)
         if (outcome == ResumedPlaceSearch.NOT_FOUND) {
             notices.noticeInfo(
-                "Couldn't find where you left off",
-                "It wasn't in the newest posts, so the feed starts at the top.",
+                UiText.Resource(R.string.feed_resume_not_found_title),
+                UiText.Resource(R.string.feed_resume_not_found),
             )
         }
     }
@@ -253,8 +255,7 @@ internal suspend fun searchForResumedPlace(
     // have stopped changing.
     if (refreshed.failedOperation != RepositoryLoadOperation.REFRESH) awaitSteadyRows(itemKeys)
     log(
-        "resume-find refreshed applied=${refreshed.lastAppliedOperation} failed=${refreshed.failedOperation} " +
-            "rows=${itemKeys().size} found=${target in itemKeys()}",
+        "resume-find refreshed applied=${refreshed.lastAppliedOperation} failed=${refreshed.failedOperation} rows=${itemKeys().size} found=${target in itemKeys()}",
     )
     if (refreshed.failedOperation == RepositoryLoadOperation.REFRESH) return ResumedPlaceSearch.KEEP_STORED
     var pagesRead = 1

@@ -1,9 +1,15 @@
 package io.github.brealorg.subshell.ui
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
+// TRANSLATE14: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Crosspost01A1E3DestinationSupportPolicyTest {
     @Test
     fun explicitFalseStillBlocks() {
@@ -15,7 +21,7 @@ class Crosspost01A1E3DestinationSupportPolicyTest {
 
         assertEquals(
             "This community does not allow crossposts",
-            crosspostDestinationSupportBlockingMessage(destination),
+            crosspostDestinationSupportBlockingMessage(destination)?.s,
         )
     }
 

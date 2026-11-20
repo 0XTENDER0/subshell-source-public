@@ -29,6 +29,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlin.coroutines.cancellation.CancellationException
 import io.github.brealorg.subshell.data.auth.AUTH_CALLBACK_CANCELLED_TOKEN
 
+import io.github.brealorg.subshell.data.account.RedditModmailFailedAction
+
 // MODMAIL01A1_ACCOUNT_PINNED_READ_COORDINATOR_V1
 // MODMAIL02_REPLY_INTERNAL_NOTE_COORDINATOR_V1
 // MODMAIL04A1_ARCHIVE_UNARCHIVE_COORDINATOR_V1
@@ -50,7 +52,10 @@ internal class ModmailCoordinator(
     // conversation (shown only there, cleared when that thread loads again,
     // which is the refresh the composer asks for), and every finished request
     // clears its in-progress flag whichever conversation is selected.
-    private var unknownSendConversationId: String? = null
+    // ISSUE304_AN_UNKNOWN_SEND_BELONGS_TO_ITS_ACCOUNT_V1: kept with its account,
+    // so another account with the same conversation (a shared subreddit) is
+    // not told its reply may not have been sent.
+    private var unknownSend: Pair<String, String>? = null
 
     val uiState: StateFlow<RedditModmailUiState> = mutableUiState.asStateFlow()
 
@@ -120,6 +125,11 @@ internal class ModmailCoordinator(
             contentRevision = retained?.contentRevision ?: 0L,
             selectedConversationId = retained?.selectedConversationId.takeIf { keepOpenConversation },
             thread = retained?.thread.takeIf { keepOpenConversation },
+            // ISSUE304_A_WRITE_IN_FLIGHT_KEEPS_ITS_FLAG_V1: a list refresh while a
+            // reply, action or read change is still running keeps it blocked.
+            sendInProgress = retained?.sendInProgress == true,
+            conversationActionInProgress = retained?.conversationActionInProgress == true,
+            readStateMutationInProgress = retained?.readStateMutationInProgress == true,
         )
         applyListResult(
             account = account,
@@ -194,7 +204,7 @@ internal class ModmailCoordinator(
             threadLoading = true,
             conversationActionOutcomeUnknown = false,
             readStateOutcomeUnknown = false,
-            sendOutcomeUnknown = conversationId == unknownSendConversationId,
+            sendOutcomeUnknown = unknownSend == account to conversationId,
             failureKind = null,
             failureRetryable = false,
             failureHttpStatusCode = null,
@@ -206,7 +216,7 @@ internal class ModmailCoordinator(
                 if (!latest.matches(account) || latest.selectedConversationId != conversationId) {
                     return
                 }
-                if (conversationId == unknownSendConversationId) unknownSendConversationId = null
+                if (unknownSend == account to conversationId) unknownSend = null
                 mutableUiState.value = latest.copy(
                     sendOutcomeUnknown = false,
                     thread = result.thread,
@@ -246,6 +256,7 @@ internal class ModmailCoordinator(
                     latest.copy(
                         threadLoading = false,
                         failureKind = result.kind.toUiFailureKind(),
+                        failedAction = RedditModmailFailedAction.THREAD,
                         failureRetryable = result.retryable,
                         failureHttpStatusCode = result.httpStatusCode,
                         failureDetails = result.details,
@@ -322,20 +333,26 @@ internal class ModmailCoordinator(
                 )
                 refreshSelectedQueueAndUnreadCounts(account)
             }
+            // ISSUE304_RESULTS_STAY_WITH_THEIR_ACCOUNT_V1
             AuthenticatedRedditModmailThreadResult.AuthorizationRequired ->
-                mutableUiState.value = mutableUiState.value.copy(
-                    threadLoading = false,
-                    authorizationRequired = true,
-                    failureKind = null,
-                )
+                applyToConversation(account, conversationId) { latest ->
+                    latest.copy(
+                        threadLoading = false,
+                        authorizationRequired = true,
+                        failureKind = null,
+                    )
+                }
             is AuthenticatedRedditModmailThreadResult.Failed ->
-                mutableUiState.value = mutableUiState.value.copy(
-                    threadLoading = false,
-                    failureKind = result.kind.toUiFailureKind(),
-                    failureRetryable = result.retryable,
-                    failureHttpStatusCode = result.httpStatusCode,
-                    failureDetails = result.details,
-                )
+                applyToConversation(account, conversationId) { latest ->
+                    latest.copy(
+                        threadLoading = false,
+                        failureKind = result.kind.toUiFailureKind(),
+                        failedAction = RedditModmailFailedAction.THREAD,
+                        failureRetryable = result.retryable,
+                        failureHttpStatusCode = result.httpStatusCode,
+                        failureDetails = result.details,
+                    )
+                }
         }
     }
 
@@ -366,6 +383,7 @@ internal class ModmailCoordinator(
         if (configuredWriter == null) {
             mutableUiState.value = current.copy(
                 failureKind = RedditModmailUiFailureKind.CONFIGURATION,
+                failedAction = RedditModmailFailedAction.SEND,
                 failureRetryable = false,
                 sendOutcomeUnknown = false,
             )
@@ -408,7 +426,7 @@ internal class ModmailCoordinator(
                     mutableUiState.value = afterSend.copy(sendInProgress = false)
                     return
                 }
-                if (conversationId == unknownSendConversationId) unknownSendConversationId = null
+                if (unknownSend == account to conversationId) unknownSend = null
                 mutableUiState.value = afterSend.copy(
                     sendInProgress = false,
                     sendOutcomeUnknown = false,
@@ -450,6 +468,7 @@ internal class ModmailCoordinator(
                         applyToConversation(account, conversationId) { latest ->
                             latest.copy(
                                 failureKind = threadResult.kind.toUiFailureKind(),
+                                failedAction = RedditModmailFailedAction.THREAD,
                                 failureRetryable = threadResult.retryable,
                                 failureHttpStatusCode = threadResult.httpStatusCode,
                                 failureDetails = threadResult.details,
@@ -469,7 +488,7 @@ internal class ModmailCoordinator(
             }
             is AuthenticatedRedditModmailSendResult.Failed -> {
                 val latest = mutableUiState.value
-                if (result.outcomeUnknown) unknownSendConversationId = conversationId
+                if (result.outcomeUnknown) unknownSend = account to conversationId
                 if (!latest.matches(account)) return
                 if (latest.selectedConversationId != conversationId) {
                     mutableUiState.value = latest.copy(sendInProgress = false)
@@ -479,6 +498,7 @@ internal class ModmailCoordinator(
                     sendInProgress = false,
                     sendOutcomeUnknown = result.outcomeUnknown,
                     failureKind = result.kind.toUiFailureKind(),
+                    failedAction = RedditModmailFailedAction.SEND,
                     failureRetryable = false,
                     failureHttpStatusCode = result.httpStatusCode,
                     failureDetails = result.failureDetails,
@@ -505,7 +525,10 @@ internal class ModmailCoordinator(
             current.readStateMutationInProgress
         ) return
         val configuredWriter = writer ?: run {
-            mutableUiState.value = current.copy(failureKind = RedditModmailUiFailureKind.CONFIGURATION)
+            mutableUiState.value = current.copy(
+                failureKind = RedditModmailUiFailureKind.CONFIGURATION,
+                failedAction = RedditModmailFailedAction.ARCHIVE,
+            )
             return
         }
         mutableUiState.value = current.copy(
@@ -530,6 +553,8 @@ internal class ModmailCoordinator(
         }
         when (result) {
             AuthenticatedRedditModmailArchiveResult.Applied -> {
+                // ISSUE304_RESULTS_STAY_WITH_THEIR_ACCOUNT_V1
+                if (!mutableUiState.value.matches(account)) return
                 mutableUiState.value = mutableUiState.value.copy(
                     conversationActionInProgress = false,
                     conversationActionOutcomeUnknown = false,
@@ -555,6 +580,7 @@ internal class ModmailCoordinator(
                         applyToConversation(account, conversationId) {
                             it.copy(
                                 failureKind = threadResult.kind.toUiFailureKind(),
+                                failedAction = RedditModmailFailedAction.THREAD,
                                 failureRetryable = threadResult.retryable,
                                 failureHttpStatusCode = threadResult.httpStatusCode,
                                 failureDetails = threadResult.details,
@@ -593,6 +619,7 @@ internal class ModmailCoordinator(
                         conversationActionInProgress = false,
                         conversationActionOutcomeUnknown = result.outcomeUnknown,
                         failureKind = result.kind.toUiFailureKind(),
+                        failedAction = RedditModmailFailedAction.ARCHIVE,
                         failureRetryable = false,
                         failureHttpStatusCode = result.httpStatusCode,
                         failureDetails = result.failureDetails,
@@ -638,6 +665,7 @@ internal class ModmailCoordinator(
         val configuredWriter = writer ?: run {
             mutableUiState.value = current.copy(
                 failureKind = RedditModmailUiFailureKind.CONFIGURATION,
+                failedAction = RedditModmailFailedAction.TRIAGE,
             )
             return
         }
@@ -669,6 +697,8 @@ internal class ModmailCoordinator(
 
         when (result) {
             AuthenticatedRedditModmailTriageResult.Applied -> {
+                // ISSUE304_RESULTS_STAY_WITH_THEIR_ACCOUNT_V1
+                if (!mutableUiState.value.matches(account)) return
                 mutableUiState.value = mutableUiState.value.copy(
                     conversationActionInProgress = false,
                     conversationActionOutcomeUnknown = false,
@@ -704,6 +734,7 @@ internal class ModmailCoordinator(
                         applyToConversation(account, conversationId) {
                             it.copy(
                                 failureKind = threadResult.kind.toUiFailureKind(),
+                                failedAction = RedditModmailFailedAction.THREAD,
                                 failureRetryable = threadResult.retryable,
                                 failureHttpStatusCode = threadResult.httpStatusCode,
                                 failureDetails = threadResult.details,
@@ -747,6 +778,7 @@ internal class ModmailCoordinator(
                         conversationActionInProgress = false,
                         conversationActionOutcomeUnknown = result.outcomeUnknown,
                         failureKind = result.kind.toUiFailureKind(),
+                        failedAction = RedditModmailFailedAction.TRIAGE,
                         failureRetryable = false,
                         failureHttpStatusCode = result.httpStatusCode,
                         failureDetails = result.failureDetails,
@@ -775,6 +807,7 @@ internal class ModmailCoordinator(
         val configuredWriter = writer ?: run {
             mutableUiState.value = current.copy(
                 failureKind = RedditModmailUiFailureKind.CONFIGURATION,
+                failedAction = RedditModmailFailedAction.READ_STATE,
                 readStateOutcomeUnknown = false,
             )
             return
@@ -849,24 +882,36 @@ internal class ModmailCoordinator(
                 )
                 refreshSelectedQueueAndUnreadCounts(account)
             }
+            // ISSUE304_RESULTS_STAY_WITH_THEIR_ACCOUNT_V1
             AuthenticatedRedditModmailReadStateResult.AuthorizationRequired ->
-                mutableUiState.value = mutableUiState.value.copy(
-                    readStateMutationInProgress = false,
-                    readStateOutcomeUnknown = false,
-                    authorizationRequired = true,
-                    failureKind = null,
-                )
+                applyToConversation(
+                    account,
+                    conversationId,
+                    elsewhere = { it.copy(readStateMutationInProgress = false) },
+                ) {
+                    it.copy(
+                        readStateMutationInProgress = false,
+                        readStateOutcomeUnknown = false,
+                        authorizationRequired = true,
+                        failureKind = null,
+                    )
+                }
             is AuthenticatedRedditModmailReadStateResult.Failed ->
-                mutableUiState.value = if (mutableUiState.value.selectedConversationId != conversationId) {
-                    mutableUiState.value.copy(readStateMutationInProgress = false)
-                } else mutableUiState.value.copy(
-                    readStateMutationInProgress = false,
-                    readStateOutcomeUnknown = result.outcomeUnknown,
-                    failureKind = result.kind.toUiFailureKind(),
-                    failureRetryable = false,
-                    failureHttpStatusCode = result.httpStatusCode,
-                    failureDetails = result.failureDetails,
-                )
+                applyToConversation(
+                    account,
+                    conversationId,
+                    elsewhere = { it.copy(readStateMutationInProgress = false) },
+                ) {
+                    it.copy(
+                        readStateMutationInProgress = false,
+                        readStateOutcomeUnknown = result.outcomeUnknown,
+                        failureKind = result.kind.toUiFailureKind(),
+                        failedAction = RedditModmailFailedAction.READ_STATE,
+                        failureRetryable = false,
+                        failureHttpStatusCode = result.httpStatusCode,
+                        failureDetails = result.failureDetails,
+                    )
+                }
         }
     }
 
@@ -890,11 +935,12 @@ internal class ModmailCoordinator(
             selectedConversationId = null,
             thread = null,
             threadLoading = false,
-            sendInProgress = false,
+            // ISSUE304_A_WRITE_IN_FLIGHT_KEEPS_ITS_FLAG_V1 (#304): closing cleared
+            // the in-progress flags while the request still ran, so Back, reopen
+            // and Send again sent a second reply. Each request clears its own
+            // flag when it ends, whichever conversation is open.
             sendOutcomeUnknown = false,
-            conversationActionInProgress = false,
             conversationActionOutcomeUnknown = false,
-            readStateMutationInProgress = false,
             readStateOutcomeUnknown = false,
             failureKind = null,
             failureRetryable = false,
@@ -1078,6 +1124,7 @@ internal class ModmailCoordinator(
                 appending = false,
                 authorizing = false,
                 failureKind = result.kind.toUiFailureKind(),
+                failedAction = null,
                 failureRetryable = result.retryable,
                 failureHttpStatusCode = result.httpStatusCode,
                 failureDetails = result.details,

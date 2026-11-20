@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Immutable
 import java.nio.charset.StandardCharsets
 import java.util.Base64
@@ -215,8 +217,8 @@ internal enum class SearchProviderKind {
 @Immutable
 internal data class SearchDirectAction(
     val target: RedditTarget,
-    val title: String,
-    val subtitle: String,
+    val title: UiText,
+    val subtitle: UiText,
 )
 
 @Immutable
@@ -584,59 +586,71 @@ private fun normalizeSearchHistoryEntry(value: String): String = normalizeSearch
 private fun RedditTarget.toSearchDirectAction(): SearchDirectAction = when (this) {
     is RedditTarget.Community -> SearchDirectAction(
         target = this,
-        title = "Open r/$name",
-        subtitle = sort?.let { "Community · ${it.label}" } ?: "Community",
+        title = UiText.Resource(R.string.search_direct_open_community, name),
+        subtitle = sort?.let { UiText.Resource(R.string.search_direct_community_sorted, UiText.Resource(it.labelRes)) }
+            ?: UiText.Resource(R.string.search_direct_community),
     )
     is RedditTarget.Search -> SearchDirectAction(
         target = this,
-        title = "Search Reddit for \"$query\"",
-        subtitle = community?.let { "In r/$it" } ?: "Search",
+        title = UiText.Resource(R.string.search_direct_search_reddit_for, query),
+        subtitle = community?.let { UiText.Resource(R.string.search_direct_in_community, it) }
+            ?: UiText.Resource(R.string.search_direct_search),
     )
     is RedditTarget.CustomFeed -> SearchDirectAction(
         target = this,
-        title = "Open custom feed $name",
-        subtitle = owner?.let { "By u/$it" } ?: "Your custom feed",
+        title = UiText.Resource(R.string.search_direct_open_custom_feed, name),
+        subtitle = owner?.let { UiText.Resource(R.string.search_direct_by_user, it) }
+            ?: UiText.Resource(R.string.search_direct_your_custom_feed),
     )
     is RedditTarget.Compose -> SearchDirectAction(
         target = this,
-        title = "Message u/$recipient",
-        subtitle = "New message",
+        title = UiText.Resource(R.string.search_direct_message_user, recipient),
+        subtitle = UiText.Resource(R.string.search_direct_new_message),
     )
     is RedditTarget.ShareLink -> SearchDirectAction(
         target = this,
-        title = "Open shared Reddit link",
-        subtitle = "Reddit share link",
+        title = UiText.Resource(R.string.search_direct_open_shared_link),
+        subtitle = UiText.Resource(R.string.search_direct_share_link),
     )
     is RedditTarget.Image -> SearchDirectAction(
         target = this,
-        title = if (animated) "Open GIF" else "Open image",
-        subtitle = runCatching { java.net.URI(url).host }.getOrNull() ?: "Reddit media",
+        title = if (animated) {
+            UiText.Resource(R.string.search_direct_open_gif)
+        } else {
+            UiText.Resource(R.string.search_direct_open_image)
+        },
+        subtitle = runCatching { java.net.URI(url).host }.getOrNull()?.let { UiText.Plain(it) }
+            ?: UiText.Resource(R.string.search_direct_reddit_media),
     )
     is RedditTarget.Feed -> SearchDirectAction(
         target = this,
-        title = "Open ${source.label}",
-        subtitle = "Feed",
+        title = UiText.Resource(R.string.search_direct_open_feed, UiText.Resource(source.labelRes)),
+        subtitle = UiText.Resource(R.string.search_direct_feed),
     )
     is RedditTarget.User -> SearchDirectAction(
         target = this,
-        title = "Open u/$username",
-        subtitle = tab?.let { "User profile · ${it.name.lowercase().replaceFirstChar(Char::uppercase)}" }
-            ?: "User profile",
+        title = UiText.Resource(R.string.search_direct_open_user, username),
+        subtitle = tab?.let {
+            UiText.Resource(
+                R.string.search_direct_user_profile_tab,
+                it.name.lowercase().replaceFirstChar(Char::uppercase),
+            )
+        } ?: UiText.Resource(R.string.search_direct_user_profile),
     )
     is RedditTarget.Post -> SearchDirectAction(
         target = this,
-        title = "Open Reddit post",
-        subtitle = "t3_$postId",
+        title = UiText.Resource(R.string.search_direct_open_post),
+        subtitle = UiText.Plain("t3_$postId"),
     )
     is RedditTarget.Comment -> SearchDirectAction(
         target = this,
-        title = "Open Reddit comment",
-        subtitle = "t1_$commentId · t3_$postId",
+        title = UiText.Resource(R.string.search_direct_open_comment),
+        subtitle = UiText.Plain("t1_$commentId · t3_$postId"),
     )
     is RedditTarget.InlineVideo -> SearchDirectAction(
         target = this,
-        title = "Play Reddit video",
-        subtitle = "v.redd.it/$mediaId",
+        title = UiText.Resource(R.string.search_direct_play_video),
+        subtitle = UiText.Plain("v.redd.it/$mediaId"),
     )
 }
 

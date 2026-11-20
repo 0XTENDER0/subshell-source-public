@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertFalse
@@ -11,7 +12,7 @@ class AuthBug01OnboardingPolicyTest {
     fun clientIdConfigurationReloadStartsFreshRootTaskWithoutFinishRace() {
         val activity = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/MainActivity.kt",
-        ).readText()
+        ).readSourceText()
 
         val reload = activity
             .substringAfter("private fun reloadRedditConfigurationHost() {")
@@ -31,7 +32,7 @@ class AuthBug01OnboardingPolicyTest {
     fun firstRunSetupIsANeutralStepAndExampleIsClearlyStatic() {
         val screen = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/RedditOnboardingScreen.kt",
-        ).readText()
+        ).readSourceText()
 
         assertTrue(screen.contains("Setup required before sign-in"))
         assertTrue(screen.contains("Show me how to get a Client ID"))

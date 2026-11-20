@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.CircleShape
@@ -173,7 +175,7 @@ internal fun SubshellDrawer(
     ) {
         SubshellWordmark(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 14.dp),
-            subtitle = "Your Reddit, your way",
+            subtitle = stringResource(R.string.drawer_tagline),
         )
 
         // M3223_DRAWER_ROWS_ARE_MATERIAL_DRAWER_ITEMS_V1: the drawer uses the app's
@@ -188,18 +190,18 @@ internal fun SubshellDrawer(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 item("drawer-feeds-title") {
-                    DrawerSectionLabel("Feeds")
+                    DrawerSectionLabel(stringResource(R.string.drawer_section_feeds))
                 }
                 items(
                     items = listOf(
-                        Triple(FeedSource.HOME, Symbols.Home, "Home"),
-                        Triple(FeedSource.POPULAR, Symbols.TrendingUp, "Popular"),
-                        Triple(FeedSource.ALL, Symbols.Public, "All"),
+                        Triple(FeedSource.HOME, Symbols.Home, R.string.nav_home),
+                        Triple(FeedSource.POPULAR, Symbols.TrendingUp, R.string.feed_popular),
+                        Triple(FeedSource.ALL, Symbols.Public, R.string.feed_all),
                     ),
                     key = { (source, _, _) -> "drawer-feed-${source.name}" },
                 ) { (source, icon, label) ->
                     CompactDrawerItem(
-                        label = label,
+                        label = stringResource(label),
                         icon = icon,
                         selected = activeCustomFeedPath == null &&
                             state.destination == MainDestination.HOME &&
@@ -215,7 +217,7 @@ internal fun SubshellDrawer(
                 if (drawerCustomFeeds.isNotEmpty()) {
                     item("drawer-custom-feeds-header") {
                         CompactDrawerItem(
-                            label = "Custom feeds · ${drawerCustomFeeds.size}",
+                            label = stringResource(R.string.drawer_custom_feeds_count, drawerCustomFeeds.size),
                             icon = Symbols.ViewList,
                             // LOWUX3_CUSTOM_FEEDS_HEADER_SELECTED_ONLY_ON_HOME_V1 (OCB-123):
                             // a remembered feed kept it lit next to Inbox or Profile.
@@ -240,9 +242,9 @@ internal fun SubshellDrawer(
                                         Symbols.KeyboardArrowRight
                                     },
                                     contentDescription = if (customFeedsExpanded) {
-                                        "Collapse custom feeds"
+                                        stringResource(R.string.all_collapse_custom_feeds)
                                     } else {
-                                        "Expand custom feeds"
+                                        stringResource(R.string.all_expand_custom_feeds)
                                     },
                                     modifier = Modifier.size(20.dp),
                                 )
@@ -280,7 +282,7 @@ internal fun SubshellDrawer(
                     DrawerCommunitiesMode.CURRENT -> {
                         item("drawer-communities-current") {
                             CompactDrawerItem(
-                                label = "Communities",
+                                label = stringResource(R.string.drawer_communities),
                                 icon = Symbols.Groups,
                                 selected = state.destination == MainDestination.SUBS &&
                                     state.secondaryDestination == null &&
@@ -292,7 +294,7 @@ internal fun SubshellDrawer(
                     DrawerCommunitiesMode.COLLAPSIBLE -> {
                         item("drawer-communities-header") {
                             CompactDrawerItem(
-                                label = "Communities",
+                                label = stringResource(R.string.drawer_communities),
                                 icon = Symbols.Groups,
                                 selected = state.destination == MainDestination.SUBS &&
                                     state.secondaryDestination == null &&
@@ -319,9 +321,9 @@ internal fun SubshellDrawer(
                                                 Symbols.KeyboardArrowRight
                                             },
                                             contentDescription = if (communitiesExpanded) {
-                                                "Collapse communities"
+                                                stringResource(R.string.all_collapse_communities)
                                             } else {
-                                                "Expand communities"
+                                                stringResource(R.string.all_expand_communities)
                                             },
                                             modifier = Modifier.size(20.dp),
                                         )
@@ -341,7 +343,7 @@ internal fun SubshellDrawer(
                     DrawerCommunitiesMode.FULL -> {
                         item("drawer-communities-header") {
                             CompactDrawerItem(
-                                label = "Communities",
+                                label = stringResource(R.string.drawer_communities),
                                 icon = Symbols.Groups,
                                 selected = state.destination == MainDestination.SUBS &&
                                     state.secondaryDestination == null &&
@@ -362,11 +364,11 @@ internal fun SubshellDrawer(
                     DrawerSectionDivider()
                 }
                 item("drawer-you-title") {
-                    DrawerSectionLabel("You")
+                    DrawerSectionLabel(stringResource(R.string.drawer_section_you))
                 }
                 item("drawer-you-inbox") {
                     CompactDrawerItem(
-                        label = "Inbox",
+                        label = stringResource(R.string.drawer_inbox),
                         icon = Symbols.Inbox,
                         selected = state.destination == MainDestination.INBOX &&
                             state.secondaryDestination == null,
@@ -375,7 +377,7 @@ internal fun SubshellDrawer(
                 }
                 item("drawer-you-profile") {
                     CompactDrawerItem(
-                        label = "Profile",
+                        label = stringResource(R.string.drawer_profile),
                         icon = Symbols.Person,
                         selected = state.destination == MainDestination.YOU &&
                             state.secondaryDestination == null,
@@ -397,7 +399,7 @@ internal fun SubshellDrawer(
                         var layoutMenuOpen by remember { mutableStateOf(false) }
                         Box {
                             CompactDrawerItem(
-                                label = "Post layout · ${state.postLayout.label}",
+                                label = "Post layout · ${stringResource(state.postLayout.labelRes)}",
                                 icon = postLayoutIcon(state.postLayout),
                                 selected = false,
                                 isDestination = false,
@@ -425,7 +427,7 @@ internal fun SubshellDrawer(
 
         if (activeCommunityMutes.isNotEmpty()) {
             CompactDrawerItem(
-                label = "Muted communities",
+                label = stringResource(R.string.drawer_muted_communities),
                 icon = Symbols.VolumeOff,
                 selected = false,
                 onClick = {
@@ -440,7 +442,7 @@ internal fun SubshellDrawer(
         }
 
         CompactDrawerItem(
-            label = "Show NSFW posts",
+            label = stringResource(R.string.drawer_show_nsfw),
             icon = if (state.showNsfwPosts) Symbols.Visibility else Symbols.VisibilityOff,
             selected = false,
             isDestination = false,
@@ -461,7 +463,7 @@ internal fun SubshellDrawer(
 
         if (state.offersRandomNsfwCommunity(io.github.brealorg.subshell.ui.RandomNsfwCommunityPlacement.MENU) && onRandomNsfwCommunity != null) {
             CompactDrawerItem(
-                label = "Random NSFW community",
+                label = stringResource(R.string.drawer_random_nsfw),
                 icon = Symbols.Shuffle,
                 selected = false,
                 isDestination = false,
@@ -470,7 +472,7 @@ internal fun SubshellDrawer(
         }
 
         CompactDrawerItem(
-            label = "Settings",
+            label = stringResource(R.string.drawer_settings),
             icon = Symbols.Settings,
             selected = state.secondaryDestination == SecondaryDestination.SETTINGS,
             onClick = { onAction { state.openSecondary(SecondaryDestination.SETTINGS) } },
@@ -570,7 +572,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.drawerCommunityGroups
 
     if (favorites.isNotEmpty()) {
         item("drawer-favorite-communities-title") {
-            DrawerCommunitySubsectionLabel("Favorites")
+            DrawerCommunitySubsectionLabel(stringResource(R.string.all_favorites))
         }
         drawerCommunityItems(
             state = state,
@@ -583,7 +585,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.drawerCommunityGroups
 
     if (recent.isNotEmpty()) {
         item("drawer-recent-communities-title") {
-            DrawerCommunitySubsectionLabel("Recent")
+            DrawerCommunitySubsectionLabel(stringResource(R.string.all_recent))
         }
         drawerCommunityItems(
             state = state,
@@ -597,7 +599,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.drawerCommunityGroups
     if (otherCommunities.isNotEmpty()) {
         if (favorites.isNotEmpty() || recent.isNotEmpty()) {
             item("drawer-other-communities-title") {
-                DrawerCommunitySubsectionLabel("Other communities")
+                DrawerCommunitySubsectionLabel(stringResource(R.string.all_other_communities))
             }
         }
         drawerCommunityItems(
@@ -633,7 +635,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.drawerCommunityItems(
     if (communities.isEmpty()) {
         item("$keyPrefix-empty") {
             Text(
-                text = "No cached joined communities",
+                text = stringResource(R.string.drawer_no_cached_communities),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 28.dp, vertical = 10.dp),
@@ -652,7 +654,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.drawerCommunityItems(
                 .padding(start = 20.dp),
             label = {
                 Text(
-                    text = "r/${community.name}",
+                    text = stringResource(R.string.scr_r, community.name),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     softWrap = false,
@@ -680,7 +682,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.drawerCommunityItems(
                         Icon(
                             imageVector = Symbols.VolumeOff,
                             contentDescription =
-                                "Mute settings for r/${community.name}",
+                                stringResource(R.string.drawer_mute_settings_for, community.name),
                             modifier = Modifier.size(18.dp),
                             tint = MaterialTheme.colorScheme.primary,
                         )
@@ -757,7 +759,7 @@ private fun DrawerThemeSelector(
                 label = {
                     // ISSUE31_DRAWER_THEME_LABELS_ONE_LINE_V1: one line, shrinks instead of breaking.
                     OneLineAutoSizeLabel(
-                        text = mode.shortLabel,
+                        text = stringResource(mode.shortLabelRes),
                         style = MaterialTheme.typography.labelLarge,
                     )
                 },

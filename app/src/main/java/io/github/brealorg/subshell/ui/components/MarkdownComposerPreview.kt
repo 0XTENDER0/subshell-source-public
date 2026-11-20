@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +29,7 @@ fun MarkdownComposerPreview(text: String, modifier: Modifier = Modifier) {
         Box(Modifier.fillMaxWidth().padding(16.dp)) {
             if (text.isBlank()) {
                 Text(
-                    "Nothing to preview yet",
+                    stringResource(R.string.all_nothing_to_preview_yet),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {

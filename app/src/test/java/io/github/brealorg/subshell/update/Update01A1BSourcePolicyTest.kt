@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertFalse
@@ -168,12 +169,12 @@ class Update01A1BSourcePolicyTest {
             .listFiles { file -> file.extension == "kt" }
             .orEmpty()
             .sortedBy { file -> file.name }
-            .joinToString("") { file -> file.readText() }
+            .joinToString("") { file -> file.readSourceText() }
         return source("app/src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/SubshellApp.kt") + extracted
     }
 
     private fun source(relative: String): String =
         File(root, relative).also { file ->
             check(file.exists()) { "Missing fixture: ${file.path}" }
-        }.readText()
+        }.readSourceText()
 }

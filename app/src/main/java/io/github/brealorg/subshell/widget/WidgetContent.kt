@@ -43,7 +43,8 @@ internal sealed interface InboxWidgetContent {
 
 /** Where a Posts widget takes its posts from: Home, or one community. */
 internal data class PostsWidgetSource(val community: String?) {
-    val label: String get() = community?.let { name -> "r/$name" } ?: "Home"
+    fun label(context: android.content.Context): String =
+        community?.let { name -> "r/$name" } ?: context.getString(io.github.brealorg.subshell.R.string.nav_home)
 
     companion object {
         val Home = PostsWidgetSource(community = null)
@@ -136,8 +137,11 @@ internal fun postsWidgetContent(
     return PostsWidgetContent.Shown(source = source, rows = rows)
 }
 
+/** Shown through the widget's own `widget_message` (Glance reads it with the context). */
+internal const val WIDGET_UNTITLED_MESSAGE = "Message"
+
 private fun InboxItem.widgetTitle(): String = when (kind) {
-    ActivityKind.MESSAGE -> title.ifBlank { "Message" }
+    ActivityKind.MESSAGE -> title.ifBlank { WIDGET_UNTITLED_MESSAGE }
     else -> postTitle?.takeIf(String::isNotBlank)?.let { post -> "$title · $post" } ?: title
 }
 

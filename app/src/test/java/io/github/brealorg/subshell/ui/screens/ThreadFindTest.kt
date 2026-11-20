@@ -1,10 +1,16 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.s
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import io.github.brealorg.subshell.model.Comment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class ThreadFindTest {
     private fun comment(id: String, body: String, depth: Int = 0, children: List<Comment> = emptyList(), more: Boolean = false) =
         Comment(
@@ -75,8 +81,8 @@ class ThreadFindTest {
         assertEquals("0/0", threadFindCountLabel(active = -1, size = 0))
         assertEquals("–/4", threadFindCountLabel(active = -1, size = 4))
         assertEquals("2/4", threadFindCountLabel(active = 1, size = 4))
-        assertEquals("No matches", threadFindCountDescription(active = -1, size = 0))
-        assertEquals("4 matches", threadFindCountDescription(active = -1, size = 4))
-        assertEquals("Match 2 of 4", threadFindCountDescription(active = 1, size = 4))
+        assertEquals("No matches", threadFindCountDescription(active = -1, size = 0).s)
+        assertEquals("4 matches", threadFindCountDescription(active = -1, size = 4).s)
+        assertEquals("Match 2 of 4", threadFindCountDescription(active = 1, size = 4).s)
     }
 }

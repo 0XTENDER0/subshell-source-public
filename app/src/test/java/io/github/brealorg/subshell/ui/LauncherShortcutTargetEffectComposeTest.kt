@@ -139,7 +139,7 @@ class LauncherShortcutTargetEffectComposeTest {
         assertNull(harness.feedTarget.value)
         val notice = harness.notices.currentRequest
         assertEquals(LauncherShortcutNoticeScope, notice?.scopeKey)
-        assertEquals("Switch to u/alice", notice?.presentation?.title)
+        assertEquals("Switch to u/alice", notice?.presentation?.title?.s)
     }
 
     @Test
@@ -152,6 +152,6 @@ class LauncherShortcutTargetEffectComposeTest {
         composeRule.waitForIdle()
 
         assertNull(harness.activeCustomFeedPath.value)
-        assertEquals("Custom feed not found", harness.notices.currentRequest?.presentation?.title)
+        assertEquals("Custom feed not found", harness.notices.currentRequest?.presentation?.title?.s)
     }
 }

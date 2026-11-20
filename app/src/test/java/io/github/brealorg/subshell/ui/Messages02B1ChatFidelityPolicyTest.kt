@@ -6,6 +6,8 @@ import io.github.brealorg.subshell.ui.screens.inboxMessageSubjectLabel
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class Messages02B1ChatFidelityPolicyTest {
     @Test
     fun directChatTransportSubjectIsNeverExposedInMessagesList() {
@@ -17,7 +19,7 @@ class Messages02B1ChatFidelityPolicyTest {
             age = "1m",
             preview = "hello",
         )
-        assertEquals("Direct chat", inboxMessageSubjectLabel(item))
+        assertEquals("Direct chat", inboxMessageSubjectLabel(item).s)
     }
 
     @Test
@@ -30,6 +32,6 @@ class Messages02B1ChatFidelityPolicyTest {
             age = "1d",
             preview = "hello",
         )
-        assertEquals("Icons in boost?", inboxMessageSubjectLabel(item))
+        assertEquals("Icons in boost?", inboxMessageSubjectLabel(item).s)
     }
 }

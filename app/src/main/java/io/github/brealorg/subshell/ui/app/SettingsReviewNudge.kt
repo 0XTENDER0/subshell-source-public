@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.compose.runtime.Composable
@@ -30,10 +33,10 @@ private const val DONE_KEY = "done"
 
 internal fun settingsReviewNudgePresentation(): ErrorPresentation = ErrorPresentation(
     kind = ErrorPresentationKind.DEGRADED,
-    title = "Make subshell yours",
-    message = "Settings has choices for the theme, feeds, video, comments and more.",
-    primaryAction = ErrorAction(ErrorActionKind.RETRY, "Open Settings"),
-    secondaryAction = ErrorAction(ErrorActionKind.DISMISS, "Dismiss"),
+    title = UiText.Resource(R.string.notice_settingsrevi_make_subshell_yours),
+    message = UiText.Resource(R.string.notice_settingsrevi_settings_has_choices_for_the_theme_feeds),
+    primaryAction = ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.notice_settingsrevi_open_settings)),
+    secondaryAction = ErrorAction(ErrorActionKind.DISMISS, UiText.Resource(R.string.notice_settingsrevi_dismiss)),
 )
 
 /** What the nudge should do now; a pure decision so it can be tested. */

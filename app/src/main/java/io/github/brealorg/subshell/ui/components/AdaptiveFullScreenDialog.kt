@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -46,7 +48,7 @@ internal fun AdaptiveFullScreenDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     closeEnabled: Boolean = true,
-    closeLabel: String = "Close",
+    closeLabel: String = stringResource(R.string.all_close),
     navigationIcon: (@Composable () -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,

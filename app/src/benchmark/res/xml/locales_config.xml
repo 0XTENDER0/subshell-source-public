@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TRANSLATE10_RELEASE_SHIPS_ONLY_FINISHED_LANGUAGES_V1: the languages this
+     build ships (app/build.gradle.kts SUBSHELL_RELEASE_LOCALE_FILTER). The
+     unfinished ones stay in src/main/res/xml/locales_config.xml for debug and
+     lane builds. Add a language here and to the filter when it is finished. -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+</locale-config>

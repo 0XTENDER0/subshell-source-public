@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.data.normalizeRedditCommunityName
 import io.github.brealorg.subshell.model.Post
 
@@ -20,16 +22,19 @@ data class CommunityMute(
         expiresAtEpochMillis == null || expiresAtEpochMillis > nowEpochMillis
 }
 
+// TRANSLATE14_MUTE_PRESETS_ARE_WHOLE_SENTENCES_V1: "Automatically unmute after"
+// took the lowercased English label; each preset has its own sentence.
 enum class CommunityMutePreset(
-    val label: String,
+    @androidx.annotation.StringRes val labelRes: Int,
+    @androidx.annotation.StringRes val unmuteAfterRes: Int?,
     val durationMillis: Long?,
 ) {
-    ONE_HOUR("1 hour", COMMUNITY_MUTE_ONE_HOUR_MILLIS),
-    EIGHT_HOURS("8 hours", COMMUNITY_MUTE_EIGHT_HOURS_MILLIS),
-    ONE_DAY("24 hours", COMMUNITY_MUTE_ONE_DAY_MILLIS),
-    THREE_DAYS("3 days", COMMUNITY_MUTE_THREE_DAYS_MILLIS),
-    ONE_WEEK("1 week", COMMUNITY_MUTE_ONE_WEEK_MILLIS),
-    INDEFINITE("Indefinitely", null),
+    ONE_HOUR(R.string.mute_preset_1_hour, R.string.mute_unmute_after_1_hour, COMMUNITY_MUTE_ONE_HOUR_MILLIS),
+    EIGHT_HOURS(R.string.mute_preset_8_hours, R.string.mute_unmute_after_8_hours, COMMUNITY_MUTE_EIGHT_HOURS_MILLIS),
+    ONE_DAY(R.string.mute_preset_24_hours, R.string.mute_unmute_after_24_hours, COMMUNITY_MUTE_ONE_DAY_MILLIS),
+    THREE_DAYS(R.string.mute_preset_3_days, R.string.mute_unmute_after_3_days, COMMUNITY_MUTE_THREE_DAYS_MILLIS),
+    ONE_WEEK(R.string.mute_preset_1_week, R.string.mute_unmute_after_1_week, COMMUNITY_MUTE_ONE_WEEK_MILLIS),
+    INDEFINITE(R.string.mute_preset_indefinitely, null, null),
     ;
 
     fun expiryFrom(nowEpochMillis: Long): Long? = durationMillis?.let { duration ->
@@ -139,16 +144,16 @@ internal const val MUTED_COMMUNITY_DIRECT_VIEW_MODE_KEY =
     "muted_community_direct_view_mode"
 
 enum class MutedCommunityDirectViewMode(
-    val label: String,
-    val description: String,
+    @androidx.annotation.StringRes val labelRes: Int,
+    @androidx.annotation.StringRes val descriptionRes: Int,
 ) {
     SHOW_POSTS(
-        label = "Show posts",
-        description = "Direct visits can still show posts while the community is muted",
+        labelRes = R.string.muted_direct_view_show_posts_label,
+        descriptionRes = R.string.muted_direct_view_show_posts_description,
     ),
     ABOUT_ONLY(
-        label = "About only",
-        description = "Direct visits show community information without any posts",
+        labelRes = R.string.muted_direct_view_about_only_label,
+        descriptionRes = R.string.muted_direct_view_about_only_description,
     ),
 }
 

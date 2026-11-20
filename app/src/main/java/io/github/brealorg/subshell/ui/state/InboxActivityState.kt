@@ -67,6 +67,37 @@ internal class InboxActivityState(
     // GIF attached to an unsent reply, under the draft's key.
     private val messageConversationMedia = mutableStateMapOf<String, ComposerMediaAttachment>()
     val readInboxIds = mutableStateListOf<String>()
+    // ISSUE304_MODMAIL_DRAFT_SURVIVES_CLOSING_V1
+    private val modmailDrafts = mutableStateMapOf<String, io.github.brealorg.subshell.data.account.RedditModmailDraft>()
+
+    fun modmailDraft(
+        accountStableId: String,
+        conversationId: String,
+    ): io.github.brealorg.subshell.data.account.RedditModmailDraft? =
+        modmailDrafts[messageConversationDraftKey(accountStableId, "modmail:$conversationId")]
+
+    internal fun modmailDraftsForSnapshot(): Map<String, io.github.brealorg.subshell.data.account.RedditModmailDraft> =
+        modmailDrafts.toMap()
+
+    internal fun restoreModmailDrafts(drafts: Map<String, io.github.brealorg.subshell.data.account.RedditModmailDraft>) {
+        drafts.forEach { (key, draft) ->
+            if (key.isNotBlank() && draft != io.github.brealorg.subshell.data.account.RedditModmailDraft()) modmailDrafts[key] = draft
+        }
+    }
+
+    fun updateModmailDraft(
+        accountStableId: String,
+        conversationId: String,
+        draft: io.github.brealorg.subshell.data.account.RedditModmailDraft,
+    ) {
+        val key = messageConversationDraftKey(accountStableId, "modmail:$conversationId")
+        val bounded = draft.copy(text = draft.text.take(10_000))
+        if (bounded == io.github.brealorg.subshell.data.account.RedditModmailDraft()) {
+            modmailDrafts.remove(key)
+        } else {
+            modmailDrafts[key] = bounded
+        }
+    }
 
     internal fun consumeInboxReadReceipt(
         postId: String,

@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.data.account.ModeratorReportTarget
 import io.github.brealorg.subshell.data.account.ModeratorReportsUiState
 import io.github.brealorg.subshell.data.account.RedditModerationUiState
@@ -12,7 +15,7 @@ import io.github.brealorg.subshell.data.account.RedditModeratorQueueKind
 internal data class ModeratorReportLookupContent(
     val queueItems: List<RedditModeratorQueueItem>,
     val recentTargets: List<ModeratorReportTarget>,
-    val queueMessage: String?,
+    val queueMessage: io.github.brealorg.subshell.ui.UiText?,
 )
 
 internal fun moderatorReportLookupContent(
@@ -23,7 +26,7 @@ internal fun moderatorReportLookupContent(
     if (!moderation.matchesAccount(accountStableId)) {
         return ModeratorReportLookupContent(
             emptyList(), emptyList(),
-            "The queue is unavailable for this account. Open an item by link or ID.",
+            io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.comp_report_lookup_other_account),
         )
     }
     val queueItems = if (moderation.queueLoaded) {
@@ -46,19 +49,19 @@ internal fun moderatorReportLookupContent(
         emptyList()
     }
     val queueMessage = when {
-        moderation.queueLoading -> "Loading the moderation queue…"
+        moderation.queueLoading -> io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.comp_report_lookup_loading)
         moderation.queueFailureKind != null ->
-            "The queue could not be refreshed. Any items shown are from the last successful load."
+            io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.comp_report_lookup_failed)
         !moderation.queueLoaded ->
-            "No queue has been loaded. Open an item by link or ID, or return to the queue to refresh."
+            io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.comp_report_lookup_not_loaded)
         queueItems.isEmpty() ->
-            "No items from the loaded queue are available here. You can still open an item by link or ID."
+            io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.comp_report_lookup_empty)
         moderation.queueNextCursor != null ->
-            "Showing loaded items only. More may be available in the moderation queue."
+            io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.comp_report_lookup_more)
         else -> null
     }
     return ModeratorReportLookupContent(queueItems, recentTargets, queueMessage)
 }
 
-internal fun moderatorReportQuantity(count: Int): String =
-    if (count == 1) "1 report" else "$count reports"
+internal fun moderatorReportQuantity(count: Int): UiText =
+    UiText.Plural(R.plurals.report_count, count, count)

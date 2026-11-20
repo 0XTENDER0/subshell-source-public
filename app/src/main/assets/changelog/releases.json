@@ -2,6 +2,106 @@
   "schemaVersion": 1,
   "releases": [
     {
+      "versionCode": 263,
+      "versionName": "1.0.4",
+      "date": "2026-11-17",
+      "headline": "Subshell 1.0.4: polls that stay open, clearer mod queue reasons and a sturdier Wiki",
+      "highlights": [
+        "Reading: \"Open on Reddit to vote\" on a poll opens it in your browser and keeps it there, also when you sign in on the way. Subshell's links come back when you return.",
+        "Inbox: the ⋮ menu on a chat message stays open while the keyboard is up.",
+        "Moderation: mod queue cards name why an item is held, read from the mod log: \"Held by AutoModerator: <the rule's reason>\" or \"Held by Reddit's filters: <reason>\".",
+        "Moderation: an item removed by a named moderator or app says who removed it and is not called a filter hold, and a card's age shows before a long user flair.",
+        "Moderation: Back steps out of a mod tool and the community Wiki one step at a time, and the Mod tab comes back on its own after a failed check.",
+        "Wiki: a page or wiki that only exists in Reddit's new Wiki says so and offers Open on reddit.com, and config pages such as AutoModerator's read as plain text.",
+        "Behind the scenes: the app's text is ready for translation. This release is still in English only.",
+        "If something does not work for you, tell us on r/subshell or GitHub."
+      ],
+      "notes": [
+        "Thanks to Dr-Khal for reporting the poll problem, u/Punk-Tum for the chat menu problem, and u/vpsj on r/subshell for the mod queue card idea and for testing it with real moderation data."
+      ],
+      "releaseUrl": "https://github.com/brealorg/subshell/releases/tag/v1.0.4"
+    },
+    {
+      "versionCode": 262,
+      "versionName": "1.0.3",
+      "date": "2026-11-15",
+      "headline": "Subshell 1.0.3: a copy sheet, your own start feed, a steadier Inbox and better moderator tools",
+      "highlights": [
+        "Reading: one \"Copy…\" entry on posts and comments opens a sheet to copy the text, select part of it, copy the link, or pick any link in the text.",
+        "Reading: choose your start feed (Home, Popular or All) and the default sort for feeds and communities in Settings > Feeds & content > Feeds.",
+        "Reading: links to replies deep down a long thread open at the reply, and a post opened from a link comes back after Android has closed the app.",
+        "Inbox: a chat text sent right after an image stays in the same row, image messages read as text, and the Inbox keeps its place and selection for each account.",
+        "Inbox: when Reddit does not confirm a chat image, Subshell checks before you send again and gives the image back if it never arrived.",
+        "Inbox: an expired chat sign-in offers Sign in again, and New message finds a user by their exact name.",
+        "Inbox: a reply typed in a notification is stored encrypted while it waits to be sent, and says so in the notification if it could not be sent.",
+        "Moderation: mod queue cards show why an item is there (report reasons, \"Held by AutoModerator\", who removed it and why) with a picture, flair and age.",
+        "Moderation: picking a removal reason with a message switches the removal message on with that text. You can still turn it off.",
+        "Modmail: a reply is never sent twice, a failed action says what failed, an unsent reply is kept when you close the conversation, and a notification tap opens the conversation.",
+        "If something does not work for you, tell us on r/subshell or GitHub."
+      ],
+      "notes": [
+        "Thanks to u/vpsj and u/_orest on r/subshell for the copy sheet, mod queue and start feed requests."
+      ],
+      "releaseUrl": "https://github.com/brealorg/subshell/releases/tag/v1.0.3"
+    },
+    {
+      "versionCode": 261,
+      "versionName": "1.0.2",
+      "date": "2026-11-12",
+      "headline": "Subshell 1.0.2: steadier comment threads, cleaner links and new defaults",
+      "highlights": [
+        "Comment threads no longer jump while replies load. The comment you are reading stays where it is, also when you scroll up from an Inbox reply.",
+        "A thread opens where you left it, also after Android has closed the app in the background.",
+        "Replies load sooner and in fewer steps, and the loading row no longer flashes on screen.",
+        "Clean links: tracking parameters (utm_, fbclid and many more) are removed when you open a link. On by default; turn it off in Settings > Media & links.",
+        "Long links are shown short, in text and on link cards.",
+        "Long press a link to share it, copy it, open it in your browser, or copy the original address.",
+        "New defaults for settings you have never changed, among them the drawer on the right, 24-hour time, NSFW posts and media shown, and high video quality on mobile data. Settings you chose yourself stay as they are.",
+        "TalkBack reads a link post's picture by its site name instead of the whole address.",
+        "If something does not work for you, tell us on r/subshell or GitHub."
+      ],
+      "notes": [
+        "Comment threads: when replies loaded above the comment you were reading, the list could be thrown far away. Every change to a thread now waits until your finger is off the screen and keeps the comment you are reading in place (#298).",
+        "New defaults: the new values only apply where you never changed the setting. Everything is in Settings, and a backup from an older version keeps your choices."
+      ],
+      "releaseUrl": "https://github.com/brealorg/subshell/releases/tag/v1.0.2"
+    },
+    {
+      "versionCode": 260,
+      "versionName": "1.0.1",
+      "date": "2026-11-11",
+      "headline": "Subshell 1.0.1: fixes the app staying blank and \"not responding\" on the first start after updating from rc.2",
+      "highlights": [
+        "Fixed: on some phones the app showed a blank window and then \"not responding\" on the first start after updating from rc.2. Starting no longer waits for encryption.",
+        "Data older versions stored as plain text is now encrypted in the background, and only while the app is not busy.",
+        "Feeds and the start stay fast on phones with a slow Android Keystore, and the app no longer freezes if the Keystore stops answering.",
+        "Diagnostics now keep where the app was stuck when Android reports it as not responding, so problems like this are easier to find.",
+        "If something does not work for you, tell us on r/subshell or GitHub."
+      ],
+      "notes": [
+        "Why it happened: after the update, the app had to encrypt everything older versions had stored as plain text before it could show the first screen. On some phones, where the secure key store is slow, that took so long that Android showed \"not responding\".",
+        "What changed: the first screen now waits at most two seconds for encryption. The rest happens in the background, in small steps, and only when the app is idle.",
+        "Also fixed: on a phone with a very slow key store, feed pages no longer load slowly. Private data is now opened with a key kept in memory, and the app does not freeze if the key store stops answering.",
+        "Thanks to Dr-Khal for the detailed report on GitHub (#296)."
+      ],
+      "releaseUrl": "https://github.com/brealorg/subshell/releases/tag/v1.0.1"
+    },
+    {
+      "versionCode": 259,
+      "versionName": "1.0.0",
+      "date": "2026-11-10",
+      "headline": "Subshell 1.0: moderation tools, clearer comment threads and private data stored encrypted",
+      "highlights": [
+        "Moderators can approve, remove or mark as spam from any ⋮ menu, change a post's flair, and see Removed, Edited and Unmoderated lists in Mod tools.",
+        "Comment threads are easier to follow: replies step right with each level (Settings > Comments > Reply indent), and Reply scrolls the comment you answer above the composer.",
+        "Tapping a post's flair searches its community for that flair, newest first.",
+        "New setting, off by default: Languages. Search skips communities and posts your phone is sure are in a language you have not chosen.",
+        "What is about you (inbox, joined communities, saved lists, hidden communities, notes, drafts, searches) is now stored encrypted. Diagnostics shows if anything cannot be opened.",
+        "Public posts, images and app settings are not encrypted. If something does not work for you, tell us on r/subshell or GitHub."
+      ],
+      "releaseUrl": "https://github.com/brealorg/subshell/releases/tag/v1.0.0"
+    },
+    {
       "versionCode": 258,
       "versionName": "1.0.0-rc.2",
       "date": "2026-11-07",

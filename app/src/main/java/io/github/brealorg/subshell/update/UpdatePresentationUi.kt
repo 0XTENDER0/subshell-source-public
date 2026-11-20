@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.ActivityNotFoundException
 import android.Manifest
 import android.content.pm.PackageManager
@@ -345,7 +347,7 @@ internal fun UpdateAvailableDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(if (advisory != null) "Known problem in your version" else "subshell update available")
+            Text(if (advisory != null) stringResource(R.string.upd_known_problem_in_your_version) else stringResource(R.string.update_notification_available))
         },
         text = {
             // ISSUE209_UPDATE_DIALOGS_SCROLL_V1 (#209): AlertDialog does not
@@ -370,7 +372,7 @@ internal fun UpdateAvailableDialog(
                     }
                 }
                 Text(
-                    if (advisory != null) "${release.versionName} fixes it" else release.versionName,
+                    if (advisory != null) stringResource(R.string.update_notification_fixes_it, release.versionName) else release.versionName,
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
@@ -396,11 +398,11 @@ internal fun UpdateAvailableDialog(
                 // UPDATE08_UPDATE_DIALOG_ASKS_FOR_NOTIFICATIONS_V1
                 onNotifyNextTime?.let { notify ->
                     TextButton(onClick = notify) {
-                        Text("Notify me next time")
+                        Text(stringResource(R.string.sw_notify_me_next_time))
                     }
                 }
                 TextButton(onClick = onViewRelease) {
-                    Text("View release")
+                    Text(stringResource(R.string.sw_view_release))
                 }
             }
         },
@@ -409,12 +411,12 @@ internal fun UpdateAvailableDialog(
         // GitHub page is the second choice.
         confirmButton = {
             TextButton(onClick = onUpdate) {
-                Text("Update")
+                Text(stringResource(R.string.sw_update))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Not now")
+                Text(stringResource(R.string.sw_not_now))
             }
         },
     )
@@ -428,7 +430,7 @@ internal fun WhatsNewDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("What's new in subshell") },
+        title = { Text(stringResource(R.string.sw_what_s_new_in_subshell)) },
         text = {
             // ISSUE209_UPDATE_DIALOGS_SCROLL_V1 (#209): AlertDialog does not
             // scroll its text, so long highlights cut off the rest.
@@ -444,9 +446,18 @@ internal fun WhatsNewDialog(
                     release.headline,
                     style = MaterialTheme.typography.bodyMedium,
                 )
-                release.highlights.take(5).forEach { highlight ->
+                // RELNOTES02_BUNDLED_NOTES_ARE_LONGER_THAN_HIGHLIGHTS_V1: the
+                // dialog shows the whole entry, every highlight and the notes;
+                // it scrolls, so nothing is cut at five.
+                release.highlights.forEach { highlight ->
                     Text(
                         "• $highlight",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+                release.notes.forEach { paragraph ->
+                    Text(
+                        paragraph,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -454,12 +465,12 @@ internal fun WhatsNewDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Got it")
+                Text(stringResource(R.string.sw_got_it))
             }
         },
         dismissButton = {
             TextButton(onClick = onViewChangelog) {
-                Text("View changelog")
+                Text(stringResource(R.string.sw_view_changelog))
             }
         },
     )
@@ -478,12 +489,12 @@ internal fun UpdateChangelogScreen(
         modifier = modifier.fillMaxSize(),
     ) {
         TopAppBar(
-            title = { Text("Changelog") },
+            title = { Text(stringResource(R.string.sw_changelog)) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
                     Icon(
                         Symbols.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(R.string.sw_back),
                     )
                 }
             },
@@ -492,7 +503,7 @@ internal fun UpdateChangelogScreen(
 
         if (changelog.releases.isEmpty()) {
             Text(
-                "No bundled changelog is available in this build.",
+                stringResource(R.string.all2_no_bundled_changelog_is_available_in_this),
                 modifier = Modifier.padding(20.dp),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -558,12 +569,21 @@ internal fun UpdateChangelogReleaseItem(
                     )
                 }
             }
+            if (release.notes.isNotEmpty()) {
+                HorizontalDivider()
+                release.notes.forEach { paragraph ->
+                    Text(
+                        paragraph,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
             release.releaseUrl?.let { url ->
                 Spacer(Modifier.height(2.dp))
                 TextButton(
                     onClick = { openUpdateRelease(activityContext, url) },
                 ) {
-                    Text("View GitHub release")
+                    Text(stringResource(R.string.sw_view_github_release))
                 }
             }
         }

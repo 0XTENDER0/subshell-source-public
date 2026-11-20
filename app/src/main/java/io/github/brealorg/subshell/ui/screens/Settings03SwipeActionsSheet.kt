@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.ui.components.settingsRowBleed
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.clickable
@@ -93,14 +95,14 @@ internal fun SwipeActionsSettingsSummary(
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        text = "Swipe actions",
+                        text = stringResource(R.string.set_swipe_actions),
                         style = MaterialTheme.typography.bodyLarge,
                     )
                     Text(
                         text = if (enabled) {
-                            "Horizontal shortcuts · side menu opens from the menu button"
+                            stringResource(R.string.all_horizontal_shortcuts_side_menu_opens_from_the)
                         } else {
-                            "Horizontal shortcuts for posts and comments"
+                            stringResource(R.string.all_horizontal_shortcuts_for_posts_and_comments)
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -115,8 +117,8 @@ internal fun SwipeActionsSettingsSummary(
             HorizontalDivider()
 
             SwipeSummaryRow(
-                label = "Posts",
-                value = "← ${postLeftAction.label} · ${postRightAction.label} →",
+                label = stringResource(R.string.set_posts),
+                value = "← ${stringResource(postLeftAction.labelRes)} · ${stringResource(postRightAction.labelRes)} →",
                 expanded = expandedTarget == SwipeActionSettingsTarget.POSTS,
                 onClick = {
                     onExpandedTargetChange(
@@ -131,8 +133,8 @@ internal fun SwipeActionsSettingsSummary(
 
             if (expandedTarget == SwipeActionSettingsTarget.POSTS) {
                 InlineSwipeActionRows(
-                    leftValue = postLeftAction.label,
-                    rightValue = postRightAction.label,
+                    leftValue = stringResource(postLeftAction.labelRes),
+                    rightValue = stringResource(postRightAction.labelRes),
                     onLeftClick = {
                         choiceTargetName = SwipeActionChoiceTarget.POST_LEFT.name
                     },
@@ -145,8 +147,8 @@ internal fun SwipeActionsSettingsSummary(
             HorizontalDivider()
 
             SwipeSummaryRow(
-                label = "Comments",
-                value = "← ${commentLeftAction.label} · ${commentRightAction.label} →",
+                label = stringResource(R.string.set_comments),
+                value = "← ${stringResource(commentLeftAction.labelRes)} · ${stringResource(commentRightAction.labelRes)} →",
                 expanded = expandedTarget == SwipeActionSettingsTarget.COMMENTS,
                 onClick = {
                     onExpandedTargetChange(
@@ -161,8 +163,8 @@ internal fun SwipeActionsSettingsSummary(
 
             if (expandedTarget == SwipeActionSettingsTarget.COMMENTS) {
                 InlineSwipeActionRows(
-                    leftValue = commentLeftAction.label,
-                    rightValue = commentRightAction.label,
+                    leftValue = stringResource(commentLeftAction.labelRes),
+                    rightValue = stringResource(commentRightAction.labelRes),
                     onLeftClick = {
                         choiceTargetName = SwipeActionChoiceTarget.COMMENT_LEFT.name
                     },
@@ -176,10 +178,10 @@ internal fun SwipeActionsSettingsSummary(
 
     when (choiceTarget) {
         SwipeActionChoiceTarget.POST_LEFT -> SwipeActionRadioDialog(
-            title = "Post · swipe left",
+            title = stringResource(R.string.set_post_swipe_left),
             options = PostSwipeAction.entries,
             selected = postLeftAction,
-            label = PostSwipeAction::label,
+            label = { stringResource(it.labelRes) },
             onSelect = { action ->
                 onPostLeftActionChange(action)
                 choiceTargetName = null
@@ -188,10 +190,10 @@ internal fun SwipeActionsSettingsSummary(
         )
 
         SwipeActionChoiceTarget.POST_RIGHT -> SwipeActionRadioDialog(
-            title = "Post · swipe right",
+            title = stringResource(R.string.set_post_swipe_right),
             options = PostSwipeAction.entries,
             selected = postRightAction,
-            label = PostSwipeAction::label,
+            label = { stringResource(it.labelRes) },
             onSelect = { action ->
                 onPostRightActionChange(action)
                 choiceTargetName = null
@@ -200,10 +202,10 @@ internal fun SwipeActionsSettingsSummary(
         )
 
         SwipeActionChoiceTarget.COMMENT_LEFT -> SwipeActionRadioDialog(
-            title = "Comment · swipe left",
+            title = stringResource(R.string.set_comment_swipe_left),
             options = CommentSwipeAction.entries,
             selected = commentLeftAction,
-            label = CommentSwipeAction::label,
+            label = { stringResource(it.labelRes) },
             onSelect = { action ->
                 onCommentLeftActionChange(action)
                 choiceTargetName = null
@@ -212,10 +214,10 @@ internal fun SwipeActionsSettingsSummary(
         )
 
         SwipeActionChoiceTarget.COMMENT_RIGHT -> SwipeActionRadioDialog(
-            title = "Comment · swipe right",
+            title = stringResource(R.string.set_comment_swipe_right),
             options = CommentSwipeAction.entries,
             selected = commentRightAction,
-            label = CommentSwipeAction::label,
+            label = { stringResource(it.labelRes) },
             onSelect = { action ->
                 onCommentRightActionChange(action)
                 choiceTargetName = null
@@ -234,17 +236,18 @@ private fun SwipeSummaryRow(
     expanded: Boolean,
     onClick: () -> Unit,
 ) {
+    val expandedState = if (expanded) stringResource(R.string.composer_state_expanded) else stringResource(R.string.composer_state_collapsed)
     Row(
         modifier = Modifier
             .fillMaxWidth()
             // ISSUE219_EXPANDABLE_ROWS_SAY_THEIR_STATE_V1: the state is spoken, not
             // inferred from the icon's label.
             .clickable(
-                onClickLabel = if (expanded) "Collapse" else "Expand",
+                onClickLabel = if (expanded) stringResource(R.string.all_collapse) else stringResource(R.string.all_expand),
                 role = Role.Button,
                 onClick = onClick,
             )
-            .semantics { stateDescription = if (expanded) "Expanded" else "Collapsed" }
+            .semantics { stateDescription = expandedState }
             .defaultMinSize(minHeight = 52.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -284,13 +287,13 @@ private fun InlineSwipeActionRows(
     ) {
         HorizontalDivider()
         SwipeActionValueRow(
-            title = "Swipe left",
+            title = stringResource(R.string.set_swipe_left),
             value = leftValue,
             onClick = onLeftClick,
         )
         HorizontalDivider()
         SwipeActionValueRow(
-            title = "Swipe right",
+            title = stringResource(R.string.set_swipe_right),
             value = rightValue,
             onClick = onRightClick,
         )
@@ -339,7 +342,7 @@ private fun <T> SwipeActionRadioDialog(
     title: String,
     options: List<T>,
     selected: T,
-    label: (T) -> String,
+    label: @androidx.compose.runtime.Composable (T) -> String,
     onSelect: (T) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -380,7 +383,7 @@ private fun <T> SwipeActionRadioDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.set_cancel))
             }
         },
     )

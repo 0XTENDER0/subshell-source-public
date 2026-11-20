@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.pluralStringResource
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -90,20 +94,27 @@ internal fun readingStatsCommunities(
 internal const val READING_STATS_COMMUNITY_ROWS = 25
 
 /** "1 h 5 min", "12 min", "under a minute". */
-internal fun readingDurationLabel(seconds: Long): String {
+internal fun readingDurationLabel(seconds: Long): UiText {
     val minutes = seconds / 60L
     return when {
-        minutes < 1L -> "under a minute"
-        minutes < 60L -> "$minutes min"
-        minutes % 60L == 0L -> "${minutes / 60L} h"
-        else -> "${minutes / 60L} h ${minutes % 60L} min"
+        minutes < 1L -> UiText.Resource(R.string.reading_under_a_minute)
+        minutes < 60L -> UiText.Resource(R.string.reading_minutes, minutes)
+        minutes % 60L == 0L -> UiText.Resource(R.string.reading_hours, minutes / 60L)
+        else -> UiText.Resource(R.string.reading_hours_minutes, minutes / 60L, minutes % 60L)
     }
 }
 
-internal fun readingCountsLabel(opens: Int, postOpens: Int): String = listOfNotNull(
-    opens.takeIf { it > 0 }?.let { if (it == 1) "1 visit" else "$it visits" },
-    postOpens.takeIf { it > 0 }?.let { if (it == 1) "1 post" else "$it posts" },
-).joinToString(" · ")
+internal fun readingCountsLabel(opens: Int, postOpens: Int): UiText {
+    val parts = listOfNotNull(
+        opens.takeIf { it > 0 }?.let { UiText.Plural(R.plurals.reading_visits, it, it) },
+        postOpens.takeIf { it > 0 }?.let { UiText.Plural(R.plurals.reading_posts, it, it) },
+    )
+    return when (parts.size) {
+        0 -> UiText.Plain("")
+        1 -> parts[0]
+        else -> UiText.Resource(R.string.join_middot, parts[0], parts[1])
+    }
+}
 
 /**
  * The subscribed communities "Your reading" suggests hiding or leaving:
@@ -156,27 +167,26 @@ internal fun ReadingStatsPanel(state: SubshellState) {
         ReadingStatsCommunityList(current, onOpen = state::openSubreddit)
         ReadingStatsSuggestionList(current, state)
         Text(
-            text = "Counted only on this device: opens and time on screen per community, " +
-                "nothing about what you read. Never sent anywhere and not in backups.",
+            text = stringResource(R.string.all2_counted_only_on_this_device_opens_and),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = { confirmDelete = "clear" }) { Text("Clear") }
-            OutlinedButton(onClick = { confirmDelete = "off" }) { Text("Turn off") }
+            OutlinedButton(onClick = { confirmDelete = "clear" }) { Text(stringResource(R.string.scr_clear)) }
+            OutlinedButton(onClick = { confirmDelete = "off" }) { Text(stringResource(R.string.scr_turn_off)) }
         }
     }
 
     confirmDelete?.let { action ->
         AlertDialog(
             onDismissRequest = { confirmDelete = null },
-            title = { Text(if (action == "off") "Turn off Your reading?" else "Clear Your reading?") },
+            title = { Text(if (action == "off") stringResource(R.string.scr_turn_off_your_reading) else stringResource(R.string.scr_clear_your_reading)) },
             text = {
                 Text(
                     if (action == "off") {
-                        "What was counted is deleted and nothing more is counted."
+                        stringResource(R.string.all_what_was_counted_is_deleted_and_nothing)
                     } else {
-                        "What was counted is deleted; counting starts again today."
+                        stringResource(R.string.all_what_was_counted_is_deleted_counting_starts)
                     },
                 )
             },
@@ -186,9 +196,9 @@ internal fun ReadingStatsPanel(state: SubshellState) {
                         confirmDelete = null
                         if (action == "off") store.onDisk { setEnabled(false) } else store.onDisk { clear() }
                     },
-                ) { Text(if (action == "off") "Turn off" else "Clear") }
+                ) { Text(if (action == "off") stringResource(R.string.scr_turn_off) else stringResource(R.string.all_clear)) }
             },
-            dismissButton = { TextButton(onClick = { confirmDelete = null }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { confirmDelete = null }) { Text(stringResource(R.string.scr_cancel)) } },
         )
     }
 }
@@ -204,14 +214,13 @@ private fun ReadingStatsOff(onTurnOn: () -> Unit, loading: Boolean) {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text("Your reading", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.scr_your_reading), style = MaterialTheme.typography.titleMedium)
             Text(
-                "See where your time goes and which communities you actually read. " +
-                    "Counted only on this device, never sent anywhere and not in backups.",
+                stringResource(R.string.all2_see_where_your_time_goes_and_which),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Button(onClick = onTurnOn, enabled = !loading) { Text("Turn on") }
+            Button(onClick = onTurnOn, enabled = !loading) { Text(stringResource(R.string.scr_turn_on)) }
         }
     }
 }
@@ -223,16 +232,16 @@ private fun ReadingStatsTotals(summary: ReadingSummary) {
             .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
     }
     val period = if (summary.days >= io.github.brealorg.subshell.data.reading.READING_STATS_WINDOW_DAYS) {
-        "Last ${summary.days} days"
+        pluralStringResource(R.plurals.reading_last_days, summary.days, summary.days)
     } else {
-        "Since $since"
+        stringResource(R.string.all_since, since)
     }
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(period, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(readingDurationLabel(summary.totalSeconds), style = MaterialTheme.typography.headlineMedium)
+        Text(readingDurationLabel(summary.totalSeconds).asString(), style = MaterialTheme.typography.headlineMedium)
         if (summary.homeSeconds > 0L) {
             Text(
-                "Home feed ${readingDurationLabel(summary.homeSeconds)}",
+                stringResource(R.string.reading_home_feed, readingDurationLabel(summary.homeSeconds).asString()),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -242,10 +251,10 @@ private fun ReadingStatsTotals(summary: ReadingSummary) {
 
 @Composable
 private fun ReadingStatsCommunityList(summary: ReadingSummary, onOpen: (String) -> Unit) {
-    Text("Communities you read", style = MaterialTheme.typography.titleSmall)
+    Text(stringResource(R.string.scr_communities_you_read), style = MaterialTheme.typography.titleSmall)
     if (summary.communities.isEmpty()) {
         Text(
-            "Nothing counted yet. Communities and posts you open show up here.",
+            stringResource(R.string.all_nothing_counted_yet_communities_and_posts_you),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -253,14 +262,14 @@ private fun ReadingStatsCommunityList(summary: ReadingSummary, onOpen: (String) 
     }
     summary.communities.take(READING_STATS_COMMUNITY_ROWS).forEach { community ->
         ListItem(
-            content = { Text("r/${community.communityName}") },
+            content = { Text(stringResource(R.string.scr_r, community.communityName)) },
             modifier = Modifier.clickable { onOpen(community.communityName) },
             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
             supportingContent = {
                 Text(
                     listOf(
-                        readingDurationLabel(community.seconds),
-                        readingCountsLabel(community.opens, community.postOpens),
+                        readingDurationLabel(community.seconds).asString(),
+                        readingCountsLabel(community.opens, community.postOpens).asString(),
                     ).filter(String::isNotBlank).joinToString(" · "),
                 )
             },
@@ -272,11 +281,11 @@ private fun ReadingStatsCommunityList(summary: ReadingSummary, onOpen: (String) 
 private fun ReadingStatsSuggestionList(summary: ReadingSummary, state: SubshellState) {
     val communities = LocalReadingStatsCommunities.current
     val subscribed = communities.subscribedNames ?: return
-    Text("Subscriptions you never open", style = MaterialTheme.typography.titleSmall)
+    Text(stringResource(R.string.scr_subscriptions_you_never_open), style = MaterialTheme.typography.titleSmall)
     if (!summary.suggestionsReady) {
         val left = READING_STATS_SUGGESTION_MIN_DAYS - summary.days
         Text(
-            "Shown after $READING_STATS_SUGGESTION_MIN_DAYS days of counting ($left to go).",
+            stringResource(R.string.all_shown_after_days_of_counting_to_go, READING_STATS_SUGGESTION_MIN_DAYS, left),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -285,14 +294,14 @@ private fun ReadingStatsSuggestionList(summary: ReadingSummary, state: SubshellS
     val suggestions = readingSuggestions(summary, subscribed, state::isCommunityHidden)
     if (suggestions.isEmpty()) {
         Text(
-            "You opened every community you subscribe to in the last ${summary.days} days.",
+            pluralStringResource(R.plurals.reading_opened_every_community, summary.days, summary.days),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         return
     }
     Text(
-        "Not opened in ${summary.days} days. Hide keeps them out of your lists; Leave unsubscribes on Reddit.",
+        pluralStringResource(R.plurals.reading_not_opened_in, summary.days, summary.days),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -302,15 +311,15 @@ private fun ReadingStatsSuggestionList(summary: ReadingSummary, state: SubshellS
             content = { Text("r/$name") },
             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
             supportingContent = if (communities.leaveFailedName.equals(name, ignoreCase = true)) {
-                { Text("Couldn't leave. Try again from the community page.", color = MaterialTheme.colorScheme.error) }
+                { Text(stringResource(R.string.scr_couldn_t_leave_try_again_from_the), color = MaterialTheme.colorScheme.error) }
             } else {
                 null
             },
             trailingContent = {
                 Row {
-                    TextButton(onClick = { state.toggleHiddenCommunity(name) }, enabled = !leaving) { Text("Hide") }
+                    TextButton(onClick = { state.toggleHiddenCommunity(name) }, enabled = !leaving) { Text(stringResource(R.string.scr_hide)) }
                     TextButton(onClick = { communities.onLeave(name) }, enabled = !leaving) {
-                        Text(if (leaving) "Leaving…" else "Leave")
+                        Text(if (leaving) stringResource(R.string.all_leaving) else stringResource(R.string.all_leave))
                     }
                 }
             },

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.auth
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertEquals
@@ -17,7 +18,7 @@ class InboxM3A2R2C2AutomaticReadFailureIsolationPolicyTest {
                 File(userDir, "src/main/java/$relative"),
                 File(userDir, "app/src/main/java/$relative"),
             )
-            return candidates.firstOrNull(File::isFile)?.readText()
+            return candidates.firstOrNull(File::isFile)?.readSourceText()
                 ?: error("Source not found: $relative")
         }
 

@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.pluralStringResource
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.ui.components.postBodyMentions
 import io.github.brealorg.subshell.ui.components.MentionSuggestions
 import io.github.brealorg.subshell.data.account.RedditPeopleSearchUiState
@@ -293,8 +297,8 @@ fun CreatePostScreen(
         draft.community.isBlank() -> null
         !authenticated || policyReady -> null
         matchingPolicySnapshot?.status == ComposerPolicyStatus.UNAVAILABLE ->
-            "Community rules couldn't be loaded."
-        else -> "Checking community rules…"
+            stringResource(R.string.all_community_rules_couldn_t_be_loaded)
+        else -> stringResource(R.string.all_checking_community_rules)
     }
 
     val bodyState = rememberTextFieldState(draft.body)
@@ -487,7 +491,7 @@ fun CreatePostScreen(
 
     val accountMismatchMessage = draft.accountStableId
         ?.takeIf { it != state.activeAccountId }
-        ?.let { "This draft belongs to another account" }
+        ?.let { stringResource(R.string.all_this_draft_belongs_to_another_account) }
     val request = synchronizedDraft()
         .takeIf { accountMismatchMessage == null }
         ?.toV4RemoteRequest(state.activeAccountId, resolvedLinkPreview)
@@ -496,7 +500,7 @@ fun CreatePostScreen(
         requestKey = request?.requestKey,
     )
     val localValidationIssue = accountMismatchMessage?.let { message ->
-        ComposerValidationIssue(ComposerValidationField.GENERAL, message)
+        ComposerValidationIssue(ComposerValidationField.GENERAL, UiText.Plain(message))
     } ?: if (authenticated) {
         validateRemoteTextPostComposerDraftIssue(synchronizedDraft(), policy)
     } else {
@@ -506,7 +510,7 @@ fun CreatePostScreen(
         .firstOrNull()
         ?.toComposerValidationIssue()
     val preflightValidationIssue = preflightFailureMessage?.let { message ->
-        ComposerValidationIssue(ComposerValidationField.GENERAL, message)
+        ComposerValidationIssue(ComposerValidationField.GENERAL, UiText.Plain(message))
     }
     val activeValidationIssue = remoteValidationIssue ?: preflightValidationIssue ?:
         localValidationIssue.takeIf { validationRequested }
@@ -544,8 +548,8 @@ fun CreatePostScreen(
             )
     val saveLabel = when {
         !draft.hasContent -> null
-        draft.updatedAtEpochMs > persistedRevision -> "Saving…"
-        else -> "Saved in Drafts"
+        draft.updatedAtEpochMs > persistedRevision -> stringResource(R.string.all_saving_2)
+        else -> stringResource(R.string.all_saved_in_drafts)
     }
 
     fun revealValidationIssue(issue: ComposerValidationIssue) {
@@ -606,7 +610,7 @@ fun CreatePostScreen(
         validationRequested = true
         preflightFailureMessage = null
         val failure = accountMismatchMessage?.let { message ->
-            ComposerValidationIssue(ComposerValidationField.GENERAL, message)
+            ComposerValidationIssue(ComposerValidationField.GENERAL, UiText.Plain(message))
         } ?: if (authenticated) {
             validateRemoteTextPostComposerDraftIssue(current, policy)
         } else {
@@ -623,7 +627,7 @@ fun CreatePostScreen(
             ) ?: run {
                 // ISSUE100_POST_REQUEST_FAILURE_VISIBLE_V1: Post used to do
                 // nothing at all here.
-                preflightFailureMessage = COMPOSER_REQUEST_UNBUILDABLE_MESSAGE
+                preflightFailureMessage = context.getString(COMPOSER_REQUEST_UNBUILDABLE_MESSAGE)
                 return
             }
             onResetTextPostWriteState()
@@ -712,7 +716,7 @@ fun CreatePostScreen(
                             pendingPreflightRequestKey = null
                             awaitingPreflightAuthorization = false
                             preflightFailureMessage =
-                                "Posting access is required to check community rules"
+                                context.getString(R.string.composer_posting_access_required)
                             return@LaunchedEffect
                         }
                         val launched = onAuthorizeComposerPostRequirements(
@@ -724,7 +728,7 @@ fun CreatePostScreen(
                         } else {
                             pendingPreflightRequestKey = null
                             preflightFailureMessage =
-                                "Posting access is required to check community rules"
+                                context.getString(R.string.composer_posting_access_required)
                         }
                     }
 
@@ -776,7 +780,7 @@ fun CreatePostScreen(
             )
             if (refreshedFlair == null) {
                 update { it.copy(flair = null) }
-                flairNotice = "This flair is no longer available."
+                flairNotice = context.getString(R.string.composer_flair_no_longer_available)
             } else if (refreshedFlair != selectedFlair) {
                 update { it.copy(flair = refreshedFlair) }
             }
@@ -789,8 +793,7 @@ fun CreatePostScreen(
     var revealedRemoteIssueKey by rememberSaveable(draft.id) { mutableStateOf<String?>(null) }
     LaunchedEffect(remoteValidationIssue, policy.flairAuthorizationRequired, policy.flairOptionsLoaded) {
         val issue = remoteValidationIssue ?: return@LaunchedEffect
-        val revealKey = "${activeTextPostWriteState.requestKey}:${activeTextPostWriteState.completionRevision}:" +
-            "${issue.field}:${policy.flairAuthorizationRequired}:${policy.flairOptionsLoaded}"
+        val revealKey = "${activeTextPostWriteState.requestKey}:${activeTextPostWriteState.completionRevision}:${issue.field}:${policy.flairAuthorizationRequired}:${policy.flairOptionsLoaded}"
         if (revealKey == revealedRemoteIssueKey) return@LaunchedEffect
         revealedRemoteIssueKey = revealKey
         when (issue.field) {
@@ -924,7 +927,7 @@ fun CreatePostScreen(
                     scrollBehavior = routeTopBarScroll,
                     title = {
                         Column {
-                            Text("Create post")
+                            Text(stringResource(R.string.sw_create_post))
                             saveLabel?.let {
                                 Text(
                                     it,
@@ -938,7 +941,7 @@ fun CreatePostScreen(
                         IconButton(onClick = state::closePostComposer) {
                             Icon(
                                 Symbols.ArrowBack,
-                                contentDescription = "Save draft and close",
+                                contentDescription = stringResource(R.string.sw_save_draft_and_close),
                             )
                         }
                     },
@@ -950,13 +953,13 @@ fun CreatePostScreen(
                         )
                         ComposerPrimaryAction(
                             text = when {
-                                preflightPending -> "Checking…"
+                                preflightPending -> stringResource(R.string.all_checking)
                                 activeTextPostWriteState.phase == TextPostWritePhase.SENDING &&
                                     draft.type == ComposerPostType.MEDIA -> "Uploading…"
                                 activeTextPostWriteState.phase ==
-                                    TextPostWritePhase.RECONCILING -> "Checking…"
-                                activeTextPostWriteState.inProgress -> "Posting…"
-                                else -> "Post"
+                                    TextPostWritePhase.RECONCILING -> stringResource(R.string.all_checking)
+                                activeTextPostWriteState.inProgress -> stringResource(R.string.all_posting)
+                                else -> stringResource(R.string.all_post)
                             },
                             enabled = postEnabled,
                             onClick = ::submit,
@@ -1017,18 +1020,18 @@ fun CreatePostScreen(
                             sendingMessage = if (draft.type == ComposerPostType.MEDIA) {
                                 when {
                                     draft.media.size > 1 ->
-                                        "Uploading gallery to Reddit…"
+                                        stringResource(R.string.all_uploading_gallery_to_reddit)
                                     draft.media.singleOrNull()?.isComposerVideoGif() == true ->
-                                        "Uploading GIF to Reddit…"
+                                        stringResource(R.string.all_uploading_gif_to_reddit)
                                     draft.media.singleOrNull()?.kind == ComposerMediaKind.GIF ->
-                                        "Uploading GIF to Reddit…"
+                                        stringResource(R.string.all_uploading_gif_to_reddit)
                                     draft.media.singleOrNull()?.isComposerVideoSource() == true ->
-                                        "Uploading video to Reddit…"
+                                        stringResource(R.string.all_uploading_video_to_reddit)
                                     else ->
-                                        "Uploading image to Reddit…"
+                                        stringResource(R.string.all_uploading_image_to_reddit)
                                 }
                             } else {
-                                "Posting to Reddit…"
+                                stringResource(R.string.all_posting_to_reddit)
                             },
                         )
                     }
@@ -1062,7 +1065,7 @@ fun CreatePostScreen(
                                                 draft.community,
                                             )
                                         },
-                                    ) { Text("Retry") }
+                                    ) { Text(stringResource(R.string.sw_retry)) }
                                 }
                             }
                         }
@@ -1075,7 +1078,7 @@ fun CreatePostScreen(
                                 ),
                                 flair = draft.flair,
                                 required = policy.flairRequired,
-                                errorMessage = flairValidationMessage,
+                                errorMessage = flairValidationMessage?.asString(),
                                 community = draft.community,
                                 authorizationRequired = flairAuthorizationRequired,
                                 loadFailed = flairLoadFailed,
@@ -1109,7 +1112,7 @@ fun CreatePostScreen(
                                 shape = MaterialTheme.shapes.medium,
                             ) {
                                 Text(
-                                    message,
+                                    message.asString(),
                                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp),
                                     style = MaterialTheme.typography.bodyMedium,
                                 )
@@ -1130,12 +1133,12 @@ fun CreatePostScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .focusRequester(titleFocusRequester),
-                                label = { Text("Title") },
-                                placeholder = { Text("Add a clear, interesting title") },
+                                label = { Text(stringResource(R.string.sw_title)) },
+                                placeholder = { Text(stringResource(R.string.sw_add_a_clear_interesting_title)) },
                                 isError = titleValidationMessage != null ||
                                     draft.title.length > policy.titleMaxLength,
                                 supportingText = composerTitleSupportingText(
-                                    message = titleValidationMessage,
+                                    message = titleValidationMessage?.asString(),
                                     length = draft.title.length,
                                     maxLength = policy.titleMaxLength,
                                 ),
@@ -1151,7 +1154,7 @@ fun CreatePostScreen(
                         item("link") {
                             V4LinkAttachment(
                                 value = draft.linkUrl,
-                                validationMessage = linkValidationMessage,
+                                validationMessage = linkValidationMessage?.asString(),
                                 focusRequester = linkFocusRequester,
                                 bringIntoViewRequester = linkBringIntoViewRequester,
                                 previewsByUrl = linkPreviewsByUrl,
@@ -1180,7 +1183,7 @@ fun CreatePostScreen(
                                     mediaBringIntoViewRequester,
                                 ),
                                 media = draft.media,
-                                validationMessage = mediaValidationMessage,
+                                validationMessage = mediaValidationMessage?.asString(),
                                 videoAsGif = draft.media.singleOrNull()?.isComposerVideoGif() == true,
                                 videoAllowed = policy.allowVideo,
                                 videoGifAllowed = policy.allowVideoGifs,
@@ -1275,7 +1278,7 @@ fun CreatePostScreen(
                                 compactPreviewVisible = compactPreviewVisible,
                                 onPreviewVisibleChange = { compactPreviewVisible = it },
                                 onFormat = ::applyFormat,
-                                validationMessage = bodyValidationMessage,
+                                validationMessage = bodyValidationMessage?.asString(),
                                 inputLocked = composerLocked,
                                 visibleListHeight = {
                                     composerListState.layoutInfo.let { info ->
@@ -1421,8 +1424,8 @@ fun CreatePostScreen(
     pendingReplacement?.let { (loss, transform) ->
         AlertDialog(
             onDismissRequest = { pendingReplacement = null },
-            title = { Text(loss.title) },
-            text = { Text(loss.message) },
+            title = { Text(loss.title.asString()) },
+            text = { Text(loss.message.asString()) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -1432,18 +1435,18 @@ fun CreatePostScreen(
                             linkFocusRequestRevision += 1
                         }
                     },
-                ) { Text("Remove", color = MaterialTheme.colorScheme.error) }
+                ) { Text(stringResource(R.string.sw_remove), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
-                TextButton(onClick = { pendingReplacement = null }) { Text("Keep") }
+                TextButton(onClick = { pendingReplacement = null }) { Text(stringResource(R.string.sw_keep)) }
             },
         )
     }
     if (discardConfirmationVisible) {
         AlertDialog(
             onDismissRequest = { discardConfirmationVisible = false },
-            title = { Text("Discard draft?") },
-            text = { Text("This permanently removes this draft from Drafts.") },
+            title = { Text(stringResource(R.string.sw_discard_draft)) },
+            text = { Text(stringResource(R.string.sw_this_permanently_removes_this_draft_from_drafts)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -1451,11 +1454,11 @@ fun CreatePostScreen(
                         state.discardPostComposerDraft()
                         if (authenticated) onResetTextPostWriteState()
                     },
-                ) { Text("Discard", color = MaterialTheme.colorScheme.error) }
+                ) { Text(stringResource(R.string.sw_discard), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
                 TextButton(onClick = { discardConfirmationVisible = false }) {
-                    Text("Keep draft")
+                    Text(stringResource(R.string.sw_keep_draft))
                 }
             },
         )
@@ -1474,7 +1477,7 @@ private fun TextPostWriteValidationIssue.toComposerValidationIssue(): ComposerVa
             TextPostWriteValidationField.MEDIA -> ComposerValidationField.MEDIA
             TextPostWriteValidationField.GENERAL -> ComposerValidationField.GENERAL
         },
-        message = message,
+        message = UiText.Plain(message),
     )
 
 private fun TextFieldState.replaceAllV4(value: String) {
@@ -1584,7 +1587,7 @@ internal fun V4CommunitySelector(
             if (community.isNotBlank()) {
                 RemoteIdentityImage(
                     uri = iconUri,
-                    contentDescription = "Icon for r/$community",
+                    contentDescription = stringResource(R.string.sw_icon_for_r, community),
                     modifier = Modifier.size(38.dp).clip(CircleShape),
                 ) {
                     CommunityAvatar(
@@ -1610,16 +1613,16 @@ internal fun V4CommunitySelector(
                 verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 Text(
-                    postingAs?.let { username -> "Posting as u/$username to" } ?: "Posting to",
+                    postingAs?.let { username -> stringResource(R.string.all_posting_as_u_to, username) } ?: stringResource(R.string.all_posting_to),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    if (community.isBlank()) "Choose a community" else composerDestinationLabel(community),
+                    if (community.isBlank()) stringResource(R.string.all_choose_a_community) else composerDestinationLabel(community),
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
-            Icon(Symbols.ExpandMore, contentDescription = "Choose community")
+            Icon(Symbols.ExpandMore, contentDescription = stringResource(R.string.sw_choose_community))
         }
     }
 }
@@ -1694,29 +1697,29 @@ internal fun V4CommunitySheet(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Choose a community", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.sw_choose_a_community), style = MaterialTheme.typography.headlineSmall)
                     Text(
                         if (authenticated) {
-                            "Search Reddit or choose a known community"
+                            stringResource(R.string.all_search_reddit_or_choose_a_known_community)
                         } else {
-                            "Choose from the available communities"
+                            stringResource(R.string.all_choose_from_the_available_communities)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 IconButton(onClick = onDismiss) {
-                    Icon(Symbols.Close, contentDescription = "Close community picker")
+                    Icon(Symbols.Close, contentDescription = stringResource(R.string.sw_close_community_picker))
                 }
             }
             SubshellSearchField(
                 query = query,
                 onQueryChange = onQueryChange,
-                placeholder = "Search r/norge, r/android…",
+                placeholder = stringResource(R.string.sw_search_r_norge_r_android),
                 trailingIcon = if (query.isNotBlank()) {
                     {
                         IconButton(onClick = { onQueryChange("") }) {
-                            Icon(Symbols.Close, contentDescription = "Clear search")
+                            Icon(Symbols.Close, contentDescription = stringResource(R.string.sw_clear_search))
                         }
                     }
                 } else {
@@ -1729,9 +1732,9 @@ internal fun V4CommunitySheet(
             ) {
                 Text(
                     when {
-                        normalizedQuery.isNotBlank() -> "Results"
-                        authenticated -> "Your communities"
-                        else -> "Known communities"
+                        normalizedQuery.isNotBlank() -> stringResource(R.string.all_results)
+                        authenticated -> stringResource(R.string.all_your_communities)
+                        else -> stringResource(R.string.all_known_communities)
                     },
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.titleSmall,
@@ -1764,7 +1767,7 @@ internal fun V4CommunitySheet(
                 if (options.isEmpty() && normalizedQuery.isBlank() && authenticated) {
                     item("community-none-joined") {
                         Text(
-                            "Search for a community to post in.",
+                            stringResource(R.string.all_search_for_a_community_to_post_in),
                             modifier = Modifier.padding(vertical = 18.dp),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1775,13 +1778,13 @@ internal fun V4CommunitySheet(
                     item("community-empty") {
                         Text(
                             if (remoteSearch.status == ComposerCommunitySearchStatus.UNAVAILABLE) {
-                                "Reddit search is unavailable. Check the connection and try again."
+                                stringResource(R.string.all_reddit_search_is_unavailable_check_the_connection)
                             } else if (
                                 remoteSearch.status == ComposerCommunitySearchStatus.LOADED
                             ) {
-                                "No communities found for “$normalizedQuery”."
+                                stringResource(R.string.all_no_communities_found_for, normalizedQuery)
                             } else {
-                                "Searching Reddit…"
+                                stringResource(R.string.all_searching_reddit)
                             },
                             modifier = Modifier.padding(vertical = 18.dp),
                             style = MaterialTheme.typography.bodyMedium,
@@ -1817,7 +1820,7 @@ private fun V4CommunityOptionRow(
         ) {
             RemoteIdentityImage(
                 uri = option.iconImageUri,
-                contentDescription = "Icon for ${composerDestinationLabel(option.name)}",
+                contentDescription = stringResource(R.string.sw_icon_for, composerDestinationLabel(option.name)),
                 modifier = Modifier.size(42.dp).clip(CircleShape),
             ) {
                 CommunityAvatar(
@@ -1829,7 +1832,7 @@ private fun V4CommunityOptionRow(
             Column(modifier = Modifier.weight(1f)) {
                 Text(composerDestinationLabel(option.name), style = MaterialTheme.typography.titleMedium)
                 val details = buildList {
-                    if (option.joined) add("Joined")
+                    if (option.joined) add(stringResource(R.string.all_joined))
                     option.members?.let { add(v4CompactMemberCount(it)) }
                     option.title.takeIf(String::isNotBlank)?.let(::add)
                 }.joinToString(" · ")
@@ -1844,7 +1847,7 @@ private fun V4CommunityOptionRow(
                 }
             }
             if (selected) {
-                Icon(Symbols.Check, contentDescription = "Selected")
+                Icon(Symbols.Check, contentDescription = stringResource(R.string.sw_selected))
             } else {
                 Icon(Symbols.ChevronRight, contentDescription = null)
             }
@@ -1852,10 +1855,11 @@ private fun V4CommunityOptionRow(
     }
 }
 
+@Composable
 private fun v4CompactMemberCount(value: Long): String = when {
-    value >= 1_000_000L -> "${value / 100_000L / 10.0}M members"
-    value >= 1_000L -> "${value / 100L / 10.0}K members"
-    else -> "$value members"
+    value >= 1_000_000L -> stringResource(R.string.comm_members_text, "${value / 100_000L / 10.0}M")
+    value >= 1_000L -> stringResource(R.string.comm_members_text, "${value / 100L / 10.0}K")
+    else -> pluralStringResource(R.plurals.comm_members_count, value.toInt(), value.toInt())
 }
 
 @Composable
@@ -1923,7 +1927,7 @@ private fun V4FlairAction(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
-                    "Post flair",
+                    stringResource(R.string.all_post_flair),
                     style = MaterialTheme.typography.labelMedium,
                     color = if (isError) {
                         MaterialTheme.colorScheme.error
@@ -1934,19 +1938,19 @@ private fun V4FlairAction(
                 when {
                     authorizationRequired -> {
                         Text(
-                            "Allow flair access",
+                            stringResource(R.string.all_allow_flair_access),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.primary,
                         )
                         Text(
-                            "Needed to load r/$community post flairs",
+                            stringResource(R.string.all_needed_to_load_r_post_flairs, community),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     loadFailed -> Text(
-                        "Couldn't load post flairs · Tap to retry",
+                        stringResource(R.string.all_couldn_t_load_post_flairs_tap_to),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error,
                     )
@@ -1956,7 +1960,7 @@ private fun V4FlairAction(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            if (required) "Choose a flair" else "Add flair",
+                            if (required) stringResource(R.string.all_choose_a_flair) else stringResource(R.string.all_add_flair),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = when {
@@ -1979,9 +1983,9 @@ private fun V4FlairAction(
             Icon(
                 if (loadFailed) Symbols.Refresh else Symbols.ChevronRight,
                 contentDescription = when {
-                    authorizationRequired -> "Allow access to post flairs"
-                    loadFailed -> "Retry loading post flairs"
-                    else -> "Choose post flair"
+                    authorizationRequired -> stringResource(R.string.all_allow_access_to_post_flairs)
+                    loadFailed -> stringResource(R.string.all_retry_loading_post_flairs)
+                    else -> stringResource(R.string.all_choose_post_flair)
                 },
                 tint = if (loadFailed || isError) {
                     MaterialTheme.colorScheme.error
@@ -2049,7 +2053,7 @@ internal fun V4FlairSheet(
                         }
                     }
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Choose post flair", style = MaterialTheme.typography.headlineSmall)
+                        Text(stringResource(R.string.sw_choose_post_flair), style = MaterialTheme.typography.headlineSmall)
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -2063,7 +2067,7 @@ internal fun V4FlairSheet(
                         }
                     }
                     IconButton(onClick = onDismiss) {
-                        Icon(Symbols.Close, contentDescription = "Close flair picker")
+                        Icon(Symbols.Close, contentDescription = stringResource(R.string.sw_close_flair_picker))
                     }
                 }
 
@@ -2071,11 +2075,11 @@ internal fun V4FlairSheet(
                     SubshellSearchField(
                         query = query,
                         onQueryChange = { query = it },
-                        placeholder = "Search flairs",
+                        placeholder = stringResource(R.string.sw_search_flairs),
                         trailingIcon = if (query.isNotEmpty()) {
                             {
                                 IconButton(onClick = { query = "" }) {
-                                    Icon(Symbols.Close, contentDescription = "Clear search")
+                                    Icon(Symbols.Close, contentDescription = stringResource(R.string.sw_clear_search))
                                 }
                             }
                         } else {
@@ -2087,15 +2091,15 @@ internal fun V4FlairSheet(
                 when {
                     options.isEmpty() -> Text(
                         if (required) {
-                            "This community requires flair, but Reddit returned no selectable flair."
+                            stringResource(R.string.all_this_community_requires_flair_but_reddit_returned)
                         } else {
-                            "No post flair is available for this community."
+                            stringResource(R.string.all_no_post_flair_is_available_for_this)
                         },
                         modifier = Modifier.padding(vertical = 12.dp),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     filteredOptions.isEmpty() -> Text(
-                        "No flairs match your search.",
+                        stringResource(R.string.all_no_flairs_match_your_search),
                         modifier = Modifier.padding(vertical = 12.dp),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -2146,14 +2150,14 @@ private fun V4FlairChoiceChip(
         selected = selected,
         onClick = onClick,
         label = {
-            if (flair == null) Text("No flair") else V4FlairLabel(flair)
+            if (flair == null) Text(stringResource(R.string.scr_no_flair)) else V4FlairLabel(flair)
         },
         leadingIcon = when {
             selected -> {
                 {
                     Icon(
                         Symbols.Check,
-                        contentDescription = "Selected",
+                        contentDescription = stringResource(R.string.sw_selected),
                         modifier = Modifier.size(18.dp),
                     )
                 }
@@ -2173,7 +2177,7 @@ private fun V4FlairChoiceChip(
             {
                 Icon(
                     Symbols.Edit,
-                    contentDescription = "Customize flair",
+                    contentDescription = stringResource(R.string.sw_customize_flair),
                     modifier = Modifier.size(18.dp),
                 )
             }
@@ -2202,10 +2206,10 @@ private fun V4EditableFlairEditor(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onCancel) {
-                Icon(Symbols.ArrowBack, contentDescription = "Back to flairs")
+                Icon(Symbols.ArrowBack, contentDescription = stringResource(R.string.sw_back_to_flairs))
             }
             Column(modifier = Modifier.weight(1f)) {
-                Text("Customize flair", style = MaterialTheme.typography.headlineSmall)
+                Text(stringResource(R.string.sw_customize_flair), style = MaterialTheme.typography.headlineSmall)
                 Text(
                     composerDestinationLabel(community),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -2222,7 +2226,7 @@ private fun V4EditableFlairEditor(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 Text(
-                    "Preview",
+                    stringResource(R.string.all_preview),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -2233,8 +2237,8 @@ private fun V4EditableFlairEditor(
             value = editedText,
             onValueChange = { if (it.length <= COMPOSER_FLAIR_TEXT_MAX_LENGTH) editedText = it },
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Flair text") },
-            supportingText = { Text("${editedText.length} / $COMPOSER_FLAIR_TEXT_MAX_LENGTH") },
+            label = { Text(stringResource(R.string.sw_flair_text)) },
+            supportingText = { Text(stringResource(R.string.sw_text, editedText.length, COMPOSER_FLAIR_TEXT_MAX_LENGTH)) },
             singleLine = true,
         )
         Row(
@@ -2242,13 +2246,13 @@ private fun V4EditableFlairEditor(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextButton(onClick = onCancel) { Text("Cancel") }
+            TextButton(onClick = onCancel) { Text(stringResource(R.string.sw_cancel)) }
             Button(
                 enabled = editedText.isNotBlank(),
                 onClick = {
                     onApply(template.copy(text = editedText.trim(), richText = emptyList()))
                 },
-            ) { Text("Apply") }
+            ) { Text(stringResource(R.string.sw_apply)) }
         }
     }
 }
@@ -2261,7 +2265,7 @@ private fun V4RequiredBadge() {
         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
     ) {
         Text(
-            "Required",
+            stringResource(R.string.all_required),
             modifier = Modifier.padding(horizontal = 9.dp, vertical = 3.dp),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.SemiBold,
@@ -2295,7 +2299,7 @@ private fun V4FlairLabel(
     ) {
         if (flair.richText.isEmpty()) {
             Text(
-                flair.text.ifBlank { "Editable flair" },
+                flair.text.ifBlank { stringResource(R.string.all_editable_flair) },
                 style = MaterialTheme.typography.labelLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -2306,7 +2310,7 @@ private fun V4FlairLabel(
                     "emoji" -> if (!segment.imageUrl.isNullOrBlank()) {
                         RemoteImage(
                             uri = segment.imageUrl,
-                            label = segment.emojiRef ?: "Flair emoji",
+                            label = segment.emojiRef ?: stringResource(R.string.all_flair_emoji),
                             modifier = Modifier.size(18.dp).clip(MaterialTheme.shapes.small),
                             aspectRatio = null,
                             containerColor = Color.Transparent,
@@ -2383,12 +2387,12 @@ private fun V4LinkAttachment(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Symbols.Link, contentDescription = null)
                 Text(
-                    "Link attachment",
+                    stringResource(R.string.all_link_attachment),
                     modifier = Modifier.weight(1f).padding(start = 10.dp),
                     style = MaterialTheme.typography.titleSmall,
                 )
                 IconButton(onClick = onRemove) {
-                    Icon(Symbols.Close, contentDescription = "Remove link")
+                    Icon(Symbols.Close, contentDescription = stringResource(R.string.sw_remove_link))
                 }
             }
             OutlinedTextField(
@@ -2399,8 +2403,8 @@ private fun V4LinkAttachment(
                     .fillMaxWidth()
                     .bringIntoViewRequester(bringIntoViewRequester)
                     .focusRequester(focusRequester),
-                label = { Text("Destination URL") },
-                placeholder = { Text("https:" + "//example.com") },
+                label = { Text(stringResource(R.string.sw_destination_url)) },
+                placeholder = { Text("https://example.com") },
                 isError = validationMessage != null,
                 supportingText = validationMessage?.let { message ->
                     { Text(message) }
@@ -2440,12 +2444,12 @@ private fun V4CompactLinkPreview(state: V4LinkPreviewState) {
                     InlineProgressIndicator()
                     Column {
                         Text(
-                            "Finding preview…",
+                            stringResource(R.string.all_finding_preview),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
                         )
                         Text(
-                            "Checking page title and image",
+                            stringResource(R.string.all_checking_page_title_and_image),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -2455,7 +2459,7 @@ private fun V4CompactLinkPreview(state: V4LinkPreviewState) {
         }
         V4LinkPreviewState.Unavailable -> {
             Text(
-                "Preview unavailable · Link can still be posted",
+                stringResource(R.string.all_preview_unavailable_link_can_still_be_posted),
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -2477,14 +2481,14 @@ private fun V4CompactLinkPreview(state: V4LinkPreviewState) {
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         Text(
-                            "${metadata.displayHost} · Preview found",
+                            stringResource(R.string.post_preview_found, metadata.displayHost),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
-                            metadata.title ?: "Link preview ready",
+                            metadata.title ?: stringResource(R.string.all_link_preview_ready),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
                             maxLines = 2,
@@ -2494,7 +2498,7 @@ private fun V4CompactLinkPreview(state: V4LinkPreviewState) {
                     if (metadata.imageUrl != null) {
                         RemoteImage(
                             uri = metadata.imageUrl,
-                            label = "Link preview image",
+                            label = stringResource(R.string.sw_link_preview_image),
                             modifier = Modifier
                                 .size(width = 96.dp, height = 72.dp)
                                 .clip(MaterialTheme.shapes.medium),
@@ -2577,9 +2581,9 @@ private fun V4MediaSection(
                 Icon(Symbols.PermMedia, contentDescription = null)
                 Text(
                     when {
-                        media.size > 1 -> "Gallery · ${media.size} items"
-                        video != null -> if (videoAsGif) "GIF" else "Video"
-                        else -> media.singleOrNull()?.kind?.label ?: "Media"
+                        media.size > 1 -> pluralStringResource(R.plurals.post_gallery_items, media.size, media.size)
+                        video != null -> stringResource(if (videoAsGif) R.string.media_label_gif else R.string.media_label_video)
+                        else -> media.singleOrNull()?.kind?.labelRes?.let { stringResource(it) } ?: stringResource(R.string.all_media)
                     },
                     modifier = Modifier.weight(1f).padding(start = 10.dp),
                     style = MaterialTheme.typography.titleSmall,
@@ -2589,7 +2593,7 @@ private fun V4MediaSection(
                         enabled = videoAllowed || videoGifAllowed,
                         onClick = onReplaceVideo,
                     ) {
-                        Text("Replace video")
+                        Text(stringResource(R.string.sw_replace_video))
                     }
                 } else {
                     TextButton(
@@ -2597,7 +2601,7 @@ private fun V4MediaSection(
                         onClick = onAddPhotos,
                     ) {
                         Icon(Symbols.Add, contentDescription = null, Modifier.size(18.dp))
-                        Text("Add photos", Modifier.padding(start = 4.dp))
+                        Text(stringResource(R.string.sw_add_photos), Modifier.padding(start = 4.dp))
                     }
                 }
             }
@@ -2619,14 +2623,14 @@ private fun V4MediaSection(
                         if (item.isComposerVideoSource()) {
                             V4MutedVideoPreview(
                                 uri = item.uri,
-                                contentDescription = "Video ${index + 1} of ${media.size}",
+                                contentDescription = stringResource(R.string.sw_video_of, index + 1, media.size),
                                 modifier = Modifier.fillMaxSize(),
                             )
                         } else {
                             LocalUriMedia(
                                 uri = item.uri,
                                 mimeType = item.mimeType,
-                                contentDescription = "${item.kind.label} ${index + 1} of ${media.size}",
+                                contentDescription = stringResource(R.string.sw_of, stringResource(item.kind.labelRes), index + 1, media.size),
                                 modifier = Modifier.fillMaxSize(),
                             )
                         }
@@ -2656,7 +2660,7 @@ private fun V4MediaSection(
                                     Icon(
                                         Symbols.Delete,
                                         // COMPOSER12_LABELLED_SWITCHES_V1: names what is removed.
-                                        contentDescription = composerMediaRemoveLabel(item, index),
+                                        contentDescription = composerMediaRemoveLabel(item, index).asString(),
                                         tint = Color.White,
                                     )
                                 }
@@ -2670,7 +2674,7 @@ private fun V4MediaSection(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            "Reorder",
+                            stringResource(R.string.all_reorder),
                             modifier = Modifier.weight(1f),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -2682,7 +2686,7 @@ private fun V4MediaSection(
                         ) {
                             Icon(
                                 Symbols.ArrowBack,
-                                contentDescription = "Move image earlier",
+                                contentDescription = stringResource(R.string.sw_move_image_earlier),
                             )
                         }
                         IconButton(
@@ -2692,7 +2696,7 @@ private fun V4MediaSection(
                         ) {
                             Icon(
                                 Symbols.ArrowForward,
-                                contentDescription = "Move image later",
+                                contentDescription = stringResource(R.string.sw_move_image_later),
                             )
                         }
                     }
@@ -2709,7 +2713,7 @@ private fun V4MediaSection(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 14.dp),
-                            label = { Text("Caption (optional)") },
+                            label = { Text(stringResource(R.string.sw_caption_optional)) },
                             supportingText = {
                                 Text(
                                     "${activeItem.caption.length} / $COMPOSER_GALLERY_CAPTION_MAX_LENGTH",
@@ -2731,10 +2735,10 @@ private fun V4MediaSection(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 14.dp),
-                                label = { Text("Attached link (optional)") },
-                                placeholder = { Text("https:" + "//example.com") },
+                                label = { Text(stringResource(R.string.sw_attached_link_optional)) },
+                                placeholder = { Text("https://example.com") },
                                 supportingText = {
-                                    Text("Opens separately from the image")
+                                    Text(stringResource(R.string.sw_opens_separately_from_the_image))
                                 },
                                 singleLine = true,
                                 keyboardOptions = KeyboardOptions(
@@ -2749,7 +2753,7 @@ private fun V4MediaSection(
                                 },
                                 modifier = Modifier.padding(horizontal = 14.dp),
                             ) {
-                                Text("+ Add link")
+                                Text(stringResource(R.string.scr_add_link_2))
                             }
                         }
                     }
@@ -2773,20 +2777,20 @@ private fun V4MediaSection(
                             verticalArrangement = Arrangement.spacedBy(2.dp),
                         ) {
                             Text(
-                                "Post as GIF",
+                                stringResource(R.string.all_post_as_gif),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                             )
                             Text(
                                 when {
                                     !videoAllowed && !videoGifAllowed ->
-                                        "This community doesn't allow video posts"
+                                        stringResource(R.string.all_this_community_doesn_t_allow_video_posts)
                                     !videoGifAllowed ->
-                                        "This community doesn't allow GIF-style video posts"
+                                        stringResource(R.string.all_this_community_doesn_t_allow_gif_style)
                                     !videoAllowed ->
-                                        "This community only allows GIF-style video posts"
+                                        stringResource(R.string.all_this_community_only_allows_gif_style_video)
                                     else ->
-                                        "Publish as Reddit's silent looping GIF-style video"
+                                        stringResource(R.string.all_publish_as_reddit_s_silent_looping_gif)
                                 },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -2892,9 +2896,9 @@ private fun V4MutedVideoPreview(
             .clickable(
                 enabled = !failed,
                 onClickLabel = if (playing) {
-                    "Pause muted video preview"
+                    stringResource(R.string.all_pause_muted_video_preview)
                 } else {
-                    "Play muted video preview"
+                    stringResource(R.string.all_play_muted_video_preview)
                 },
             ) {
                 playing = !playing
@@ -2931,9 +2935,9 @@ private fun V4MutedVideoPreview(
             ) {
                 Text(
                     when {
-                        failed -> "Preview unavailable"
-                        playing -> "Preview · Tap to pause"
-                        else -> "Preview · Tap to play"
+                        failed -> stringResource(R.string.all_preview_unavailable)
+                        playing -> stringResource(R.string.all_preview_tap_to_pause)
+                        else -> stringResource(R.string.all_preview_tap_to_play)
                     },
                     color = Color.White,
                     style = MaterialTheme.typography.labelMedium,
@@ -2949,7 +2953,7 @@ private fun V4MutedVideoPreview(
             ) {
                 Icon(
                     Symbols.PlayArrowFilled,
-                    contentDescription = "Play muted video preview",
+                    contentDescription = stringResource(R.string.sw_play_muted_video_preview),
                     tint = Color.White,
                     modifier = Modifier.padding(12.dp),
                 )
@@ -2972,7 +2976,7 @@ private fun V4MediaPickerSheet(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text("Add media", style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.sw_add_media), style = MaterialTheme.typography.headlineSmall)
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = photosEnabled,
@@ -2983,9 +2987,9 @@ private fun V4MediaPickerSheet(
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Symbols.Image, contentDescription = null)
                     Column(Modifier.padding(start = 14.dp)) {
-                        Text("Photos or gallery", style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(R.string.sw_photos_or_gallery), style = MaterialTheme.typography.titleMedium)
                         Text(
-                            "Choose up to 20 images or GIFs",
+                            stringResource(R.string.all_choose_up_to_20_images_or_gifs),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -3002,9 +3006,9 @@ private fun V4MediaPickerSheet(
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Symbols.Movie, contentDescription = null)
                     Column(Modifier.padding(start = 14.dp)) {
-                        Text("Video", style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(R.string.sw_video), style = MaterialTheme.typography.titleMedium)
                         Text(
-                            "Choose one video",
+                            stringResource(R.string.all_choose_one_video),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -3043,7 +3047,7 @@ private fun V4BodyEditor(
         verticalArrangement = Arrangement.spacedBy(9.dp),
     ) {
         ComposerBodyHeader(
-            title = "Body",
+            title = stringResource(R.string.sw_body),
             length = body.length,
             maxLength = maxLength,
             previewVisible = previewShown,
@@ -3059,7 +3063,7 @@ private fun V4BodyEditor(
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "Editor",
+                        stringResource(R.string.all_editor),
                         modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -3077,7 +3081,7 @@ private fun V4BodyEditor(
                 }
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "Preview",
+                        stringResource(R.string.all_preview),
                         modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -3121,7 +3125,7 @@ private fun V4BodyNotAllowed(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(9.dp),
     ) {
-        Text("Body", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.sw_body), style = MaterialTheme.typography.titleMedium)
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
@@ -3137,12 +3141,12 @@ private fun V4BodyNotAllowed(
             )
         }
         Text(
-            COMPOSER_BODY_NOT_ALLOWED_MESSAGE,
+            COMPOSER_BODY_NOT_ALLOWED_MESSAGE.asString(),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.error,
         )
         OutlinedButton(onClick = onRemove, enabled = enabled) {
-            Text("Remove body text")
+            Text(stringResource(R.string.sw_remove_body_text))
         }
     }
 }
@@ -3189,7 +3193,7 @@ private fun V4BodyCanvas(
     }
     PostStyleComposerEditor(
         state = state,
-        placeholder = "Share the details…",
+        placeholder = stringResource(R.string.sw_share_the_details),
         focusRequester = focusRequester,
         onFormat = onFormat,
         onMediaReceived = onMediaReceived,
@@ -3252,7 +3256,7 @@ private fun V4AddContentRow(
         AssistChip(
             enabled = linkEnabled,
             onClick = onAddLink,
-            label = { Text("Add link") },
+            label = { Text(stringResource(R.string.scr_add_link)) },
             leadingIcon = {
                 Icon(Symbols.AddLink, contentDescription = null, Modifier.size(18.dp))
             },
@@ -3261,7 +3265,7 @@ private fun V4AddContentRow(
             AssistChip(
                 enabled = mediaEnabled,
                 onClick = onAddMedia,
-                label = { Text("Add media") },
+                label = { Text(stringResource(R.string.scr_add_media)) },
                 leadingIcon = {
                     Icon(Symbols.PermMedia, contentDescription = null, Modifier.size(18.dp))
                 },
@@ -3284,12 +3288,14 @@ private fun V4PostOptions(
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
+        val expandedState = stringResource(R.string.composer_state_expanded)
+        val collapsedState = stringResource(R.string.composer_state_collapsed)
         Column {
             // ISSUE219_EXPANDABLE_ROWS_SAY_THEIR_STATE_V1
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .semantics { stateDescription = if (expanded) "Expanded" else "Collapsed" },
+                    .semantics { stateDescription = if (expanded) expandedState else collapsedState },
                 color = Color.Transparent,
                 onClick = onExpandedChange,
             ) {
@@ -3298,11 +3304,11 @@ private fun V4PostOptions(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(Modifier.weight(1f)) {
-                        Text("Post options", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.scr_post_options), style = MaterialTheme.typography.titleSmall)
                         val active = buildList {
                             if (draft.nsfw) add("NSFW")
-                            if (draft.spoiler) add("Spoiler")
-                            if (!draft.sendReplies) add("Replies off")
+                            if (draft.spoiler) add(stringResource(R.string.all_spoiler))
+                            if (!draft.sendReplies) add(stringResource(R.string.all_replies_off))
                         }
                         if (active.isNotEmpty()) {
                             Text(
@@ -3321,10 +3327,10 @@ private fun V4PostOptions(
             }
             if (expanded) {
                 HorizontalDivider()
-                V4OptionSwitch("Mark as NSFW", draft.nsfw, onNsfwChange)
-                V4OptionSwitch("Mark as spoiler", draft.spoiler, onSpoilerChange)
+                V4OptionSwitch(stringResource(R.string.all_mark_as_nsfw), draft.nsfw, onNsfwChange)
+                V4OptionSwitch(stringResource(R.string.all_mark_as_spoiler), draft.spoiler, onSpoilerChange)
                 V4OptionSwitch(
-                    "Send reply notifications",
+                    stringResource(R.string.all_send_reply_notifications),
                     draft.sendReplies,
                     onRepliesChange,
                 )
@@ -3368,7 +3374,7 @@ internal fun composerPostingAsUsername(state: SubshellState): String? =
             state.accountSessions.count { session -> session.source == AccountSessionSource.AUTHENTICATED } > 1
     }
 
-internal data class ComposerContentLoss(val title: String, val message: String)
+internal data class ComposerContentLoss(val title: UiText, val message: UiText)
 
 // COMPOSER04_CONFIRM_BEFORE_REPLACING_CONTENT_V1: what a change to the draft
 // would remove, or null when it keeps the link and every attachment.
@@ -3381,21 +3387,46 @@ internal fun composerContentLoss(
     val linkRemoved = current.type == ComposerPostType.LINK &&
         current.linkUrl.isNotBlank() &&
         (next.type != ComposerPostType.LINK || next.linkUrl.isBlank())
-    val what = when {
-        removedMedia.isNotEmpty() && linkRemoved -> "the link and the attachments"
-        linkRemoved -> "the link"
-        removedMedia.isEmpty() -> return null
-        removedMedia.all { it.isComposerVideoSource() } -> "the video"
-        removedMedia.size == 1 && removedMedia.single().kind == ComposerMediaKind.GIF -> "the GIF"
-        removedMedia.size == 1 -> "the image"
-        removedMedia.none { it.isComposerVideoSource() } -> "${removedMedia.size} images"
-        else -> "${removedMedia.size} attachments"
+    fun loss(key: String, count: Int = 0): ComposerContentLoss = when (key) {
+        "link_and_attachments" -> ComposerContentLoss(
+            UiText.Resource(R.string.composer_loss_title_link_and_attachments),
+            UiText.Resource(R.string.composer_loss_message_link_and_attachments),
+        )
+        "link" -> ComposerContentLoss(
+            UiText.Resource(R.string.composer_loss_title_link),
+            UiText.Resource(R.string.composer_loss_message_link),
+        )
+        "video" -> ComposerContentLoss(
+            UiText.Resource(R.string.composer_loss_title_video),
+            UiText.Resource(R.string.composer_loss_message_video),
+        )
+        "gif" -> ComposerContentLoss(
+            UiText.Resource(R.string.composer_loss_title_gif),
+            UiText.Resource(R.string.composer_loss_message_gif),
+        )
+        "image" -> ComposerContentLoss(
+            UiText.Resource(R.string.composer_loss_title_image),
+            UiText.Resource(R.string.composer_loss_message_image),
+        )
+        "images" -> ComposerContentLoss(
+            UiText.Plural(R.plurals.composer_loss_title_images, count, count),
+            UiText.Plural(R.plurals.composer_loss_message_images, count, count),
+        )
+        else -> ComposerContentLoss(
+            UiText.Plural(R.plurals.composer_loss_title_attachments, count, count),
+            UiText.Plural(R.plurals.composer_loss_message_attachments, count, count),
+        )
     }
-    return ComposerContentLoss(
-        title = "Remove $what?",
-        message = "A post can't have both. ${what.replaceFirstChar(Char::uppercase)} " +
-            "will be removed from this draft.",
-    )
+    return when {
+        removedMedia.isNotEmpty() && linkRemoved -> loss("link_and_attachments")
+        linkRemoved -> loss("link")
+        removedMedia.isEmpty() -> null
+        removedMedia.all { it.isComposerVideoSource() } -> loss("video")
+        removedMedia.size == 1 && removedMedia.single().kind == ComposerMediaKind.GIF -> loss("gif")
+        removedMedia.size == 1 -> loss("image")
+        removedMedia.none { it.isComposerVideoSource() } -> loss("images", removedMedia.size)
+        else -> loss("attachments", removedMedia.size)
+    }
 }
 
 // COMPOSER08_PASTED_MEDIA_DISTINCT_V1: an image pasted twice is attached once
@@ -3411,10 +3442,10 @@ internal fun composerMediaWithPasted(
 }
 
 // COMPOSER12_LABELLED_SWITCHES_V1: the remove action names the attachment.
-internal fun composerMediaRemoveLabel(item: ComposerMediaAttachment, index: Int): String = when {
-    item.isComposerVideoSource() -> "Remove video"
-    item.kind == ComposerMediaKind.GIF -> "Remove GIF ${index + 1}"
-    else -> "Remove image ${index + 1}"
+internal fun composerMediaRemoveLabel(item: ComposerMediaAttachment, index: Int): UiText = when {
+    item.isComposerVideoSource() -> UiText.Resource(R.string.composer_remove_video)
+    item.kind == ComposerMediaKind.GIF -> UiText.Resource(R.string.composer_remove_gif_n, index + 1)
+    else -> UiText.Resource(R.string.composer_remove_image_n, index + 1)
 }
 
 // COMPOSER13_BODY_SYNC_ECHO_V1
@@ -3437,8 +3468,8 @@ internal fun restoredPreflightMinimumRevision(
     savedMinimumRevision: Long,
 ): Long = if (savedProcessToken == currentProcessToken) savedMinimumRevision else 0L
 
-internal const val COMPOSER_REQUEST_UNBUILDABLE_MESSAGE =
-    "This post can't be sent as it is. Check its link and attachments."
+@androidx.annotation.StringRes
+internal val COMPOSER_REQUEST_UNBUILDABLE_MESSAGE: Int = R.string.composer_request_unbuildable
 
 // LOWUI1_GALLERY_PAGE_KEYS_UNIQUE_V1 (OCB-315): a draft saved before COMPOSER08
 // can hold the same image twice; a repeat gets its own key instead of crashing
@@ -3464,8 +3495,8 @@ private fun ViewportErrorHostState.presentGalleryFull(leftOut: Int) {
         scopeKey = GALLERY_FULL_NOTICE_SCOPE,
         presentation = ErrorPresentation(
             kind = ErrorPresentationKind.DEGRADED,
-            title = "A gallery holds 20 photos",
-            message = if (leftOut == 1) "1 photo was left out." else "$leftOut photos were left out.",
+            title = UiText.Resource(R.string.ep_a_gallery_holds_20_photos),
+            message = UiText.Plural(R.plurals.post_photos_left_out, leftOut, leftOut),
         ),
         failureDetails = null,
         onRetry = null,
@@ -3488,7 +3519,7 @@ internal fun composerTitleSupportingText(
         Row(Modifier.fillMaxWidth()) {
             Text(message.orEmpty(), modifier = Modifier.weight(1f))
             if (showCounter) {
-                Text("$length / $maxLength", modifier = Modifier.padding(start = 16.dp))
+                Text(stringResource(R.string.scr_text, length, maxLength), modifier = Modifier.padding(start = 16.dp))
             }
         }
     }

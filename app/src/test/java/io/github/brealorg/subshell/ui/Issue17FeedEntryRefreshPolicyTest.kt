@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertFalse
@@ -34,7 +35,7 @@ class Issue17FeedEntryRefreshPolicyTest {
         relativePath: String,
         surfaceMarker: String,
     ) {
-        val source = File(repositoryRoot, relativePath).readText()
+        val source = File(repositoryRoot, relativePath).readSourceText()
         val start = source.indexOf(
             "// ISSUE17_AUTHENTICATED_FEED_ENTRY_REVALIDATION_V1",
         )

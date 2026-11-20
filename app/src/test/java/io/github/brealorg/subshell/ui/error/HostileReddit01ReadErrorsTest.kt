@@ -1,5 +1,10 @@
 package io.github.brealorg.subshell.ui.error
 
+import io.github.brealorg.subshell.ui.UiText
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.account.CustomFeedPostsFailureKind
 import io.github.brealorg.subshell.data.account.RedditCommentUiFailureKind
 import io.github.brealorg.subshell.data.account.RedditCommunityDiscoveryUiFailureKind
@@ -21,6 +26,9 @@ import org.junit.Test
  * is blocking the request when its failure is Reddit's block page, whether or
  * not stored content is still shown.
  */
+// TRANSLATE03: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class HostileReddit01ReadErrorsTest {
     private val blocked = FailureDetails(
         httpStatusCode = 403,
@@ -46,7 +54,7 @@ class HostileReddit01ReadErrorsTest {
     fun everySharedReadErrorNamesTheBlockPage() {
         val silent = listOf(false, true).flatMap { cached ->
             presentations(cached)
-                .filterNot { (_, presentation) -> presentation.message.contains(REDDIT_BLOCK_PAGE_MESSAGE) }
+                .filterNot { (_, presentation) -> presentation.message.s.contains(REDDIT_BLOCK_PAGE_MESSAGE.s) }
                 .map { (name, presentation) -> "$name (cached=$cached): ${presentation.message}" }
         }
         assertTrue(silent.joinToString("\n"), silent.isEmpty())

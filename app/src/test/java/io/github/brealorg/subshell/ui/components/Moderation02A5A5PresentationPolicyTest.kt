@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import io.github.brealorg.subshell.model.CommunityModerator
 import java.io.File
@@ -22,8 +23,8 @@ class Moderation02A5A5PresentationPolicyTest {
 
     @Test
     fun inviteEditorReusesPeopleSearchAndExistingSingleSheetBackOwnership() {
-        val team = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/ModeratorTeam.kt").readText()
-        val tools = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/ModeratorToolsSheet.kt").readText()
+        val team = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/ModeratorTeam.kt").readSourceText()
+        val tools = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/ModeratorToolsSheet.kt").readSourceText()
 
         assertTrue(team.contains("LocalModeratorUserManagement.current"))
         assertTrue(team.contains("Search Reddit users"))
@@ -50,7 +51,7 @@ class Moderation02A5A5PresentationPolicyTest {
 
     @Test
     fun invitationCopyDoesNotProjectPendingInviteAsActiveModerator() {
-        val team = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/ModeratorTeam.kt").readText()
+        val team = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/ModeratorTeam.kt").readSourceText()
         assertTrue(team.contains("becomes a moderator after accepting the invitation on Reddit"))
         assertTrue(team.contains("Authorization updated. Review the target and permissions"))
         assertTrue(team.contains("state.failureDetails"))

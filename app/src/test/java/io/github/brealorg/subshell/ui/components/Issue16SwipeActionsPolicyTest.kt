@@ -1,5 +1,10 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.s
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.harness.readSourceText
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.ui.unit.LayoutDirection
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
@@ -13,12 +18,15 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue16SwipeActionsPolicyTest {
     @Test
-    fun swipeActionsAreBackwardCompatibleOffWithUsefulMappingsReady() {
+    fun swipeActionsAreOnByDefaultWithUsefulMappingsReady() {
         val settings = SubshellSettings()
 
-        assertFalse(settings.swipeActionsEnabled)
+        // DEFAULTS102_OWNER_SETTINGS_BECOME_DEFAULTS_V1 (owner 2026-11-11): on by default.
+        assertTrue(settings.swipeActionsEnabled)
         // Settings audit (owner 2026-10-13, SETTINGSAUDIT01_DEFAULTS_V1): swipe left
         // upvotes, swipe right downvotes, for posts and comments.
         assertEquals(PostSwipeAction.UPVOTE, settings.postSwipeLeftAction)
@@ -54,19 +62,19 @@ class Issue16SwipeActionsPolicyTest {
     fun affordanceLabelsDescribeTheExistingMutationSemantics() {
         assertEquals(
             "Remove upvote",
-            postSwipeActionLabel(PostSwipeAction.UPVOTE, vote = 1, saved = false, hidden = false),
+            postSwipeActionLabel(PostSwipeAction.UPVOTE, vote = 1, saved = false, hidden = false).s,
         )
         assertEquals(
             "Unsave",
-            postSwipeActionLabel(PostSwipeAction.SAVE, vote = 0, saved = true, hidden = false),
+            postSwipeActionLabel(PostSwipeAction.SAVE, vote = 0, saved = true, hidden = false).s,
         )
         assertEquals(
             "Unhide",
-            postSwipeActionLabel(PostSwipeAction.HIDE, vote = 0, saved = false, hidden = true),
+            postSwipeActionLabel(PostSwipeAction.HIDE, vote = 0, saved = false, hidden = true).s,
         )
         assertEquals(
             "Remove downvote",
-            commentSwipeActionLabel(CommentSwipeAction.DOWNVOTE, vote = -1),
+            commentSwipeActionLabel(CommentSwipeAction.DOWNVOTE, vote = -1).s,
         )
     }
 
@@ -89,7 +97,7 @@ class Issue16SwipeActionsPolicyTest {
             SubshellSettings.COMMENT_SWIPE_RIGHT_ACTION,
         )
         val restoredLegacy = SubshellSettings.fromStorageMap(legacy)
-        assertFalse(restoredLegacy.swipeActionsEnabled)
+        assertTrue(restoredLegacy.swipeActionsEnabled) // a backup without the key gets the default (on)
         assertEquals(PostSwipeAction.UPVOTE, restoredLegacy.postSwipeLeftAction)
         assertEquals(PostSwipeAction.DOWNVOTE, restoredLegacy.postSwipeRightAction)
     }
@@ -159,5 +167,5 @@ class Issue16SwipeActionsPolicyTest {
     }
 
     private fun source(relative: String): String =
-        File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative").readText()
+        File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative").readSourceText()
 }

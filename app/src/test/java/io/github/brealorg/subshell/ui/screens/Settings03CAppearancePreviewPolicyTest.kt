@@ -1,17 +1,22 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+
+import io.github.brealorg.subshell.ui.s
 import androidx.compose.ui.unit.dp
 import io.github.brealorg.subshell.ui.theme.ThemeMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class Settings03CAppearancePreviewPolicyTest {
     @Test
     fun themeLabelsAreProductCopy() {
-        assertEquals("System", appearanceThemeLabel(ThemeMode.SYSTEM))
-        assertEquals("Light", appearanceThemeLabel(ThemeMode.LIGHT))
-        assertEquals("Dark", appearanceThemeLabel(ThemeMode.DARK))
+        assertEquals("System", appearanceThemeLabel(ThemeMode.SYSTEM).s)
+        assertEquals("Light", appearanceThemeLabel(ThemeMode.LIGHT).s)
+        assertEquals("Dark", appearanceThemeLabel(ThemeMode.DARK).s)
     }
 
     @Test
@@ -22,8 +27,8 @@ class Settings03CAppearancePreviewPolicyTest {
 
     @Test
     fun appearanceOwnsThemeAndMotionSectionLabels() {
-        assertEquals("Theme & style", settingsSectionTitle(SettingsDestination.APPEARANCE, "Appearance"))
-        assertEquals("Motion", settingsSectionTitle(SettingsDestination.APPEARANCE, "Accessibility"))
+        assertEquals(R.string.set_section_theme_style, settingsSectionTitle(SettingsDestination.APPEARANCE, R.string.all_appearance))
+        assertEquals(R.string.set_section_motion, settingsSectionTitle(SettingsDestination.APPEARANCE, R.string.all_accessibility))
         assertTrue(
             settingsSectionVisible(
                 destination = SettingsDestination.APPEARANCE,

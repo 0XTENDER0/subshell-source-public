@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.pluralStringResource
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDefaults
@@ -35,7 +39,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -71,6 +75,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
@@ -99,11 +104,10 @@ import io.github.brealorg.subshell.model.Post
 import io.github.brealorg.subshell.ui.SubshellState
 import io.github.brealorg.subshell.ui.components.ErrorNotice
 import io.github.brealorg.subshell.ui.components.SavedResponseActions
-import io.github.brealorg.subshell.ui.components.InboxModerationActionStatus
 import io.github.brealorg.subshell.ui.components.InboxModeratorQueueFailure
 import io.github.brealorg.subshell.ui.components.InboxModeratorQueueItemCard
+import io.github.brealorg.subshell.ui.components.ModeratorQueueItemThumbnail
 import io.github.brealorg.subshell.ui.components.ModeratorReportLookupButton
-import io.github.brealorg.subshell.ui.components.InboxModeratorRemovalDialog
 import io.github.brealorg.subshell.ui.components.InboxModmailComposer
 import io.github.brealorg.subshell.ui.components.InboxModmailConversationRow
 import io.github.brealorg.subshell.ui.components.InboxModmailFailure
@@ -136,22 +140,22 @@ import io.github.brealorg.subshell.ui.app.rememberPredictiveBackPage
 // SUBSHELL_INBOXM3A1R1_VISUAL_REFINEMENT_PREVIEW_V1
 // SUBSHELL_INBOXM3A2_BADGE_OFFSET_PREVIEW_V1
 // SUBSHELL_INBOXM3A2R2_BADGE_POLISH_PREVIEW_V1
-private enum class InboxFilter(val label: String) {
-    ALL("All"),
-    UNREAD("Unread"),
+private enum class InboxFilter(@androidx.annotation.StringRes val labelRes: Int) {
+    ALL( io.github.brealorg.subshell.R.string.inbox_filter_all),
+    UNREAD( io.github.brealorg.subshell.R.string.inbox_filter_unread),
 }
 
 // MODMAIL01A1_QUEUE_MODMAIL_SECONDARY_NAV_V1
-enum class InboxModSection(val label: String) {
-    QUEUE("Queue"),
-    MODMAIL("Modmail"),
+enum class InboxModSection(@androidx.annotation.StringRes val labelRes: Int) {
+    QUEUE( io.github.brealorg.subshell.R.string.inbox_mod_section_queue),
+    MODMAIL( io.github.brealorg.subshell.R.string.inbox_mod_section_modmail),
 }
 
 // MOD01A22_CONDITIONAL_INBOX_MOD_TAB_V1
-enum class InboxPrimaryTab(val label: String) {
-    ACTIVITY("Activity"),
-    MESSAGES("Messages"),
-    MOD("Mod"),
+enum class InboxPrimaryTab(@androidx.annotation.StringRes val labelRes: Int) {
+    ACTIVITY( io.github.brealorg.subshell.R.string.inbox_primary_tab_activity),
+    MESSAGES( io.github.brealorg.subshell.R.string.inbox_primary_tab_messages),
+    MOD( io.github.brealorg.subshell.R.string.inbox_primary_tab_mod),
 }
 
 internal fun inboxPrimaryTabs(showModeration: Boolean): List<InboxPrimaryTab> =
@@ -191,12 +195,6 @@ fun InboxScreen(
         { _, _, onResolved -> onResolved(null) },
     moderationActionState: RedditModeratorActionUiState =
         RedditModeratorActionUiState(),
-    onModerateRedditQueueItem: (RedditModeratorActionRequest) -> Unit = {},
-    onRetryRedditModerationAction: () -> Unit = {},
-    onAuthorizeRedditModerationAction: () -> Unit = {},
-    removalReasonState: RedditRemovalReasonUiState = RedditRemovalReasonUiState(),
-    onLoadRedditRemovalReasons: (String, String, Boolean) -> Unit = { _, _, _ -> },
-    onAuthorizeRedditRemovalReasons: () -> Unit = {},
     redditModmailState: RedditModmailUiState = RedditModmailUiState(),
     onLoadRedditModmail: (String, Boolean) -> Unit = { _, _ -> },
     onAppendRedditModmail: (String) -> Unit = {},
@@ -382,11 +380,14 @@ fun InboxScreen(
         }
     }
 
-    val activityListState = rememberLazyListState()
-    val messagesListState = rememberLazyListState()
-    val moderationListState = rememberLazyListState()
-    val modmailListState = rememberLazyListState()
-    val modmailThreadListState = rememberLazyListState()
+    // ISSUE306_INBOX_LISTS_AND_SELECTION_BELONG_TO_THE_ACCOUNT_V1 (#306): the
+    // scroll positions and the selection carried over to another account
+    // ("3 selected" over its items, Back eaten by the selection).
+    val activityListState = rememberSaveable(accountStableId, saver = LazyListState.Saver) { LazyListState() }
+    val messagesListState = rememberSaveable(accountStableId, saver = LazyListState.Saver) { LazyListState() }
+    val moderationListState = rememberSaveable(accountStableId, saver = LazyListState.Saver) { LazyListState() }
+    val modmailListState = rememberSaveable(accountStableId, saver = LazyListState.Saver) { LazyListState() }
+    val modmailThreadListState = rememberSaveable(accountStableId, saver = LazyListState.Saver) { LazyListState() }
     val listState = when (selectedTab) {
         InboxPrimaryTab.ACTIVITY -> activityListState
         InboxPrimaryTab.MESSAGES -> messagesListState
@@ -398,7 +399,7 @@ fun InboxScreen(
     var filter by rememberSaveable(accountStableId) {
         mutableStateOf(InboxFilter.ALL)
     }
-    var selectedActivityIds by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var selectedActivityIds by remember(accountStableId) { mutableStateOf<Set<String>>(emptySet()) }
     // LOWUI6_INBOX_UNDO_BELONGS_TO_ITS_ACCOUNT_V1 (OCB-317): the undo offer is
     // kept per account (another account never undoes this one's clear),
     // survives a configuration change and goes away after INBOX_UNDO_VISIBLE_MS.
@@ -414,15 +415,11 @@ fun InboxScreen(
             undoDismissedIdList = ArrayList()
         }
     }
-    var pendingModeratorRemoval by remember {
-        mutableStateOf<RedditModeratorQueueItem?>(null)
-    }
     LaunchedEffect(accountStableId, selectedTab, selectedModSection) {
         if (
             selectedTab != InboxPrimaryTab.MOD ||
             selectedModSection != InboxModSection.QUEUE
         ) {
-            pendingModeratorRemoval = null
         }
         if (
             selectedTab != InboxPrimaryTab.MOD ||
@@ -478,7 +475,12 @@ fun InboxScreen(
     val modmailThread = redditModmailState.thread.takeIf { modmailStateMatches }
     val modmailAuthorizationRequired =
         modmailStateMatches && redditModmailState.authorizationRequired
-    val modmailFailure = redditModmailState.failureKind.takeIf { modmailStateMatches }
+    // ISSUE304_A_FAILED_ACTION_SAYS_WHICH_V1: the list shows its own failures (and
+    // a thread that could not be opened); an open thread shows action failures.
+    val modmailFailure = redditModmailState.failureKind.takeIf {
+        modmailStateMatches &&
+            (redditModmailState.failedAction == null || redditModmailState.thread == null)
+    }
     val modmailNextCursor = redditModmailState.nextCursor.takeIf { modmailStateMatches }
 
     LaunchedEffect(
@@ -894,35 +896,6 @@ fun InboxScreen(
         }
     }
 
-    pendingModeratorRemoval?.let { item ->
-        InboxModeratorRemovalDialog(
-            item = item,
-            accountStableId = accountStableId,
-            actionUiState = moderationActionState,
-            removalReasonState = removalReasonState,
-            onLoadRemovalReasons = { communityName, force ->
-                onLoadRedditRemovalReasons(
-                    accountStableId,
-                    communityName,
-                    force,
-                )
-            },
-            onAuthorizeRemovalReasons = onAuthorizeRedditRemovalReasons,
-            onModerate = onModerateRedditQueueItem,
-            onDismiss = { pendingModeratorRemoval = null },
-            // MODRESPONSE01A3_SAVED_RESPONSES_PICKER_V1
-            savedResponses = SavedResponseActions(
-                responses = state.moderatorSavedResponses,
-                onSave = state::saveModeratorResponse,
-                onDelete = state::deleteModeratorResponse,
-                initialType = state.moderatorRemovalMessageType(state.activeAccountId),
-                onTypeUsed = { type ->
-                    state.rememberModeratorRemovalMessageType(state.activeAccountId, type)
-                },
-            ),
-        )
-    }
-
     if (
         showSelectedModmailThread &&
         selectedTab == InboxPrimaryTab.MOD &&
@@ -1050,7 +1023,7 @@ fun InboxScreen(
                                     // ISSUE96_CANCEL_WAITING_AUTHORIZATION_V1: waiting for
                                     // the browser had no way out (Enable Inbox was off).
                                     TextButton(onClick = onCancelRedditInboxAuthorization) {
-                                        Text("Cancel authorization")
+                                        Text(stringResource(R.string.scr_cancel_authorization))
                                     }
                                 } else if (authenticated && liveAuthorizationRequired) {
                                     TextButton(
@@ -1058,7 +1031,7 @@ fun InboxScreen(
                                             onAuthorizeRedditInbox(accountStableId)
                                         },
                                     ) {
-                                        Text("Enable Inbox")
+                                        Text(stringResource(R.string.scr_enable_inbox))
                                     }
                                 }
                             }
@@ -1104,7 +1077,6 @@ fun InboxScreen(
                                 onSelect = { section ->
                                     selectedModSectionName = section.name
                                     onModSectionChanged(section)
-                                    pendingModeratorRemoval = null
                                 },
                             )
                             Row(
@@ -1117,15 +1089,15 @@ fun InboxScreen(
                                 val statusText = when (selectedModSection) {
                                     InboxModSection.QUEUE -> moderationCommunityCountLabel(
                                         redditModerationState.moderatedCommunities.size,
-                                    )
+                                    ).asString()
                                     InboxModSection.MODMAIL -> when {
-                                        !modmailStateMatches -> "Modmail"
+                                        !modmailStateMatches -> stringResource(R.string.all_modmail)
                                         redditModmailState.mailCommunities.isNotEmpty() ->
                                             modmailCommunityCountLabel(
                                                 redditModmailState.mailCommunities.size,
-                                            )
-                                        redditModmailState.loaded -> "No communities with mail permission"
-                                        else -> "Modmail"
+                                            ).asString()
+                                        redditModmailState.loaded -> stringResource(R.string.all_no_communities_with_mail_permission)
+                                        else -> stringResource(R.string.all_modmail)
                                     }
                                 }
                                 Text(
@@ -1144,9 +1116,9 @@ fun InboxScreen(
                                     ) {
                                         Text(
                                             if (redditModmailState.authorizing) {
-                                                "Authorizing…"
+                                                stringResource(R.string.all_authorizing)
                                             } else {
-                                                "Enable Modmail"
+                                                stringResource(R.string.all_enable_modmail)
                                             },
                                         )
                                     }
@@ -1186,8 +1158,8 @@ fun InboxScreen(
                                     Icon(
                                         Symbols.Refresh,
                                         contentDescription = when (selectedModSection) {
-                                            InboxModSection.QUEUE -> "Refresh moderation queue"
-                                            InboxModSection.MODMAIL -> "Refresh Modmail"
+                                            InboxModSection.QUEUE -> stringResource(R.string.all_refresh_moderation_queue)
+                                            InboxModSection.MODMAIL -> stringResource(R.string.all_refresh_modmail)
                                         },
                                     )
                                 }
@@ -1211,7 +1183,7 @@ fun InboxScreen(
                                     }
                                     clearActivitySelection()
                                 },
-                                label = { Text("Unread") },
+                                label = { Text(stringResource(R.string.scr_unread)) },
                             )
                             Spacer(Modifier.weight(1f))
                             if (
@@ -1226,7 +1198,7 @@ fun InboxScreen(
                                     Icon(
                                         Symbols.DoneAll,
                                         contentDescription =
-                                            "Mark all activity as read",
+                                            stringResource(R.string.all_mark_all_activity_as_read),
                                     )
                                 }
                             }
@@ -1242,7 +1214,7 @@ fun InboxScreen(
                                     Icon(
                                         Symbols.DoneAll,
                                         contentDescription =
-                                            "Mark all messages as read",
+                                            stringResource(R.string.all_mark_all_messages_as_read),
                                     )
                                 }
                             }
@@ -1284,7 +1256,7 @@ fun InboxScreen(
                         if (sectionItems.isNotEmpty()) {
                             item("activity-section-${section.name}") {
                                 Text(
-                                    section.label,
+                                    stringResource(section.labelRes),
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(
@@ -1327,7 +1299,7 @@ fun InboxScreen(
                         if (sectionItems.isNotEmpty()) {
                             item("message-section-${section.name}") {
                                 Text(
-                                    section.label,
+                                    stringResource(section.labelRes),
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(
@@ -1374,21 +1346,8 @@ fun InboxScreen(
                             }
                         }
 
-                        if (
-                            moderationActionState.phase !=
-                            io.github.brealorg.subshell.data.account.RedditModeratorActionPhase.IDLE &&
-                            moderationActionState.phase !=
-                            io.github.brealorg.subshell.data.account.RedditModeratorActionPhase.SENDING
-                        ) {
-                            item("mod-inbox-action-status") {
-                                InboxModerationActionStatus(
-                                    uiState = moderationActionState,
-                                    onRetry = onRetryRedditModerationAction,
-                                    onAuthorize = onAuthorizeRedditModerationAction,
-                                )
-                            }
-                        }
-
+                        // ISSUE295_QUEUE_USES_THE_SHEET_V1: an action's answer is the
+                        // tray notice and question every moderator action shows.
                         if (
                             moderationQueueLoading &&
                             moderationItems.isEmpty() &&
@@ -1405,7 +1364,7 @@ fun InboxScreen(
                                     InlineProgressIndicator()
                                     Spacer(Modifier.width(10.dp))
                                     Text(
-                                        "Loading moderation queue…",
+                                        stringResource(R.string.all_loading_moderation_queue),
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
@@ -1419,11 +1378,11 @@ fun InboxScreen(
                             OpeningTargetOverlay(opening = item.fullname in openingTargetKeys) {
                                 InboxModeratorQueueItemCard(
                                     item = item,
-                                    accountStableId = accountStableId,
                                     actionUiState = moderationActionState,
                                     onOpen = { openModeratorItem(item) },
-                                    onModerate = onModerateRedditQueueItem,
-                                    onRequestRemove = { pendingModeratorRemoval = it },
+                                    thumbnail = { thumbnailModifier ->
+                                        ModeratorQueueItemThumbnail(item, state, thumbnailModifier)
+                                    },
                                 )
                             }
                         }
@@ -1436,9 +1395,9 @@ fun InboxScreen(
                         ) {
                             item("mod-inbox-empty") {
                                 InboxEmptyState(
-                                    title = "Moderation queue is clear",
+                                    title = stringResource(R.string.scr_moderation_queue_is_clear),
                                     supportingText =
-                                        "No reported posts or comments need review.",
+                                        stringResource(R.string.all_no_reported_posts_or_comments_need_review),
                                 )
                             }
                         }
@@ -1474,9 +1433,9 @@ fun InboxScreen(
                             ) {
                                 item("modmail-authorization") {
                                     InboxEmptyState(
-                                        title = "Modmail permission required",
+                                        title = stringResource(R.string.scr_modmail_permission_required),
                                         supportingText =
-                                            "Enable Reddit Modmail access for this account to read moderator conversations.",
+                                            stringResource(R.string.all_enable_reddit_modmail_access_for_this_account),
                                     )
                                 }
                             }
@@ -1497,7 +1456,7 @@ fun InboxScreen(
                                         InlineProgressIndicator()
                                         Spacer(Modifier.width(10.dp))
                                         Text(
-                                            "Loading conversation…",
+                                            stringResource(R.string.all_loading_conversation_2),
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
                                     }
@@ -1520,7 +1479,7 @@ fun InboxScreen(
                                             InlineProgressIndicator()
                                             Spacer(Modifier.width(10.dp))
                                             Text(
-                                                "Loading Modmail…",
+                                                stringResource(R.string.all_loading_modmail),
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             )
                                         }
@@ -1557,9 +1516,9 @@ fun InboxScreen(
                                 ) {
                                     item("modmail-no-mail-permission") {
                                         InboxEmptyState(
-                                            title = "No Modmail access",
+                                            title = stringResource(R.string.scr_no_modmail_access),
                                             supportingText =
-                                                "This account has no moderated communities with mail permission.",
+                                                stringResource(R.string.all_this_account_has_no_moderated_communities_with),
                                         )
                                     }
                                 } else if (
@@ -1614,25 +1573,25 @@ fun InboxScreen(
                             supportingText = "",
                         )
                         clearedCurrentActivity -> InboxEmptyState(
-                            title = "Activity cleared",
-                            supportingText = "New activity will appear here.",
+                            title = stringResource(R.string.scr_activity_cleared),
+                            supportingText = stringResource(R.string.scr_new_activity_will_appear_here),
                         )
                         selectedTab == InboxPrimaryTab.ACTIVITY &&
                             filter == InboxFilter.UNREAD -> InboxEmptyState(
-                            title = "You're all caught up",
-                            supportingText = "No unread activity.",
+                            title = stringResource(R.string.scr_you_re_all_caught_up),
+                            supportingText = stringResource(R.string.scr_no_unread_activity),
                         )
                         selectedTab == InboxPrimaryTab.ACTIVITY -> InboxEmptyState(
-                            title = "No activity yet",
-                            supportingText = "Replies and mentions will appear here.",
+                            title = stringResource(R.string.scr_no_activity_yet),
+                            supportingText = stringResource(R.string.scr_replies_and_mentions_will_appear_here),
                         )
                         filter == InboxFilter.UNREAD -> InboxEmptyState(
-                            title = "You're all caught up",
-                            supportingText = "No unread messages.",
+                            title = stringResource(R.string.scr_you_re_all_caught_up),
+                            supportingText = stringResource(R.string.scr_no_unread_messages),
                         )
                         else -> InboxEmptyState(
-                            title = "No messages yet",
-                            supportingText = "Private messages will appear here.",
+                            title = stringResource(R.string.scr_no_messages_yet),
+                            supportingText = stringResource(R.string.scr_private_messages_will_appear_here),
                         )
                     }
                 }
@@ -1641,7 +1600,7 @@ fun InboxScreen(
             if (selectedAppending) {
                 item("inbox-appending-${selectedTab.name}") {
                     Text(
-                        "Loading more…",
+                        stringResource(R.string.all_loading_more),
                         modifier = Modifier.padding(
                             horizontal = 24.dp,
                             vertical = 12.dp,
@@ -1680,15 +1639,15 @@ fun InboxScreen(
                             contentColor = SnackbarDefaults.actionColor,
                         ),
                     ) {
-                        Text("Undo")
+                        Text(stringResource(R.string.scr_undo))
                     }
                 },
             ) {
                 Text(
                     if (showUndoClear) {
-                        "Activity cleared"
+                        stringResource(R.string.all_activity_cleared)
                     } else {
-                        "${undoDismissedIdList.size} dismissed"
+                        pluralStringResource(R.plurals.scr_inbox_dismissed, undoDismissedIdList.size, undoDismissedIdList.size)
                     },
                 )
             }
@@ -1718,15 +1677,11 @@ internal fun inboxTabUnreadCounts(
     return InboxTabUnreadCounts(activity = activity, messages = messages)
 }
 
-internal fun moderationCommunityCountLabel(count: Int): String = when (count) {
-    1 -> "Across 1 moderated community"
-    else -> "Across $count moderated communities"
-}
+internal fun moderationCommunityCountLabel(count: Int): UiText =
+    UiText.Plural(R.plurals.scr_across_moderated_communities, count, count)
 
-internal fun modmailCommunityCountLabel(count: Int): String = when (count) {
-    1 -> "Modmail for 1 community"
-    else -> "Modmail for $count communities"
-}
+internal fun modmailCommunityCountLabel(count: Int): UiText =
+    UiText.Plural(R.plurals.scr_modmail_for_communities, count, count)
 
 private fun InboxPrimaryTab.workspaceIcon(): ImageVector = when (this) {
     InboxPrimaryTab.ACTIVITY -> Symbols.AlternateEmail
@@ -1752,13 +1707,13 @@ private fun InboxWorkspacePrimaryNavigation(
     onSelect: (InboxPrimaryTab) -> Unit,
 ) {
     InboxTabRow(
-        labels = tabs.map { it.label },
+        labels = tabs.map { stringResource(it.labelRes) },
         selectedIndex = tabs.indexOf(selectedTab).coerceAtLeast(0),
         primary = true,
     ) {
         tabs.forEach { tab ->
             InboxTab(
-                label = tab.label,
+                label = stringResource(tab.labelRes),
                 icon = tab.workspaceIcon(),
                 count = badgeCount(tab),
                 selected = selectedTab == tab,
@@ -1776,13 +1731,13 @@ private fun InboxWorkspaceModerationNavigation(
     onSelect: (InboxModSection) -> Unit,
 ) {
     InboxTabRow(
-        labels = InboxModSection.entries.map { it.label },
+        labels = InboxModSection.entries.map { stringResource(it.labelRes) },
         selectedIndex = InboxModSection.entries.indexOf(selectedSection),
         primary = false,
     ) {
         InboxModSection.entries.forEach { section ->
             InboxTab(
-                label = section.label,
+                label = stringResource(section.labelRes),
                 icon = section.workspaceIcon(),
                 count = if (section == InboxModSection.MODMAIL) modmailUnreadCount else 0,
                 selected = selectedSection == section,
@@ -1868,23 +1823,25 @@ private fun InboxTab(
     )
 }
 
+@androidx.compose.runtime.Composable
 private fun inboxOperationalStatusLabel(
     authenticated: Boolean,
     liveStateMatches: Boolean,
     liveState: RedditInboxUiState,
 ): String? {
     if (!authenticated) return null
-    if (!liveStateMatches) return "Loading Inbox…"
+    if (!liveStateMatches) return stringResource(R.string.scr_inboxOperationalStatusLabel_1)
     return when {
-        liveState.authorizing -> "Waiting for Reddit authorization…"
-        liveState.authorizationRequired -> "Inbox permission required"
-        liveState.loading && !liveState.loaded -> "Loading Inbox…"
-        liveState.failureKind != null && liveState.items.isNotEmpty() -> "Showing saved Inbox"
-        liveState.failureKind != null -> "Inbox unavailable"
+        liveState.authorizing -> stringResource(R.string.scr_inboxOperationalStatusLabel_2)
+        liveState.authorizationRequired -> stringResource(R.string.scr_inboxOperationalStatusLabel_3)
+        liveState.loading && !liveState.loaded -> stringResource(R.string.scr_inboxOperationalStatusLabel_4)
+        liveState.failureKind != null && liveState.items.isNotEmpty() -> stringResource(R.string.scr_inboxOperationalStatusLabel_5)
+        liveState.failureKind != null -> stringResource(R.string.scr_inboxOperationalStatusLabel_6)
         else -> null
     }
 }
 
+@androidx.compose.runtime.Composable
 private fun inboxEmptyLabel(
     authenticated: Boolean,
     filter: InboxFilter,
@@ -1892,13 +1849,13 @@ private fun inboxEmptyLabel(
     liveState: RedditInboxUiState,
 ): String {
     if (!authenticated) {
-        return if (filter == InboxFilter.UNREAD) "Nothing unread here." else "No local items for this filter."
+        return if (filter == InboxFilter.UNREAD) stringResource(R.string.scr_inboxEmptyLabel_1) else stringResource(R.string.scr_inboxEmptyLabel_2)
     }
-    if (!liveStateMatches || liveState.loading && !liveState.loaded) return "Loading Inbox…"
+    if (!liveStateMatches || liveState.loading && !liveState.loaded) return stringResource(R.string.scr_inboxEmptyLabel_3)
     if (liveState.authorizationRequired) {
-        return "Allow Inbox read access to load Reddit activity and messages."
+        return stringResource(R.string.scr_inboxEmptyLabel_4)
     }
-    return if (filter == InboxFilter.UNREAD) "Nothing unread here." else "No Reddit items for this filter."
+    return if (filter == InboxFilter.UNREAD) stringResource(R.string.scr_inboxEmptyLabel_5) else stringResource(R.string.scr_inboxEmptyLabel_6)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -1913,7 +1870,9 @@ private fun ActivityRow(
     onOpen: () -> Unit,
     onLongPress: () -> Unit,
 ) {
+    val readStateLabel = stringResource(if (read) R.string.scr_inbox_read else R.string.scr_inbox_unread)
     val hapticFeedback = LocalHapticFeedback.current
+    val selectLabel = stringResource(R.string.scr_select_activity)
     val user = state.userFor(item.sender)
     val avatarUri = user.avatarImageUri
         ?.trim()
@@ -1937,12 +1896,15 @@ private fun ActivityRow(
                 // LOWUI7_READ_STATE_ON_THE_FOCUSED_ROW_V1 (OCB-224): on the
                 // clickable node TalkBack focuses, not the outer Surface.
                 .semantics {
-                    stateDescription = if (read) "Read" else "Unread"
+                    stateDescription = readStateLabel
+                    // ISSUE306_INBOX_ROWS_TELL_TALKBACK_ABOUT_SELECTION_V1 (#306)
+                    if (selectionMode) this.selected = selected
                 }
                 .combinedClickable(
                     onClick = {
                         if (selectionMode) onToggleSelected() else onOpen()
                     },
+                    onLongClickLabel = selectLabel,
                     onLongClick = {
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                         if (selectionMode) onToggleSelected() else onLongPress()
@@ -1969,7 +1931,7 @@ private fun ActivityRow(
                 // ISSUE34_USER_TAGS_V1
                 NameWithUserTag(tag = state.userTagFor(item.sender)) {
                     Text(
-                        text = item.sender.ifBlank { "Reddit" },
+                        text = item.sender.ifBlank { stringResource(R.string.all_reddit) },
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = if (read) FontWeight.Normal else FontWeight.SemiBold,
                         maxLines = 1,
@@ -2071,7 +2033,7 @@ private fun InboxActivityIdentity(
         ) {
             RemoteIdentityImage(
                 uri = avatarUri,
-                contentDescription = "Avatar for u/${item.sender}",
+                contentDescription = stringResource(R.string.scr_avatar_for_u, item.sender),
                 modifier = Modifier
                     .align(Alignment.Center)
                     .size(40.dp)
@@ -2150,6 +2112,7 @@ private fun InboxMessageRow(
     read: Boolean,
     onOpen: () -> Unit,
 ) {
+    val readStateLabel = stringResource(if (read) R.string.scr_inbox_read else R.string.scr_inbox_unread)
     val user = state.userFor(item.sender)
     val avatarUri = user.avatarImageUri
         ?.trim()
@@ -2160,7 +2123,7 @@ private fun InboxMessageRow(
             .fillMaxWidth()
             // A11Y01A1_INBOX_MESSAGE_READ_STATE_SEMANTICS_V1
             .semantics {
-                stateDescription = if (read) "Read" else "Unread"
+                stateDescription = readStateLabel
             }
             .padding(horizontal = 4.dp, vertical = 4.dp),
         shape = MaterialTheme.shapes.large,
@@ -2178,7 +2141,7 @@ private fun InboxMessageRow(
                     sender = item.sender,
                     avatarUri = avatarUri,
                     unread = !read,
-                    contentDescription = "Open ${item.title}",
+                    contentDescription = stringResource(R.string.scr_open, item.title),
                 )
             },
             content = {
@@ -2196,7 +2159,7 @@ private fun InboxMessageRow(
             supportingContent = {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
-                        text = inboxMessageSubjectLabel(item),
+                        text = inboxMessageSubjectLabel(item).asString(),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = if (read) FontWeight.Normal else FontWeight.Medium,
                         color = if (read) {
@@ -2275,7 +2238,7 @@ private fun InboxMessageIdentity(
 
         RemoteIdentityImage(
             uri = avatarUri,
-            contentDescription = "Avatar for u/$sender",
+            contentDescription = stringResource(R.string.scr_avatar_for_u, sender),
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .size(40.dp)
@@ -2316,11 +2279,11 @@ private fun InboxItem.activityActorUsername(): String? = sender
             !username.equals("reddit", ignoreCase = true)
     }
 
-internal fun inboxMessageSubjectLabel(item: InboxItem): String =
+internal fun inboxMessageSubjectLabel(item: InboxItem): UiText =
     if (item.title.trim().equals("[direct chat room]", ignoreCase = true)) {
-        "Direct chat"
+        UiText.Resource(R.string.scr_inbox_direct_chat)
     } else {
-        item.title.ifBlank { "Message" }
+        item.title.takeIf(String::isNotBlank)?.let(UiText::Plain) ?: UiText.Resource(R.string.scr_inbox_message)
     }
 
 private fun InboxItem.inboxMessageIdentityUsername(): String? {
@@ -2335,12 +2298,13 @@ private fun InboxItem.inboxMessageIdentityUsername(): String? {
         }
 }
 
+@androidx.compose.runtime.Composable
 private fun InboxItem.activityVerbLabel(): String = when (kind) {
-    ActivityKind.REPLY -> "Replied to your comment"
-    ActivityKind.POST_REPLY -> "Replied to your post"
-    ActivityKind.MENTION -> "Mentioned you"
-    ActivityKind.MOD -> title.ifBlank { "Reddit activity" }
-    ActivityKind.MESSAGE -> "Message"
+    ActivityKind.REPLY -> stringResource(R.string.scr_activityVerbLabel_1)
+    ActivityKind.POST_REPLY -> stringResource(R.string.scr_activityVerbLabel_2)
+    ActivityKind.MENTION -> stringResource(R.string.scr_activityVerbLabel_3)
+    ActivityKind.MOD -> title.ifBlank { stringResource(R.string.scr_activityVerbLabel_4) }
+    ActivityKind.MESSAGE -> stringResource(R.string.scr_activityVerbLabel_5)
 }
 
 private fun InboxItem.activityContextLabel(): String? {
@@ -2498,12 +2462,32 @@ internal fun InboxModmailThreadSurface(
             if (thread.messages.isEmpty()) {
                 item("modmail-thread-empty") {
                     InboxEmptyState(
-                        title = "No messages",
+                        title = stringResource(R.string.scr_no_messages),
                         supportingText =
-                            "Reddit returned this conversation without readable messages.",
+                            stringResource(R.string.all_reddit_returned_this_conversation_without_readable_messages),
                     )
                 }
             }
+        }
+
+        val failedAction = redditModmailState.failedAction
+        val failureKind = redditModmailState.failureKind
+        if (
+            failedAction != null &&
+            failureKind != null &&
+            // The composer and the header already say an outcome is unknown.
+            !(failedAction == io.github.brealorg.subshell.data.account.RedditModmailFailedAction.SEND && redditModmailState.sendOutcomeUnknown) &&
+            !redditModmailState.conversationActionOutcomeUnknown &&
+            !redditModmailState.readStateOutcomeUnknown
+        ) {
+            io.github.brealorg.subshell.ui.components.InboxModmailActionFailure(
+                failedAction = failedAction,
+                failureKind = failureKind,
+                httpStatusCode = redditModmailState.failureHttpStatusCode,
+                onReload = {
+                    onOpenRedditModmailConversation(accountStableId, thread.conversation.id)
+                },
+            )
         }
 
         InboxModmailComposer(
@@ -2527,6 +2511,10 @@ internal fun InboxModmailThreadSurface(
             sendOutcomeUnknown =
                 redditModmailState.sendOutcomeUnknown,
             sendRevision = redditModmailState.sendRevision,
+            initialDraft = state.modmailDraft(accountStableId, thread.conversation.id),
+            onDraftChange = { draft ->
+                state.updateModmailDraft(accountStableId, thread.conversation.id, draft)
+            },
             onSend = { body, internal, authorHidden ->
                 onSendRedditModmailMessage(
                     accountStableId,
@@ -2547,6 +2535,7 @@ private fun OpeningTargetOverlay(
     opening: Boolean,
     content: @Composable () -> Unit,
 ) {
+    val openingDescription = stringResource(R.string.scr_inbox_opening)
     Box {
         content()
         if (opening) {
@@ -2554,7 +2543,7 @@ private fun OpeningTargetOverlay(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .semantics { contentDescription = "Opening" },
+                    .semantics { contentDescription = openingDescription },
             )
         }
     }

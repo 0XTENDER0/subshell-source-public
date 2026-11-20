@@ -323,7 +323,10 @@ pass COMMENT_COMPOSER_KEEPS_PASTED_IMAGES
 # From messages02c3/c5r2: an image or GIF pasted from the keyboard into a
 # conversation reaches the same attachment path as the picker; the editor
 # takes it through a content receiver no JVM test can drive.
-grep -Fq 'onMediaReceived = ::requestMedia,' "$M/ui/screens/ConversationScreen.kt" &&
+# ISSUE306_A_PASTED_IMAGE_IS_KEPT_IN_THE_APP_V1: the same path, with the pasted
+# image copied into the app first (COMPOSER16), is the successor spelling.
+{ grep -Fq 'onMediaReceived = ::requestMedia,' "$M/ui/screens/ConversationScreen.kt" ||
+  grep -Fq 'onMediaReceived = { pasted -> requestMedia(pastedImageKeptInApp(pasteContext, pasted)) },' "$M/ui/screens/ConversationScreen.kt"; } &&
 grep -Fq '.contentReceiver(receiveContentListener)' "$M/ui/components/PostStyleComposerEditor.kt" ||
     fail CONVERSATION_COMPOSER_TAKES_PASTED_MEDIA
 pass CONVERSATION_COMPOSER_TAKES_PASTED_MEDIA
@@ -788,8 +791,9 @@ rg -U -q 'private fun reloadRedditConfigurationHost\(\) \{\n(\s*//[^\n]*\n)*\s*s
     "$M/MainActivity.kt" &&
 ! rg -q 'killProcess\(|System\.exit\(' "$M/MainActivity.kt" &&
 rg -U -q 'onRedditConfigurationChanged =\n\s*onRedditConfigurationChanged,' "$M/ui/app/SecondaryRouteHost.kt" &&
-rg -U -q '"Reddit connection configuration saved"\n\s*onRedditConfigurationChanged\(\)' "$M/ui/screens/SettingsScreen.kt" &&
-rg -U -q '"Reddit connection configuration removed"\n\s*onRedditConfigurationChanged\(\)' "$M/ui/screens/SettingsScreen.kt" ||
+# TRANSLATE14: the message may be the English literal or its string resource.
+rg -U -q '("Reddit connection configuration saved"|R\.string\.set_connection_configuration_saved\))\n\s*onRedditConfigurationChanged\(\)' "$M/ui/screens/SettingsScreen.kt" &&
+rg -U -q '("Reddit connection configuration removed"|R\.string\.set_connection_configuration_removed\))\n\s*onRedditConfigurationChanged\(\)' "$M/ui/screens/SettingsScreen.kt" ||
     fail CONFIGURATION_CHANGE_RELOADS_THE_HOST
 pass CONFIGURATION_CHANGE_RELOADS_THE_HOST
 

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.account.REDDIT_MODERATION_AGGREGATE_QUEUE
 import io.github.brealorg.subshell.data.account.RedditModerationUiState
 import io.github.brealorg.subshell.data.account.RedditModeratorQueueItem
@@ -11,6 +12,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class Mod01A22InboxModTabPolicyTest {
     @Test
     fun modTabOnlyAppearsForAccountsWithModeratedCommunities() {
@@ -69,11 +72,11 @@ class Mod01A22InboxModTabPolicyTest {
     fun moderationCommunityCountCopyIsGrammaticallyStable() {
         assertEquals(
             "Across 1 moderated community",
-            moderationCommunityCountLabel(1),
+            moderationCommunityCountLabel(1).s,
         )
         assertEquals(
             "Across 3 moderated communities",
-            moderationCommunityCountLabel(3),
+            moderationCommunityCountLabel(3).s,
         )
     }
 

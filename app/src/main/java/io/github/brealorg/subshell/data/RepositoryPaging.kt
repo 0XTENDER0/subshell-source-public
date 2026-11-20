@@ -57,14 +57,14 @@ enum class RedditMainFeed(
 
 enum class RedditListingTimePeriod(
     val apiValue: String,
-    val label: String,
+    @androidx.annotation.StringRes val labelRes: Int,
 ) {
-    HOUR(apiValue = "hour", label = "Past hour"),
-    DAY(apiValue = "day", label = "Today"),
-    WEEK(apiValue = "week", label = "This week"),
-    MONTH(apiValue = "month", label = "This month"),
-    YEAR(apiValue = "year", label = "This year"),
-    ALL(apiValue = "all", label = "All time"),
+    HOUR(apiValue = "hour", labelRes = io.github.brealorg.subshell.R.string.period_hour),
+    DAY(apiValue = "day", labelRes = io.github.brealorg.subshell.R.string.period_day),
+    WEEK(apiValue = "week", labelRes = io.github.brealorg.subshell.R.string.period_week),
+    MONTH(apiValue = "month", labelRes = io.github.brealorg.subshell.R.string.period_month),
+    YEAR(apiValue = "year", labelRes = io.github.brealorg.subshell.R.string.period_year),
+    ALL(apiValue = "all", labelRes = io.github.brealorg.subshell.R.string.period_all),
 }
 
 /**

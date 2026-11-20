@@ -77,7 +77,6 @@ import io.github.brealorg.subshell.ui.legacyStorageWritePermissionNeeded
 import io.github.brealorg.subshell.ui.RedditLinkHandlingPromptStore
 import io.github.brealorg.subshell.ui.RedditLinkHandlingState
 import io.github.brealorg.subshell.ui.RedditLinkHandlingStatus
-import io.github.brealorg.subshell.ui.RedditExternalPollHandoffStore
 import io.github.brealorg.subshell.ui.openRedditLinkHandlingSettings
 import io.github.brealorg.subshell.ui.readRedditLinkHandlingState
 import io.github.brealorg.subshell.ui.redditViewIntentLaunchOrNull
@@ -327,8 +326,8 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
         onResult: (Boolean) -> Unit,
     ) {
         requestDeviceUnlock(
-            title = "Unlock hidden subscriptions",
-            subtitle = "Confirm your device unlock to reveal hidden community names",
+            title = this@MainActivity.getString(R.string.biometric_unlock_hidden_title),
+            subtitle = this@MainActivity.getString(R.string.biometric_unlock_hidden_subtitle),
             onResult = onResult,
         )
     }
@@ -358,8 +357,8 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
             return
         }
         requestDeviceUnlock(
-            title = "Unlock subshell",
-            subtitle = "Confirm your device unlock to open subshell",
+            title = this@MainActivity.getString(R.string.biometric_unlock_app_title),
+            subtitle = this@MainActivity.getString(R.string.biometric_unlock_app_subtitle),
         ) { unlocked ->
             appUnlockPromptGate.onPromptFinished(unlocked)
             if (unlocked) {
@@ -468,6 +467,8 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
         // CRASH01_CRASHES_ARE_RECORDED_LOCALLY_V1: first, so a crash anywhere
         // after this point is recorded (once per process).
         CrashRecorder.install(applicationContext)
+        // ISSUE293_LANGUAGE_FILTER_V1
+        io.github.brealorg.subshell.language.ContentLanguages.install(applicationContext)
         // ISSUE265_SAVE_FOR_OFFLINE_V1
         RemoteImageLoader.offlineImageStore = OfflineImageStore.forContext(applicationContext)
         ListingSkipReports.install(applicationContext)
@@ -525,7 +526,7 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
             lifecycleScope.launch {
                 val runtime = AuthRuntimePreparation.obtain(applicationContext)
                 // STRICTMODE02_PREFERENCES_LOAD_BEFORE_THE_FIRST_FRAME_V1 (#243):
-                // the launch intent's handling reads the poll handoff file.
+                // the launch intent's handling reads the start-up preference files.
                 StartupPreferences.await(applicationContext)
                 authRuntimeForTheViewModel = runtime
                 authConnectViewModel
@@ -655,8 +656,8 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
                     onChange = ::changeAppLockSettings,
                     onRequestUnlock = { onResult ->
                         requestDeviceUnlock(
-                            title = "Turn on app lock",
-                            subtitle = "Confirm your device unlock to lock subshell",
+                            title = this@MainActivity.getString(R.string.biometric_turn_on_lock_title),
+                            subtitle = this@MainActivity.getString(R.string.biometric_turn_on_lock_subtitle),
                             onResult = onResult,
                         )
                     },
@@ -689,6 +690,7 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
                         checkRedditAccess = communitiesViewModel::checkRedditAccess,
                         onLogoutActiveAccount = authConnectViewModel::logoutActiveAccount,
                         onReconnectAccount = ::launchReconnectAccount,
+                        onWebSignInAgain = ::launchWebSignInAgain,
                         onlineVisibilityRuntime = io.github.brealorg.subshell.ui.components.OnlineVisibilityRuntime(
                             state = onlineVisibilityState,
                             onOpen = authConnectViewModel::openOnlineVisibility,
@@ -802,6 +804,10 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
                             readingViewModel::loadFocusedRedditComment,
                         onLoadMoreRedditComments =
                             readingViewModel::loadMoreRedditComments,
+                        onLoadMoreRedditCommentsFromEnd =
+                            readingViewModel::loadMoreRedditCommentsFromEnd,
+                        onLoadMoreRedditCommentsTogether =
+                            readingViewModel::loadMoreRedditCommentsTogether,
                     ),
                     redditUserFlairState = redditUserFlairState,
                     onLoadRedditUserFlair = postComposerViewModel::loadUserFlair,
@@ -812,6 +818,8 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
                             moderationViewModel::loadRedditModQueue,
                         onAppendRedditModQueue =
                             moderationViewModel::appendRedditModQueue,
+                        onSelectRedditModQueueList =
+                            moderationViewModel::selectRedditModQueueList,
                         onResolveRedditModerationTarget =
                             moderationViewModel::resolveRedditModerationTarget,
                         moderationActionState = moderationActionState,
@@ -1076,6 +1084,8 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
             recentsCardHiddenBySecureFlag = false
             window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
+        // ISSUE308_REDDIT_LINKS_STAY_OFF_UNTIL_THE_READER_RETURNS_V1
+        io.github.brealorg.subshell.ui.components.redditLinksBackOnReturn(this)
         refreshRedditLinkHandlingState()
     }
 
@@ -1228,6 +1238,17 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
     ) {
         launchAuthBrowser(
             { authConnectViewModel.beginReconnect(accountStableId) },
+            propagateFreshAccountSession = true,
+        ) {
+            authConnectViewModel.browserLaunchFailed()
+        }
+    }
+
+    private fun launchWebSignInAgain(
+        accountStableId: String,
+    ) {
+        launchAuthBrowser(
+            { authConnectViewModel.beginWebSignInAgain(accountStableId) },
             propagateFreshAccountSession = true,
         ) {
             authConnectViewModel.browserLaunchFailed()
@@ -1584,20 +1605,6 @@ class MainActivity : FragmentActivity(), LegacyStorageWritePermissionRequester {
         delivery: String,
     ): Boolean {
         val rawUri = candidate?.dataString
-        if (RedditExternalPollHandoffStore(this).consumeIfMatching(rawUri)) {
-            candidate?.data = null
-            if (BuildConfig.DEBUG) {
-                Log.d(
-                    "SubshellDeepLink",
-                    "phase=external_poll_rebound_suppressed delivery=$delivery uri=$rawUri",
-                )
-            }
-            window.decorView.post {
-                moveTaskToBack(true)
-            }
-            return true
-        }
-
         val target = redditViewIntentLaunchOrNull(
             action = candidate?.action,
             rawUri = rawUri,

@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.ui.error.ReportFailureDiagnostic
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -28,7 +30,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -99,39 +100,8 @@ internal fun ModeratorReportLookupButton(communityName: String? = null) {
     ) {
         Icon(Symbols.Search, contentDescription = null, modifier = Modifier.size(18.dp))
         Spacer(Modifier.width(8.dp))
-        Text("Find reports")
+        Text(stringResource(R.string.comp_find_reports))
     }
-}
-
-@Composable
-internal fun ModeratorReportsButton(item: RedditModeratorQueueItem) {
-    val entries = LocalModeratorReports.current ?: return
-    if (!entries.canInspect(item.communityName)) return
-    // MODERATION02A2R2_VISIBLE_ROW_REPORT_BUTTON_V1
-    OutlinedButton(
-        onClick = { entries.open(item.reportTarget()) },
-        modifier = Modifier.padding(horizontal = 12.dp).heightIn(min = 48.dp),
-        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
-    ) {
-        Icon(Symbols.FactCheck, contentDescription = null, modifier = Modifier.size(18.dp))
-        Spacer(Modifier.width(8.dp))
-        Text("View reports")
-    }
-}
-
-@Composable
-internal fun ModeratorReportMenuItem(target: ModeratorReportTarget?, onDismissMenu: () -> Unit) {
-    val entries = LocalModeratorReports.current ?: return
-    val community = target?.communityName ?: return
-    if (!entries.canInspect(community)) return
-    DropdownMenuItem(
-        text = { Text("Moderator reports") },
-        leadingIcon = { Icon(Symbols.FactCheck, contentDescription = null) },
-        onClick = {
-            onDismissMenu()
-            entries.open(target)
-        },
-    )
 }
 
 // MODERATION02A2_SHARED_REPORT_DIALOG_READ_CONFIRM_READBACK_V1
@@ -153,6 +123,8 @@ internal fun ModeratorReportsDialog(
     var lookup by remember(accountStableId, state.target) { mutableStateOf("") }
     var invalidLookup by remember(accountStableId, state.target) { mutableStateOf(false) }
     var lookupExpanded by remember(accountStableId, state.target) { mutableStateOf(false) }
+    val expandedState = stringResource(R.string.composer_state_expanded)
+    val collapsedState = stringResource(R.string.composer_state_collapsed)
     var pending by remember(accountStableId, state.target, state.revision) {
         mutableStateOf<ModeratorReportConfirmation?>(null)
     }
@@ -164,13 +136,13 @@ internal fun ModeratorReportsDialog(
     val reportListState = key(accountStableId, state.target?.fullname) { rememberLazyListState() }
     // MODERATION02A2R3_COMPACT_REPORT_TOP_BAR_V1, M3225_FORM_DIALOGS_ARE_FULL_SCREEN_ON_PHONES_V1
     AdaptiveFullScreenDialog(
-        title = if (state.target == null) "Find reports" else "Reports",
+        title = if (state.target == null) stringResource(R.string.comp_find_reports) else stringResource(R.string.comp_reports_title),
         onDismissRequest = onDismiss,
-        closeLabel = "Close reports",
+        closeLabel = stringResource(R.string.all_close_reports),
         navigationIcon = if (state.target != null) {
             {
                 IconButton(onClick = { onOpen(null) }, enabled = !busy) {
-                    Icon(Symbols.ArrowBack, contentDescription = "Choose another item")
+                    Icon(Symbols.ArrowBack, contentDescription = stringResource(R.string.comp_choose_another_item))
                 }
             }
         } else {
@@ -179,9 +151,9 @@ internal fun ModeratorReportsDialog(
         actions = {
             if (state.target != null) {
                 IconButton(onClick = onRefresh, enabled = !busy) {
-                    Icon(Symbols.Refresh, contentDescription = "Refresh reports")
+                    Icon(Symbols.Refresh, contentDescription = stringResource(R.string.comp_refresh_reports))
                 }
-                IconButton(onClick = onDismiss) { Icon(Symbols.Close, contentDescription = "Close reports") }
+                IconButton(onClick = onDismiss) { Icon(Symbols.Close, contentDescription = stringResource(R.string.comp_close_reports)) }
             }
         },
     ) {
@@ -195,9 +167,9 @@ internal fun ModeratorReportsDialog(
             // MODERATION02A2R3_QUEUE_FIRST_COLLAPSIBLE_MANUAL_LOOKUP_V1
             if (state.target == null) {
                 item("queue-heading") {
-                    ReportSectionHeading("In the loaded queue")
+                    ReportSectionHeading(stringResource(R.string.all_in_the_loaded_queue))
                     lookupContent.queueMessage?.let { message ->
-                        Text(message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(message.asString(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
                 itemsIndexed(lookupContent.queueItems, key = { _, item -> "lookup-queue-${item.fullname}" }) { _, item ->
@@ -210,7 +182,7 @@ internal fun ModeratorReportsDialog(
                     )
                 }
                 if (lookupContent.recentTargets.isNotEmpty()) {
-                    item("recent-heading") { ReportSectionHeading("Recently opened · this session") }
+                    item("recent-heading") { ReportSectionHeading(stringResource(R.string.all_recently_opened_this_session)) }
                     itemsIndexed(lookupContent.recentTargets, key = { _, target -> "recent-${target.fullname}" }) { _, target ->
                         ModeratorReportTargetButton(
                             target = target,
@@ -231,13 +203,13 @@ internal fun ModeratorReportsDialog(
                             Row(
                                 modifier = Modifier.fillMaxWidth()
                                     .clickable(enabled = !busy, role = Role.Button) { lookupExpanded = !lookupExpanded }
-                                    .semantics { stateDescription = if (lookupExpanded) "Expanded" else "Collapsed" }
+                                    .semantics { stateDescription = if (lookupExpanded) expandedState else collapsedState }
                                     .heightIn(min = 56.dp).padding(horizontal = 14.dp, vertical = 10.dp),
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Icon(Symbols.Link, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                                Text("Open by link or ID", modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                                Text(stringResource(R.string.comp_open_by_link_or_id), modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
                                 Icon(if (lookupExpanded) Symbols.ExpandLess else Symbols.ExpandMore, contentDescription = null)
                             }
                             if (lookupExpanded) {
@@ -248,9 +220,9 @@ internal fun ModeratorReportsDialog(
                                     OutlinedTextField(
                                         value = lookup,
                                         onValueChange = { lookup = it.take(2_000); invalidLookup = false },
-                                        label = { Text("Reddit link or t3_/t1_ ID") },
+                                        label = { Text(stringResource(R.string.comp_reddit_link_or_t3_t1_id)) },
                                         supportingText = {
-                                            Text(if (invalidLookup) "Enter one valid Reddit post/comment link or full ID." else "Also works for items no longer in the queue.")
+                                            Text(if (invalidLookup) stringResource(R.string.comp_enter_one_valid_reddit_post_comment) else stringResource(R.string.all_also_works_for_items_no_longer_in))
                                         },
                                         isError = invalidLookup,
                                         enabled = !busy,
@@ -267,7 +239,7 @@ internal fun ModeratorReportsDialog(
                                     ) {
                                         Icon(Symbols.Search, contentDescription = null, modifier = Modifier.size(18.dp))
                                         Spacer(Modifier.width(8.dp))
-                                        Text("Open reports")
+                                        Text(stringResource(R.string.comp_open_reports))
                                     }
                                 }
                             }
@@ -281,7 +253,7 @@ internal fun ModeratorReportsDialog(
                     // MODERATION02A2R3_CONTENT_BEFORE_TECHNICAL_ID_V1
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            ModeratorMetadataPill(if (target.fullname.startsWith("t3_")) "Post" else "Comment")
+                            ModeratorMetadataPill(stringResource(if (target.fullname.startsWith("t3_")) R.string.comp_pill_post else R.string.comp_pill_comment))
                             target.communityName?.let { ModeratorMetadataPill("r/$it") }
                         }
                         state.item?.let { item ->
@@ -297,7 +269,7 @@ internal fun ModeratorReportsDialog(
                 item("progress") {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                         InlineProgressIndicator()
-                        Text(if (state.mutating) "Checking and updating report settings…" else "Reading reports from Reddit…", style = MaterialTheme.typography.bodySmall)
+                        Text(if (state.mutating) stringResource(R.string.all_checking_and_updating_report_settings) else stringResource(R.string.all_reading_reports_from_reddit), style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
@@ -315,7 +287,7 @@ internal fun ModeratorReportsDialog(
                         actionState.request.thingFullname == state.target?.fullname &&
                         actionState.phase == RedditModeratorActionPhase.AUTHORIZATION_REQUIRED
                     ) {
-                        TextButton(onClick = onAuthorize) { Text("Authorize moderator actions") }
+                        TextButton(onClick = onAuthorize) { Text(stringResource(R.string.comp_authorize_moderator_actions)) }
                     }
                 }
             }
@@ -324,12 +296,12 @@ internal fun ModeratorReportsDialog(
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         ReportStatusBadge(reports.ignored)
                         Text(
-                            reports.totalCount?.let { "${moderatorReportQuantity(it)} returned" } ?: "Total report count unavailable",
+                            reports.totalCount?.let { "${moderatorReportQuantity(it).asString()} returned" } ?: stringResource(R.string.all_total_report_count_unavailable),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         if (reports.incomplete) {
-                            Text("Some report details were unavailable or shortened.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(R.string.comp_some_report_details_were_unavailable_or_shortened), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                         }
                     }
                 }
@@ -337,45 +309,45 @@ internal fun ModeratorReportsDialog(
                 if (userReasons == null || userReasons.isEmpty()) {
                     item("user-empty") {
                         ReportEmptySection(
-                            text = if (userReasons == null || reports.incomplete) "User report details unavailable." else "No user reports returned.",
+                            text = if (userReasons == null || reports.incomplete) stringResource(R.string.comp_user_report_details_unavailable) else stringResource(R.string.comp_no_user_reports_returned),
                             unavailable = userReasons == null || reports.incomplete,
                         )
                     }
                 } else {
-                    item("user-heading") { ReportSectionHeading("User reports") }
+                    item("user-heading") { ReportSectionHeading(stringResource(R.string.all_user_reports)) }
                     itemsIndexed(userReasons, key = { index, _ -> "user-$index" }) { _, reason -> ReportReasonRow(reason, false) }
                 }
                 val modReasons = reports.moderatorReports
                 if (modReasons == null || modReasons.isEmpty()) {
                     item("mod-empty") {
                         ReportEmptySection(
-                            text = if (modReasons == null || reports.incomplete) "Moderator report details unavailable." else "No moderator reports returned.",
+                            text = if (modReasons == null || reports.incomplete) stringResource(R.string.comp_moderator_report_details_unavailable) else stringResource(R.string.comp_no_moderator_reports_returned),
                             unavailable = modReasons == null || reports.incomplete,
                         )
                     }
                 } else {
-                    item("mod-heading") { ReportSectionHeading("Moderator reports") }
+                    item("mod-heading") { ReportSectionHeading(stringResource(R.string.all_moderator_reports)) }
                     itemsIndexed(modReasons, key = { index, _ -> "mod-$index" }) { _, reason -> ReportReasonRow(reason, true) }
                 }
                 item("action") {
                     // MODERATION02A2R3_REPORT_CONTROL_GROUP_V1
                     Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer) {
                         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text("Report handling", style = MaterialTheme.typography.titleSmall)
+                            Text(stringResource(R.string.comp_report_handling), style = MaterialTheme.typography.titleSmall)
                             if (confirmation != null) {
                                 val ignoring = confirmation.action == RedditModeratorAction.IGNORE_REPORTS
                                 Text(
-                                    if (ignoring) "Stop future report alerts for this item." else "Allow future report alerts for this item again.",
+                                    if (ignoring) stringResource(R.string.all_stop_future_report_alerts_for_this_item) else stringResource(R.string.all_allow_future_report_alerts_for_this_item),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                                 OutlinedButton(onClick = { pending = confirmation }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) {
                                     Icon(if (ignoring) Symbols.NotificationsOff else Symbols.NotificationsActive, contentDescription = null, modifier = Modifier.size(18.dp))
                                     Spacer(Modifier.width(8.dp))
-                                    Text(if (ignoring) "Ignore reports…" else "Unignore reports…")
+                                    Text(if (ignoring) stringResource(R.string.all_ignore_reports) else stringResource(R.string.all_unignore_reports))
                                 }
                             } else if (!state.busy) {
-                                Text("A known report setting and moderator permission are required before changing it.", style = MaterialTheme.typography.bodySmall)
+                                Text(stringResource(R.string.comp_a_known_report_setting_and_moderator_permission), style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
@@ -389,7 +361,7 @@ internal fun ModeratorReportsDialog(
     AlertDialog(
         onDismissRequest = { pending = null },
         icon = { Icon(if (ignoring) Symbols.NotificationsOff else Symbols.NotificationsActive, contentDescription = null) },
-        title = { Text(if (ignoring) "Ignore reports?" else "Unignore reports?") },
+        title = { Text(if (ignoring) stringResource(R.string.all_ignore_reports_2) else stringResource(R.string.all_unignore_reports_2)) },
         text = {
             Column(Modifier.heightIn(max = 280.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
@@ -399,9 +371,9 @@ internal fun ModeratorReportsDialog(
                         Text(pinned.target.fullname, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
-                Text(if (ignoring) "Future reports on this item will no longer trigger notifications or appear in moderation listings." else "Future reports on this item can trigger notifications and appear in moderation listings again.")
-                Text(if (ignoring) "Undo with Unignore reports." else "You can switch this off again with Ignore reports.", style = MaterialTheme.typography.bodySmall)
-                Text("This does not approve, remove or mark the content as spam, or ban its author.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(if (ignoring) stringResource(R.string.all_future_reports_on_this_item_will_no) else stringResource(R.string.all_future_reports_on_this_item_can_trigger))
+                Text(if (ignoring) stringResource(R.string.all_undo_with_unignore_reports) else stringResource(R.string.all_you_can_switch_this_off_again_with), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.comp_this_does_not_approve_remove_or_mark), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
         confirmButton = {
@@ -413,9 +385,9 @@ internal fun ModeratorReportsDialog(
                     onConfirm(current)
                 },
                 enabled = pinned == confirmation && !busy,
-            ) { Text(if (ignoring) "Ignore reports" else "Unignore reports") }
+            ) { Text(if (ignoring) stringResource(R.string.all_ignore_reports_3) else stringResource(R.string.all_unignore_reports_3)) }
         },
-        dismissButton = { TextButton(onClick = { pending = null }) { Text("Cancel") } },
+        dismissButton = { TextButton(onClick = { pending = null }) { Text(stringResource(R.string.comp_cancel)) } },
     )
 }
 
@@ -444,7 +416,7 @@ private fun ModeratorReportTargetButton(
             leadingContent = { ModeratorItemGlyph(isPost = target.fullname.startsWith("t3_")) },
             content = {
                 Text(
-                    summary ?: if (target.fullname.startsWith("t3_")) "Post" else "Comment",
+                    summary ?: stringResource(if (target.fullname.startsWith("t3_")) R.string.comp_pill_post else R.string.comp_pill_comment),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -465,9 +437,9 @@ private fun ModeratorReportTargetButton(
 @Composable
 private fun ReportStatusBadge(ignored: Boolean?) {
     val label = when (ignored) {
-        true -> "Reports ignored"
-        false -> "Reports active"
-        null -> "Report status unavailable"
+        true -> stringResource(R.string.all_reports_ignored)
+        false -> stringResource(R.string.all_reports_active)
+        null -> stringResource(R.string.all_report_status_unavailable)
     }
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -504,9 +476,9 @@ private fun ReportReasonRow(reason: RedditModeratorReportReason, moderator: Bool
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(reason.reason, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
             if (moderator) {
-                reason.moderatorName?.let { Text("Moderator: $it", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                reason.moderatorName?.let { Text(stringResource(R.string.comp_moderator, it), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             } else {
-                ModeratorMetadataPill(reason.count?.let(::moderatorReportQuantity) ?: "Count unavailable", emphasized = true)
+                ModeratorMetadataPill(reason.count?.let { moderatorReportQuantity(it).asString() } ?: stringResource(R.string.all_count_unavailable), emphasized = true)
             }
         }
     }
@@ -528,18 +500,19 @@ private fun ModeratorReportNotice(notice: ModeratorReportsNotice) {
     }
 }
 
+@androidx.compose.runtime.Composable
 internal fun moderatorReportsNoticeText(notice: ModeratorReportsNotice): String = when (notice) {
-    ModeratorReportsNotice.INVALID_TARGET -> "Enter one valid post/comment link or fullname."
-    ModeratorReportsNotice.NOT_FOUND -> "Reddit did not return the exact target. Its report status is unknown."
-    ModeratorReportsNotice.READ_FAILED -> "Could not read report details. Refresh to check again; no report state is assumed."
-    ModeratorReportsNotice.NO_PERMISSION -> "Reddit did not confirm Posts moderation permission for this target. Report settings cannot be changed."
-    ModeratorReportsNotice.STATE_UNKNOWN -> "Reddit did not return a known report-ignore setting. No change can be sent."
-    ModeratorReportsNotice.SETTINGS_CHANGED -> "Report settings changed since you opened the dialog. Review the current state before confirming again."
-    ModeratorReportsNotice.BUSY -> "Another moderator action is in progress. This action was not queued. Refresh before confirming again."
-    ModeratorReportsNotice.AUTHORIZATION_REQUIRED -> "Moderator authorization is required. After authorizing, refresh reports and confirm again. No write is resumed automatically."
-    ModeratorReportsNotice.WRITE_FAILED -> "The report action could not be completed. Refresh the target before making a new explicit choice."
-    ModeratorReportsNotice.VERIFIED -> "Report setting verified by a fresh read from Reddit."
-    ModeratorReportsNotice.VERIFIED_AFTER_UNKNOWN -> "The write response was unclear. A fresh read now confirms the displayed report setting. The write was not retried."
-    ModeratorReportsNotice.NOT_CONFIRMED -> "The requested report setting could not be confirmed. Refresh and inspect the current state before acting again. No retry was sent."
-    ModeratorReportsNotice.ACCOUNT_CHANGED -> "The active account changed. Reopen reports with the intended moderator account."
+    ModeratorReportsNotice.INVALID_TARGET -> stringResource(R.string.comp_reports_notice_1)
+    ModeratorReportsNotice.NOT_FOUND -> stringResource(R.string.comp_reports_notice_2)
+    ModeratorReportsNotice.READ_FAILED -> stringResource(R.string.comp_reports_notice_3)
+    ModeratorReportsNotice.NO_PERMISSION -> stringResource(R.string.comp_reports_notice_4)
+    ModeratorReportsNotice.STATE_UNKNOWN -> stringResource(R.string.comp_reports_notice_5)
+    ModeratorReportsNotice.SETTINGS_CHANGED -> stringResource(R.string.comp_reports_notice_6)
+    ModeratorReportsNotice.BUSY -> stringResource(R.string.comp_reports_notice_7)
+    ModeratorReportsNotice.AUTHORIZATION_REQUIRED -> stringResource(R.string.comp_reports_notice_8)
+    ModeratorReportsNotice.WRITE_FAILED -> stringResource(R.string.comp_reports_notice_9)
+    ModeratorReportsNotice.VERIFIED -> stringResource(R.string.comp_reports_notice_10)
+    ModeratorReportsNotice.VERIFIED_AFTER_UNKNOWN -> stringResource(R.string.comp_reports_notice_11)
+    ModeratorReportsNotice.NOT_CONFIRMED -> stringResource(R.string.comp_reports_notice_12)
+    ModeratorReportsNotice.ACCOUNT_CHANGED -> stringResource(R.string.comp_reports_notice_13)
 }

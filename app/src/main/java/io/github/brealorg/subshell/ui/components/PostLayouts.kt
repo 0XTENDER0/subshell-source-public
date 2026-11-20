@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import androidx.compose.ui.res.pluralStringResource
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -85,7 +88,7 @@ internal fun FeedPostLayoutContent(
 ) {
     val actions = feedPostAccessibilityActions(post, state, vote, saved, onComments)
     val openModifier = Modifier
-        .clickable(onClickLabel = "Open post", role = Role.Button, onClick = onOpen)
+        .clickable(onClickLabel = stringResource(R.string.feed_open_post), role = Role.Button, onClick = onOpen)
         .semantics(mergeDescendants = true) { customActions = actions }
     when (layout) {
         PostLayout.COMPACT -> CompactPostCard(post, state, vote, saved, read, onOpenCommunity, overflowMenu, modifier, openModifier)
@@ -95,6 +98,7 @@ internal fun FeedPostLayoutContent(
     }
 }
 
+@Composable
 private fun feedPostAccessibilityActions(
     post: Post,
     state: SubshellState,
@@ -103,13 +107,13 @@ private fun feedPostAccessibilityActions(
     onComments: () -> Unit,
 ): List<CustomAccessibilityAction> = buildList {
     if (state.postVoteControlEnabled(post)) {
-        add(CustomAccessibilityAction(if (vote == 1) "Remove upvote" else "Upvote") { state.vote(post, 1); true })
-        add(CustomAccessibilityAction(if (vote == -1) "Remove downvote" else "Downvote") { state.vote(post, -1); true })
+        add(CustomAccessibilityAction(stringResource(if (vote == 1) R.string.feed_action_remove_upvote else R.string.feed_action_upvote)) { state.vote(post, 1); true })
+        add(CustomAccessibilityAction(stringResource(if (vote == -1) R.string.feed_action_remove_downvote else R.string.feed_action_downvote)) { state.vote(post, -1); true })
     }
     if (state.postSaveControlEnabled(post)) {
-        add(CustomAccessibilityAction(if (saved) "Unsave" else "Save") { state.toggleSaved(post); true })
+        add(CustomAccessibilityAction(stringResource(if (saved) R.string.feed_action_unsave else R.string.feed_action_save)) { state.toggleSaved(post); true })
     }
-    add(CustomAccessibilityAction("Comments") { onComments(); true })
+    add(CustomAccessibilityAction(stringResource(R.string.feed_action_comments)) { onComments(); true })
 }
 
 @Composable
@@ -135,7 +139,7 @@ private fun CompactPostCard(
                     Modifier
                         .weight(1f)
                         .clip(MaterialTheme.shapes.small)
-                        .clickable(onClickLabel = "Open community", role = Role.Button, onClick = onOpenCommunity),
+                        .clickable(onClickLabel = stringResource(R.string.feed_open_community), role = Role.Button, onClick = onOpenCommunity),
                 ) {
                     PostMetaLine(post, state, read)
                 }
@@ -303,7 +307,7 @@ private fun PostMetaLine(post: Post, state: SubshellState, read: Boolean) {
         }
         Spacer(Modifier.width(6.dp))
         Text(
-            text = "${state.subredditLabel(post.community)} · ${post.age}",
+            text = stringResource(R.string.feed_text, state.subredditLabel(post.community), post.age),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
@@ -312,27 +316,34 @@ private fun PostMetaLine(post: Post, state: SubshellState, read: Boolean) {
         )
         if (shouldShowUnreadMarker(state.showUnreadMarker, read)) {
             Spacer(Modifier.width(6.dp))
+            val unreadDescription = stringResource(R.string.feed_unread_post)
             Box(
                 Modifier
                     .size(6.dp)
                     .background(MaterialTheme.colorScheme.primary, CircleShape)
-                    .semantics { contentDescription = "Unread post" },
+                    .semantics { contentDescription = unreadDescription },
             )
         }
-        postLabels(post).forEach { label ->
+        postLabels(post, showRemoved = postShowsRemoved(post, LocalModeratorQuickActions.current)).forEach { label ->
             Spacer(Modifier.width(6.dp))
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
-                color = if (label == "NSFW") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary,
+                color = if (label == "NSFW" || label == "REMOVED") {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.tertiary
+                },
                 maxLines = 1,
             )
         }
     }
 }
 
-internal fun postLabels(post: Post): List<String> = buildList {
+internal fun postLabels(post: Post, showRemoved: Boolean = false): List<String> = buildList {
+    // ISSUE295_REMOVED_POST_IS_MARKED_V1
+    if (showRemoved) add("REMOVED")
     if (post.pinned) add("PINNED")
     if (post.moderatorPost) add("MOD")
     if (post.spoiler) add("SPOILER")
@@ -346,8 +357,8 @@ private fun PostStatsLine(post: Post, state: SubshellState, vote: Int, saved: Bo
         Icon(
             imageVector = if (vote == -1) Symbols.ArrowDownward else Symbols.ArrowUpward,
             contentDescription = when (vote) {
-                1 -> "Upvoted"
-                -1 -> "Downvoted"
+                1 -> stringResource(R.string.all_upvoted)
+                -1 -> stringResource(R.string.all_downvoted)
                 else -> null
             },
             modifier = Modifier.size(16.dp),
@@ -357,23 +368,29 @@ private fun PostStatsLine(post: Post, state: SubshellState, vote: Int, saved: Bo
                 else -> quiet
             },
         )
+        val pointsDescription = pluralStringResource(
+            R.plurals.points_count,
+            state.effectivePostScore(post),
+            state.effectivePostScore(post),
+        )
         Text(
             text = compactNumber(state.effectivePostScore(post)),
             style = MaterialTheme.typography.labelMedium,
             color = quiet,
-            modifier = Modifier.semantics { contentDescription = "${state.effectivePostScore(post)} points" },
+            modifier = Modifier.semantics { contentDescription = pointsDescription },
         )
         Spacer(Modifier.width(8.dp))
         Icon(Symbols.Comment, contentDescription = null, modifier = Modifier.size(16.dp), tint = quiet)
+        val commentsDescription = pluralStringResource(R.plurals.comments_count, post.comments, post.comments)
         Text(
             text = compactNumber(post.comments),
             style = MaterialTheme.typography.labelMedium,
             color = quiet,
-            modifier = Modifier.semantics { contentDescription = "${post.comments} comments" },
+            modifier = Modifier.semantics { contentDescription = commentsDescription },
         )
         if (saved) {
             Spacer(Modifier.width(8.dp))
-            Icon(Symbols.BookmarkFilled, contentDescription = "Saved", modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
+            Icon(Symbols.BookmarkFilled, contentDescription = stringResource(R.string.feed_saved), modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
         }
         if (post.kind == PostKind.LINK) {
             post.domain?.takeIf(String::isNotBlank)?.let { domain ->
@@ -412,14 +429,16 @@ internal fun PostThumbnail(post: Post, state: SubshellState, modifier: Modifier 
     val mode = state.sensitiveMediaPreviewMode
     val hidden = sensitive && !revealed && mode == SensitiveMediaPreviewMode.HIDE_PREVIEW
     val coverOnly = sensitive && !revealed && mode == SensitiveMediaPreviewMode.LOAD_ON_TAP
-    val label = post.mediaLabel.ifBlank { post.title }
+    // LINKLABEL01_TALKBACK_READS_THE_DOMAIN_NOT_THE_ADDRESS_V1
+    val label = postMediaDescription(post).asString()
     val uriHandler = LocalUriHandler.current
+    val cleanLinks = LocalCleanLinks.current
     // A tap on a still opens what Large's media opens; a post kind without
     // its own media viewer leaves the tap to the row (it opens the post).
     val onClick: (() -> Unit)? = when {
         hidden -> ({ state.openMedia(post) })
         sensitive && !revealed -> ({ state.revealMedia(post) })
-        post.kind == PostKind.LINK -> externalPostUrl(post)?.let { url -> fun() { runCatching { uriHandler.openUri(url) } } }
+        post.kind == PostKind.LINK -> externalPostUrl(post, cleanLinks)?.let { url -> fun() { runCatching { uriHandler.openUri(url) } } }
         post.kind in MediaViewerKinds -> ({ state.openMedia(post) })
         else -> null
     }
@@ -433,10 +452,10 @@ internal fun PostThumbnail(post: Post, state: SubshellState, modifier: Modifier 
                 } else {
                     Modifier.clickable(
                         onClickLabel = when {
-                            hidden -> "Open hidden media"
-                            sensitive && !revealed -> "Show sensitive media"
-                            post.kind == PostKind.LINK -> "Open link"
-                            else -> "Open media"
+                            hidden -> stringResource(R.string.all_open_hidden_media)
+                            sensitive && !revealed -> stringResource(R.string.all_show_sensitive_media)
+                            post.kind == PostKind.LINK -> stringResource(R.string.feed_open_link)
+                            else -> stringResource(R.string.all_open_media)
                         },
                         role = Role.Button,
                         onClick = onClick,
@@ -446,8 +465,8 @@ internal fun PostThumbnail(post: Post, state: SubshellState, modifier: Modifier 
         contentAlignment = Alignment.Center,
     ) {
         when {
-            hidden -> Icon(Symbols.VisibilityOff, contentDescription = "Sensitive media hidden", tint = MaterialTheme.colorScheme.onSurfaceVariant)
-            coverOnly -> Icon(Symbols.Visibility, contentDescription = "Sensitive media, tap to load", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            hidden -> Icon(Symbols.VisibilityOff, contentDescription = stringResource(R.string.feed_sensitive_media_hidden), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            coverOnly -> Icon(Symbols.Visibility, contentDescription = stringResource(R.string.feed_sensitive_media_tap_to_load), tint = MaterialTheme.colorScheme.onSurfaceVariant)
             else -> {
                 val blurModifier = if (revealed) Modifier else Modifier.blur(16.dp)
                 val uri = postThumbnailUri(post)
@@ -514,7 +533,7 @@ internal fun PostLayoutDropdown(state: SubshellState, expanded: Boolean, onDismi
     ) {
         PostLayout.entries.forEach { layout ->
             DropdownMenuItem(
-                text = { Text(layout.label) },
+                text = { Text(stringResource(layout.labelRes)) },
                 modifier = Modifier.semantics { selected = layout == state.postLayout },
                 leadingIcon = { Icon(postLayoutIcon(layout), contentDescription = null) },
                 trailingIcon = if (layout == state.postLayout) {
@@ -532,7 +551,7 @@ internal fun PostLayoutDropdown(state: SubshellState, expanded: Boolean, onDismi
             HorizontalDivider()
             ListThumbnailSide.entries.forEach { side ->
                 DropdownMenuItem(
-                    text = { Text("Thumbnail ${side.label.lowercase()}") },
+                    text = { Text("Thumbnail ${stringResource(side.labelRes).lowercase()}") },
                     modifier = Modifier.semantics { selected = side == state.listThumbnailSide },
                     trailingIcon = if (side == state.listThumbnailSide) {
                         { Icon(Symbols.Check, contentDescription = null) }
@@ -562,7 +581,7 @@ internal fun PostLayoutMenuButton(state: SubshellState, modifier: Modifier = Mod
     var expanded by remember { mutableStateOf(false) }
     Box(modifier) {
         IconButton(onClick = { expanded = true }) {
-            Icon(postLayoutIcon(state.postLayout), contentDescription = "Post layout: ${state.postLayout.label}")
+            Icon(postLayoutIcon(state.postLayout), contentDescription = stringResource(R.string.feed_post_layout, stringResource(state.postLayout.labelRes)))
         }
         // One width for every choice: the menu was as wide as its longest row,
         // so "Compact ✓" and List's thumbnail rows moved it sideways (owner, phone).
@@ -573,7 +592,7 @@ internal fun PostLayoutMenuButton(state: SubshellState, modifier: Modifier = Mod
         ) {
             PostLayout.entries.forEach { layout ->
                 DropdownMenuItem(
-                    text = { Text(layout.label) },
+                    text = { Text(stringResource(layout.labelRes)) },
                     modifier = Modifier.semantics { selected = layout == state.postLayout },
                     leadingIcon = { Icon(postLayoutIcon(layout), contentDescription = null) },
                     trailingIcon = if (layout == state.postLayout) {
@@ -591,7 +610,7 @@ internal fun PostLayoutMenuButton(state: SubshellState, modifier: Modifier = Mod
                 HorizontalDivider()
                 ListThumbnailSide.entries.forEach { side ->
                     DropdownMenuItem(
-                        text = { Text("Thumbnail ${side.label.lowercase()}") },
+                        text = { Text(stringResource(R.string.feed_thumbnail, stringResource(side.labelRes).lowercase())) },
                         modifier = Modifier.semantics { selected = side == state.listThumbnailSide },
                         trailingIcon = if (side == state.listThumbnailSide) {
                             { Icon(Symbols.Check, contentDescription = null) }

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -88,7 +89,7 @@ class Issue97MembershipSyncRetryComposeTest {
     fun aFailedSyncSaysSoAndRetryReloadsIt() {
         showFailedSync()
 
-        assertEquals("Couldn't check your communities", noticeHost.currentRequest?.presentation?.title)
+        assertEquals("Couldn't check your communities", noticeHost.currentRequest?.presentation?.title?.s)
         assertEquals(0, composeRule.onAllNodesWithText("Loading…").fetchSemanticsNodes().size)
 
         composeRule.runOnIdle { noticeHost.retryCurrent() }

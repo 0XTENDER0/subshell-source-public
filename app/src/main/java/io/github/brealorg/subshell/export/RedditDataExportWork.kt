@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.export
 
+import io.github.brealorg.subshell.ui.UiText
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.DownloadManager
@@ -47,7 +48,7 @@ internal sealed interface RedditDataExportStatus {
     data object Waiting : RedditDataExportStatus
     data class Running(val done: Int, val total: Int) : RedditDataExportStatus
     data class Saved(val location: String, val items: Int, val incompleteLists: Int) : RedditDataExportStatus
-    data class Failed(val message: String) : RedditDataExportStatus
+    data class Failed(val reason: RedditExportFailure) : RedditDataExportStatus
 }
 
 internal object RedditDataExportScheduler {
@@ -94,7 +95,7 @@ internal fun WorkInfo.toExportStatus(accountStableId: String): RedditDataExportS
                     incompleteLists = data.getInt(KEY_INCOMPLETE, 0),
                 )
             } else {
-                RedditDataExportStatus.Failed(data.getString(KEY_MESSAGE) ?: EXPORT_NOT_SAVED)
+                RedditDataExportStatus.Failed(RedditExportFailure.fromStored(data.getString(KEY_MESSAGE)))
             }
         }
         WorkInfo.State.FAILED, WorkInfo.State.CANCELLED -> null
@@ -109,12 +110,12 @@ internal class RedditDataExportWorker(
         val account = inputData.getString(KEY_ACCOUNT)?.trim()?.takeIf(String::isNotEmpty)
             ?: return Result.success()
         val notifications = RedditDataExportNotifications(applicationContext)
-        fun failed(message: String): Result {
-            notifications.failed(message)
-            return Result.success(Data.Builder().putString(KEY_ACCOUNT, account).putString(KEY_MESSAGE, message).build())
+        fun failed(reason: RedditExportFailure): Result {
+            notifications.failed(reason)
+            return Result.success(Data.Builder().putString(KEY_ACCOUNT, account).putString(KEY_MESSAGE, reason.key).build())
         }
         val runtime = runCatching { AuthApplicationRuntimeFactory.create(applicationContext) }.getOrNull()
-        val reader = runtime?.redditDataExportReader ?: return failed(EXPORT_NOT_AVAILABLE)
+        val reader = runtime?.redditDataExportReader ?: return failed(RedditExportFailure.NOT_AVAILABLE)
         val username = try {
             runtime.accountSessionDirectory?.hydratedSnapshot()?.accounts?.firstOrNull { candidate ->
                 candidate.stableId == account && candidate.source == AccountSessionSource.AUTHENTICATED
@@ -123,11 +124,11 @@ internal class RedditDataExportWorker(
             throw cancelled
         } catch (_: Exception) {
             null
-        } ?: return failed(EXPORT_SIGN_IN)
+        } ?: return failed(RedditExportFailure.SIGN_IN)
         val access = when (val opened = reader.open(account)) {
             is RedditDataExportAccess.Granted -> opened
-            RedditDataExportAccess.SignInRequired -> return failed(EXPORT_SIGN_IN)
-            RedditDataExportAccess.Unavailable -> return failed(EXPORT_NO_TOKEN)
+            RedditDataExportAccess.SignInRequired -> return failed(RedditExportFailure.SIGN_IN)
+            RedditDataExportAccess.Unavailable -> return failed(RedditExportFailure.NO_TOKEN)
         }
         val today = LocalDate.now(ZoneOffset.UTC)
         val displayName = "subshell-reddit-export-u_$username-$today.zip"
@@ -154,9 +155,9 @@ internal class RedditDataExportWorker(
                     },
                 )
             }
-            if (run.items == 0 && run.incomplete.isNotEmpty()) return failed(EXPORT_NOTHING_READ)
+            if (run.items == 0 && run.incomplete.isNotEmpty()) return failed(RedditExportFailure.NOTHING_READ)
             val location = saveToDownloads(applicationContext, staged, displayName)
-                ?: return failed(EXPORT_NOT_SAVED)
+                ?: return failed(RedditExportFailure.NOT_SAVED)
             notifications.saved(location, run)
             return Result.success(
                 Data.Builder()
@@ -238,8 +239,8 @@ internal class RedditDataExportNotifications(context: Context) {
         post(
             NotificationCompat.Builder(appContext, REDDIT_EXPORT_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_subshell)
-                .setContentTitle("Exporting your Reddit data")
-                .setContentText("$done of $total lists")
+                .setContentTitle(appContext.getString(R.string.export_notification_running))
+                .setContentText(appContext.getString(R.string.export_lists_done, done, total))
                 .setProgress(total, done, total == 0)
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)
@@ -248,11 +249,11 @@ internal class RedditDataExportNotifications(context: Context) {
     }
 
     fun saved(location: String, run: RedditExportRun) {
-        val text = exportSavedText(location, run.items, run.incomplete.size)
+        val text = exportSavedText(location, run.items, run.incomplete.size).resolve(appContext)
         post(
             NotificationCompat.Builder(appContext, REDDIT_EXPORT_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_subshell)
-                .setContentTitle("Your Reddit data is exported")
+                .setContentTitle(appContext.getString(R.string.export_notification_saved))
                 .setContentText(text)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(text))
                 .setContentIntent(
@@ -267,11 +268,12 @@ internal class RedditDataExportNotifications(context: Context) {
         )
     }
 
-    fun failed(message: String) {
+    fun failed(reason: RedditExportFailure) {
+        val message = appContext.getString(reason.textRes)
         post(
             NotificationCompat.Builder(appContext, REDDIT_EXPORT_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_subshell)
-                .setContentTitle("Your Reddit data wasn't exported")
+                .setContentTitle(appContext.getString(R.string.export_notification_failed))
                 .setContentText(message)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message))
                 .setAutoCancel(true),
@@ -300,25 +302,44 @@ internal class RedditDataExportNotifications(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val manager = appContext.getSystemService(NotificationManager::class.java) ?: return
         manager.createNotificationChannel(
-            NotificationChannel(REDDIT_EXPORT_CHANNEL_ID, "Data export", NotificationManager.IMPORTANCE_LOW).apply {
-                description = "Progress while your Reddit data is exported"
+            NotificationChannel(REDDIT_EXPORT_CHANNEL_ID, appContext.getString(R.string.export_channel_name), NotificationManager.IMPORTANCE_LOW).apply {
+                description = appContext.getString(R.string.export_channel_description)
             },
         )
     }
 }
 
-internal fun exportSavedText(location: String, items: Int, incompleteLists: Int): String = buildString {
-    append("$items items saved to $location.")
-    if (incompleteLists > 0) {
-        append(" $incompleteLists ${if (incompleteLists == 1) "list is" else "lists are"} incomplete; summary.json says why.")
+internal fun exportSavedText(location: String, items: Int, incompleteLists: Int): UiText {
+    val saved = UiText.Plural(R.plurals.export_items_saved, items, items, location)
+    return if (incompleteLists > 0) {
+        UiText.Resource(
+            R.string.export_saved_with_incomplete,
+            saved,
+            UiText.Plural(R.plurals.export_lists_incomplete, incompleteLists, incompleteLists),
+        )
+    } else {
+        saved
     }
 }
 
-internal const val EXPORT_SIGN_IN = "Sign in to Reddit with this account again, then export."
-internal const val EXPORT_NO_TOKEN = "Couldn't reach Reddit to start the export. Try again later."
-internal const val EXPORT_NOTHING_READ = "Reddit didn't answer for any list. Try again later."
-internal const val EXPORT_NOT_SAVED = "Couldn't save the file to Downloads."
-internal const val EXPORT_NOT_AVAILABLE = "Export isn't available with this sign-in."
+/**
+ * TRANSLATE14_EXPORT_FAILURE_IS_STORED_AS_A_KEY_V1: the worker stores [key], and the
+ * reader shows [textRes] in the reader's language. Exports before this stored the
+ * English sentence ([legacyText]); it is still recognised.
+ */
+internal enum class RedditExportFailure(val key: String, @androidx.annotation.StringRes val textRes: Int, val legacyText: String) {
+    SIGN_IN("sign_in", R.string.export_failed_sign_in, "Sign in to Reddit with this account again, then export."),
+    NO_TOKEN("no_token", R.string.export_failed_no_token, "Couldn't reach Reddit to start the export. Try again later."),
+    NOTHING_READ("nothing_read", R.string.export_failed_nothing_read, "Reddit didn't answer for any list. Try again later."),
+    NOT_SAVED("not_saved", R.string.export_failed_not_saved, "Couldn't save the file to Downloads."),
+    NOT_AVAILABLE("not_available", R.string.export_failed_not_available, "Export isn't available with this sign-in."),
+    ;
+
+    companion object {
+        fun fromStored(stored: String?): RedditExportFailure =
+            entries.firstOrNull { it.key == stored || it.legacyText == stored } ?: NOT_SAVED
+    }
+}
 internal const val REDDIT_EXPORT_CHANNEL_ID = "subshell_data_export"
 internal const val REDDIT_EXPORT_UNIQUE_WORK = "subshell-reddit-data-export"
 private const val REDDIT_EXPORT_NOTIFICATION_ID = 26_502

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.export
 
+import io.github.brealorg.subshell.ui.s
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import io.github.brealorg.subshell.harness.RetryOnRobolectricRendererFlake
@@ -42,7 +43,7 @@ class RedditExport01NoticeFitsTest {
         }
         composeRule.waitForIdle()
 
-        assertEquals(1, composeRule.onAllNodesWithText(REDDIT_EXPORT_NOTICE_TITLE).fetchSemanticsNodes().size)
+        assertEquals(1, composeRule.onAllNodesWithText(REDDIT_EXPORT_NOTICE_TITLE.s).fetchSemanticsNodes().size)
         assertEquals(0, composeRule.onAllNodesWithText("More").fetchSemanticsNodes().size)
     }
 }

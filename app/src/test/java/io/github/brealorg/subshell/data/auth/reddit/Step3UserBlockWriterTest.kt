@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.data.auth.reddit
 
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.account.ContentSafetyFailureKind
 import io.github.brealorg.subshell.data.account.ContentSafetyOperation
 import io.github.brealorg.subshell.data.account.ContentSafetyPhase
@@ -200,8 +201,8 @@ class Step3UserBlockWriterTest {
             ),
         )
 
-        assertEquals("Couldn't block user", presentation.title)
-        assertTrue(presentation.message, presentation.message.contains("approved OAuth clients"))
+        assertEquals("Couldn't block user", presentation.title.s)
+        assertTrue(presentation.message.s, presentation.message.s.contains("approved OAuth clients"))
         assertNull(presentation.primaryAction)
     }
 

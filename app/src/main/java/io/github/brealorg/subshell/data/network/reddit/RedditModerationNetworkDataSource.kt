@@ -2,17 +2,23 @@ package io.github.brealorg.subshell.data.network.reddit
 
 import io.github.brealorg.subshell.data.account.REDDIT_MODERATION_AGGREGATE_QUEUE
 import io.github.brealorg.subshell.data.account.RedditModeratorQueueItem
+import io.github.brealorg.subshell.data.account.RedditModeratorQueueList
 import io.github.brealorg.subshell.data.account.RedditModeratorQueueKind
 import io.github.brealorg.subshell.data.account.ModeratorReportTarget
 import io.github.brealorg.subshell.data.network.JsonGetRequest
 import io.github.brealorg.subshell.data.network.NetworkPage
 import io.github.brealorg.subshell.data.network.NetworkResult
 import io.github.brealorg.subshell.data.network.SubshellHttpClient
+import io.github.brealorg.subshell.data.network.SubshellNetworkJson
+import io.github.brealorg.subshell.data.account.RedditModeratorQueueItemDetails
 import io.github.brealorg.subshell.data.network.map
 import io.github.brealorg.subshell.data.normalizeRedditCommunityName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 
 // MOD01A1_CLASSIC_REDDIT_MODERATOR_DIRECTORY_AND_MODQUEUE_TRANSPORT_V1
 // MOD01A22_AGGREGATE_R_MOD_MODQUEUE_TRANSPORT_V1
@@ -25,6 +31,17 @@ internal interface RedditModerationSource {
         communityName: String,
         after: String? = null,
     ): NetworkResult<NetworkPage<RedditModeratorQueueItem>>
+
+    // ISSUE295_REMOVED_CONTENT_LISTS_V1: one of the community's moderator
+    // lists; a source that knows only the queue serves only the queue.
+    suspend fun modList(
+        communityName: String,
+        list: RedditModeratorQueueList,
+        after: String? = null,
+    ): NetworkResult<NetworkPage<RedditModeratorQueueItem>> {
+        check(list == RedditModeratorQueueList.QUEUE) { "This source has only the mod queue" }
+        return modQueue(communityName, after)
+    }
 }
 
 internal class RedditModerationNetworkDataSource(
@@ -42,10 +59,41 @@ internal class RedditModerationNetworkDataSource(
         communityName: String,
         after: String?,
     ): NetworkResult<NetworkPage<RedditModeratorQueueItem>> =
-        httpClient.getJson(
-            request = redditModQueueRequest(communityName, after),
-            deserializer = RedditModerationListingDto.serializer(),
-        ).map { listing -> listing.toModeratorQueuePage(communityName) }
+        modList(communityName, RedditModeratorQueueList.QUEUE, after)
+
+    override suspend fun modList(
+        communityName: String,
+        list: RedditModeratorQueueList,
+        after: String?,
+    ): NetworkResult<NetworkPage<RedditModeratorQueueItem>> {
+        val result = httpClient.getJson(
+            request = redditModQueueRequest(communityName, after, list),
+            deserializer = RedditReadListingDto.serializer(),
+        ).map { listing ->
+            listing.toModeratorQueuePage(
+                rawCommunityName = communityName,
+                json = SubshellNetworkJson.providerJson,
+                nowEpochSeconds = System.currentTimeMillis() / 1_000L,
+            )
+        }
+        if (result !is NetworkResult.Success) return result
+        // ISSUE301C_A_FILTER_REASON_COMES_FROM_THE_MOD_LOG_V1: a failed log read
+        // leaves the page as Reddit sent it.
+        val items = moderatorQueueItemsWithFilterReasons(result.value.items, list) { moderator, logAfter ->
+            (
+                httpClient.getJson(
+                    request = redditModerationLogRequest(communityName, after = logAfter, moderator = moderator),
+                    deserializer = RedditModerationLogListingDto.serializer(),
+                ) as? NetworkResult.Success
+            )?.value?.data?.let { page ->
+                ModeratorLogPage(
+                    entries = page.children.mapNotNull { child -> child?.data },
+                    after = page.after,
+                )
+            }
+        }
+        return result.copy(value = result.value.copy(items = items))
+    }
 
     // MODERATION02A2_EXACT_REPORT_TARGET_READ_OUTSIDE_QUEUE_V1
     // ISSUE281_READS_AVOID_API_INFO_V1: read from the post's thread; the caller
@@ -79,10 +127,11 @@ internal fun redditModeratedCommunitiesRequest(
 internal fun redditModQueueRequest(
     rawCommunityName: String,
     after: String? = null,
+    list: RedditModeratorQueueList = RedditModeratorQueueList.QUEUE,
 ): JsonGetRequest {
     val communityName = normalizeRedditCommunityName(rawCommunityName)
     return JsonGetRequest(
-        pathSegments = listOf("r", communityName, "about", "modqueue"),
+        pathSegments = listOf("r", communityName, "about", list.path),
         queryParameters = buildList {
             add("limit" to MODQUEUE_PAGE_LIMIT.toString())
             add("raw_json" to "1")
@@ -168,6 +217,181 @@ internal fun RedditModerationListingDto.toModeratorQueuePage(
     )
 }
 
+/**
+ * ISSUE301_QUEUE_CARD_SHOWS_WHY_AND_WHAT_V1: a moderator list read with every
+ * child kept as JSON, so a post is also read the way the feed reads it (its
+ * picture, gallery, video and flair) and a comment's first picture is found.
+ * A child the feed cannot read still becomes a queue item without them.
+ */
+internal fun RedditReadListingDto.toModeratorQueuePage(
+    rawCommunityName: String,
+    json: Json,
+    nowEpochSeconds: Long,
+): NetworkPage<RedditModeratorQueueItem> {
+    val communityName = normalizeRedditCommunityName(rawCommunityName)
+    val items = data.children.asSequence()
+        .mapNotNull { child ->
+            val thing = runCatching {
+                json.decodeFromJsonElement(RedditModerationThingDto.serializer(), child)
+            }.getOrNull() ?: return@mapNotNull null
+            val item = thing.toModeratorQueueItem(communityName) ?: return@mapNotNull null
+            item.copy(details = moderatorQueueItemDetails(item, child, json, nowEpochSeconds))
+        }
+        .distinctBy(RedditModeratorQueueItem::fullname)
+        .take(MODQUEUE_PAGE_LIMIT)
+        .toList()
+    return NetworkPage(
+        items = items,
+        nextCursor = data.after
+            ?.trim()
+            ?.takeIf(String::isNotEmpty),
+    )
+}
+
+@Serializable
+internal data class RedditModerationQueueExtrasDto(
+    @SerialName("created_utc") val createdUtc: Double? = null,
+    @SerialName("link_flair_text") val linkFlairText: String? = null,
+    @SerialName("author_flair_text") val authorFlairText: String? = null,
+    @SerialName("link_title") val linkTitle: String? = null,
+    val selftext: String? = null,
+    val body: String? = null,
+    @SerialName("mod_reason_title") val modReasonTitle: String? = null,
+    @SerialName("mod_reason_by") val modReasonBy: String? = null,
+    @SerialName("banned_by") val bannedBy: JsonElement? = null,
+    val removed: Boolean? = null,
+    @SerialName("removed_by_category") val removedByCategory: String? = null,
+    @SerialName("media_metadata") val mediaMetadata: Map<String, RedditMediaMetadataDto>? = null,
+)
+
+internal fun moderatorQueueItemDetails(
+    item: RedditModeratorQueueItem,
+    child: JsonElement,
+    json: Json,
+    nowEpochSeconds: Long,
+): RedditModeratorQueueItemDetails {
+    val extras = runCatching {
+        json.decodeFromJsonElement(RedditThingExtrasDto.serializer(), child).data
+    }.getOrNull() ?: RedditModerationQueueExtrasDto()
+    val bannedBy = (extras.bannedBy as? JsonPrimitive)
+        ?.takeIf(JsonPrimitive::isString)
+        ?.contentOrNull
+        .cleanQueueLabel()
+    val heldByAutoModerator = moderatorQueueItemHeldByAutoModerator(extras.removedByCategory, bannedBy, extras.removed)
+    val heldByRedditFilter = !heldByAutoModerator && moderatorQueueItemHeldByRedditFilter(
+        removedByCategory = extras.removedByCategory,
+        bannedByReddit = (extras.bannedBy as? JsonPrimitive)?.let { value -> !value.isString && value.content == "true" } == true,
+        removed = extras.removed,
+    )
+    val post = if (item.kind == RedditModeratorQueueKind.POST) {
+        runCatching {
+            json.decodeFromJsonElement(RedditThingDto.serializer(), child).data
+                .takeIf { dto -> dto.id.isNotBlank() && dto.title.isNotBlank() }
+                ?.toPost(nowEpochSeconds)
+        }.getOrNull()
+    } else {
+        null
+    }
+    return RedditModeratorQueueItemDetails(
+        post = post,
+        commentImageUrl = if (item.kind == RedditModeratorQueueKind.COMMENT) {
+            moderatorQueueCommentImageUrl(extras.body, extras.mediaMetadata.orEmpty())
+        } else {
+            null
+        },
+        ageLabel = extras.createdUtc?.let { created -> redditRelativeAgeLabel(nowEpochSeconds, created.toLong()) },
+        // A text that only repeats the title is not shown twice.
+        snippet = extras.selftext.takeIf { item.kind == RedditModeratorQueueKind.POST }
+            ?.let(::moderatorQueueSnippet)
+            ?.takeUnless { snippet -> snippet.equals(item.summary.trim(), ignoreCase = true) },
+        postFlair = extras.linkFlairText.cleanQueueLabel().takeIf { item.kind == RedditModeratorQueueKind.POST },
+        authorFlair = extras.authorFlairText.cleanQueueLabel(),
+        linkTitle = extras.linkTitle.cleanQueueLabel().takeIf { item.kind == RedditModeratorQueueKind.COMMENT },
+        removalReasonTitle = extras.modReasonTitle.cleanQueueLabel(),
+        // Reddit gives the remover's name, or true/false for its own filters.
+        // An AutoModerator filter also names AutoModerator here, but the item is
+        // held, not removed: it gets no "Removed by" line.
+        removedBy = if (heldByAutoModerator) {
+            null
+        } else {
+            bannedBy ?: extras.modReasonBy.cleanQueueLabel()
+        },
+        heldByAutoModerator = heldByAutoModerator,
+        heldByRedditFilter = heldByRedditFilter,
+        createdEpochSeconds = extras.createdUtc?.toLong(),
+    )
+}
+
+/**
+ * ISSUE301B_AUTOMOD_HELD_IS_NAMED_V1: a post AutoModerator filtered carries
+ * `removed_by_category = "automod_filtered"`, `banned_by = "AutoModerator"` and
+ * `removed = false` (u/vpsj's post in r/indianrailways, 2026-11-14); a comment
+ * has no category, so the name with `removed = false` counts too.
+ */
+internal fun moderatorQueueItemHeldByAutoModerator(removedByCategory: String?, bannedBy: String?, removed: Boolean?): Boolean {
+    // ISSUE301F_A_POSTS_CATEGORY_DECIDES_V1: a post carries removed_by_category;
+    // an AutoModerator removal (not a filter) is "moderator" while `removed`
+    // can read false (fsvreddit's Spam Src Spotter, 2026-11-16), so the
+    // category decides wherever there is one.
+    val category = removedByCategory?.trim()?.takeIf(String::isNotEmpty)
+    if (category != null) return category.equals("automod_filtered", ignoreCase = true)
+    return removed == false && bannedBy.equals("AutoModerator", ignoreCase = true)
+}
+
+/**
+ * ISSUE301C_REDDIT_FILTER_HELD_IS_NAMED_V1, ISSUE301F_A_POSTS_CATEGORY_DECIDES_V1:
+ * Reddit's own filters (Crowd Control, ban evasion, harassment, …) hold a post
+ * with `removed_by_category = "reddit"`; a comment has no category and shows
+ * `banned_by = true` with `removed = false` (u/vpsj's comment).
+ */
+internal fun moderatorQueueItemHeldByRedditFilter(removedByCategory: String?, bannedByReddit: Boolean, removed: Boolean?): Boolean {
+    val category = removedByCategory?.trim()?.takeIf(String::isNotEmpty)
+    if (category != null) return category.equals("reddit", ignoreCase = true)
+    return removed == false && bannedByReddit
+}
+
+@Serializable
+internal data class RedditThingExtrasDto(
+    val data: RedditModerationQueueExtrasDto = RedditModerationQueueExtrasDto(),
+)
+
+private fun String?.cleanQueueLabel(): String? =
+    this?.trim()?.replace(Regex("\\s+"), " ")?.takeIf(String::isNotEmpty)?.take(MAX_QUEUE_LABEL_CHARS)
+
+/** The first lines of a post's text, without picture placeholders. */
+internal fun moderatorQueueSnippet(raw: String): String? =
+    raw.replace(REDDIT_PROCESSING_IMAGE_PLACEHOLDER, " ")
+        .replace(REDDIT_INLINE_IMAGE_PLACEHOLDER, " ")
+        .replace(REDDIT_INLINE_GIF_PLACEHOLDER, " ")
+        .replace(Regex("\\s+"), " ")
+        .trim()
+        .takeIf(String::isNotEmpty)
+        ?.take(MAX_QUEUE_SNIPPET_CHARS)
+
+/**
+ * The first picture in a comment: a picture Reddit stored with it (the
+ * smallest preview at least [COMMENT_PREVIEW_MIN_WIDTH] wide, else the
+ * original), else a bare i.redd.it / preview.redd.it address in the text.
+ */
+internal fun moderatorQueueCommentImageUrl(
+    body: String?,
+    mediaMetadata: Map<String, RedditMediaMetadataDto>,
+): String? {
+    val stored = mediaMetadata.values.firstNotNullOfOrNull { media ->
+        media.remoteImageUrl()?.let { original ->
+            media.previews
+                .filter { preview -> (preview.width ?: 0) >= COMMENT_PREVIEW_MIN_WIDTH }
+                .minByOrNull { preview -> preview.width ?: Int.MAX_VALUE }
+                ?.url
+                ?.replace("&amp;", "&")
+                ?.takeIf { url -> url.startsWith("https://") }
+                ?: original
+        }
+    }
+    if (stored != null) return stored
+    return body?.let(REDDIT_BARE_IMAGE_URL::find)?.value?.replace("&amp;", "&")
+}
+
 private fun RedditModerationThingDto.toModeratorQueueItem(
     communityName: String,
 ): RedditModeratorQueueItem? {
@@ -243,7 +467,9 @@ internal fun moderationQueueSummary(
     }
 
     val hasImage = REDDIT_PROCESSING_IMAGE_PLACEHOLDER.containsMatchIn(normalized) ||
-        REDDIT_INLINE_IMAGE_PLACEHOLDER.containsMatchIn(normalized)
+        REDDIT_INLINE_IMAGE_PLACEHOLDER.containsMatchIn(normalized) ||
+        // ISSUE301_QUEUE_CARD_SHOWS_WHY_AND_WHAT_V1: a picture pasted as its address.
+        REDDIT_BARE_IMAGE_URL.containsMatchIn(normalized)
     // LOW_NET_MODQUEUE_GIF_PREVIEW_V1 (OCB-550): a Giphy placeholder
     // (![gif](giphy|id)) is shown as a GIF, not as raw markup.
     val hasGif = REDDIT_INLINE_GIF_PLACEHOLDER.containsMatchIn(normalized)
@@ -253,6 +479,7 @@ internal fun moderationQueueSummary(
         .replace(REDDIT_PROCESSING_IMAGE_PLACEHOLDER, " ")
         .replace(REDDIT_INLINE_IMAGE_PLACEHOLDER, " ")
         .replace(REDDIT_INLINE_GIF_PLACEHOLDER, " ")
+        .replace(REDDIT_BARE_IMAGE_URL, " ")
         .replace(Regex("\\s+"), " ")
         .trim()
     val preview = if (text.isEmpty()) {
@@ -276,6 +503,13 @@ private val REDDIT_INLINE_GIF_PLACEHOLDER = Regex(
     pattern = """!\[gif]\([^\r\n)]{1,512}\)""",
     option = RegexOption.IGNORE_CASE,
 )
+private val REDDIT_BARE_IMAGE_URL = Regex(
+    pattern = """https://(?:i|preview)\.redd\.it/[^\s)\]]{1,1024}""",
+    option = RegexOption.IGNORE_CASE,
+)
+private const val MAX_QUEUE_LABEL_CHARS = 200
+private const val MAX_QUEUE_SNIPPET_CHARS = 300
+private const val COMMENT_PREVIEW_MIN_WIDTH = 320
 private const val MODERATOR_DIRECTORY_PAGE_LIMIT = 100
 private const val MODQUEUE_PAGE_LIMIT = 50
 private const val MAX_QUEUE_AUTHOR_CHARS = 100

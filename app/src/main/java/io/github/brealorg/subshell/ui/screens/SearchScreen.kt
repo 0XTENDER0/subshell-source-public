@@ -3,6 +3,9 @@ package io.github.brealorg.subshell.ui.screens
 // SEARCH02A12_SEARCH_INTENT_ONLY_ZERO_QUERY_V5
 // SEARCH02A12_POPULAR_DATA_PATH_RETIRED_V9
 
+import androidx.compose.ui.res.stringResource
+import io.github.brealorg.subshell.R
+import io.github.brealorg.subshell.ui.UiText
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import io.github.brealorg.subshell.ui.RandomNsfwCommunityPlacement
@@ -93,6 +96,7 @@ import io.github.brealorg.subshell.ui.SearchScope
 import io.github.brealorg.subshell.ui.SubshellState
 import io.github.brealorg.subshell.ui.ZeroQueryCommunitySuggestion
 import io.github.brealorg.subshell.ui.components.FilteredPostsSummaryRow
+import io.github.brealorg.subshell.ui.components.languageHiddenSummaryText
 import io.github.brealorg.subshell.ui.selectZeroQueryCommunitySuggestions
 import io.github.brealorg.subshell.ui.canAppendRedditFeed
 import io.github.brealorg.subshell.ui.pagingFooterKey
@@ -249,6 +253,15 @@ fun SearchScreen(
             order = state.searchOrder,
         )
     }
+    // ISSUE293_LANGUAGE_FILTER_V1: Show lets results in other languages
+    // through for this search, like the content filters' summary.
+    var languageRevealed by rememberSaveable(pagingKey) { mutableStateOf(false) }
+    val joinedNamesForLanguage = state.communities
+        .filter { community -> community.joined }
+        .map { community -> community.name.lowercase() }
+        .toSet()
+    fun hiddenByLanguage(community: io.github.brealorg.subshell.model.Community): Boolean =
+        community.name.lowercase() !in joinedNamesForLanguage && state.languageHidesCommunity(community.name)
     val activeRedditFeedState = if (
         liveSearchEligible && redditFeedState.matches(
             accountStableId = state.activeAccountId,
@@ -322,7 +335,10 @@ fun SearchScreen(
         rankSearchMatches(
             rawQuery = query,
             values = (remoteCommunityCandidates + areaCommunities)
-                .distinctBy { community -> community.name.lowercase() },
+                .distinctBy { community -> community.name.lowercase() }
+                // ISSUE293_LANGUAGE_FILTER_V1: Reddit's answers and the communities
+                // the app knows alike; one the reader joined is never hidden.
+                .filterNot { community -> !languageRevealed && hiddenByLanguage(community) },
             primaryText = { community -> community.name },
             secondaryText = { community -> community.description },
             boost = { community ->
@@ -490,13 +506,22 @@ fun SearchScreen(
         .map { item -> item.community }
         .filter { community -> state.matchesSearchArea(community.name) }
         .toList()
+    val submittedCommunityCandidates = if (
+        submittedResultsActive && submittedScopeIncludesCommunities
+    ) {
+        (submittedRemoteCommunities + areaCommunities).distinctBy { community -> community.name.lowercase() }
+    } else {
+        emptyList()
+    }
+    // ISSUE293_LANGUAGE_FILTER_V1
+    val languageHiddenCommunities = submittedCommunityCandidates.count(::hiddenByLanguage)
     val submittedCommunityResults = if (
         submittedResultsActive && submittedScopeIncludesCommunities
     ) {
         rankSearchMatches(
             rawQuery = submittedQuery,
-            values = (submittedRemoteCommunities + areaCommunities)
-                .distinctBy { community -> community.name.lowercase() },
+            values = submittedCommunityCandidates
+                .filterNot { community -> !languageRevealed && hiddenByLanguage(community) },
             primaryText = { community -> community.name },
             secondaryText = { community -> community.description },
             boost = { community ->
@@ -619,6 +644,27 @@ fun SearchScreen(
     } else {
         emptyList()
     }
+    // ISSUE293_LANGUAGE_FILTER_V1: results on screen whose language is not yet
+    // known (read before the filter was on, or from the cache) are told now.
+    LaunchedEffect(
+        state.shownLanguages,
+        matchingPostResults.map(Post::id),
+        retainedSubmittedCommunityItems.value.map { item -> item.community.name },
+        activeCommunityDiscoveryState.items.map { item -> item.community.name },
+    ) {
+        state.detectLanguages(
+            matchingPostResults.map { post ->
+                io.github.brealorg.subshell.language.postLanguageKey(post.id) to
+                    io.github.brealorg.subshell.language.postLanguageText(post.title, post.body)
+            } + (retainedSubmittedCommunityItems.value + activeCommunityDiscoveryState.items).map { item ->
+                io.github.brealorg.subshell.language.communityLanguageKey(item.community.name) to
+                    io.github.brealorg.subshell.language.communityLanguageText(
+                        item.community.name,
+                        item.community.description,
+                    )
+            },
+        )
+    }
     // CONTENTFILTER04_FILTERED_SUMMARY_V1: the count row search shares with
     // the feeds; Show reveals the filtered results for this query.
     // CONTENTFILTER06_REVEAL_KEYED_ON_ACCOUNT_V1: the paging key carries
@@ -627,7 +673,10 @@ fun SearchScreen(
     // CONTENTFILTER02_EVERY_FEED_SURFACE_V1
     val filteredSearchResults = searchPostResults(
         matching = matchingPostResults,
-        showsPost = state::showsPost,
+        // ISSUE293_LANGUAGE_FILTER_V1: a result in a left-out language is not shown.
+        showsPost = { post ->
+            state.showsPost(post) && (languageRevealed || !state.languageHidesSearchPost(post))
+        },
         filters = state.contentFilters,
         summaryEnabled = state.filteredPostsSummary,
         revealed = filteredRevealed,
@@ -637,6 +686,9 @@ fun SearchScreen(
     )
     val filteredCount = filteredSearchResults.filteredCount
     val filteredSummaryVisible = filteredSearchResults.summaryVisible
+    val languageHiddenCount = languageHiddenCommunities +
+        matchingPostResults.count { post -> state.showsPost(post) && state.languageHidesSearchPost(post) }
+    val languageSummaryVisible = submittedResultsActive && languageHiddenCount > 0
     val postResults = filteredSearchResults.posts
     val draftUserResults = if (
         !state.activeAccountIsAuthenticated &&
@@ -777,14 +829,14 @@ fun SearchScreen(
                 failureKind = searchReadFailure,
                 details = activeRedditFeedState.failureDetails,
                 retryable = activeRedditFeedState.failureRetryable,
-            ).copy(title = "Couldn't load more search results")
+            ).copy(title = UiText.Plain(stringResource(R.string.all_couldn_t_load_more_search_results)))
         } else {
             redditFeedErrorPresentation(
                 failureKind = searchReadFailure,
                 details = activeRedditFeedState.failureDetails,
                 retryable = activeRedditFeedState.failureRetryable,
                 showingCachedContent = true,
-            ).copy(title = "Couldn't refresh search")
+            ).copy(title = UiText.Plain(stringResource(R.string.all_couldn_t_refresh_search)))
         }
     } else {
         null
@@ -878,6 +930,11 @@ fun SearchScreen(
         if (resubmitActiveQuery) submitCurrentSearch()
     }
 
+    // ISSUE294_A_SEARCH_FROM_A_LINK_OR_FLAIR_LOADS_V1
+    LaunchedEffect(state.searchLoadRequested) {
+        if (state.searchLoadRequested && state.takeSearchLoadRequest()) submitCurrentSearch()
+    }
+
     val linkNoticeHost = LocalViewportErrorHostState.current
     val linkUriHandler = LocalUriHandler.current
     fun openDirectSearchAction(action: SearchDirectAction) {
@@ -961,6 +1018,7 @@ fun SearchScreen(
         // LOWUI8_SEARCH_KEYS_MATCH_THE_ROWS_V1 (OCB-251): everything the list
         // below reads to choose its rows is a key here too.
         filteredSummaryVisible,
+        languageSummaryVisible,
     ) {
         buildList {
             when {
@@ -1029,6 +1087,8 @@ fun SearchScreen(
                             },
                         )
                     }
+                    // ISSUE293_LANGUAGE_FILTER_V1
+                    if (languageSummaryVisible) add("search-language-summary")
                     when (state.searchScope) {
                         SearchScope.ALL -> if (submittedResultsActive) {
                             if (
@@ -1180,7 +1240,7 @@ fun SearchScreen(
             if (showWorkspaceControls) {
                 SearchWorkspaceTopBar(
                     query = state.searchQuery,
-                    hint = state.currentSearchHint,
+                    hint = state.currentSearchHint.asString(),
                     focusRequester = focusRequester,
                     onQueryChange = { updated ->
                         state.updateSearchQuery(
@@ -1302,7 +1362,7 @@ fun SearchScreen(
                     // ISSUE206_SAVED_SEARCHES_V1 (#206): first in the hub.
                     if (state.savedSearches.isNotEmpty()) {
                         item("saved-searches-title") {
-                            WorkspaceSectionHeading("Saved searches")
+                            WorkspaceSectionHeading(stringResource(R.string.all_saved_searches))
                         }
                         items(
                             state.savedSearches,
@@ -1339,14 +1399,14 @@ fun SearchScreen(
                     if (recentIndexedPeople.isNotEmpty()) {
                         item("recent-people-title") {
                             WorkspaceSectionHeading(
-                                title = "Recent people",
+                                title = stringResource(R.string.scr_recent_people),
                                 trailing = {
                                     TextButton(
                                         onClick = {
                                             state.clearSearchIndex(SearchIndexKind.USER)
                                         },
                                     ) {
-                                        Text("Clear")
+                                        Text(stringResource(R.string.scr_clear))
                                     }
                                 },
                             )
@@ -1372,7 +1432,7 @@ fun SearchScreen(
                     }
                     if (recentCommunities.isNotEmpty()) {
                         item("recent-communities-title") {
-                            WorkspaceSectionHeading("Recent communities")
+                            WorkspaceSectionHeading(stringResource(R.string.all_recent_communities))
                         }
                         items(
                             recentCommunities,
@@ -1394,7 +1454,7 @@ fun SearchScreen(
                     }
                     if (suggestedCommunities.isNotEmpty()) {
                         item("suggested-communities-title") {
-                            WorkspaceSectionHeading("Suggested communities")
+                            WorkspaceSectionHeading(stringResource(R.string.all_suggested_communities))
                         }
                         items(
                             suggestedCommunities,
@@ -1442,12 +1502,12 @@ fun SearchScreen(
                     }
                 } else if (query.isNotEmpty() && query.length < 2) {
                     item("minimum-query") {
-                        SearchWorkspaceHint("Keep typing to search Reddit.")
+                        SearchWorkspaceHint(stringResource(R.string.all_keep_typing_to_search_reddit))
                     }
                 } else {
                     if (communitySuggestions.isNotEmpty()) {
                         item("community-suggestions-title") {
-                            WorkspaceSectionHeading("Communities")
+                            WorkspaceSectionHeading(stringResource(R.string.all_communities))
                         }
                         items(
                             communitySuggestions,
@@ -1467,7 +1527,7 @@ fun SearchScreen(
                     }
                     if (userSuggestions.isNotEmpty()) {
                         item("user-suggestions-title") {
-                            WorkspaceSectionHeading("People")
+                            WorkspaceSectionHeading(stringResource(R.string.all_people))
                         }
                         items(
                             userSuggestions,
@@ -1490,6 +1550,17 @@ fun SearchScreen(
                             )
                         }
                     }
+                    // ISSUE293_LANGUAGE_FILTER_V1
+                    if (languageSummaryVisible) {
+                        item("search-language-summary") {
+                            FilteredPostsSummaryRow(
+                                filteredCount = languageHiddenCount,
+                                revealed = languageRevealed,
+                                onToggle = { languageRevealed = !languageRevealed },
+                                text = languageHiddenSummaryText(languageHiddenCount, languageRevealed).asString(),
+                            )
+                        }
+                    }
                     when (state.searchScope) {
                         SearchScope.ALL -> if (submittedResultsActive) {
                             // SEARCH01C2_ALL_PROVIDER_ORDER_COMMUNITIES_PEOPLE_POSTS
@@ -1499,14 +1570,14 @@ fun SearchScreen(
                             ) {
                                 item("community-results-title") {
                                     WorkspaceSectionHeading(
-                                        title = "Communities",
+                                        title = stringResource(R.string.scr_communities),
                                         trailing = {
                                             TextButton(
                                                 onClick = {
                                                     applySearchScope(SearchScope.COMMUNITIES)
                                                 },
                                             ) {
-                                                Text("See all")
+                                                Text(stringResource(R.string.scr_see_all))
                                             }
                                         },
                                     )
@@ -1543,9 +1614,9 @@ fun SearchScreen(
                                     item("user-results-title") {
                                         WorkspaceSectionHeading(
                                             title = if (state.activeAccountIsAuthenticated) {
-                                                "People"
+                                                stringResource(R.string.all_people)
                                             } else {
-                                                "People on this device"
+                                                stringResource(R.string.all_people_on_this_device)
                                             },
                                             trailing = {
                                                 if (state.activeAccountIsAuthenticated) {
@@ -1554,7 +1625,7 @@ fun SearchScreen(
                                                             applySearchScope(SearchScope.USERS)
                                                         },
                                                     ) {
-                                                        Text("See all")
+                                                        Text(stringResource(R.string.scr_see_all))
                                                     }
                                                 }
                                             },
@@ -1599,9 +1670,9 @@ fun SearchScreen(
                                 item("submitted-results-title") {
                                     WorkspaceSectionHeading(
                                         if (state.searchHasUnsubmittedChanges) {
-                                            "Posts for “$submittedQuery”"
+                                            stringResource(R.string.all_posts_for, submittedQuery)
                                         } else {
-                                            "Posts"
+                                            stringResource(R.string.all_posts)
                                         },
                                         // ISSUE289_SEARCH_RESULTS_CAN_BE_SORTED_V1
                                         trailing = if (liveSearchEligible) {
@@ -1628,7 +1699,7 @@ fun SearchScreen(
                                 if (postResults.isEmpty()) {
                                     item("no-posts") {
                                         if (liveSearchSubmitted && missingSearchCommunity != null) {
-                                            SearchWorkspaceHint("Couldn't find r/$missingSearchCommunity")
+                                            SearchWorkspaceHint(stringResource(R.string.all_couldn_t_find_r, missingSearchCommunity))
                                         } else if (liveSearchSubmitted && searchReadFailure != null) {
                                             ErrorNotice(
                                                 presentation = redditFeedErrorPresentation(
@@ -1636,7 +1707,7 @@ fun SearchScreen(
                                                     details = activeRedditFeedState.failureDetails,
                                                     retryable = activeRedditFeedState.failureRetryable,
                                                     showingCachedContent = false,
-                                                ).copy(title = "Couldn't load search results"),
+                                                ).copy(title = UiText.Plain(stringResource(R.string.all_couldn_t_load_search_results))),
                                                 diagnosticScopeKey = "search_posts",
                                                 onAction = { action ->
                                                     if (action == ErrorActionKind.RETRY) {
@@ -1679,9 +1750,9 @@ fun SearchScreen(
                             item("submitted-results-title") {
                                 WorkspaceSectionHeading(
                                     if (state.searchHasUnsubmittedChanges) {
-                                        "Results for “$submittedQuery”"
+                                        stringResource(R.string.all_results_for, submittedQuery)
                                     } else {
-                                        "Posts"
+                                        stringResource(R.string.all_posts)
                                     },
                                     // ISSUE234_LAYOUT_CHOICE_BESIDE_THE_FEED_V1
                                     trailing = {
@@ -1710,7 +1781,7 @@ fun SearchScreen(
                             if (postResults.isEmpty()) {
                                 item("no-posts") {
                                     if (liveSearchSubmitted && missingSearchCommunity != null) {
-                                        SearchWorkspaceHint("Couldn't find r/$missingSearchCommunity")
+                                        SearchWorkspaceHint(stringResource(R.string.all_couldn_t_find_r, missingSearchCommunity))
                                     } else if (liveSearchSubmitted && searchReadFailure != null) {
                                         ErrorNotice(
                                             presentation = redditFeedErrorPresentation(
@@ -1718,7 +1789,7 @@ fun SearchScreen(
                                                 details = activeRedditFeedState.failureDetails,
                                                 retryable = activeRedditFeedState.failureRetryable,
                                                 showingCachedContent = false,
-                                            ).copy(title = "Couldn't load search results"),
+                                            ).copy(title = UiText.Plain(stringResource(R.string.all_couldn_t_load_search_results))),
                                             diagnosticScopeKey = "search_posts",
                                             onAction = { action ->
                                                 if (action == ErrorActionKind.RETRY) {
@@ -1758,7 +1829,7 @@ fun SearchScreen(
                         }
                         SearchScope.COMMUNITIES -> if (showSubmittedCommunityResults) {
                             item("community-results-title") {
-                                WorkspaceSectionHeading("Communities")
+                                WorkspaceSectionHeading(stringResource(R.string.all_communities))
                             }
                             if (submittedCommunityResults.isEmpty()) {
                                 item("no-communities") { NoResults(submittedQuery) }
@@ -1783,7 +1854,7 @@ fun SearchScreen(
                         }
                         SearchScope.USERS -> if (showSubmittedUserResults) {
                             item("user-results-title") {
-                                WorkspaceSectionHeading("People")
+                                WorkspaceSectionHeading(stringResource(R.string.all_people))
                             }
                             if (submittedUserResults.isEmpty()) {
                                 item("no-users") {
@@ -1889,7 +1960,7 @@ private fun SearchWorkspaceTopBar(
                     IconButton(onClick = onBack) {
                         Icon(
                             Symbols.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.scr_back),
                         )
                     }
                 },
@@ -1901,7 +1972,7 @@ private fun SearchWorkspaceTopBar(
                     ) {
                         Icon(
                             Symbols.Search,
-                            contentDescription = "Search",
+                            contentDescription = stringResource(R.string.scr_search),
                         )
                     }
                 },
@@ -1932,7 +2003,7 @@ private fun SearchContextFilters(
                 onClick = {
                     if (saved) state.removeSavedSearch(current) else state.saveSearch(current)
                 },
-                label = { Text(if (saved) "Saved" else "Save search") },
+                label = { Text(if (saved) stringResource(R.string.all_saved) else stringResource(R.string.all_save_search)) },
                 leadingIcon = {
                     Icon(
                         if (saved) Symbols.BookmarkFilled else Symbols.Bookmark,
@@ -1947,7 +2018,7 @@ private fun SearchContextFilters(
                 FilterChip(
                     selected = state.searchArea == area,
                     onClick = { onAreaSelected(area) },
-                    label = { Text(state.searchAreaLabel(area)) },
+                    label = { Text(state.searchAreaLabel(area).asString()) },
                 )
             }
         }
@@ -1956,7 +2027,7 @@ private fun SearchContextFilters(
                 FilterChip(
                     selected = state.searchScope == scope,
                     onClick = { onScopeSelected(scope) },
-                    label = { Text(scope.label) },
+                    label = { Text(stringResource(scope.labelRes)) },
                 )
             }
         }
@@ -1975,9 +2046,9 @@ private fun SavedSearchRow(
     var menuOpen by remember { mutableStateOf(false) }
     ListCard(
         headline = search.query,
-        supporting = search.scopeSummary(),
+        supporting = search.scopeSummary().asString(),
         onClick = onRun,
-        onClickLabel = "Run search",
+        onClickLabel = stringResource(R.string.scr_run_search),
         leading = {
             Icon(
                 Symbols.BookmarkFilled,
@@ -1990,7 +2061,7 @@ private fun SavedSearchRow(
                 IconButton(onClick = { menuOpen = true }) {
                     Icon(
                         Symbols.MoreVert,
-                        contentDescription = "Options for saved search ${search.query}",
+                        contentDescription = stringResource(R.string.scr_options_for_saved_search, search.query),
                     )
                 }
                 DropdownMenu(
@@ -1998,7 +2069,7 @@ private fun SavedSearchRow(
                     onDismissRequest = { menuOpen = false },
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Remove") },
+                        text = { Text(stringResource(R.string.scr_remove_3)) },
                         onClick = {
                             menuOpen = false
                             onRemove()
@@ -2017,8 +2088,8 @@ private fun RecentSearchChips(
     onClear: () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        WorkspaceSectionHeading("Recent searches") {
-            TextButton(onClick = onClear) { Text("Clear") }
+        WorkspaceSectionHeading(stringResource(R.string.all_recent_searches)) {
+            TextButton(onClick = onClear) { Text(stringResource(R.string.scr_clear)) }
         }
         Row(
             modifier = Modifier
@@ -2074,11 +2145,11 @@ private fun DirectSearchActionResult(
                     .weight(1f),
             ) {
                 Text(
-                    action.title,
+                    action.title.asString(),
                     style = MaterialTheme.typography.titleSmall,
                 )
                 Text(
-                    action.subtitle,
+                    action.subtitle.asString(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
@@ -2153,14 +2224,14 @@ private fun LivePeopleSearchStatus(
         // takes 100 characters; a longer query sent nothing and read
         // "Searching…" for good.
         query.trim().length > REDDIT_PEOPLE_SEARCH_MAX_QUERY_LENGTH ->
-            "People search takes up to $REDDIT_PEOPLE_SEARCH_MAX_QUERY_LENGTH characters. Shorten the search."
-        state.loading -> "Searching Reddit people for “$query”…"
+            UiText.Resource(R.string.search_people_query_too_long, REDDIT_PEOPLE_SEARCH_MAX_QUERY_LENGTH)
+        state.loading -> UiText.Resource(R.string.search_people_searching, query)
         // BLOCKPAGE02_SMALLER_READ_SURFACES_NAME_THE_BLOCK_PAGE_V1
         state.failureKind != null -> io.github.brealorg.subshell.ui.error.redditPeopleSearchFailureMessage(state.failureDetails)
-        state.loaded -> "No people found for “$query”."
-        else -> "Searching Reddit people for “$query”…"
+        state.loaded -> UiText.Resource(R.string.search_people_none_found, query)
+        else -> UiText.Resource(R.string.search_people_searching, query)
     }
-    SearchWorkspaceHint(message)
+    SearchWorkspaceHint(message.asString())
 }
 
 @Composable
@@ -2173,7 +2244,7 @@ private fun CompactUserResult(
 ) {
     ListCard(
         headline = "u/$username",
-        supporting = description.ifBlank { metadata.ifBlank { "Reddit profile" } },
+        supporting = description.ifBlank { metadata.ifBlank { stringResource(R.string.all_reddit_profile) } },
         onClick = onClick,
         leading = {
             CommunityAvatar(
@@ -2207,11 +2278,11 @@ private fun SearchWorkspaceEmptyState() {
             tint = MaterialTheme.colorScheme.primary,
         )
         Text(
-            "Search Reddit",
+            stringResource(R.string.all_search_reddit),
             style = MaterialTheme.typography.titleMedium,
         )
         Text(
-            "Find posts, communities and people, or paste a Reddit link.",
+            stringResource(R.string.all_find_posts_communities_and_people_or_paste),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -2255,11 +2326,11 @@ private fun NoResults(
     SearchWorkspaceHint(
         when {
             // CONTENTFILTER06_SEARCH_ALL_FILTERED_V1
-            filtered -> "All posts for “$query” are filtered"
-            !live -> "No local results for “$query”"
-            inProgress -> "Searching Reddit for “$query”…"
-            submitted -> "No Reddit posts found for “$query”"
-            else -> "Search is ready for “$query”"
+            filtered -> stringResource(R.string.all_all_posts_for_are_filtered, query)
+            !live -> stringResource(R.string.all_no_local_results_for, query)
+            inProgress -> stringResource(R.string.all_searching_reddit_for, query)
+            submitted -> stringResource(R.string.all_no_reddit_posts_found_for, query)
+            else -> stringResource(R.string.all_search_is_ready_for, query)
         },
     )
 }

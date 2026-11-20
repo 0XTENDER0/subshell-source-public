@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.error
 
+import io.github.brealorg.subshell.ui.s
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -27,11 +28,11 @@ class Issue88ErrorTrayScopesTest {
     fun theFeedErrorComesBackWhenTheVoteErrorClears() {
         feedFails()
         voteFails()
-        assertEquals("Couldn't update vote", host.currentRequest?.presentation?.title)
+        assertEquals("Couldn't update vote", host.currentRequest?.presentation?.title?.s)
 
         host.clear("vote")
 
-        assertEquals("Couldn't refresh the feed", host.currentRequest?.presentation?.title)
+        assertEquals("Couldn't refresh the feed", host.currentRequest?.presentation?.title?.s)
         host.retryCurrent()
         assertEquals(1, feedRetries)
     }
@@ -43,7 +44,7 @@ class Issue88ErrorTrayScopesTest {
 
         host.dismissCurrent()
 
-        assertEquals("Couldn't refresh the feed", host.currentRequest?.presentation?.title)
+        assertEquals("Couldn't refresh the feed", host.currentRequest?.presentation?.title?.s)
     }
 
     @Test
@@ -68,6 +69,6 @@ class Issue88ErrorTrayScopesTest {
 
         feedFails()
 
-        assertEquals("Couldn't update vote", host.currentRequest?.presentation?.title)
+        assertEquals("Couldn't update vote", host.currentRequest?.presentation?.title?.s)
     }
 }

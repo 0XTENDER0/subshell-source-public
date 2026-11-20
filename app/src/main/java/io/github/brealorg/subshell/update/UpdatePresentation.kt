@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.content.Intent
 import kotlinx.coroutines.flow.MutableStateFlow

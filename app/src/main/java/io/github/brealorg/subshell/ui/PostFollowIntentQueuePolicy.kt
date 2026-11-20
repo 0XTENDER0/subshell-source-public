@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
 // FOLLOWPOST01A1B_LAST_INTENT_POLICY_V1
 internal fun postFollowTargetControlEnabled(
     activeAccountIsAuthenticated: Boolean,
@@ -29,9 +30,9 @@ internal fun postFollowDesiredState(
 
 internal fun postFollowActionLabel(
     currentKnownState: Boolean?,
-): String =
+): UiText =
     if (currentKnownState == true) {
-        "Unfollow post"
+        UiText.Resource(R.string.post_unfollow)
     } else {
-        "Follow post"
+        UiText.Resource(R.string.post_follow)
     }

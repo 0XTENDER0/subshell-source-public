@@ -7,6 +7,8 @@ import kotlin.math.abs
 
 enum class DirectChatLiveFailureKind {
     SESSION,
+    // ISSUE303B: Reddit's web sign-in has expired; only signing in again helps.
+    WEB_SIGN_IN_EXPIRED,
     ROOM,
     HTTP,
     TRANSPORT,

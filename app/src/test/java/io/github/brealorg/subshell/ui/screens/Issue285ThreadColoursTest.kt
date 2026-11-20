@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.ui.screens
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.label
 import io.github.brealorg.subshell.model.Comment
 import io.github.brealorg.subshell.ui.CommentHierarchyStyle
 import io.github.brealorg.subshell.ui.CommentThreadColours
@@ -11,6 +15,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /** #285: coloured thread lines and a card for each top-level thread. ISSUE285_THREAD_COLOURS_V1. */
+// TRANSLATE08: reads string resources (enum labels), so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue285ThreadColoursTest {
     @Test
     fun offIsTheDefaultAndTheChoiceIsStoredAndRestored() {

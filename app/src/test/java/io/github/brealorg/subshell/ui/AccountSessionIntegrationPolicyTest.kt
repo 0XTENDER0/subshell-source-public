@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import io.github.brealorg.subshell.data.account.AccountSessionSource
 import io.github.brealorg.subshell.data.account.AccountSessionState
 import io.github.brealorg.subshell.data.account.AccountSessionSummary
@@ -12,6 +15,9 @@ import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// TRANSLATE14: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class AccountSessionIntegrationPolicyTest {
     @Test
     fun localAndAuthenticatedAccountsUseStableIdsAndSanitizedUiState() {
@@ -104,7 +110,7 @@ class AccountSessionIntegrationPolicyTest {
         assertEquals("", state.postComposerDraft.community)
         assertEquals(
             "Choose a community",
-            state.postComposerValidationMessage,
+            state.postComposerValidationMessage?.s,
         )
         assertNull(state.publishPostComposerDraft())
     }

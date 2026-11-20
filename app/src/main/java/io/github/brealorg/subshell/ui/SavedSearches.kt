@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.data.REDDIT_SEARCH_QUERY_MAX_LENGTH
 import java.util.Locale
 
@@ -61,11 +63,11 @@ internal fun normalizeSavedSearches(searches: List<SavedSearch>): List<SavedSear
         .take(SAVED_SEARCHES_PER_ACCOUNT)
 
 /** "Posts · r/norge", "All · All Reddit": what a saved search searches. */
-internal fun SavedSearch.scopeSummary(): String {
+internal fun SavedSearch.scopeSummary(): UiText {
     val where = when (area) {
-        SearchArea.CURRENT_COMMUNITY -> "r/$community"
-        SearchArea.MY_COMMUNITIES -> "My communities"
-        SearchArea.ALL_SUBSHELL -> "All Reddit"
+        SearchArea.CURRENT_COMMUNITY -> UiText.Plain("r/$community")
+        SearchArea.MY_COMMUNITIES -> UiText.Resource(R.string.saved_search_area_my_communities)
+        SearchArea.ALL_SUBSHELL -> UiText.Resource(R.string.saved_search_area_all_reddit)
     }
-    return "${scope.label} · $where"
+    return UiText.Resource(R.string.saved_search_scope_summary, UiText.Resource(scope.labelRes), where)
 }

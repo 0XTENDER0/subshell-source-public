@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.ui.screens.title
 import android.app.Application
 import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedDispatcher

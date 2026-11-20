@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.s
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -30,6 +31,8 @@ import io.github.brealorg.subshell.data.account.RedditRemovalReasonPhase
 import io.github.brealorg.subshell.data.account.RedditRemovalReasonUiState
 import io.github.brealorg.subshell.data.account.RedditRemovalStepOutcome
 import io.github.brealorg.subshell.harness.RetryOnRobolectricRendererFlake
+import io.github.brealorg.subshell.ui.error.ViewportErrorHostState
+import io.github.brealorg.subshell.ui.error.rememberViewportErrorHostState
 import io.github.brealorg.subshell.ui.theme.SubshellTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -97,37 +100,54 @@ class Step3ModeratorQueueSheetComposeTest {
         queueFailureDetails = details,
     )
 
+    // ISSUE295_QUEUE_USES_THE_SHEET_V1: the queue writes through the Moderate
+    // sheet's entry points; the harness wires them as SubshellApp does.
+    private val quick = ModeratorQuickActionsState()
+    private lateinit var notices: ViewportErrorHostState
+
+    private val selectedLists = mutableListOf<io.github.brealorg.subshell.data.account.RedditModeratorQueueList>()
+
     private fun show(
         uiState: () -> RedditModerationUiState = { queue() },
         actionUiState: () -> RedditModeratorActionUiState = { RedditModeratorActionUiState() },
         removalReasonState: () -> RedditRemovalReasonUiState = { RedditRemovalReasonUiState() },
     ) {
         composeRule.setContent {
+            notices = rememberViewportErrorHostState()
             SubshellTheme {
-                ModeratorToolsSheet(
-                    communityLabel = "r/subshell",
-                    communityName = "subshell",
+                androidx.compose.runtime.CompositionLocalProvider(
+                    io.github.brealorg.subshell.ui.error.LocalViewportErrorHostState provides notices,
+                ) {
+                ModeratorQuickActionsHarness(
                     accountStableId = account,
-                    uiState = uiState(),
-                    onDismiss = {},
-                    onRefresh = {},
-                    onAppend = { appends += 1 },
-                    actionUiState = actionUiState(),
+                    actionState = actionUiState(),
                     onModerate = { moderated += it },
-                    onAuthorizeAction = { authorizeActions += 1 },
+                    notices = notices,
                     removalReasonState = removalReasonState(),
-                    onLoadRemovalReasons = {},
                     onAuthorizeRemovalReasons = { authorizeReasons += 1 },
-                    savedResponses = SavedResponseActions(
-                        responses = emptyList(),
-                        onSave = { _, _ -> null },
-                        onDelete = {},
-                    ),
-                )
+                    onAuthorize = { authorizeActions += 1 },
+                    quickActions = quick,
+                ) {
+                    ModeratorToolsSheet(
+                        communityLabel = "r/subshell",
+                        communityName = "subshell",
+                        accountStableId = account,
+                        uiState = uiState(),
+                        onDismiss = {},
+                        onRefresh = {},
+                        onAppend = { appends += 1 },
+                        actionUiState = actionUiState(),
+                        onSelectList = { selectedLists += it },
+                    )
+                }
+                }
             }
         }
         composeRule.waitForIdle()
     }
+
+    private fun trayTitle() = notices.currentRequest?.presentation?.title?.s
+    private fun trayMessage() = notices.currentRequest?.presentation?.message?.s
 
     private fun count(text: String) = composeRule.onAllNodesWithText(text).fetchSemanticsNodes().size
 
@@ -187,10 +207,12 @@ class Step3ModeratorQueueSheetComposeTest {
                 request = RedditModeratorActionRequest(account, "subshell", "t3_abc123", RedditModeratorAction.APPROVE),
             ),
         )
+        quick.awaiting = action.request
         show(actionUiState = { action })
 
-        assertEquals(1, count("Moderator authorization required"))
-        click("Authorize")
+        // ISSUE295_QUEUE_USES_THE_SHEET_V1: the same question every moderator action asks.
+        assertEquals(1, count("Allow moderation"))
+        click("Allow")
         assertEquals(1, authorizeActions)
 
         composeRule.runOnIdle {
@@ -200,11 +222,12 @@ class Step3ModeratorQueueSheetComposeTest {
         }
         composeRule.waitForIdle()
 
-        assertEquals(0, count("Moderator authorization required"))
+        assertEquals(0, count("Allow moderation"))
     }
 
     @Test
     fun aDeniedActionAndADeniedQueueNameThePostsPermission() {
+        quick.awaiting = RedditModeratorActionRequest(account, "subshell", "t3_abc123", RedditModeratorAction.REMOVE)
         show(
             uiState = { queue(failure = RedditModerationUiFailureKind.HTTP, httpStatusCode = 403) },
             actionUiState = {
@@ -219,8 +242,8 @@ class Step3ModeratorQueueSheetComposeTest {
 
         assertEquals(1, count("Mod queue"))
         assertEquals(
-            1,
-            count("Reddit denied this moderation action. Your moderator role may not include the required Posts permission."),
+            "Reddit denied this moderation action. Your moderator role may not include the required Posts permission.",
+            trayMessage(),
         )
         assertEquals(1, count("Reddit denied this mod queue. Your moderator role may not include the Posts permission."))
     }
@@ -251,6 +274,7 @@ class Step3ModeratorQueueSheetComposeTest {
 
     @Test
     fun aRemovalWhoseReasonCouldNotBeConfirmedSaysSo() {
+        quick.awaiting = RedditModeratorActionRequest(account, "subshell", "t3_abc123", RedditModeratorAction.REMOVE)
         show(
             actionUiState = {
                 RedditModeratorActionUiState(
@@ -261,8 +285,10 @@ class Step3ModeratorQueueSheetComposeTest {
             },
         )
 
-        assertEquals(1, count("Item removed"))
-        assertEquals(1, count(removalPartialSuccessMessage(true, RedditRemovalStepOutcome.NOT_REQUESTED)))
+        assertEquals("Post removed", trayTitle())
+        // Drawn inside the Mod tools sheet's own window, not only behind it.
+        assertEquals(1, count("Post removed"))
+        assertEquals(removalPartialSuccessMessage(true, RedditRemovalStepOutcome.NOT_REQUESTED).s, trayMessage())
     }
 
     @Test
@@ -318,13 +344,16 @@ class Step3ModeratorQueueSheetComposeTest {
         composeRule.onAllNodes(hasSetTextAction() and hasText("Mod note (optional)")).onFirst()
             .performTextInput("spam ring")
         composeRule.waitForIdle()
-        composeRule.onAllNodes(hasText("Remove") and hasClickAction())
-            .let { it[it.fetchSemanticsNodes().size - 1] }
+        // MODRESPONSE02_PICKING_A_REASON_TURNS_THE_MESSAGE_ON_V1: a reason with a
+        // message switches the removal message on, so the confirm says so.
+        composeRule.onAllNodes(hasText("Remove and send") and hasClickAction())
+            .onFirst()
             .performSemanticsAction(SemanticsActions.OnClick)
         composeRule.waitForIdle()
 
         assertEquals("reason-a", moderated.single().removalReasonId)
         assertEquals("spam ring", moderated.single().modNote)
+        assertEquals("First", moderated.single().removalMessage?.body)
     }
 
     @Test
@@ -375,5 +404,34 @@ class Step3ModeratorQueueSheetComposeTest {
         composeRule.waitForIdle()
         assertEquals(1, moderated.size)
         assertNull(moderated.single().removalReasonId)
+    }
+
+    // ISSUE295_REMOVED_CONTENT_LISTS_V1
+    @Test
+    fun theCommunitysListsAreChipsAndEachSaysWhatItIs() {
+        val lists = io.github.brealorg.subshell.data.account.RedditModeratorQueueList.entries
+        var state by mutableStateOf(queue(items = emptyList()))
+        show(uiState = { state })
+
+        for (list in listOf("Queue", "Removed", "Edited", "Unmoderated")) {
+            assertEquals(list, 1, composeRule.onAllNodes(hasText(list) and hasClickAction()).fetchSemanticsNodes().size)
+        }
+        assertEquals(1, count("Mod queue is clear"))
+        click("Queue")
+        assertEquals(emptyList<Any>(), selectedLists)
+        click("Removed")
+        assertEquals(listOf(lists[1]), selectedLists)
+
+        composeRule.runOnIdle { state = queue(items = emptyList()).copy(queueList = lists[1]) }
+        composeRule.waitForIdle()
+        assertEquals(1, count("Posts and comments removed by moderators or Reddit's filters. Approve puts one back."))
+        assertEquals(1, count("Nothing removed"))
+        assertEquals(0, count("Mod queue is clear"))
+
+        // A removed item's card says nothing about reports when it has none.
+        composeRule.runOnIdle { state = queue().copy(queueList = lists[1]) }
+        composeRule.waitForIdle()
+        assertEquals(1, count("A reported post"))
+        assertEquals(0, count("No reports returned"))
     }
 }

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import android.content.pm.PackageInstaller
 import androidx.compose.runtime.mutableStateOf
@@ -127,10 +128,10 @@ class Issue286UpdatesScreenTest {
 
         screen.value = state(
             available = newer,
-            install = UpdateInstallState.Failed(255, UpdateApkFailure.HASH_MISMATCH.message),
+            install = UpdateInstallState.Failed(255, io.github.brealorg.subshell.ui.UiText.Resource(UpdateApkFailure.HASH_MISMATCH.messageRes)),
         )
         composeRule.waitForIdle()
-        assertTrue(shows(UpdateApkFailure.HASH_MISMATCH.message))
+        assertTrue(shows("The downloaded file isn't the published update, so it was deleted."))
         tap("Try again")
         assertEquals(2, updates.size)
     }
@@ -194,13 +195,13 @@ class Issue286UpdatesScreenTest {
         assertEquals(UpdateInstallState.Installing(255), UpdateInstallCoordinator.state.value)
         UpdateInstallCoordinator.installerAnswered(PackageInstaller.STATUS_FAILURE_ABORTED)
         assertEquals(
-            UpdateInstallState.Failed(255, "The update wasn't installed."),
+            UpdateInstallState.Failed(255, io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.update_install_aborted)),
             UpdateInstallCoordinator.state.value,
         )
         assertFalse(kept.exists())
         assertEquals(
             "Android refused the update because it doesn't match the installed app.",
-            updateInstallFailureMessage(PackageInstaller.STATUS_FAILURE_CONFLICT),
+            updateInstallFailureMessage(PackageInstaller.STATUS_FAILURE_CONFLICT).s,
         )
     }
 

@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -55,14 +58,29 @@ import io.github.brealorg.subshell.ui.symbols.Symbols
 // MODRESPONSE01A2_REMOVAL_RESPONSE_DRAFT_V1
 /**
  * The moderator's draft of the removal response inside the remove dialog.
- * Off by default: selecting a reason never sends anything. The body is
- * pre-filled from the selected reason until the moderator edits it; an
- * edited body is kept when the reason changes.
+ * Off until a reason is picked. The body is pre-filled from the selected
+ * reason until the moderator edits it; an edited body is kept when the
+ * reason changes.
  */
 internal class RemovalResponseDraft(
     initialType: RedditRemovalMessageType = RedditRemovalMessageType.PRIVATE,
 ) {
     var enabled by mutableStateOf(false)
+        private set
+
+    // MODRESPONSE02_PICKING_A_REASON_TURNS_THE_MESSAGE_ON_V1: picking a reason
+    // that has a message means the moderator wants it sent (a mod's request,
+    // r/subshell 2026-11-13: the post was removed and the author never told
+    // why). The switch follows the reason until the moderator sets it.
+    var setByModerator by mutableStateOf(false)
+        private set
+
+    /** The moderator's own choice; the reason no longer moves the switch. */
+    fun setEnabledByModerator(value: Boolean) {
+        enabled = value
+        setByModerator = true
+    }
+
     var type by mutableStateOf(initialType)
     var body by mutableStateOf("")
         private set
@@ -76,6 +94,8 @@ internal class RemovalResponseDraft(
 
     fun prefillFrom(reason: RedditRemovalReason?) {
         body = removalResponsePrefill(reason = reason, current = body, edited = edited)
+        // A message the moderator wrote or picked stays as they left it.
+        if (!setByModerator && !edited) enabled = reason != null && body.isNotBlank()
     }
 
     fun useTemplate(text: String) {
@@ -113,26 +133,26 @@ internal fun removalResponseMessageOrNull(
     )
 }
 
-internal fun removalResponseTypeLabel(type: RedditRemovalMessageType): String = when (type) {
-    RedditRemovalMessageType.PUBLIC -> "Public comment as you"
-    RedditRemovalMessageType.PUBLIC_AS_SUBREDDIT -> "Public comment as the subreddit"
-    RedditRemovalMessageType.PRIVATE -> "Private modmail (your name hidden)"
-    RedditRemovalMessageType.PRIVATE_EXPOSED -> "Private modmail (your name shown)"
+internal fun removalResponseTypeLabel(type: RedditRemovalMessageType): UiText = when (type) {
+    RedditRemovalMessageType.PUBLIC -> UiText.Resource(R.string.comp_removal_type_public)
+    RedditRemovalMessageType.PUBLIC_AS_SUBREDDIT -> UiText.Resource(R.string.comp_removal_type_public_as_subreddit)
+    RedditRemovalMessageType.PRIVATE -> UiText.Resource(R.string.comp_removal_type_private)
+    RedditRemovalMessageType.PRIVATE_EXPOSED -> UiText.Resource(R.string.comp_removal_type_private_exposed)
 }
 
 internal fun removalResponseTypeDescription(
     type: RedditRemovalMessageType,
     kind: RedditModeratorQueueKind,
-): String = when (type) {
+): UiText = when (type) {
     RedditRemovalMessageType.PUBLIC,
     RedditRemovalMessageType.PUBLIC_AS_SUBREDDIT,
     -> when (kind) {
-        RedditModeratorQueueKind.POST -> "Reddit posts it as a distinguished, stickied comment."
-        RedditModeratorQueueKind.COMMENT -> "Reddit posts it as a distinguished reply."
+        RedditModeratorQueueKind.POST -> UiText.Resource(R.string.comp_removal_type_desc_post)
+        RedditModeratorQueueKind.COMMENT -> UiText.Resource(R.string.comp_removal_type_desc_comment)
     }
     RedditRemovalMessageType.PRIVATE,
     RedditRemovalMessageType.PRIVATE_EXPOSED,
-    -> "Sent from the subreddit's modmail."
+    -> UiText.Resource(R.string.comp_removal_type_desc_modmail)
 }
 
 // MODRESPONSE01A3_SAVED_RESPONSES_PICKER_V1
@@ -172,16 +192,16 @@ internal fun RemovalResponseSection(
                     value = draft.enabled,
                     role = Role.Switch,
                     onValueChange = { checked ->
-                        draft.enabled = checked
+                        draft.setEnabledByModerator(checked)
                         if (checked) editorOpen = true
                     },
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Send a removal message", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.comp_send_a_removal_message), style = MaterialTheme.typography.labelLarge)
                 Text(
-                    "Optional. You review it before anything is sent.",
+                    stringResource(R.string.all_on_when_the_removal_reason_has_a),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -200,9 +220,9 @@ internal fun RemovalResponseSection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(removalResponseTypeLabel(draft.type), style = MaterialTheme.typography.bodyMedium)
+                Text(removalResponseTypeLabel(draft.type).asString(), style = MaterialTheme.typography.bodyMedium)
                 Text(
-                    text = draft.body.trim().ifEmpty { "No message yet — tap to write one." },
+                    text = draft.body.trim().ifEmpty { stringResource(R.string.comp_no_message_yet_tap_to_write) },
                     style = MaterialTheme.typography.bodySmall,
                     color = if (draft.blocksConfirm) {
                         MaterialTheme.colorScheme.error
@@ -214,7 +234,7 @@ internal fun RemovalResponseSection(
                 )
             }
             TextButton(onClick = { editorOpen = true }) {
-                Text(if (draft.body.isBlank()) "Write" else "Edit")
+                Text(if (draft.body.isBlank()) stringResource(R.string.all_write) else stringResource(R.string.all_edit))
             }
         }
     }
@@ -299,11 +319,11 @@ internal fun RemovalResponseEditor(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        "Removal message",
+                        stringResource(R.string.all_removal_message),
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.weight(1f),
                     )
-                    ComposerPrimaryAction(text = "Done", enabled = true, onClick = onDone)
+                    ComposerPrimaryAction(text = stringResource(R.string.comp_done), enabled = true, onClick = onDone)
                 }
                 Row(
                     modifier = Modifier
@@ -312,16 +332,16 @@ internal fun RemovalResponseEditor(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Send as", style = MaterialTheme.typography.labelMedium)
-                        Text(removalResponseTypeLabel(draft.type), style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(R.string.comp_send_as), style = MaterialTheme.typography.labelMedium)
+                        Text(removalResponseTypeLabel(draft.type).asString(), style = MaterialTheme.typography.bodyMedium)
                         Text(
-                            removalResponseTypeDescription(draft.type, kind),
+                            removalResponseTypeDescription(draft.type, kind).asString(),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     Box {
-                        TextButton(onClick = { typeMenuOpen = true }) { Text("Change") }
+                        TextButton(onClick = { typeMenuOpen = true }) { Text(stringResource(R.string.comp_change)) }
                         DropdownMenu(
                             expanded = typeMenuOpen,
                             onDismissRequest = { typeMenuOpen = false },
@@ -330,9 +350,9 @@ internal fun RemovalResponseEditor(
                                 DropdownMenuItem(
                                     text = {
                                         Column {
-                                            Text(removalResponseTypeLabel(type))
+                                            Text(removalResponseTypeLabel(type).asString())
                                             Text(
-                                                removalResponseTypeDescription(type, kind),
+                                                removalResponseTypeDescription(type, kind).asString(),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             )
@@ -359,20 +379,20 @@ internal fun RemovalResponseEditor(
                             enabled = savedResponses.responses.isNotEmpty(),
                         ) {
                             Text(
-                                if (savedResponses.responses.isEmpty()) "No saved responses" else "Use saved response…",
+                                if (savedResponses.responses.isEmpty()) stringResource(R.string.all_no_saved_responses) else stringResource(R.string.all_use_saved_response),
                             )
                         }
                         TextButton(
                             onClick = { saveTitle = "" },
                             enabled = draft.body.isNotBlank(),
                         ) {
-                            Text("Save as response…")
+                            Text(stringResource(R.string.comp_save_as_response))
                         }
                     }
                 }
                 PostStyleComposerEditor(
                     state = editor,
-                    placeholder = "Message",
+                    placeholder = stringResource(R.string.comp_message),
                     focusRequester = focusRequester,
                     onFormat = ::applyFormat,
                     onMediaReceived = {},
@@ -383,8 +403,7 @@ internal fun RemovalResponseEditor(
                     maxLines = Int.MAX_VALUE,
                 )
                 Text(
-                    "${draft.body.length}/${RedditRemovalMessage.MAX_REMOVAL_MESSAGE_BODY_CHARS}" +
-                        " · Reddit adds the removed item's details.",
+                    stringResource(R.string.comp_reddit_adds_the_removed_item_s, draft.body.length, RedditRemovalMessage.MAX_REMOVAL_MESSAGE_BODY_CHARS),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 4.dp),
@@ -413,7 +432,7 @@ internal fun RemovalResponseEditor(
     if (savedResponses != null && pickerOpen) {
         AlertDialog(
             onDismissRequest = { pickerOpen = false },
-            title = { Text("Saved responses") },
+            title = { Text(stringResource(R.string.comp_saved_responses)) },
             text = {
                 LazyColumn(modifier = Modifier.heightIn(max = 320.dp)) {
                     items(savedResponses.responses, key = { it.id }) { response ->
@@ -439,14 +458,14 @@ internal fun RemovalResponseEditor(
                                 )
                             }
                             IconButton(onClick = { pendingDelete = response }) {
-                                Icon(Symbols.Delete, contentDescription = "Delete ${response.title}")
+                                Icon(Symbols.Delete, contentDescription = stringResource(R.string.comp_delete, response.title))
                             }
                         }
                     }
                 }
             },
             confirmButton = {
-                TextButton(onClick = { pickerOpen = false }) { Text("Close") }
+                TextButton(onClick = { pickerOpen = false }) { Text(stringResource(R.string.comp_close)) }
             },
         )
     }
@@ -454,18 +473,18 @@ internal fun RemovalResponseEditor(
     if (savedResponses != null && deleting != null) {
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
-            title = { Text("Delete \"${deleting.title}\"?") },
-            text = { Text("This saved response is removed from this device.") },
+            title = { Text(stringResource(R.string.comp_delete_2, deleting.title)) },
+            text = { Text(stringResource(R.string.comp_this_saved_response_is_removed_from_this)) },
             confirmButton = {
                 TextButton(
                     onClick = {
                         savedResponses.onDelete(deleting.id)
                         pendingDelete = null
                     },
-                ) { Text("Delete") }
+                ) { Text(stringResource(R.string.comp_delete_3)) }
             },
             dismissButton = {
-                TextButton(onClick = { pendingDelete = null }) { Text("Cancel") }
+                TextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.comp_cancel)) }
             },
         )
     }
@@ -515,26 +534,25 @@ internal fun SaveAsResponseDialog(
             saveRefused = false
             onClose()
         },
-        title = { Text("Save as response") },
+        title = { Text(stringResource(R.string.comp_save_as_response_2)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = pendingTitle,
                     onValueChange = { onTitleChange(it.take(ModeratorSavedResponse.MAX_TITLE_CHARS)) },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Title") },
+                    label = { Text(stringResource(R.string.comp_title)) },
                     singleLine = true,
                 )
                 if (saveRefused) {
                     Text(
-                        "You have ${ModeratorSavedResponse.MAX_RESPONSES} saved responses. " +
-                            "Delete one, or use the title of one to replace it.",
+                        stringResource(R.string.all2_you_have_saved_responses_delete_one_or, ModeratorSavedResponse.MAX_RESPONSES),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error,
                     )
                 }
                 Text(
-                    "Saves the current message text for reuse on this device. A response with the same title is replaced.",
+                    stringResource(R.string.all_saves_the_current_message_text_for_reuse),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -552,11 +570,11 @@ internal fun SaveAsResponseDialog(
                 },
                 enabled = saveAsResponseEnabled(pendingTitle, body),
             ) {
-                Text("Save")
+                Text(stringResource(R.string.comp_save))
             }
         },
         dismissButton = {
-            TextButton(onClick = onClose) { Text("Cancel") }
+            TextButton(onClick = onClose) { Text(stringResource(R.string.comp_cancel)) }
         },
     )
 }

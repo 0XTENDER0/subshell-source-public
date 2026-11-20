@@ -1,5 +1,10 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
+import androidx.compose.material3.FilterChip
+import io.github.brealorg.subshell.data.account.RedditModeratorQueueList
 import io.github.brealorg.subshell.ui.error.redditModQueueFailureMessage
 import io.github.brealorg.subshell.ui.error.redditModQueueMoreFailedLabel
 import androidx.compose.foundation.selection.selectable
@@ -16,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import io.github.brealorg.subshell.data.account.RedditRemovalMessageType
 import io.github.brealorg.subshell.data.account.RedditRemovalStepOutcome
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
@@ -115,16 +121,13 @@ fun ModeratorToolsSheet(
     onDismiss: () -> Unit,
     onRefresh: () -> Unit,
     onAppend: () -> Unit,
+    // ISSUE295_QUEUE_USES_THE_SHEET_V1: Approve, Remove and the Moderate sheet
+    // write through LocalModeratorQuickActions; the queue only shows progress.
     actionUiState: RedditModeratorActionUiState = RedditModeratorActionUiState(),
-    onModerate: (RedditModeratorActionRequest) -> Unit = {},
-    onRetryAction: () -> Unit = {},
-    onAuthorizeAction: () -> Unit = {},
-    removalReasonState: RedditRemovalReasonUiState = RedditRemovalReasonUiState(),
-    onLoadRemovalReasons: (Boolean) -> Unit = {},
-    onAuthorizeRemovalReasons: () -> Unit = {},
-    // STEP3_SAVED_RESPONSES_ARE_WIRED_V1: required, so the compiler proves the
-    // screen passes the moderator's saved responses (was nullable, default null).
-    savedResponses: SavedResponseActions,
+    // ISSUE295_REMOVED_CONTENT_LISTS_V1
+    onSelectList: (RedditModeratorQueueList) -> Unit = {},
+    // ISSUE301_QUEUE_CARD_SHOWS_WHY_AND_WHAT_V1: the card's picture (ModeratorQueueItemThumbnail).
+    itemThumbnail: (@Composable (RedditModeratorQueueItem, Modifier) -> Unit)? = null,
 ) {
     val workspaceNavigation = LocalModeratorToolsNavigation.current
     val workspaceContent = LocalModeratorToolsWorkspaceContent.current
@@ -185,26 +188,7 @@ fun ModeratorToolsSheet(
     val loading = !matches || uiState.queueLoading
     val failureKind = uiState.queueFailureKind.takeIf { matches }
     val nextCursor = uiState.queueNextCursor.takeIf { matches }
-    var pendingRemove by remember(communityName) {
-        mutableStateOf<RedditModeratorQueueItem?>(null)
-    }
-    pendingRemove?.let { item ->
-        ModeratorRemovalDialog(
-            item = item,
-            accountStableId = accountStableId,
-            communityName = moderatedCommunityName,
-            displayCommunityName = communityName,
-            actionUiState = actionUiState,
-            removalReasonState = removalReasonState,
-            removalReasonsCommunity = communityName,
-            onLoadRemovalReasons = onLoadRemovalReasons,
-            onAuthorizeRemovalReasons = onAuthorizeRemovalReasons,
-            onModerate = onModerate,
-            onDismiss = { pendingRemove = null },
-            savedResponses = savedResponses,
-        )
-    }
-
+    val list = uiState.queueList.takeIf { matches } ?: RedditModeratorQueueList.QUEUE
     ModalBottomSheet(
         onDismissRequest = {
             if (workspaceBusy.busy) return@ModalBottomSheet
@@ -220,6 +204,24 @@ fun ModeratorToolsSheet(
         },
         sheetState = sheetState,
     ) {
+        // MODTOOLSBACK01_BACK_STEPS_INSIDE_THE_SHEET_V1: a tool's Back is handled
+        // inside the sheet's content (as WIKI02). Through confirmValueChange alone,
+        // M3's predictive Back shrank the sheet, the veto kept it open and it
+        // stayed shrunk at the root (Pixel 11, 2026-11-16; the Back that seemed
+        // lost). A running write keeps the tool open, as before.
+        androidx.activity.compose.BackHandler(
+            enabled = workspaceBusy.busy ||
+                workspaceDestination != ModeratorToolsWorkspaceDestination.ROOT,
+        ) {
+            if (!workspaceBusy.busy) {
+                returnToRoot(workspaceDestination)
+            }
+        }
+        // ISSUE295_QUEUE_USES_THE_SHEET_V1: the sheet is its own window, so the
+        // app's tray (moderator action notices, Retry) is drawn here too while
+        // it is open; the same state, so a notice shows once and goes once.
+        val trayState = io.github.brealorg.subshell.ui.error.LocalViewportErrorHostState.current
+        Box(modifier = Modifier.fillMaxWidth()) {
         when (workspaceDestination) {
             ModeratorToolsWorkspaceDestination.ROOT -> {
             LazyColumn(
@@ -246,7 +248,7 @@ fun ModeratorToolsSheet(
                         Spacer(Modifier.width(10.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Mod tools",
+                                text = stringResource(R.string.comp_mod_tools),
                                 style = MaterialTheme.typography.headlineSmall,
                             )
                             Text(
@@ -262,7 +264,7 @@ fun ModeratorToolsSheet(
                                 modifier = Modifier.size(18.dp),
                             )
                             Spacer(Modifier.width(4.dp))
-                            Text("Refresh")
+                            Text(stringResource(R.string.comp_refresh))
                         }
                     }
                 }
@@ -312,14 +314,30 @@ fun ModeratorToolsSheet(
                         verticalArrangement = Arrangement.spacedBy(2.dp),
                     ) {
                         Text(
-                            text = "Mod queue",
+                            text = moderatorQueueListTitle(list),
                             style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
-                            text = "Review reported posts and comments, then approve, remove, or mark them as spam.",
+                            text = moderatorQueueListDescription(list),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                    }
+                }
+                // ISSUE295_REMOVED_CONTENT_LISTS_V1: the community's moderator
+                // lists; every one uses the same cards and Moderate sheet.
+                item("modqueue-lists") {
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        RedditModeratorQueueList.entries.forEach { option ->
+                            FilterChip(
+                                selected = option == list,
+                                onClick = { if (option != list) onSelectList(option) },
+                                label = { Text(stringResource(option.labelRes)) },
+                            )
+                        }
                     }
                 }
 
@@ -335,47 +353,9 @@ fun ModeratorToolsSheet(
                     }
                 }
 
-                if (
-                    actionUiState.phase == RedditModeratorActionPhase.AUTHORIZATION_REQUIRED &&
-                    actionUiState.request?.communityName == moderatedCommunityName
-                ) {
-                    item("modqueue-action-auth") {
-                        ModerationActionNotice(
-                            title = "Moderator authorization required",
-                            message = "Reddit needs the modposts permission before this action can be sent.",
-                            actionLabel = "Authorize",
-                            onAction = onAuthorizeAction,
-                        )
-                    }
-                } else if (
-                    actionUiState.phase == RedditModeratorActionPhase.FAILED &&
-                    actionUiState.request?.communityName == moderatedCommunityName
-                ) {
-                    item("modqueue-action-error") {
-                        ModerationActionFailure(
-                            uiState = actionUiState,
-                            onRetry = onRetryAction,
-                        )
-                    }
-                }
-
-                if (
-                    actionUiState.phase == RedditModeratorActionPhase.SUCCEEDED &&
-                    (actionUiState.removalReasonWarning || actionUiState.removalMessageOutcome == RedditRemovalStepOutcome.FAILED) &&
-                    actionUiState.request?.communityName == moderatedCommunityName
-                ) {
-                    item("modqueue-removal-reason-warning") {
-                        ModerationActionNotice(
-                            title = "Item removed",
-                            message = removalPartialSuccessMessage(
-                                reasonWarning = actionUiState.removalReasonWarning,
-                                messageOutcome = actionUiState.removalMessageOutcome,
-                            ),
-                            actionLabel = null,
-                            onAction = {},
-                        )
-                    }
-                }
+                // ISSUE295_QUEUE_USES_THE_SHEET_V1: an action's answer (authorization,
+                // failure with Retry, partial removal) is the tray notice and the
+                // question ModeratorQuickActionsHost shows for every moderator action.
 
                 if (loading && items.isEmpty() && failureKind == null) {
                     item("modqueue-loading") {
@@ -389,7 +369,7 @@ fun ModeratorToolsSheet(
                             InlineProgressIndicator()
                             Spacer(Modifier.width(10.dp))
                             Text(
-                                text = "Loading mod queue…",
+                                text = stringResource(R.string.comp_loading_mod_queue),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
@@ -408,11 +388,11 @@ fun ModeratorToolsSheet(
                                 verticalArrangement = Arrangement.spacedBy(4.dp),
                             ) {
                                 Text(
-                                    text = "Mod queue is clear",
+                                    text = moderatorQueueListEmptyTitle(list),
                                     style = MaterialTheme.typography.titleMedium,
                                 )
                                 Text(
-                                    text = "Reddit returned no posts or comments requiring review.",
+                                    text = moderatorQueueListEmptyMessage(list),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -435,49 +415,11 @@ fun ModeratorToolsSheet(
                             ModeratorQueueItemSummary(
                                 item = item,
                                 inProgress = actionUiState.inProgressFor(item.fullname),
+                                showsReportCount = list == RedditModeratorQueueList.QUEUE,
+                                thumbnail = itemThumbnail?.let { draw -> { thumbnailModifier -> draw(item, thumbnailModifier) } },
                             )
-                            ModeratorReportsButton(item)
-                            FlowRow(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
-                                // MODERATION02A3_COMMUNITY_CONTENT_CONTROLS_ENTRY_V1
-                                ModeratorContentControlsButton(item)
-                                TextButton(
-                                    modifier = Modifier.heightIn(min = 48.dp),
-                                    onClick = {
-                                        onModerate(
-                                            RedditModeratorActionRequest(
-                                                accountStableId = accountStableId,
-                                                communityName = moderatedCommunityName,
-                                                thingFullname = item.fullname,
-                                                action = RedditModeratorAction.APPROVE,
-                                            ),
-                                        )
-                                    },
-                                    enabled = !actionUiState.inProgress,
-                                ) {
-                                    ModeratorActionIcon(Symbols.Check)
-                                    Spacer(Modifier.width(6.dp))
-                                    Text("Approve")
-                                }
-                                TextButton(
-                                    modifier = Modifier.heightIn(min = 48.dp),
-                                    onClick = { pendingRemove = item },
-                                    enabled = !actionUiState.inProgress,
-                                ) {
-                                    ModeratorActionIcon(Symbols.Block)
-                                    Spacer(Modifier.width(6.dp))
-                                    Text("Remove")
-                                }
-                                ModeratorSpamAction(
-                                    item = item,
-                                    accountStableId = accountStableId,
-                                    actionUiState = actionUiState,
-                                    onModerate = onModerate,
-                                )
-                            }
+                            // ISSUE295_QUEUE_USES_THE_SHEET_V1
+                            ModeratorQueueItemActions(item, inProgress = actionUiState.inProgress)
                         }
                     }
                 }
@@ -498,7 +440,7 @@ fun ModeratorToolsSheet(
                         ) {
                             if (pageFailed && !uiState.queueLoading) {
                                 Text(
-                                    redditModQueueMoreFailedLabel(uiState.queueFailureDetails),
+                                    redditModQueueMoreFailedLabel(uiState.queueFailureDetails).asString(),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.error,
                                 )
@@ -508,7 +450,7 @@ fun ModeratorToolsSheet(
                                     enabled = !actionUiState.inProgress,
                                     modifier = Modifier.heightIn(min = 48.dp),
                                 ) {
-                                    Text("Retry")
+                                    Text(stringResource(R.string.comp_retry))
                                 }
                             } else {
                                 InlineProgressIndicator()
@@ -553,6 +495,13 @@ fun ModeratorToolsSheet(
                 }
             }
         }
+            if (trayState != null) {
+                ViewportErrorTrayHost(
+                    state = trayState,
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp),
+                )
+            }
+        }
     }
 }
 
@@ -560,57 +509,36 @@ fun ModeratorToolsSheet(
 internal fun removalPartialSuccessMessage(
     reasonWarning: Boolean,
     messageOutcome: RedditRemovalStepOutcome,
-): String {
-    val parts = buildList {
-        if (reasonWarning) add("the removal reason or mod note could not be confirmed")
-        if (messageOutcome == RedditRemovalStepOutcome.FAILED) add("the removal message was not sent")
-    }
-    return "Reddit removed the item, but " + parts.joinToString(" and ") + "."
+): UiText {
+    // TRANSLATE14: one whole sentence per combination.
+    val messageFailed = messageOutcome == RedditRemovalStepOutcome.FAILED
+    return UiText.Resource(
+        when {
+            reasonWarning && messageFailed -> R.string.comp_removal_partial_both
+            reasonWarning -> R.string.comp_removal_partial_reason
+            messageFailed -> R.string.comp_removal_partial_message
+            else -> R.string.comp_removal_done
+        },
+    )
 }
 
-@Composable
-private fun ModerationActionFailure(
-    uiState: RedditModeratorActionUiState,
-    onRetry: () -> Unit,
-) {
-    val message = when {
+/** What a failed approve, remove or spam says, in the queue and from the ⋮ menu. */
+internal fun moderatorActionFailureMessage(uiState: RedditModeratorActionUiState): UiText =
+    when {
         uiState.failureKind == RedditModeratorActionFailureKind.AUTHORIZATION &&
             uiState.httpStatusCode == 403 ->
-            "Reddit denied this moderation action. Your moderator role may not include the required Posts permission."
+            UiText.Resource(R.string.comp_mod_action_failure_1)
         uiState.failureKind == RedditModeratorActionFailureKind.OUTCOME_UNKNOWN ->
-            "The outcome could not be confirmed. The mod queue is being refreshed from Reddit before you act again."
+            UiText.Resource(R.string.comp_mod_action_failure_2)
         uiState.failureKind == RedditModeratorActionFailureKind.SESSION ->
-            "The Reddit sign-in for this account needs attention."
+            UiText.Resource(R.string.comp_mod_action_failure_3)
         uiState.failureKind == RedditModeratorActionFailureKind.TRANSPORT ->
-            "subshell couldn't reach Reddit for this moderation action."
+            UiText.Resource(R.string.comp_mod_action_failure_transport)
         uiState.failureKind == RedditModeratorActionFailureKind.HTTP ->
-            "Reddit rejected this moderation action."
+            UiText.Resource(R.string.comp_mod_action_failure_4)
         else ->
-            "This moderation action couldn't be completed."
+            UiText.Resource(R.string.comp_mod_action_failure_5)
     }
-    ModerationActionNotice(
-        title = "Moderator action failed",
-        message = message,
-        actionLabel = "Retry".takeIf { uiState.retryable },
-        onAction = onRetry,
-    )
-}
-
-@Composable
-private fun ModerationActionNotice(
-    title: String,
-    message: String,
-    actionLabel: String?,
-    onAction: () -> Unit,
-) {
-    // ISSUE222_ONE_INLINE_ERROR_NOTICE_V1
-    InlineErrorNotice(
-        message = message,
-        title = title,
-        actionLabel = actionLabel,
-        onAction = onAction,
-    )
-}
 
 @Composable
 private fun ModeratorQueueFailure(
@@ -621,12 +549,12 @@ private fun ModeratorQueueFailure(
     // BLOCKPAGE02_SMALLER_READ_SURFACES_NAME_THE_BLOCK_PAGE_V1
     details: io.github.brealorg.subshell.data.error.FailureDetails?,
 ) {
-    val message = redditModQueueFailureMessage(failureKind, httpStatusCode, details)
+    val message = redditModQueueFailureMessage(failureKind, httpStatusCode, details).asString()
     // ISSUE222_ONE_INLINE_ERROR_NOTICE_V1
     InlineErrorNotice(
         message = message,
-        title = "Couldn't load mod queue",
-        actionLabel = if (retryable) "Retry" else null,
+        title = stringResource(R.string.comp_couldn_t_load_mod_queue),
+        actionLabel = if (retryable) stringResource(R.string.all_retry) else null,
         onAction = onRetry,
     )
 }
@@ -637,9 +565,14 @@ private fun ModeratorQueueFailure(
 // composable for the mod tools sheet and the Inbox queue, not a form inside an
 // AlertDialog copied twice. The reasons are plain rows in the form's own
 // scroll, not a nested scrolling list.
+/**
+ * ISSUE295_REMOVE_FROM_THE_MENU_V1 (#295): the same removal form for a post or
+ * comment removed from its ⋮ menu, outside the mod queue.
+ */
 @Composable
 internal fun ModeratorRemovalDialog(
-    item: RedditModeratorQueueItem,
+    thingFullname: String,
+    kind: RedditModeratorQueueKind,
     accountStableId: String,
     communityName: String,
     displayCommunityName: String,
@@ -652,10 +585,10 @@ internal fun ModeratorRemovalDialog(
     onDismiss: () -> Unit,
     savedResponses: SavedResponseActions,
 ) {
-    var selectedRemovalReasonId by remember(item.fullname) { mutableStateOf<String?>(null) }
-    var removalModNote by remember(item.fullname) { mutableStateOf("") }
+    var selectedRemovalReasonId by remember(thingFullname) { mutableStateOf<String?>(null) }
+    var removalModNote by remember(thingFullname) { mutableStateOf("") }
     // MODRESPONSE01A2_REMOVAL_RESPONSE_DRAFT_V1
-    val removalResponse = remember(item.fullname) {
+    val removalResponse = remember(thingFullname) {
         RemovalResponseDraft(initialType = savedResponses.initialType)
     }
     val removalReasonsMatch = removalReasonState.matches(accountStableId, removalReasonsCommunity)
@@ -664,7 +597,7 @@ internal fun ModeratorRemovalDialog(
     } else {
         emptyList()
     }
-    LaunchedEffect(item.fullname, accountStableId, removalReasonsCommunity) {
+    LaunchedEffect(thingFullname, accountStableId, removalReasonsCommunity) {
         selectedRemovalReasonId = null
         removalModNote = ""
         onLoadRemovalReasons(false)
@@ -675,12 +608,12 @@ internal fun ModeratorRemovalDialog(
     }
 
     AdaptiveFullScreenDialog(
-        title = when (item.kind) {
-            RedditModeratorQueueKind.POST -> "Remove this post?"
-            RedditModeratorQueueKind.COMMENT -> "Remove this comment?"
+        title = when (kind) {
+            RedditModeratorQueueKind.POST -> stringResource(R.string.all_remove_this_post)
+            RedditModeratorQueueKind.COMMENT -> stringResource(R.string.all_remove_this_comment)
         },
         onDismissRequest = onDismiss,
-        closeLabel = "Cancel",
+        closeLabel = stringResource(R.string.all_cancel),
         actions = {
             TextButton(
                 onClick = {
@@ -691,7 +624,7 @@ internal fun ModeratorRemovalDialog(
                         RedditModeratorActionRequest(
                             accountStableId = accountStableId,
                             communityName = communityName,
-                            thingFullname = item.fullname,
+                            thingFullname = thingFullname,
                             action = RedditModeratorAction.REMOVE,
                             removalReasonId = selectedRemovalReasonId
                                 .takeIf { reasonsAvailable },
@@ -704,7 +637,7 @@ internal fun ModeratorRemovalDialog(
                 },
                 enabled = !actionUiState.inProgress && !removalResponse.blocksConfirm,
             ) {
-                Text(if (removalResponse.enabled) "Remove and send" else "Remove")
+                Text(if (removalResponse.enabled) stringResource(R.string.all_remove_and_send) else stringResource(R.string.all_remove_2))
             }
         },
     ) {
@@ -716,23 +649,21 @@ internal fun ModeratorRemovalDialog(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Text(
-                "Remove from r/$displayCommunityName. A subreddit removal reason is optional and " +
-                    "is recorded for moderators; it does not send a removal message by itself.",
+                stringResource(R.string.all2_remove_from_r_a_subreddit_removal_reason, displayCommunityName),
             )
             when {
                 removalReasonState.phase == RedditRemovalReasonPhase.AUTHORIZATION_REQUIRED &&
                     removalReasonsMatch -> {
                     Text(
-                        "Reddit needs the modcontributors permission to read this " +
-                            "community's removal reasons.",
+                        stringResource(R.string.all2_reddit_needs_the_modcontributors_permission_to_read),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     TextButton(onClick = onAuthorizeRemovalReasons) {
-                        Text("Authorize removal reasons")
+                        Text(stringResource(R.string.comp_authorize_removal_reasons))
                     }
                     Text(
-                        "You can still remove without a reason.",
+                        stringResource(R.string.all_you_can_still_remove_without_a_reason),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -741,37 +672,37 @@ internal fun ModeratorRemovalDialog(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         InlineProgressIndicator()
                         Spacer(Modifier.width(8.dp))
-                        Text("Loading removal reasons…")
+                        Text(stringResource(R.string.comp_loading_removal_reasons))
                     }
                 }
                 removalReasonState.phase == RedditRemovalReasonPhase.FAILED -> {
                     Text(
-                        "Couldn't load removal reasons. You can retry or remove without one.",
+                        stringResource(R.string.all_couldn_t_load_removal_reasons_you_can),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     if (removalReasonState.retryable) {
                         TextButton(onClick = { onLoadRemovalReasons(true) }) {
-                            Text("Retry reasons")
+                            Text(stringResource(R.string.comp_retry_reasons))
                         }
                     }
                 }
                 removalReasonState.loaded -> {
                     if (removalReasons.isEmpty()) {
                         Text(
-                            "This community has no configured removal reasons.",
+                            stringResource(R.string.all_this_community_has_no_configured_removal_reasons),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     } else {
                         Text(
-                            "Removal reason",
+                            stringResource(R.string.all_removal_reason),
                             style = MaterialTheme.typography.labelLarge,
                         )
                         // LOWUI7_CHOICE_ROWS_SAY_WHICH_IS_SELECTED_V1 (OCB-134, OCB-152): the row is the radio.
                         Column(Modifier.fillMaxWidth().selectableGroup()) {
                             RemovalReasonRow(
-                                title = "No removal reason",
+                                title = stringResource(R.string.comp_no_removal_reason),
                                 message = "",
                                 selected = selectedRemovalReasonId == null,
                                 onSelect = { selectedRemovalReasonId = null },
@@ -791,8 +722,8 @@ internal fun ModeratorRemovalDialog(
                             value = removalModNote,
                             onValueChange = { value -> removalModNote = value.take(100) },
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text("Mod note (optional)") },
-                            supportingText = { Text("${removalModNote.length}/100") },
+                            label = { Text(stringResource(R.string.comp_mod_note_optional)) },
+                            supportingText = { Text(stringResource(R.string.comp_100, removalModNote.length)) },
                             singleLine = true,
                         )
                     }
@@ -801,7 +732,7 @@ internal fun ModeratorRemovalDialog(
             // MODRESPONSE01A2_REMOVAL_RESPONSE_DRAFT_V1
             RemovalResponseSection(
                 draft = removalResponse,
-                kind = item.kind,
+                kind = kind,
                 savedResponses = savedResponses,
             )
         }
@@ -830,4 +761,41 @@ private fun RemovalReasonRow(
             onClick = onSelect,
         ),
     )
+}
+
+// ISSUE295_REMOVED_CONTENT_LISTS_V1: what each list is, in the sheet's words.
+@androidx.compose.runtime.Composable
+internal fun moderatorQueueListTitle(list: RedditModeratorQueueList): String = when (list) {
+    RedditModeratorQueueList.QUEUE -> stringResource(R.string.comp_mod_queue_list_title_1)
+    RedditModeratorQueueList.REMOVED -> stringResource(R.string.comp_mod_queue_list_title_2)
+    RedditModeratorQueueList.EDITED -> stringResource(R.string.comp_mod_queue_list_title_3)
+    RedditModeratorQueueList.UNMODERATED -> stringResource(R.string.comp_mod_queue_list_title_4)
+}
+
+@androidx.compose.runtime.Composable
+internal fun moderatorQueueListDescription(list: RedditModeratorQueueList): String = when (list) {
+    RedditModeratorQueueList.QUEUE ->
+        stringResource(R.string.comp_mod_queue_list_description_1)
+    RedditModeratorQueueList.REMOVED ->
+        stringResource(R.string.comp_mod_queue_list_description_2)
+    RedditModeratorQueueList.EDITED ->
+        stringResource(R.string.comp_mod_queue_list_description_3)
+    RedditModeratorQueueList.UNMODERATED ->
+        stringResource(R.string.comp_mod_queue_list_description_4)
+}
+
+@androidx.compose.runtime.Composable
+internal fun moderatorQueueListEmptyTitle(list: RedditModeratorQueueList): String = when (list) {
+    RedditModeratorQueueList.QUEUE -> stringResource(R.string.comp_mod_queue_list_empty_title_1)
+    RedditModeratorQueueList.REMOVED -> stringResource(R.string.comp_mod_queue_list_empty_title_2)
+    RedditModeratorQueueList.EDITED -> stringResource(R.string.comp_mod_queue_list_empty_title_3)
+    RedditModeratorQueueList.UNMODERATED -> stringResource(R.string.comp_mod_queue_list_empty_title_4)
+}
+
+@androidx.compose.runtime.Composable
+internal fun moderatorQueueListEmptyMessage(list: RedditModeratorQueueList): String = when (list) {
+    RedditModeratorQueueList.QUEUE -> stringResource(R.string.comp_mod_queue_list_empty_message_1)
+    RedditModeratorQueueList.REMOVED -> stringResource(R.string.comp_mod_queue_list_empty_message_2)
+    RedditModeratorQueueList.EDITED -> stringResource(R.string.comp_mod_queue_list_empty_message_3)
+    RedditModeratorQueueList.UNMODERATED -> stringResource(R.string.comp_mod_queue_list_empty_message_4)
 }

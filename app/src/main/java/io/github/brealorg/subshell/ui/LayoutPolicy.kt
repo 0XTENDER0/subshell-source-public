@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -62,17 +64,18 @@ internal fun navigationBarBaseHeightForFontScale(fontScale: Float): Dp =
     }
 
 // A11Y01A11_LARGE_TEXT_BOTTOM_NAV_LABEL_V1
+@androidx.annotation.StringRes
 internal fun navigationVisualLabel(
     destination: MainDestination,
     fontScale: Float,
-): String =
+): Int =
     if (
         destination == MainDestination.SUBS &&
         fontScale >= LargeTextNavigationBarFontScaleThreshold
     ) {
-        "Subs"
+        io.github.brealorg.subshell.R.string.nav_subs
     } else {
-        destination.label
+        destination.labelRes
     }
 
 // A11Y01A2_EXPANDED_MAIN_BREAKPOINT_V1
@@ -84,7 +87,8 @@ internal fun useNavigationRail(windowSizeClass: WindowSizeClass): Boolean =
 
 // M3224_NAVIGATION_RAIL_FROM_MEDIUM_WIDTH_V1: the rail names the destination
 // as the bottom bar does ("Communities", not "Subs").
-internal fun navigationRailVisualLabel(destination: MainDestination): String = destination.label
+@androidx.annotation.StringRes
+internal fun navigationRailVisualLabel(destination: MainDestination): Int = destination.labelRes
 
 internal fun useExpandedHomePostListDetail(
     expandedWindow: Boolean,
@@ -237,8 +241,8 @@ internal fun shouldCloseYouBlockedDetailOnTabSelection(
     selectedTab: Int,
 ): Boolean = selectedTab != 6
 
-internal const val YOU_BLOCKED_WORKSPACE_PLACEHOLDER =
-    "Select an account"
+internal val YOU_BLOCKED_WORKSPACE_PLACEHOLDER: UiText =
+    UiText.Resource(R.string.layout_select_an_account)
 
 // NEXT01A4C_YOU_DRAFTS_WORKSPACE_POLICY_V1
 internal fun useExpandedYouDraftsWorkspaceListDetail(
@@ -256,26 +260,30 @@ internal fun shouldCloseYouDraftsDetailOnTabSelection(
     selectedTab: Int,
 ): Boolean = selectedTab != 7
 
-internal const val YOU_DRAFTS_WORKSPACE_PLACEHOLDER =
-    "Select a draft"
+internal val YOU_DRAFTS_WORKSPACE_PLACEHOLDER: UiText =
+    UiText.Resource(R.string.layout_select_a_draft)
 
-internal fun youContentWorkspaceLabel(selectedTab: Int): String =
-    when (selectedTab) {
-        0 -> "Posts"
-        1 -> "Comments"
-        2 -> "Saved"
-        3 -> "Upvotes"
-        4 -> "Downvotes"
-        5 -> "Hidden"
-        else -> "You"
-    }
+internal fun youContentWorkspaceLabel(selectedTab: Int): UiText =
+    UiText.Resource(
+        when (selectedTab) {
+            0 -> R.string.scr_profile_tab_posts
+            1 -> R.string.scr_profile_tab_comments
+            2 -> R.string.scr_profile_tab_saved
+            3 -> R.string.scr_profile_tab_upvotes
+            4 -> R.string.scr_profile_tab_downvotes
+            5 -> R.string.scr_profile_tab_hidden
+            else -> R.string.layout_you
+        },
+    )
 
-internal fun youContentWorkspacePlaceholder(selectedTab: Int): String =
-    when (selectedTab) {
-        1 -> "Select a comment"
-        2 -> "Select a saved item"
-        else -> "Select a post"
-    }
+internal fun youContentWorkspacePlaceholder(selectedTab: Int): UiText =
+    UiText.Resource(
+        when (selectedTab) {
+            1 -> R.string.layout_select_a_comment
+            2 -> R.string.layout_select_a_saved_item
+            else -> R.string.layout_select_a_post
+        },
+    )
 
 /**
  * ISSUE278_LAYOUT_IGNORES_THE_UI_SIZE_V1: the window size class of the window

@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,6 +29,7 @@ internal fun FilteredPostsSummaryRow(
     revealed: Boolean,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
+    text: String = filteredPostsSummaryText(filteredCount, revealed).asString(),
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -44,19 +48,25 @@ internal fun FilteredPostsSummaryRow(
             )
             Spacer(Modifier.width(10.dp))
             Text(
-                text = filteredPostsSummaryText(filteredCount, revealed),
+                text = text,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f),
             )
             TextButton(onClick = onToggle) {
-                Text(if (revealed) "Hide" else "Show")
+                Text(if (revealed) stringResource(R.string.all_hide) else stringResource(R.string.all_show))
             }
         }
     }
 }
 
-internal fun filteredPostsSummaryText(filteredCount: Int, revealed: Boolean): String {
-    val posts = if (filteredCount == 1) "1 post" else "$filteredCount posts"
-    return if (revealed) "Showing $posts your filters hide" else "$posts hidden by your filters"
+/** ISSUE293_LANGUAGE_FILTER_V1: the same row for results hidden by the Languages setting. */
+internal fun languageHiddenSummaryText(hiddenCount: Int, revealed: Boolean): UiText {
+    val results = UiText.Plural(R.plurals.filtered_results, hiddenCount, hiddenCount)
+    return UiText.Resource(if (revealed) R.string.language_hidden_showing else R.string.language_hidden_hidden, results)
+}
+
+internal fun filteredPostsSummaryText(filteredCount: Int, revealed: Boolean): UiText {
+    val posts = UiText.Plural(R.plurals.filtered_posts, filteredCount, filteredCount)
+    return UiText.Resource(if (revealed) R.string.filtered_posts_showing else R.string.filtered_posts_hidden, posts)
 }

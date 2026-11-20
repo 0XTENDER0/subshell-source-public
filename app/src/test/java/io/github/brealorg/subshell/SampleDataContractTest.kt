@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell
 
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.FakeSubshellRepository
 import io.github.brealorg.subshell.data.SampleData
 import io.github.brealorg.subshell.data.account.RedditCommentsUiState
@@ -32,6 +33,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class SampleDataContractTest {
     private val repository = FakeSubshellRepository()
 
@@ -233,8 +236,8 @@ class SampleDataContractTest {
         state.openSearch()
         assertEquals(SearchArea.ALL_SUBSHELL, state.searchArea)
         assertEquals(SearchScope.ALL, state.searchScope)
-        assertEquals("Search subshell", state.currentSearchHint)
-        assertEquals("All subshell", state.currentSearchAreaLabel)
+        assertEquals("Search subshell", state.currentSearchHint.s)
+        assertEquals("All subshell", state.currentSearchAreaLabel.s)
         state.closeSearch()
 
         state.navigate(MainDestination.SUBS)
@@ -250,7 +253,7 @@ class SampleDataContractTest {
         assertEquals(MainDestination.SUBS, state.destination)
         state.openSearch()
         assertEquals(SearchArea.CURRENT_COMMUNITY, state.searchArea)
-        assertEquals("r/linux", state.currentSearchAreaLabel)
+        assertEquals("r/linux", state.currentSearchAreaLabel.s)
         assertTrue(state.matchesSearchArea("linux"))
         assertFalse(state.matchesSearchArea("android"))
         assertEquals(listOf(SearchScope.POSTS), state.availableSearchScopes)

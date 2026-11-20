@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -39,6 +41,16 @@ internal fun AccountScopedEffects(
         state.activeAccountId,
         state.activeAccountIsAuthenticated,
     ) {
+        if (state.activeAccountIsAuthenticated) {
+            onLoadRedditModeratorCommunities(state.activeAccountId, false)
+        }
+    }
+    // MODDIRECTORY01_A_FAILED_READ_IS_RETRIED_ON_RETURN_V1: one failed read of
+    // the moderator directory hid the Mod tab and Mod tools for the whole
+    // process (an empty directory shows no failure either). Coming back to the
+    // app asks again; the coordinator does nothing while the directory is
+    // loading or loaded, so this costs nothing once it has been read.
+    androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
         if (state.activeAccountIsAuthenticated) {
             onLoadRedditModeratorCommunities(state.activeAccountId, false)
         }
@@ -93,6 +105,7 @@ internal fun AccountScopedEffects(
                 accountStableId = pendingAccountId,
                 subscriptions = redditSubscriptionsState,
                 coldStart = pendingAccountId == coldStartAccountId,
+                startFeed = state.startFeed,
             )
         ) {
             AuthenticatedMainFeedLandingDecision.WAIT -> Unit
@@ -109,6 +122,12 @@ internal fun AccountScopedEffects(
                 pendingAuthenticatedLandingAccountId = null
                 state.applyAuthenticatedMainFeedLanding(
                     FeedSource.POPULAR,
+                )
+            }
+            AuthenticatedMainFeedLandingDecision.ALL -> {
+                pendingAuthenticatedLandingAccountId = null
+                state.applyAuthenticatedMainFeedLanding(
+                    FeedSource.ALL,
                 )
             }
         }

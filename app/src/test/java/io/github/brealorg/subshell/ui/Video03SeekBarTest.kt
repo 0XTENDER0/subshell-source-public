@@ -63,7 +63,7 @@ class Video03SeekBarTest {
     private val context = ApplicationProvider.getApplicationContext<Application>()
 
     private val action = SwipeActionVisual(
-        label = "Vote",
+        label = UiText.Plain("Vote"),
         icon = Symbols.ThumbUp,
         containerColor = Color.Blue,
         contentColor = Color.White,
@@ -186,7 +186,7 @@ class Video03SeekBarTest {
         assertEquals(listOf("Back 10 seconds", "Forward 10 seconds"), actions.map { it.label })
         composeRule.runOnIdle { actions.forEach { it.action() } }
         assertEquals(listOf(-10_000L, 10_000L), recorded.seeks)
-        assertEquals("0:00 of 0:09", videoTimelineStateDescription(-5L, 9_000L))
+        assertEquals("0:00 of 0:09", videoTimelineStateDescription(-5L, 9_000L).s)
     }
 
     @Test

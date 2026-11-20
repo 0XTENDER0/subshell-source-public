@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.assertIsEnabled
@@ -65,7 +66,7 @@ class Composer10CommentMediaRulesTest {
         val noGifs = CommentMediaPolicy(imagesAllowed = true, gifsAllowed = false)
         assertEquals(
             "This community doesn't allow GIFs in comments. Remove it to send the text.",
-            commentMediaNotAllowedMessage(gif, noGifs),
+            commentMediaNotAllowedMessage(gif, noGifs)?.s,
         )
         assertNull(commentMediaNotAllowedMessage(image, noGifs))
         assertNull(commentMediaNotAllowedMessage(gif, null))

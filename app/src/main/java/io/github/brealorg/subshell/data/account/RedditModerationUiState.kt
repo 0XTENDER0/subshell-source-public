@@ -2,6 +2,7 @@ package io.github.brealorg.subshell.data.account
 
 import io.github.brealorg.subshell.data.error.FailureDetails
 import io.github.brealorg.subshell.data.normalizeRedditCommunityName
+import io.github.brealorg.subshell.model.Post
 
 enum class RedditModerationUiFailureKind {
     CLIENT_CONFIGURATION,
@@ -9,6 +10,18 @@ enum class RedditModerationUiFailureKind {
     HTTP,
     TRANSPORT,
     PROTOCOL,
+}
+
+/**
+ * ISSUE295_REMOVED_CONTENT_LISTS_V1 (#295 part 3): the moderator lists Mod tools
+ * shows for one community. [path] is Reddit's /r/<name>/about/<path> listing;
+ * "spam" holds what Reddit's filters and moderators removed.
+ */
+enum class RedditModeratorQueueList(@androidx.annotation.StringRes val labelRes: Int, val path: String) {
+    QUEUE( io.github.brealorg.subshell.R.string.reddit_moderator_queue_list_queue, "modqueue"),
+    REMOVED( io.github.brealorg.subshell.R.string.reddit_moderator_queue_list_removed, "spam"),
+    EDITED( io.github.brealorg.subshell.R.string.reddit_moderator_queue_list_edited, "edited"),
+    UNMODERATED( io.github.brealorg.subshell.R.string.reddit_moderator_queue_list_unmoderated, "unmoderated"),
 }
 
 enum class RedditModeratorQueueKind {
@@ -26,6 +39,8 @@ data class RedditModeratorQueueItem(
     val permalink: String? = null,
     val reportDetails: RedditModeratorReportDetails = RedditModeratorReportDetails(),
     val contentState: RedditModeratorContentState = RedditModeratorContentState(),
+    // ISSUE301_QUEUE_CARD_SHOWS_WHY_AND_WHAT_V1
+    val details: RedditModeratorQueueItemDetails = RedditModeratorQueueItemDetails(),
 ) {
     init {
         require(fullname.matches(Regex("t[13]_[a-z0-9]+")))
@@ -35,6 +50,53 @@ data class RedditModeratorQueueItem(
         require(reportCount >= 0)
     }
 }
+
+/**
+ * ISSUE301_QUEUE_CARD_SHOWS_WHY_AND_WHAT_V1 (#301, u/vpsj): what a queue card shows
+ * besides the title, so a moderator can decide from the card. Moderator-only,
+ * in-memory presentation data, like the report details.
+ */
+data class RedditModeratorQueueItemDetails(
+    /** A post as the feed reads it (picture, gallery, video, flair), or null for a comment. */
+    val post: Post? = null,
+    /** The first picture in a comment, or null. */
+    val commentImageUrl: String? = null,
+    /** "3h", "2d" … */
+    val ageLabel: String? = null,
+    /** The first lines of a post's text. */
+    val snippet: String? = null,
+    val postFlair: String? = null,
+    val authorFlair: String? = null,
+    /** The title of the post a comment was written on. */
+    val linkTitle: String? = null,
+    /** The removal reason a moderator picked (Removed list). */
+    val removalReasonTitle: String? = null,
+    /** Who removed it, as Reddit names them (Removed list). */
+    val removedBy: String? = null,
+    /**
+     * ISSUE301B_AUTOMOD_HELD_IS_NAMED_V1: AutoModerator filtered it into the queue
+     * (`removed_by_category = automod_filtered`, or `banned_by = AutoModerator`
+     * while `removed = false`); not removed. The rule's reason is in the mod log
+     * ([heldReason]).
+     */
+    val heldByAutoModerator: Boolean = false,
+    /**
+     * ISSUE301C_REDDIT_FILTER_HELD_IS_NAMED_V1: Reddit's own filter (abuse and
+     * harassment, spam, …) held it: `banned_by = true` while `removed = false`
+     * (u/vpsj's comment in r/indianrailways, 2026-11-15).
+     */
+    val heldByRedditFilter: Boolean = false,
+    /** When it was posted (`created_utc`): the mod log is read back to here (ISSUE301D). */
+    val createdEpochSeconds: Long? = null,
+    /** ISSUE301C_A_FILTER_REASON_COMES_FROM_THE_MOD_LOG_V1: why the filter held it, or null. */
+    val heldReason: RedditModeratorHeldReason? = null,
+)
+
+/** A filter's own words from the mod log, and whether AutoModerator (not Reddit) wrote them. */
+data class RedditModeratorHeldReason(
+    val byAutoModerator: Boolean,
+    val reason: String,
+)
 
 // MOD01A22_EXACT_MODERATION_TARGET_V1
 data class RedditModeratorQueueTarget(
@@ -98,6 +160,8 @@ data class RedditModerationUiState(
     val queueFailureDetails: FailureDetails? = null,
     val queueFailureHttpStatusCode: Int? = null,
     val contentRevision: Long = 0L,
+    // ISSUE295_REMOVED_CONTENT_LISTS_V1: which list the queue fields hold.
+    val queueList: RedditModeratorQueueList = RedditModeratorQueueList.QUEUE,
 ) {
     init {
         require(accountStableId == null || accountStableId.isNotBlank())

@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import io.github.brealorg.subshell.data.account.COMMENT_EDIT_TEXT_MAX_CHARS
 import androidx.activity.compose.BackHandler
@@ -150,7 +152,7 @@ internal fun CommentEditScreen(
     BackHandler(enabled = unsavedEdits, onBack = ::requestClose)
     if (discardConfirmVisible) {
         ComposerDiscardChangesDialog(
-            subject = "comment",
+            message = R.string.comp_edits_lost_comment,
             onKeepEditing = { discardConfirmVisible = false },
             onDiscard = {
                 discardConfirmVisible = false
@@ -176,24 +178,24 @@ internal fun CommentEditScreen(
         topBar = {
             RouteTopBar(
                 scrollBehavior = routeTopBarScroll,
-                title = { Text("Edit comment") },
+                title = { Text(stringResource(R.string.scr_edit_comment)) },
                 navigationIcon = {
                     IconButton(onClick = ::requestClose) {
                         Icon(
                             Symbols.ArrowBack,
-                            contentDescription = "Close comment editor",
+                            contentDescription = stringResource(R.string.scr_close_comment_editor),
                         )
                     }
                 },
                 actions = {
                     ComposerPrimaryAction(
                         text = when (relevantState.phase) {
-                            CommentEditPhase.SENDING -> "Saving…"
-                            CommentEditPhase.CHECKING -> "Checking…"
+                            CommentEditPhase.SENDING -> stringResource(R.string.all_saving_2)
+                            CommentEditPhase.CHECKING -> stringResource(R.string.all_checking)
                             CommentEditPhase.AUTHORIZING,
                             CommentEditPhase.AWAITING_CALLBACK,
-                            -> "Authorizing…"
-                            else -> "Save"
+                            -> stringResource(R.string.all_authorizing)
+                            else -> stringResource(R.string.all_save)
                         },
                         enabled = saveEnabled,
                         onClick = ::submit,
@@ -213,7 +215,7 @@ internal fun CommentEditScreen(
                 .fitInside(WindowInsetsRulers.Ime.current),
         ) {
             ComposerContextNote(
-                text = "Editing your comment in r/${post.community}",
+                text = stringResource(R.string.scr_editing_your_comment_in_r, post.community),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 10.dp),
@@ -229,7 +231,7 @@ internal fun CommentEditScreen(
             )
 
             ComposerBodyHeader(
-                title = "Comment",
+                title = stringResource(R.string.scr_comment),
                 length = body.length,
                 maxLength = 10_000,
                 previewVisible = previewVisible,
@@ -247,7 +249,7 @@ internal fun CommentEditScreen(
             } else {
                 PostStyleComposerEditor(
                     state = editor,
-                    placeholder = "Add a comment",
+                    placeholder = stringResource(R.string.scr_add_a_comment),
                     focusRequester = focusRequester,
                     onFormat = ::formatUnlessLocked,
                     onMediaReceived = {},
@@ -314,16 +316,16 @@ private fun CommentEditStatus(
             when (state.phase) {
                 CommentEditPhase.AUTHORIZATION_REQUIRED -> {
                     TextButton(onClick = onGrantAccess) {
-                        Text("Grant edit access")
+                        Text(stringResource(R.string.scr_grant_edit_access))
                     }
                     TextButton(onClick = onDismiss) {
-                        Text("Not now")
+                        Text(stringResource(R.string.scr_not_now))
                     }
                 }
                 CommentEditPhase.AUTHORIZING,
                 CommentEditPhase.AWAITING_CALLBACK,
                 -> TextButton(onClick = onCancelAuthorization) {
-                    Text("Cancel authorization")
+                    Text(stringResource(R.string.scr_cancel_authorization))
                 }
                 // LOWUI4_UNREACHABLE_FAILED_ROW_REMOVED_V1 (OCB-179): FAILED is
                 // shown by the ErrorNotice above, which returns first.
@@ -333,55 +335,56 @@ private fun CommentEditStatus(
     }
 }
 
+@androidx.compose.runtime.Composable
 internal fun commentEditStatusMessage(state: CommentEditUiState): String? =
     when (state.phase) {
         CommentEditPhase.IDLE,
         CommentEditPhase.SUCCEEDED,
         -> null
         CommentEditPhase.AUTHORIZATION_REQUIRED ->
-            "Edit access is required for this account."
+            stringResource(R.string.scr_comment_edit_1)
         CommentEditPhase.AUTHORIZING ->
-            "Preparing Reddit authorization…"
+            stringResource(R.string.scr_comment_edit_2)
         CommentEditPhase.AWAITING_CALLBACK ->
-            "Waiting for Reddit authorization…"
+            stringResource(R.string.scr_comment_edit_3)
         CommentEditPhase.SENDING ->
-            "Saving comment…"
+            stringResource(R.string.scr_comment_edit_4)
         CommentEditPhase.CHECKING ->
-            "Checking Reddit for your edit…"
+            stringResource(R.string.scr_comment_edit_5)
         CommentEditPhase.FAILED -> when (state.failureKind) {
             CommentEditFailureKind.CONFIGURATION ->
-                "Comment editing is not configured for this account."
+                stringResource(R.string.scr_comment_edit_6)
             CommentEditFailureKind.ACCOUNT_CHANGED ->
-                "The active account changed. Reopen the comment before editing."
+                stringResource(R.string.scr_comment_edit_7)
             CommentEditFailureKind.NOT_OWNER ->
-                "Only comments from the active account can be edited."
+                stringResource(R.string.scr_comment_edit_8)
             CommentEditFailureKind.BROWSER_LAUNCH ->
-                "Reddit authorization could not be opened."
+                stringResource(R.string.scr_comment_edit_9)
             CommentEditFailureKind.CALLBACK ->
-                "Reddit authorization could not be completed."
+                stringResource(R.string.scr_comment_edit_10)
             CommentEditFailureKind.AUTHORIZATION ->
-                "Edit access was not granted."
+                stringResource(R.string.scr_comment_edit_11)
             CommentEditFailureKind.SESSION ->
-                "The Reddit session could not be refreshed."
+                stringResource(R.string.scr_comment_edit_12)
             CommentEditFailureKind.RATE_LIMIT -> state.retryAfterMs
                 ?.let { delayMs ->
-                    "Reddit asked you to wait about ${((delayMs + 999L) / 1_000L)} seconds."
+                    stringResource(R.string.scr_comment_edit_13, ((delayMs + 999L) / 1_000L))
                 }
-                ?: "Reddit asked you to wait before editing again."
+                ?: stringResource(R.string.scr_comment_edit_14)
             CommentEditFailureKind.VALIDATION ->
-                "The edited comment is invalid."
+                stringResource(R.string.scr_comment_edit_15)
             CommentEditFailureKind.API ->
-                "Reddit rejected the edit."
+                stringResource(R.string.scr_comment_edit_16)
             CommentEditFailureKind.HTTP,
             CommentEditFailureKind.TRANSPORT,
-            -> "The edited comment could not be sent."
+            -> stringResource(R.string.scr_comment_edit_17)
             CommentEditFailureKind.ALREADY_EDITING ->
-                "This comment is already being edited."
+                stringResource(R.string.scr_comment_edit_18)
             CommentEditFailureKind.OUTCOME_UNKNOWN ->
-                "The edit may have been saved."
+                stringResource(R.string.scr_comment_edit_19)
             CommentEditFailureKind.NOT_SAVED ->
-                "The edit wasn't saved."
-            null -> "The comment could not be edited."
+                stringResource(R.string.scr_comment_edit_20)
+            null -> stringResource(R.string.scr_comment_edit_21)
         }
     }
 

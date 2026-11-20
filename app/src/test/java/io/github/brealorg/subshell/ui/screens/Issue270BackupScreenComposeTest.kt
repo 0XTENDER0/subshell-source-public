@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import android.content.Context
 import androidx.compose.runtime.CompositionLocalProvider
@@ -49,7 +50,7 @@ class Issue270BackupScreenComposeTest {
         val repository = SettingsBackupRepository(application, appVersion = "test")
         repository.saveCurrent(name = "Trip setup", settings = SubshellSettings())
         repository.setAutomaticHistoryEnabled(true)
-        repository.recordSettingsChange(settings = SubshellSettings(showNsfwMedia = true))
+        repository.recordSettingsChange(settings = SubshellSettings(showNsfwMedia = false))
         composeRule.setContent {
             SubshellTheme {
                 CompositionLocalProvider(LocalViewportErrorHostState provides tray) {
@@ -110,7 +111,7 @@ class Issue270BackupScreenComposeTest {
             hasText("Muted communities") and SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch),
         ).performClick()
         composeRule.waitUntil(10_000) { tray.currentRequest != null }
-        assertEquals("Muted communities will be backed up", tray.currentRequest?.presentation?.title)
+        assertEquals("Muted communities will be backed up", tray.currentRequest?.presentation?.title?.s)
         scrollTo("Never backed up")
         assertTrue(has("sign-ins and your Reddit Client ID", substring = true))
     }

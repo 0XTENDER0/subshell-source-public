@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import io.github.brealorg.subshell.model.PostKind
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -11,6 +14,9 @@ import org.junit.Test
  * Issue #41: `reddit.com/link/<post>/video/<media>/player` links play the
  * video from v.redd.it in the built-in viewer.
  */
+// TRANSLATE07: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue41InlineVideoLinkTest {
     private val expected = RedditTarget.InlineVideo(postId = "pbpmii5", mediaId = "8n56vczekerh1")
 
@@ -110,6 +116,6 @@ class Issue41InlineVideoLinkTest {
         )
 
         assertEquals(expected, plan.directAction?.target)
-        assertEquals("Play Reddit video", plan.directAction?.title)
+        assertEquals("Play Reddit video", plan.directAction?.title?.s)
     }
 }

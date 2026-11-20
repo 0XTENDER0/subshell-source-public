@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.data.account.SubmittedTextPost
 import io.github.brealorg.subshell.data.account.TextPostWritePhase
 import io.github.brealorg.subshell.data.account.TextPostWriteRequest
@@ -28,7 +30,7 @@ data class CrosspostReviewUiState(
     val draft: PostComposerDraft? = null,
     val request: TextPostWriteRequest? = null,
     val policy: ComposerCommunityPolicy? = null,
-    val message: String? = null,
+    val message: UiText? = null,
 ) {
     fun matches(candidate: PostComposerDraft): Boolean = draft == candidate.crosspostReviewIdentity()
     val busy: Boolean
@@ -97,13 +99,13 @@ internal fun crosspostDraftWriteAvailable(
 internal fun crosspostSourceValidationMessage(
     draft: PostComposerDraft,
     evidence: CrosspostSourceEvidence,
-): String? {
-    val source = draft.crosspostSource ?: return "The original post is missing"
+): UiText? {
+    val source = draft.crosspostSource ?: return UiText.Resource(R.string.xflow_the_original_post_is_missing)
     if (source.fullname != evidence.fullname || source.community != evidence.community ||
         source.author != evidence.author || source.title != evidence.title
-    ) return "The original post changed. Open it again before crossposting"
-    if (evidence.nsfw && !draft.nsfw) return "The original post is NSFW. Enable NSFW before reviewing"
-    if (evidence.spoiler && !draft.spoiler) return "The original post is a spoiler. Enable Spoiler before reviewing"
+    ) return UiText.Resource(R.string.xflow_the_original_post_changed_open_it_again)
+    if (evidence.nsfw && !draft.nsfw) return UiText.Resource(R.string.xflow_the_original_post_is_nsfw_enable_nsfw)
+    if (evidence.spoiler && !draft.spoiler) return UiText.Resource(R.string.xflow_the_original_post_is_a_spoiler_enable)
     return null
 }
 

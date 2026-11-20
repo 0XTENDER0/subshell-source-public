@@ -1,5 +1,10 @@
 package io.github.brealorg.subshell.ui.error
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.ui.s
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import io.github.brealorg.subshell.data.account.RedditModerationUiFailureKind
 import io.github.brealorg.subshell.data.error.FailureDetails
 import io.github.brealorg.subshell.data.error.REDDIT_BLOCK_PAGE_REASON
@@ -15,6 +20,9 @@ import org.junit.Test
  * ordinary 403 keeps each surface's own text (for the mod queue: the moderator
  * role, which the block page used to be mistaken for).
  */
+// TRANSLATE03: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class BlockPage02SmallerReadSurfacesTest {
     private val blocked = FailureDetails(
         httpStatusCode = 403,
@@ -24,12 +32,12 @@ class BlockPage02SmallerReadSurfacesTest {
     private val forbidden = FailureDetails(httpStatusCode = 403, retryable = false)
 
     private fun texts(details: FailureDetails): Map<String, String> = mapOf(
-        "mod queue" to redditModQueueFailureMessage(RedditModerationUiFailureKind.HTTP, 403, details),
-        "mod queue next page" to redditModQueueMoreFailedLabel(details),
-        "mod log" to redditModeratorLogFailureMessage("Reddit moderation history could not be loaded.", 403, details),
-        "wiki" to redditWikiHttpFailureMessage(403, details),
-        "people search" to redditPeopleSearchFailureMessage(details),
-        "replies row" to redditMoreRepliesFailedLabel(details),
+        "mod queue" to redditModQueueFailureMessage(RedditModerationUiFailureKind.HTTP, 403, details).s,
+        "mod queue next page" to redditModQueueMoreFailedLabel(details).s,
+        "mod log" to redditModeratorLogFailureMessage(UiText.Plain("Reddit moderation history could not be loaded."), 403, details).s,
+        "wiki" to redditWikiHttpFailureMessage(403, details).s,
+        "people search" to redditPeopleSearchFailureMessage(details).s,
+        "replies row" to redditMoreRepliesFailedLabel(details).s,
     )
 
     @Test

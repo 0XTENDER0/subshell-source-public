@@ -707,7 +707,8 @@ internal class CustomFeedCoordinator(
         _customFeedsUiState.value = _customFeedsUiState.value.copy(
             managePhase = CustomFeedManagePhase.FAILED,
             manageFailureKind = kind,
-            manageMessage = message,
+            // Not shown: a failure is presented by its kind; the text stays for diagnostics.
+            manageMessage = io.github.brealorg.subshell.ui.UiText.Plain(message),
             manageFailureDetails = failureDetails,
         )
     }
@@ -1055,18 +1056,18 @@ internal class CustomFeedCoordinator(
         _customFeedsUiState.value = _customFeedsUiState.value.copy(
             createPhase = CustomFeedCreatePhase.FAILED,
             createFailureKind = kind,
-            createMessage = message,
+            createMessage = io.github.brealorg.subshell.ui.UiText.Plain(message),
             createFailureDetails = failureDetails,
         )
     }
 }
 
-internal const val CUSTOM_FEED_CREATE_NOT_CONFIRMED_MESSAGE =
-    "Reddit hasn't shown this feed yet. Refresh your feeds before trying Create again."
-internal const val CUSTOM_FEED_SAVE_NOT_CONFIRMED_MESSAGE =
-    "Reddit hasn't shown these settings yet. Refresh your feeds before trying Save again."
-internal const val CUSTOM_FEED_DELETE_NOT_CONFIRMED_MESSAGE =
-    "Reddit still shows this feed. Refresh your feeds before trying Delete again."
+internal val CUSTOM_FEED_CREATE_NOT_CONFIRMED_MESSAGE: io.github.brealorg.subshell.ui.UiText =
+    io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.custom_feed_create_not_confirmed)
+internal val CUSTOM_FEED_SAVE_NOT_CONFIRMED_MESSAGE: io.github.brealorg.subshell.ui.UiText =
+    io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.custom_feed_save_not_confirmed)
+internal val CUSTOM_FEED_DELETE_NOT_CONFIRMED_MESSAGE: io.github.brealorg.subshell.ui.UiText =
+    io.github.brealorg.subshell.ui.UiText.Resource(io.github.brealorg.subshell.R.string.custom_feed_delete_not_confirmed)
 
 private val CUSTOM_FEED_RECONCILIATION_DELAYS_MS =
     listOf(500L, 2_000L, 5_000L, 15_000L)

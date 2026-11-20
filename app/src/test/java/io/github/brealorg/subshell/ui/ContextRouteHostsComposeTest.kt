@@ -75,7 +75,7 @@ class ContextRouteHostsComposeTest {
         assertTrue(state.currentNavigationRoute is SubshellRoute.User)
         // The list pane title and the profile header both show the name.
         assertEquals(2, composeRule.onAllNodesWithText("u/alice").fetchSemanticsNodes().size)
-        composeRule.onNodeWithText(youContentWorkspacePlaceholder(state.userProfileTab("alice"))).assertIsDisplayed()
+        composeRule.onNodeWithText(youContentWorkspacePlaceholder(state.userProfileTab("alice")).s).assertIsDisplayed()
 
         state.closeUser()
         composeRule.waitForIdle()

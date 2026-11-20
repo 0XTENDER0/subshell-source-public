@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -59,14 +61,14 @@ internal fun AccountSwitcherSheet(
                 .padding(bottom = 12.dp),
         ) {
             Text(
-                text = "Accounts",
+                text = stringResource(R.string.account_switcher_title),
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
             )
 
             if (reauthenticationAccount != null) {
                 Text(
-                    text = "u/${reauthenticationAccount.username} needs sign-in again",
+                    text = stringResource(R.string.account_switcher_needs_sign_in, reauthenticationAccount.username),
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error,
@@ -98,9 +100,9 @@ internal fun AccountSwitcherSheet(
                                 onReconnectAccount(account.stableId)
                             }
                         },
-                    content = { Text("u/${account.username}") },
+                    content = { Text(stringResource(R.string.account_switcher_user, account.username)) },
                     supportingContent = {
-                        Text(accountSwitcherSessionLabel(account, selected))
+                        Text(accountSwitcherSessionLabel(account, selected).asString())
                     },
                     leadingContent = {
                         Surface(
@@ -110,7 +112,7 @@ internal fun AccountSwitcherSheet(
                         ) {
                             io.github.brealorg.subshell.ui.components.RemoteIdentityImage(
                                 uri = accountAvatarUri,
-                                contentDescription = "Avatar for u/${account.username}",
+                                contentDescription = stringResource(R.string.account_switcher_avatar, account.username),
                                 modifier = Modifier.fillMaxSize(),
                             ) {
                                 io.github.brealorg.subshell.ui.components.RedditDefaultProfileAvatar(
@@ -124,7 +126,7 @@ internal fun AccountSwitcherSheet(
                         {
                             Icon(
                                 Symbols.Check,
-                                contentDescription = "Current account",
+                                contentDescription = stringResource(R.string.account_switcher_current),
                             )
                         }
                     } else {
@@ -141,8 +143,8 @@ internal fun AccountSwitcherSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(onClick = onManageAccounts),
-                content = { Text("Manage accounts") },
-                supportingContent = { Text("Accounts, privacy and connection") },
+                content = { Text(stringResource(R.string.account_switcher_manage)) },
+                supportingContent = { Text(stringResource(R.string.account_switcher_manage_summary)) },
                 leadingContent = {
                     Icon(Symbols.Settings, contentDescription = null)
                 },

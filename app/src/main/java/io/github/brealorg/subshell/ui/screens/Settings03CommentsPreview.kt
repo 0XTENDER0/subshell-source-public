@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -68,6 +70,9 @@ internal fun CommentsSettingsPreview(
     hierarchyStyle: CommentHierarchyStyle,
     threadColours: CommentThreadColours,
     modifier: Modifier = Modifier,
+    // REPLYCONTEXT04_PREVIEW_FOLLOWS_INDENT_AND_PARENT_RAIL_V1
+    indentStepDp: Int = COMMENT_DEPTH_INDENT_STEP_DP,
+    railFromParent: Boolean = true,
 ) {
     val actionPlacement = commentsPreviewResolvedPlacement(
         preference = actionPreference,
@@ -97,7 +102,7 @@ internal fun CommentsSettingsPreview(
     val headerDemoColor by animateColorAsState(
         targetValue = if (
             collapseTargetDemoActive &&
-            collapseMode == CommentCollapseMode.HEADER
+            collapseMode.collapsesFromHeader
         ) {
             MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
         } else {
@@ -110,7 +115,7 @@ internal fun CommentsSettingsPreview(
     val bodyDemoColor by animateColorAsState(
         targetValue = if (
             collapseTargetDemoActive &&
-            collapseMode == CommentCollapseMode.COMMENT
+            collapseMode.collapsesFromComment
         ) {
             MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
         } else {
@@ -137,7 +142,7 @@ internal fun CommentsSettingsPreview(
             verticalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             Text(
-                "Live preview",
+                stringResource(R.string.all_live_preview),
                 style = MaterialTheme.typography.titleMedium,
             )
 
@@ -187,6 +192,7 @@ internal fun CommentsSettingsPreview(
                     CommentHierarchyPreviewRail(
                         hierarchyStyle = hierarchyStyle,
                         threadColours = threadColours,
+                        railFromParent = railFromParent,
                     )
 
                     Column(
@@ -215,6 +221,7 @@ internal fun CommentsSettingsPreview(
                             showAvatar = showCommentAvatars,
                             collapsed = replyCollapsed,
                             collapseMode = collapseMode,
+                            indentDp = if (hierarchyStyle == CommentHierarchyStyle.GUIDE_LINES) indentStepDp else 0,
                             headerDemoColor = headerDemoColor,
                             bodyDemoColor = bodyDemoColor,
                             onToggle = {
@@ -256,7 +263,7 @@ private fun PreviewParentComment(
         )
 
         Text(
-            "This is the parent comment body.",
+            stringResource(R.string.all_this_is_the_parent_comment_body),
             modifier = Modifier.padding(start = 30.dp),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface,
@@ -279,6 +286,7 @@ private fun PreviewReplyComment(
     showAvatar: Boolean,
     collapsed: Boolean,
     collapseMode: CommentCollapseMode,
+    indentDp: Int,
     headerDemoColor: Color,
     bodyDemoColor: Color,
     onToggle: () -> Unit,
@@ -296,7 +304,7 @@ private fun PreviewReplyComment(
                 },
             )
             .then(
-                if (collapseMode == CommentCollapseMode.COMMENT) {
+                if (collapseMode.collapsesFromComment) {
                     Modifier.clickable(onClick = onToggle)
                 } else {
                     Modifier
@@ -307,7 +315,7 @@ private fun PreviewReplyComment(
                 MaterialTheme.shapes.small,
             )
             .padding(
-                start = 54.dp,
+                start = (54 + indentDp).dp,
                 top = 4.dp,
                 end = 7.dp,
                 bottom = 3.dp,
@@ -328,7 +336,7 @@ private fun PreviewReplyComment(
                     MaterialTheme.shapes.small,
                 )
                 .then(
-                    if (collapseMode == CommentCollapseMode.HEADER) {
+                    if (collapseMode.collapsesFromHeader) {
                         Modifier.clickable(onClick = onToggle)
                     } else {
                         Modifier
@@ -338,7 +346,7 @@ private fun PreviewReplyComment(
 
         AnimatedVisibility(collapsed) {
             Text(
-                "Comment collapsed",
+                stringResource(R.string.all_comment_collapsed),
                 modifier = Modifier.padding(start = 30.dp),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -350,7 +358,7 @@ private fun PreviewReplyComment(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Text(
-                    "This is the reply body.",
+                    stringResource(R.string.all_this_is_the_reply_body),
                     modifier = Modifier.padding(start = 30.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -496,6 +504,7 @@ private fun PreviewAction(
 private fun CommentHierarchyPreviewRail(
     hierarchyStyle: CommentHierarchyStyle,
     threadColours: CommentThreadColours = CommentThreadColours.OFF,
+    railFromParent: Boolean = true,
 ) {
     val accent = MaterialTheme.colorScheme.primary
     val laneColor = previewThreadLaneColor(
@@ -525,6 +534,16 @@ private fun CommentHierarchyPreviewRail(
                  * Current behaviour: a guide belongs visually to the reply
                  * region rather than clearly originating at its parent.
                  */
+                if (railFromParent) {
+                    // REPLYCONTEXT04_PREVIEW_FOLLOWS_INDENT_AND_PARENT_RAIL_V1: the line leaves the
+                    // middle of the parent (its row is 0..78 dp).
+                    drawLine(
+                        color = if (coloured) laneColor else accent.copy(alpha = 0.50f),
+                        start = Offset(railX, 39.dp.toPx()),
+                        end = Offset(railX, 80.dp.toPx()),
+                        strokeWidth = stroke,
+                    )
+                }
                 drawLine(
                     color = if (coloured) laneColor else accent.copy(alpha = 0.50f),
                     start = Offset(

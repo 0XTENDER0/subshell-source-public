@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.ui.error.ReportFailureDiagnostic
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
@@ -105,11 +107,11 @@ internal fun OnlineVisibilitySettingRow(
             ) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
-                        "Show online status",
+                        stringResource(R.string.all_show_online_status),
                         style = MaterialTheme.typography.bodyLarge,
                     )
                     Text(
-                        "Allow Reddit to show when u/${account.username} is online",
+                        stringResource(R.string.comp_online_allow_show, account.username),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -131,21 +133,21 @@ internal fun OnlineVisibilitySettingRow(
                             onClick = onReconnect,
                             enabled = interactionEnabled,
                         ) {
-                            Text("Sign in again")
+                            Text(stringResource(R.string.comp_sign_in_again))
                         }
                     else ->
                         TextButton(
                             onClick = { runtime.onRefresh(accountId) },
                             enabled = interactionEnabled,
                         ) {
-                            Text("Retry")
+                            Text(stringResource(R.string.comp_retry))
                         }
                 }
             }
 
             if (state.phase == OnlineVisibilityPhase.UNAVAILABLE && state.issue == null) {
                 Text(
-                    "Reddit did not return this setting. Nothing has been changed.",
+                    stringResource(R.string.all_reddit_did_not_return_this_setting_nothing),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -170,13 +172,13 @@ internal fun OnlineVisibilitySettingRow(
             when (state.notice) {
                 OnlineVisibilityNotice.SAVED ->
                     Text(
-                        "Saved and checked on Reddit.",
+                        stringResource(R.string.all_saved_and_checked_on_reddit),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 OnlineVisibilityNotice.CURRENT_VALUE_VERIFIED ->
                     Text(
-                        "Reddit now reports the selected setting. The earlier save response was not confirmed.",
+                        stringResource(R.string.all_reddit_now_reports_the_selected_setting_the),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -196,37 +198,37 @@ internal fun OnlineVisibilitySettingRow(
             title = {
                 Text(
                     if (confirmation.desiredValue) {
-                        "Show online status?"
+                        stringResource(R.string.all_show_online_status_2)
                     } else {
-                        "Hide online status?"
+                        stringResource(R.string.all_hide_online_status)
                     },
                 )
             },
             text = {
                 Text(
-                    "Change Reddit's online-visibility setting for u/${account.username}? " +
-                        "This applies to your Reddit account, not just this device.",
+                    stringResource(R.string.comp_change_reddit_s_online_visibility_setting, account.username),
                 )
             },
             confirmButton = {
                 TextButton(onClick = { runtime.onConfirm(confirmation) }) {
-                    Text(if (confirmation.desiredValue) "Show status" else "Hide status")
+                    Text(if (confirmation.desiredValue) stringResource(R.string.all_show_status) else stringResource(R.string.all_hide_status))
                 }
             },
             dismissButton = {
-                TextButton(onClick = runtime.onCancel) { Text("Cancel") }
+                TextButton(onClick = runtime.onCancel) { Text(stringResource(R.string.comp_cancel)) }
             },
         )
     }
 }
 
+@androidx.compose.runtime.Composable
 internal fun onlineVisibilityIssueMessage(issue: OnlineVisibilityIssue): String = when (issue) {
-    OnlineVisibilityIssue.AUTHORIZATION -> "Sign in again to read or change this Reddit account setting. No change will be sent automatically."
-    OnlineVisibilityIssue.ACCOUNT_CHANGED -> "The active account changed. Reopen Accounts settings to load the current account."
-    OnlineVisibilityIssue.HTTP -> "Reddit rejected the request. Refresh to check the current setting."
-    OnlineVisibilityIssue.TRANSPORT -> "Could not reach Reddit. Refresh to read the setting again."
-    OnlineVisibilityIssue.PROTOCOL -> "Reddit returned an unexpected response. The setting is unknown."
-    OnlineVisibilityIssue.CONFIGURATION -> "Online visibility is not available for this connection."
-    OnlineVisibilityIssue.CHANGED_ON_REDDIT -> "The setting changed since you reviewed it. The latest value is shown; no change was sent."
-    OnlineVisibilityIssue.OUTCOME_UNKNOWN -> "Reddit may have applied the change. Refresh to check the current setting before making another change."
+    OnlineVisibilityIssue.AUTHORIZATION -> stringResource(R.string.comp_online_visibility_authorization)
+    OnlineVisibilityIssue.ACCOUNT_CHANGED -> stringResource(R.string.comp_online_visibility_account_changed)
+    OnlineVisibilityIssue.HTTP -> stringResource(R.string.comp_online_visibility_http)
+    OnlineVisibilityIssue.TRANSPORT -> stringResource(R.string.comp_online_visibility_transport)
+    OnlineVisibilityIssue.PROTOCOL -> stringResource(R.string.comp_online_visibility_protocol)
+    OnlineVisibilityIssue.CONFIGURATION -> stringResource(R.string.comp_online_visibility_configuration)
+    OnlineVisibilityIssue.CHANGED_ON_REDDIT -> stringResource(R.string.comp_online_visibility_changed_on_reddit)
+    OnlineVisibilityIssue.OUTCOME_UNKNOWN -> stringResource(R.string.comp_online_visibility_outcome_unknown)
 }

@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.pluralStringResource
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
+import io.github.brealorg.subshell.ui.UiText
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
@@ -342,7 +346,12 @@ fun CommunitiesScreen(
         // keep the reader's text size; when the four no longer fit equal slots
         // the row scrolls (M3 scrollable tabs) instead of shrinking every label
         // (ISSUE32 shrank them toward 9 sp and "Favorites" still clipped).
-        val sectionTitles = listOf("Favorites", "Joined", "Recent", "Feeds")
+        val sectionTitles = listOf(
+            stringResource(R.string.scr_favorites),
+            stringResource(R.string.scr_joined),
+            stringResource(R.string.all_recent),
+            stringResource(R.string.scr_feeds),
+        )
         val tabLabelStyle = MaterialTheme.typography.labelLarge
         var tabRowWidth by remember { mutableStateOf(0.dp) }
         val rowDensity = LocalDensity.current
@@ -560,7 +569,32 @@ fun ExploreCommunitiesScreen(
     } else {
         emptyList()
     }
+    // ISSUE293_LANGUAGE_FILTER_V1: communities on screen whose language is not
+    // yet known are told now; those known to be in a left-out language are hidden.
+    LaunchedEffect(state.shownLanguages, discoveryState.items.map { item -> item.community.name }) {
+        state.detectLanguages(
+            discoveryState.items.map { item ->
+                io.github.brealorg.subshell.language.communityLanguageKey(item.community.name) to
+                    io.github.brealorg.subshell.language.communityLanguageText(
+                        item.community.name,
+                        item.community.description,
+                    )
+            },
+        )
+    }
+    // Show lets them through until the list changes, like the content filters' summary.
+    var languageRevealed by rememberSaveable(discoveryState.searchQuery, discoveryState.searchSort) {
+        mutableStateOf(false)
+    }
+    val languageHiddenCount = discoveryState.items.takeIf { discoveryMatchesDraft }.orEmpty().count { item ->
+        (state.showNsfwPosts || !item.nsfw) && item.community.name.lowercase() !in joinedCommunityNames &&
+            state.languageHidesCommunity(item.community.name)
+    }
     val stateDiscoveryItems = discoveryState.items.takeIf { discoveryMatchesDraft }.orEmpty()
+        .filterNot { item ->
+            !languageRevealed && item.community.name.lowercase() !in joinedCommunityNames &&
+                state.languageHidesCommunity(item.community.name)
+        }
     val candidateDiscoveryItems = if (typeaheadDraftActive) {
         (stateDiscoveryItems + localTypeaheadItems)
             .distinctBy { item -> item.community.name.lowercase() }
@@ -704,12 +738,12 @@ fun ExploreCommunitiesScreen(
             .nestedScroll(routeTopBarScroll.nestedScrollConnection),
     ) {
         RouteTopBar(
-            title = { Text("Discover communities") },
+            title = { Text(stringResource(R.string.scr_discover_communities)) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
                     Icon(
                         Symbols.ArrowBack,
-                        contentDescription = "Back to joined communities",
+                        contentDescription = stringResource(R.string.scr_back_to_joined_communities),
                     )
                 }
             },
@@ -724,6 +758,9 @@ fun ExploreCommunitiesScreen(
             liveState = liveState,
             discoveryState = discoveryState,
             visibleDiscoveryItems = visibleDiscoveryItems,
+            languageHiddenCount = languageHiddenCount,
+            languageRevealed = languageRevealed,
+            onToggleLanguageRevealed = { languageRevealed = !languageRevealed },
             joinedCommunityNames = joinedCommunityNames,
             discoveryDraft = discoveryDraft,
             normalizedDraft = normalizedDraft,
@@ -784,15 +821,15 @@ private fun FavoriteCommunitiesContent(
         if (favoriteCount > 0) {
             item("favorites-title") {
                 SectionTitle(
-                    title = "Favorites",
-                    meta = "$favoriteCount pinned",
+                    title = stringResource(R.string.scr_favorites),
+                    meta = pluralStringResource(R.plurals.comm_pinned, favoriteCount, favoriteCount),
                 )
             }
             if (favoriteFeeds.isNotEmpty()) {
                 item("favorite-feeds-title") {
                     SectionTitle(
-                        title = "Feeds",
-                        meta = "${favoriteFeeds.size} pinned",
+                        title = stringResource(R.string.scr_feeds),
+                        meta = pluralStringResource(R.plurals.comm_pinned, favoriteFeeds.size, favoriteFeeds.size),
                     )
                 }
                 items(
@@ -811,8 +848,8 @@ private fun FavoriteCommunitiesContent(
             if (favoriteCommunities.isNotEmpty()) {
                 item("favorite-communities-title") {
                     SectionTitle(
-                        title = "Communities",
-                        meta = "${favoriteCommunities.size} pinned",
+                        title = stringResource(R.string.scr_communities),
+                        meta = pluralStringResource(R.plurals.comm_pinned, favoriteCommunities.size, favoriteCommunities.size),
                     )
                 }
                 items(
@@ -831,8 +868,8 @@ private fun FavoriteCommunitiesContent(
         } else {
             item("favorites-empty") {
                 EmptyCommunitySurface(
-                    title = "No favorites yet",
-                    description = "Star a community or custom feed to keep it in your quick-access list.",
+                    title = stringResource(R.string.scr_no_favorites_yet),
+                    description = stringResource(R.string.scr_star_a_community_or_custom_feed_to),
                 )
             }
         }
@@ -870,7 +907,11 @@ private fun JoinedCommunitiesContent(
         .map { community -> community.name.lowercase() }
         .toSet()
     val inlineDiscoveryItems = inlineCommunityDiscoveryItems(
-        items = if (discoveryState.searchQuery == null) discoveryState.items else emptyList(),
+        items = if (discoveryState.searchQuery == null) {
+            discoveryState.items.filterNot { item -> state.languageHidesCommunity(item.community.name) }
+        } else {
+            emptyList()
+        },
         joinedCommunityNames = joinedCommunityNames,
         showNsfw = state.showNsfwPosts,
         limit = when (state.communityDiscoveryLayout) {
@@ -975,11 +1016,11 @@ private fun JoinedCommunitiesContent(
         }
         item("live-your-title") {
             SectionTitle(
-                title = "Joined communities",
+                title = stringResource(R.string.scr_joined_communities),
                 meta = if (hiddenJoinedCommunities.isEmpty()) {
-                    "${visibleJoinedCommunities.size} joined"
+                    pluralStringResource(R.plurals.comm_joined, visibleJoinedCommunities.size, visibleJoinedCommunities.size)
                 } else {
-                    "${visibleJoinedCommunities.size} shown"
+                    pluralStringResource(R.plurals.comm_shown, visibleJoinedCommunities.size, visibleJoinedCommunities.size)
                 },
             )
         }
@@ -1146,17 +1187,17 @@ private fun InlineCommunityDiscoverySurface(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Discover communities",
+                    text = stringResource(R.string.scr_discover_communities),
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.titleMedium,
                 )
                 TextButton(onClick = onSeeAll) {
-                    Text("See all")
+                    Text(stringResource(R.string.scr_see_all))
                 }
             }
         } else {
             Text(
-                text = "Discover communities",
+                text = stringResource(R.string.scr_discover_communities),
                 style = MaterialTheme.typography.titleMedium,
             )
         }
@@ -1165,9 +1206,9 @@ private fun InlineCommunityDiscoverySurface(
         // bar that opens community search.
         SearchEntryBar(
             text = if (layout == CommunityDiscoveryLayout.CAROUSEL) {
-                "Search communities"
+                stringResource(R.string.all_search_communities)
             } else {
-                "Search communities by name or topic"
+                stringResource(R.string.all_search_communities_by_name_or_topic)
             },
             onClick = onSearch,
         )
@@ -1178,13 +1219,13 @@ private fun InlineCommunityDiscoverySurface(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Popular communities",
+                    text = stringResource(R.string.scr_popular_communities),
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 TextButton(onClick = onSeeAll) {
-                    Text("See all")
+                    Text(stringResource(R.string.scr_see_all))
                 }
             }
         }
@@ -1216,7 +1257,7 @@ private fun InlineCommunityDiscoverySurface(
             ) {
                 InlineProgressIndicator()
                 Text(
-                    text = "Finding communities…",
+                    text = stringResource(R.string.scr_finding_communities),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -1224,9 +1265,9 @@ private fun InlineCommunityDiscoverySurface(
 
             else -> Text(
                 text = if (discoveryState.fromCache) {
-                    "Saved popular communities are unavailable right now. See all to browse."
+                    stringResource(R.string.all_saved_popular_communities_are_unavailable_right_now)
                 } else {
-                    "Browse popular communities or search by name and topic."
+                    stringResource(R.string.all_browse_popular_communities_or_search_by_name)
                 },
                 modifier = Modifier.padding(vertical = 4.dp),
                 style = MaterialTheme.typography.bodyMedium,
@@ -1288,7 +1329,7 @@ private fun InlineCommunityDiscoveryCard(
                 .takeUnless { members -> members.isBlank() || members == "—" }
                 ?.let { members ->
                     Text(
-                        text = "$members members",
+                        text = stringResource(R.string.scr_members, members),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
@@ -1298,7 +1339,7 @@ private fun InlineCommunityDiscoveryCard(
             Spacer(Modifier.weight(1f))
             membershipErrorPresentation?.let { presentation ->
                 Text(
-                    text = presentation.title,
+                    text = presentation.title.asString(),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.error,
                     maxLines = 1,
@@ -1314,7 +1355,7 @@ private fun InlineCommunityDiscoveryCard(
                 if (membershipInProgress) {
                     InlineProgressIndicator()
                     Spacer(Modifier.width(4.dp))
-                    Text(if (joined) "Leaving…" else "Joining…")
+                    Text(if (joined) stringResource(R.string.all_leaving) else stringResource(R.string.all_joining))
                 } else if (joined) {
                     Icon(
                         imageVector = Symbols.Check,
@@ -1322,7 +1363,7 @@ private fun InlineCommunityDiscoveryCard(
                         modifier = Modifier.size(16.dp),
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text("Joined")
+                    Text(stringResource(R.string.scr_joined))
                 } else {
                     Icon(
                         imageVector = Symbols.Add,
@@ -1330,7 +1371,7 @@ private fun InlineCommunityDiscoveryCard(
                         modifier = Modifier.size(16.dp),
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text("Join")
+                    Text(stringResource(R.string.scr_join))
                 }
             }
         }
@@ -1393,7 +1434,7 @@ private fun InlineCommunityDiscoveryRow(
                 }
                 membershipErrorPresentation?.let { presentation ->
                     Text(
-                        text = presentation.title,
+                        text = presentation.title.asString(),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.error,
                         maxLines = 1,
@@ -1409,7 +1450,7 @@ private fun InlineCommunityDiscoveryRow(
                 if (membershipInProgress) {
                     InlineProgressIndicator()
                     Spacer(Modifier.width(4.dp))
-                    Text(if (joined) "Leaving…" else "Joining…")
+                    Text(if (joined) stringResource(R.string.all_leaving) else stringResource(R.string.all_joining))
                 } else if (joined) {
                     Icon(
                         imageVector = Symbols.Check,
@@ -1417,7 +1458,7 @@ private fun InlineCommunityDiscoveryRow(
                         modifier = Modifier.size(16.dp),
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text("Joined")
+                    Text(stringResource(R.string.scr_joined))
                 } else {
                     Icon(
                         imageVector = Symbols.Add,
@@ -1425,7 +1466,7 @@ private fun InlineCommunityDiscoveryRow(
                         modifier = Modifier.size(16.dp),
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text("Join")
+                    Text(stringResource(R.string.scr_join))
                 }
             }
         }
@@ -1456,7 +1497,7 @@ private fun HiddenSubscriptionsEntry(
             // ISSUE220_HIDDEN_COMMUNITIES_ROW_WRAPS_V1: at large text the title
             // wraps and keeps a gap to "View" instead of running into it.
             Text(
-                text = "Hidden communities",
+                text = stringResource(R.string.scr_hidden_communities),
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 2,
@@ -1465,14 +1506,14 @@ private fun HiddenSubscriptionsEntry(
             Spacer(Modifier.width(8.dp))
             if (count > 0) {
                 Text(
-                    text = "$count hidden",
+                    text = stringResource(R.string.scr_hidden, count),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.width(10.dp))
             }
             Text(
-                text = "View",
+                text = stringResource(R.string.scr_view),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
@@ -1507,15 +1548,15 @@ private fun HiddenSubscriptionsContent(
     ) {
         item("hidden-subscriptions-title") {
             SectionTitle(
-                title = "Hidden communities",
-                meta = "${hiddenCommunities.size} hidden",
+                title = stringResource(R.string.scr_hidden_communities),
+                meta = pluralStringResource(R.plurals.comm_hidden, hiddenCommunities.size, hiddenCommunities.size),
             )
         }
         if (hiddenCommunities.isEmpty()) {
             item("hidden-subscriptions-empty") {
                 EmptyCommunitySurface(
-                    title = "No hidden communities",
-                    description = "Communities you hide locally will appear here.",
+                    title = stringResource(R.string.scr_no_hidden_communities),
+                    description = stringResource(R.string.scr_communities_you_hide_locally_will_appear_here),
                 )
             }
         } else {
@@ -1530,7 +1571,7 @@ private fun HiddenSubscriptionsContent(
                     showMembershipAction = false,
                     showHiddenAction = true,
                     hidden = true,
-                    supportingMeta = "Hidden locally",
+                    supportingMeta = stringResource(R.string.all_hidden_locally),
                     onToggle = {},
                 )
             }
@@ -1547,6 +1588,9 @@ private fun ExploreCommunitiesContent(
     liveState: RedditSubscriptionsUiState,
     discoveryState: RedditCommunityDiscoveryUiState,
     visibleDiscoveryItems: List<CommunityDiscoveryItem>,
+    languageHiddenCount: Int,
+    languageRevealed: Boolean,
+    onToggleLanguageRevealed: () -> Unit,
     joinedCommunityNames: Set<String>,
     discoveryDraft: String,
     normalizedDraft: String,
@@ -1649,7 +1693,7 @@ private fun ExploreCommunitiesContent(
                             onDiscoveryDraftChanged(value)
                         }
                     },
-                    placeholder = "Search communities",
+                    placeholder = stringResource(R.string.scr_search_communities),
                     fieldModifier = Modifier.focusRequester(searchFocusRequester),
                     onSearch = {
                         onSubmitDiscovery(
@@ -1671,7 +1715,7 @@ private fun ExploreCommunitiesContent(
                             ) {
                                 Icon(
                                     Symbols.Close,
-                                    contentDescription = "Clear community search",
+                                    contentDescription = stringResource(R.string.scr_clear_community_search),
                                 )
                             }
                         }
@@ -1686,7 +1730,7 @@ private fun ExploreCommunitiesContent(
                         ),
                         selected = discoveryState.searchSort,
                         label = { sort ->
-                            if (sort == CommunityDiscoverySort.RELEVANCE) "Best match" else "Most active"
+                            if (sort == CommunityDiscoverySort.RELEVANCE) stringResource(R.string.scr_best_match) else stringResource(R.string.scr_most_active)
                         },
                         onSelect = { sort ->
                             onSubmitDiscovery(normalizedDraft, sort, true)
@@ -1694,7 +1738,7 @@ private fun ExploreCommunitiesContent(
                     )
                 } else if (canSubmitFullSearch) {
                     Text(
-                        "Suggestions update as you type. Press search for all communities.",
+                        stringResource(R.string.all_suggestions_update_as_you_type_press_search),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -1796,18 +1840,34 @@ private fun ExploreCommunitiesContent(
             }
         }
 
+        // ISSUE293_LANGUAGE_FILTER_V1
+        if (languageHiddenCount > 0) {
+            item("discovery-language-summary") {
+                io.github.brealorg.subshell.ui.components.FilteredPostsSummaryRow(
+                    filteredCount = languageHiddenCount,
+                    revealed = languageRevealed,
+                    onToggle = onToggleLanguageRevealed,
+                    text = io.github.brealorg.subshell.ui.components.languageHiddenSummaryText(
+                        languageHiddenCount,
+                        languageRevealed,
+                    ).asString(),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                )
+            }
+        }
         when {
             visibleDiscoveryItems.isNotEmpty() -> {
                 item("live-discovery-title") {
                     SectionTitle(
                         title = when {
-                            suggestionsVisible -> "Suggestions"
-                            discoveryState.searchQuery != null -> "Search results"
-                            else -> "Popular on Reddit"
+                            suggestionsVisible -> stringResource(R.string.all_suggestions)
+                            discoveryState.searchQuery != null -> stringResource(R.string.scr_search_results)
+                            else -> stringResource(R.string.all_popular_on_reddit)
                         },
-                        meta = buildString {
-                            if (discoveryState.fromCache) append("Saved · ")
-                            append("${visibleDiscoveryItems.size} shown")
+                        meta = if (discoveryState.fromCache) {
+                            stringResource(R.string.scr_discovery_saved_shown, visibleDiscoveryItems.size)
+                        } else {
+                            stringResource(R.string.scr_discovery_shown, visibleDiscoveryItems.size)
                         },
                     )
                 }
@@ -1935,8 +1995,8 @@ private fun LocalCommunitiesContent(
         if (joinedCommunities.isNotEmpty()) {
             item("your-title") {
                 SectionTitle(
-                    "Joined communities",
-                    "${joinedCommunities.size} joined",
+                    stringResource(R.string.all_joined_communities),
+                    pluralStringResource(R.plurals.comm_joined, joinedCommunities.size, joinedCommunities.size),
                 )
             }
             items(joinedCommunities, key = { "joined-${it.id}" }) { community ->
@@ -1951,8 +2011,8 @@ private fun LocalCommunitiesContent(
         } else {
             item("local-subscriptions-empty") {
                 EmptyCommunitySurface(
-                    title = "No joined communities yet",
-                    description = "Use Discover to find communities.",
+                    title = stringResource(R.string.scr_no_joined_communities_yet),
+                    description = stringResource(R.string.scr_use_discover_to_find_communities),
                 )
             }
         }
@@ -1988,9 +2048,9 @@ private fun RecentCommunitiesContent(
         if (recentCommunities.isNotEmpty()) {
             item("recent-history-title") {
                 SectionTitle(
-                    title = "Recently visited",
-                    meta = "${recentCommunities.size} visited",
-                    actionLabel = "Clear",
+                    title = stringResource(R.string.scr_recently_visited),
+                    meta = pluralStringResource(R.plurals.comm_visited, recentCommunities.size, recentCommunities.size),
+                    actionLabel = stringResource(R.string.all_clear),
                     onAction = state::clearRecentCommunities,
                 )
             }
@@ -2006,15 +2066,15 @@ private fun RecentCommunitiesContent(
                     showMembershipAction = showMembershipAction,
                     showFavoriteAction = true,
                     supportingMeta = visitedAt?.let { timestamp ->
-                        formatRecentCommunityAge(timestamp, nowEpochMillis)
+                        formatRecentCommunityAge(timestamp, nowEpochMillis).asString()
                     },
                 ) { state.toggleCommunity(community.id) }
             }
         } else {
             item("recent-history-empty") {
                 EmptyCommunitySurface(
-                    title = "No recent communities",
-                    description = "Communities you open will appear here.",
+                    title = stringResource(R.string.scr_no_recent_communities),
+                    description = stringResource(R.string.scr_communities_you_open_will_appear_here),
                 )
             }
         }
@@ -2202,11 +2262,11 @@ internal fun CustomFeedsContent(
             busy = editorBusy,
             closeLocked = editorCloseLocked,
             phaseMessage = if (editingFeedGone) {
-                "This feed no longer exists."
+                stringResource(R.string.all_this_feed_no_longer_exists)
             } else if (editingExistingFeed) {
-                liveState.manageMessage?.takeUnless { liveState.managePhase == CustomFeedManagePhase.FAILED }
+                liveState.manageMessage?.takeUnless { liveState.managePhase == CustomFeedManagePhase.FAILED }?.asString()
             } else {
-                liveState.createMessage?.takeUnless { liveState.createPhase == CustomFeedCreatePhase.FAILED }
+                liveState.createMessage?.takeUnless { liveState.createPhase == CustomFeedCreatePhase.FAILED }?.asString()
             },
             errorPresentation = if (editingExistingFeed) {
                 if (liveState.managePhase == CustomFeedManagePhase.FAILED) {
@@ -2294,10 +2354,10 @@ internal fun CustomFeedsContent(
             onDismissRequest = {
                 if (!deleteCloseLocked) closeDeleteDialog()
             },
-            title = { Text("Delete custom feed?") },
+            title = { Text(stringResource(R.string.scr_delete_custom_feed)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("${deleteFeed.displayName} will be removed from your Reddit account.")
+                    Text(stringResource(R.string.scr_will_be_removed_from_your_reddit_account, deleteFeed.displayName))
                     if (liveState.managePhase == CustomFeedManagePhase.FAILED) {
                         ErrorNotice(
                             presentation = customFeedManageErrorPresentation(liveState, deleting = true).copy(
@@ -2309,7 +2369,7 @@ internal fun CustomFeedsContent(
                     } else {
                         liveState.manageMessage?.let { message ->
                             Text(
-                                text = message,
+                                text = message.asString(),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -2321,7 +2381,7 @@ internal fun CustomFeedsContent(
                 TextButton(
                     enabled = !deleteCloseLocked,
                     onClick = closeDeleteDialog,
-                ) { Text("Cancel") }
+                ) { Text(stringResource(R.string.scr_cancel)) }
             },
             confirmButton = {
                 TextButton(
@@ -2341,7 +2401,7 @@ internal fun CustomFeedsContent(
                         )
                     },
                 ) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.scr_delete_2), color = MaterialTheme.colorScheme.error)
                 }
             },
         )
@@ -2383,8 +2443,8 @@ internal fun CustomFeedsContent(
         when {
             !authenticated -> item("custom-feeds-sign-in") {
                 EmptyCommunitySurface(
-                    title = "Sign in to see custom feeds",
-                    description = "Custom feeds belong to your Reddit account.",
+                    title = stringResource(R.string.scr_sign_in_to_see_custom_feeds),
+                    description = stringResource(R.string.scr_custom_feeds_belong_to_your_reddit_account),
                 )
             }
             liveState.loading && liveState.feeds.isEmpty() -> item("custom-feeds-loading") {
@@ -2395,25 +2455,25 @@ internal fun CustomFeedsContent(
             }
             liveState.failureKind != null && liveState.feeds.isEmpty() -> item("custom-feeds-failed") {
                 EmptyCommunitySurface(
-                    title = "Couldn’t load custom feeds",
+                    title = stringResource(R.string.scr_couldn_t_load_custom_feeds),
                     description = when {
                         liveState.failureStatusCode != null ->
-                            "Reddit returned HTTP ${liveState.failureStatusCode}. Pull to refresh or try again."
+                            stringResource(R.string.scr_custom_feeds_http, liveState.failureStatusCode)
                         liveState.failureKind == CustomFeedFailureKind.PROTOCOL ->
-                            "Reddit returned an unexpected response. Pull to refresh or try again."
+                            stringResource(R.string.all_reddit_returned_an_unexpected_response_pull_to)
                         liveState.failureKind == CustomFeedFailureKind.SESSION ->
-                            "The Reddit session needs attention. Pull to refresh or reconnect."
-                        else -> "Pull to refresh or try again."
+                            stringResource(R.string.all_the_reddit_session_needs_attention_pull_to)
+                        else -> stringResource(R.string.all_pull_to_refresh_or_try_again)
                     },
                 )
             }
             liveState.feeds.isEmpty() -> item("custom-feeds-empty") {
-                CustomFeedsEmptyState(title = "No custom feeds yet")
+                CustomFeedsEmptyState(title = stringResource(R.string.scr_no_custom_feeds_yet))
             }
             else -> {
                 item("custom-feeds-title") {
                     SectionTitle(
-                        title = "Custom feeds",
+                        title = stringResource(R.string.scr_custom_feeds),
                         meta = customFeedCountLabel(liveState.feeds.size),
                     )
                 }
@@ -2445,7 +2505,7 @@ internal fun CustomFeedsContent(
                                     ),
                                 )
                                 if (!requested) {
-                                    userNotices.noticeFailure("Couldn't add the shortcut", "Your launcher did not accept it") // ISSUE222_NO_TOASTS_V1
+                                    userNotices.noticeFailure(UiText.Resource(R.string.nt_couldn_t_add_the_shortcut_2), UiText.Resource(R.string.nt_your_launcher_did_not_accept_it_2)) // ISSUE222_NO_TOASTS_V1
                                 }
                             }
                         } else {
@@ -2504,16 +2564,16 @@ private fun CustomFeedEditorDialog(
     val valid = feedName.trim().isNotEmpty() && selectedCommunities.isNotEmpty()
 
     AdaptiveFullScreenDialog(
-        title = if (editingFeed == null) "Create custom feed" else "Edit custom feed",
+        title = if (editingFeed == null) stringResource(R.string.scr_create_custom_feed) else stringResource(R.string.scr_edit_custom_feed),
         onDismissRequest = onDismiss,
         closeEnabled = !closeLocked,
-        closeLabel = "Cancel",
+        closeLabel = stringResource(R.string.all_cancel),
         actions = {
             TextButton(
                 enabled = !busy && valid && !submitBlocked,
                 onClick = onSubmit,
             ) {
-                Text(if (editingFeed == null) "Create" else "Save")
+                Text(if (editingFeed == null) stringResource(R.string.fab_create) else stringResource(R.string.comp_save))
             }
         },
     ) {
@@ -2542,7 +2602,7 @@ private fun CustomFeedEditorDialog(
             ) {
                 InlineProgressIndicator()
                 Text(
-                    text = if (editingFeed == null) "Creating feed…" else "Saving feed…",
+                    text = if (editingFeed == null) stringResource(R.string.scr_creating_feed) else stringResource(R.string.scr_saving_feed),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -2555,7 +2615,7 @@ private fun CustomFeedEditorDialog(
         ) {
             item("feed-editor-intro") {
                 Text(
-                    text = "Choose the communities that should appear together.",
+                    text = stringResource(R.string.scr_choose_the_communities_that_should_appear_together),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -2567,13 +2627,13 @@ private fun CustomFeedEditorDialog(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !busy,
                     singleLine = true,
-                    label = { Text("Feed name") },
-                    supportingText = { Text("${feedName.length}/50") },
+                    label = { Text(stringResource(R.string.scr_feed_name)) },
+                    supportingText = { Text(stringResource(R.string.scr_50, feedName.length)) },
                 )
             }
             item("feed-editor-visibility") {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Visibility", style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.scr_visibility), style = MaterialTheme.typography.titleSmall)
                     // M3225_SHORT_SINGLE_CHOICE_IS_A_SEGMENTED_ROW_V1
                     SegmentedChoiceRow(
                         options = CustomFeedVisibility.entries,
@@ -2588,7 +2648,7 @@ private fun CustomFeedEditorDialog(
                 SubshellSearchField(
                     query = communityQuery,
                     onQueryChange = onCommunityQueryChange,
-                    placeholder = "Search communities",
+                    placeholder = stringResource(R.string.scr_search_communities),
                     enabled = !busy,
                 )
             }
@@ -2597,9 +2657,9 @@ private fun CustomFeedEditorDialog(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("Communities", modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.scr_communities), modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
                     Text(
-                        text = "${selectedCommunities.size} selected",
+                        text = stringResource(R.string.scr_selected, selectedCommunities.size),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -2609,9 +2669,9 @@ private fun CustomFeedEditorDialog(
                 item("feed-editor-community-empty") {
                     Text(
                         text = if (communities.isEmpty()) {
-                            "No subscribed communities are available."
+                            stringResource(R.string.all_no_subscribed_communities_are_available)
                         } else {
-                            "No communities match your search."
+                            stringResource(R.string.all_no_communities_match_your_search)
                         },
                         modifier = Modifier.padding(vertical = 20.dp),
                         style = MaterialTheme.typography.bodyMedium,
@@ -2875,7 +2935,7 @@ internal fun CustomFeedBrowser(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Symbols.ArrowBack, contentDescription = "Back to custom feeds")
+                    Icon(Symbols.ArrowBack, contentDescription = stringResource(R.string.scr_back_to_custom_feeds))
                 }
                 Column(Modifier.weight(1f)) {
                     Text(
@@ -2886,8 +2946,7 @@ internal fun CustomFeedBrowser(
                     )
                     Text(
                         text = buildString {
-                            append(feed.subredditNames.size)
-                            append(if (feed.subredditNames.size == 1) " community" else " communities")
+                            append(pluralStringResource(R.plurals.communities_count, feed.subredditNames.size, feed.subredditNames.size))
                             if (feed.visibility.isNotBlank()) {
                                 append(" · ")
                                 append(feed.visibility.replaceFirstChar { character -> character.uppercase() })
@@ -2939,22 +2998,22 @@ internal fun CustomFeedBrowser(
                     }
                     activeState.failureKind != null && activeState.posts.isEmpty() -> item("custom-feed-posts-error") {
                         EmptyCommunitySurface(
-                            title = "Couldn’t load ${feed.displayName}",
+                            title = stringResource(R.string.scr_couldn_t_load, feed.displayName),
                             description = activeState.failureStatusCode?.let { status ->
-                                "Reddit returned HTTP $status. Pull to refresh or try again."
-                            } ?: "Pull to refresh or try again.",
+                                stringResource(R.string.all_reddit_returned_http_pull_to_refresh_or, status)
+                            } ?: stringResource(R.string.all_pull_to_refresh_or_try_again),
                         )
                     }
                     activeState.posts.isEmpty() -> item("custom-feed-posts-empty") {
                         EmptyCommunitySurface(
-                            title = "No posts in this feed",
-                            description = "Pull to refresh or edit the communities in this feed.",
+                            title = stringResource(R.string.scr_no_posts_in_this_feed),
+                            description = stringResource(R.string.scr_pull_to_refresh_or_edit_the_communities),
                         )
                     }
                     visiblePosts.isEmpty() -> item("custom-feed-posts-filtered") {
                         EmptyCommunitySurface(
-                            title = "All posts are filtered",
-                            description = "Hidden posts, the NSFW setting or your content filters hide every post loaded so far.",
+                            title = stringResource(R.string.scr_all_posts_are_filtered),
+                            description = stringResource(R.string.scr_hidden_posts_the_nsfw_setting_or_your),
                         )
                     }
                     else -> feedPostItems(visiblePosts, postLayout, gridColumns.count) { post, itemModifier ->
@@ -2999,7 +3058,7 @@ private fun CustomFeedsEmptyState(title: String) {
             textAlign = TextAlign.Center,
         )
         Text(
-            text = "Group communities into a feed you can browse together.",
+            text = stringResource(R.string.scr_group_communities_into_a_feed_you_can),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -3041,8 +3100,7 @@ private fun FavoriteCustomFeedRow(
                 )
                 Text(
                     text = buildString {
-                        append(feed.subredditNames.size)
-                        append(if (feed.subredditNames.size == 1) " community" else " communities")
+                        append(pluralStringResource(R.plurals.communities_count, feed.subredditNames.size, feed.subredditNames.size))
                         if (feed.visibility.isNotBlank()) {
                             append(" · ")
                             append(feed.visibility.replaceFirstChar { character ->
@@ -3059,7 +3117,7 @@ private fun FavoriteCustomFeedRow(
             IconButton(onClick = onToggleFavorite) {
                 Icon(
                     Symbols.StarFilled,
-                    contentDescription = "Remove ${feed.displayName} from favorites",
+                    contentDescription = stringResource(R.string.scr_remove_from_favorites, feed.displayName),
                     tint = favoriteStarTint(favorite = true),
                 )
             }
@@ -3111,8 +3169,7 @@ private fun CustomFeedRow(
                 }
                 Text(
                     buildString {
-                        append(feed.subredditNames.size)
-                        append(if (feed.subredditNames.size == 1) " community" else " communities")
+                        append(pluralStringResource(R.plurals.communities_count, feed.subredditNames.size, feed.subredditNames.size))
                         if (feed.visibility.isNotBlank()) {
                             append(" · ")
                             append(feed.visibility.replaceFirstChar { character -> character.uppercase() })
@@ -3139,23 +3196,23 @@ private fun CustomFeedRow(
                         Symbols.Star
                     },
                     contentDescription = if (favorite) {
-                        "Remove ${feed.displayName} from favorites"
+                        stringResource(R.string.comm_remove_from_favorites, feed.displayName)
                     } else {
-                        "Add ${feed.displayName} to favorites"
+                        stringResource(R.string.comm_add_to_favorites, feed.displayName)
                     },
                     tint = favoriteStarTint(favorite),
                 )
             }
             Box {
                 IconButton(onClick = { menuExpanded = true }) {
-                    Icon(Symbols.MoreVert, contentDescription = "Manage ${feed.displayName}")
+                    Icon(Symbols.MoreVert, contentDescription = stringResource(R.string.scr_manage, feed.displayName))
                 }
                 DropdownMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Edit feed") },
+                        text = { Text(stringResource(R.string.scr_edit_feed)) },
                         leadingIcon = { Icon(Symbols.Edit, contentDescription = null) },
                         onClick = {
                             menuExpanded = false
@@ -3165,7 +3222,7 @@ private fun CustomFeedRow(
                     // REDDITURL05_CUSTOM_FEED_LINK_V1
                     if (customFeedLinkShareable(feed)) {
                         DropdownMenuItem(
-                            text = { Text("Copy link") },
+                            text = { Text(stringResource(R.string.scr_copy_link)) },
                             leadingIcon = { Icon(Symbols.ContentCopy, contentDescription = null) },
                             onClick = {
                                 menuExpanded = false
@@ -3173,7 +3230,7 @@ private fun CustomFeedRow(
                             },
                         )
                         DropdownMenuItem(
-                            text = { Text("Share link") },
+                            text = { Text(stringResource(R.string.scr_share_link)) },
                             leadingIcon = { Icon(Symbols.Share, contentDescription = null) },
                             onClick = {
                                 menuExpanded = false
@@ -3184,7 +3241,7 @@ private fun CustomFeedRow(
                     // ISSUE37_LAUNCHER_SHORTCUT_TARGETS_V1
                     if (onAddToHomeScreen != null) {
                         DropdownMenuItem(
-                            text = { Text("Add to home screen") },
+                            text = { Text(stringResource(R.string.scr_add_to_home_screen)) },
                             leadingIcon = {
                                 Icon(Symbols.AddToHomeScreen, contentDescription = null)
                             },
@@ -3195,7 +3252,7 @@ private fun CustomFeedRow(
                         )
                     }
                     DropdownMenuItem(
-                        text = { Text("Delete feed", color = MaterialTheme.colorScheme.error) },
+                        text = { Text(stringResource(R.string.scr_delete_feed), color = MaterialTheme.colorScheme.error) },
                         leadingIcon = {
                             Icon(
                                 Symbols.Delete,
@@ -3219,7 +3276,7 @@ private fun SearchAllCommunitiesRow(
     onClick: () -> Unit,
 ) {
     ListCard(
-        headline = "Search all communities for “$query”",
+        headline = stringResource(R.string.scr_search_all_communities_for, query),
         headlineMaxLines = 2,
         onClick = onClick,
         color = MaterialTheme.colorScheme.surfaceContainer,
@@ -3309,8 +3366,8 @@ private fun LoadingCommunities() {
 @Composable
 private fun LiveSubscriptionsEmpty() {
     EmptyCommunitySurface(
-        title = "No communities yet",
-        description = "Communities you join on Reddit will appear here.",
+        title = stringResource(R.string.scr_no_communities_yet),
+        description = stringResource(R.string.scr_communities_you_join_on_reddit_will_appear),
     )
 }
 
@@ -3320,13 +3377,13 @@ private fun LiveCommunityDiscoveryEmpty(
     nsfwHidden: Boolean,
 ) {
     EmptyCommunitySurface(
-        title = if (hasUnfilteredResults) "No visible results" else "No communities found",
+        title = if (hasUnfilteredResults) stringResource(R.string.all_no_visible_results) else stringResource(R.string.all_no_communities_found),
         description = when {
             nsfwHidden ->
-                "Results hidden by your NSFW preference or because you already follow them."
+                stringResource(R.string.all_results_hidden_by_your_nsfw_preference_or)
             hasUnfilteredResults ->
-                "The returned communities are already in your joined list."
-            else -> "Try another name or topic."
+                stringResource(R.string.all_the_returned_communities_are_already_in_your)
+            else -> stringResource(R.string.all_try_another_name_or_topic)
         },
     )
 }
@@ -3334,14 +3391,14 @@ private fun LiveCommunityDiscoveryEmpty(
 internal fun formatRecentCommunityAge(
     visitedAtEpochMillis: Long,
     nowEpochMillis: Long,
-): String {
+): UiText {
     val elapsedMinutes = ((nowEpochMillis - visitedAtEpochMillis).coerceAtLeast(0L) / 60_000L)
     return when {
-        elapsedMinutes < 1L -> "Just now"
-        elapsedMinutes < 60L -> "$elapsedMinutes min ago"
-        elapsedMinutes < 24L * 60L -> "${elapsedMinutes / 60L} h ago"
-        elapsedMinutes < 48L * 60L -> "Yesterday"
-        else -> "${elapsedMinutes / (24L * 60L)} d ago"
+        elapsedMinutes < 1L -> UiText.Resource(R.string.scr_recent_just_now)
+        elapsedMinutes < 60L -> UiText.Resource(R.string.scr_recent_minutes_ago, elapsedMinutes)
+        elapsedMinutes < 24L * 60L -> UiText.Resource(R.string.scr_recent_hours_ago, elapsedMinutes / 60L)
+        elapsedMinutes < 48L * 60L -> UiText.Resource(R.string.scr_conversation_yesterday)
+        else -> UiText.Resource(R.string.scr_recent_days_ago, elapsedMinutes / (24L * 60L))
     }
 }
 
@@ -3453,9 +3510,9 @@ private fun CommunityRow(
                             Symbols.VolumeOff
                         },
                         contentDescription = if (communityMute != null) {
-                            "Edit mute for ${state.subredditLabel(community.name)}"
+                            stringResource(R.string.comm_edit_mute_for, state.subredditLabel(community.name))
                         } else {
-                            "Mute ${state.subredditLabel(community.name)}"
+                            stringResource(R.string.comm_mute_name, state.subredditLabel(community.name))
                         },
                         tint = if (communityMute != null) {
                             MaterialTheme.colorScheme.primary
@@ -3477,9 +3534,9 @@ private fun CommunityRow(
                             Symbols.Star
                         },
                         contentDescription = if (favorite) {
-                            "Remove ${state.subredditLabel(community.name)} from favorites"
+                            stringResource(R.string.comm_remove_from_favorites, state.subredditLabel(community.name))
                         } else {
-                            "Add ${state.subredditLabel(community.name)} to favorites"
+                            stringResource(R.string.comm_add_to_favorites, state.subredditLabel(community.name))
                         },
                         tint = favoriteStarTint(favorite),
                     )
@@ -3496,9 +3553,9 @@ private fun CommunityRow(
                             Symbols.VisibilityOff
                         },
                         contentDescription = if (hidden) {
-                            "Show ${state.subredditLabel(community.name)} in Joined"
+                            stringResource(R.string.comm_show_in_joined, state.subredditLabel(community.name))
                         } else {
-                            "Hide ${state.subredditLabel(community.name)} from Joined"
+                            stringResource(R.string.comm_hide_from_joined, state.subredditLabel(community.name))
                         },
                         tint = if (hidden) {
                             MaterialTheme.colorScheme.primary
@@ -3522,7 +3579,7 @@ private fun CommunityRow(
                     if (membershipInProgress) {
                         InlineProgressIndicator()
                         Spacer(Modifier.width(4.dp))
-                        Text("Leaving…")
+                        Text(stringResource(R.string.scr_leaving))
                     } else {
                         Icon(
                             Symbols.Check,
@@ -3530,7 +3587,7 @@ private fun CommunityRow(
                             modifier = Modifier.size(16.dp),
                         )
                         Spacer(Modifier.width(4.dp))
-                        Text("Joined")
+                        Text(stringResource(R.string.scr_joined))
                     }
                 }
                 showMembershipAction -> Button(
@@ -3546,9 +3603,9 @@ private fun CommunityRow(
                     if (membershipInProgress) {
                         InlineProgressIndicator()
                         Spacer(Modifier.width(4.dp))
-                        Text("Joining…")
+                        Text(stringResource(R.string.scr_joining))
                     } else {
-                        Text("Join")
+                        Text(stringResource(R.string.scr_join))
                     }
                 }
                 showJoinedBadge || nsfw -> Column(
@@ -3557,12 +3614,12 @@ private fun CommunityRow(
                 ) {
                     if (showJoinedBadge) {
                         CommunityStatusBadge(
-                            text = "Joined",
+                            text = stringResource(R.string.scr_joined),
                             showCheck = true,
                         )
                     }
                     if (nsfw) {
-                        CommunityStatusBadge(text = "18+")
+                        CommunityStatusBadge(text = stringResource(R.string.scr_18))
                     }
                 }
             }
@@ -3615,14 +3672,14 @@ private fun CommunityRow(
                     }
                     membershipErrorPresentation?.let { presentation ->
                         Text(
-                            text = presentation.title,
+                            text = presentation.title.asString(),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.error,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
-                            text = presentation.message,
+                            text = presentation.message.asString(),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 2,
@@ -3685,11 +3742,17 @@ private fun CommunityStatusBadge(
     }
 }
 
-private fun communityMeta(community: Community): String? = buildList {
-    community.members
+@Composable
+private fun communityMeta(community: Community): String? {
+    val membersText = community.members
         .takeUnless { members -> members.isBlank() || members == "—" }
-        ?.let { members -> add("$members members") }
-    community.description
+        ?.let { members -> stringResource(R.string.comm_members_text, members) }
+    return communityMetaText(io.github.brealorg.subshell.ui.state.identityDescriptionShown(community.description), membersText)
+}
+
+private fun communityMetaText(description: String, membersText: String?): String? = buildList {
+    membersText?.let(::add)
+    description
         .trim()
         .takeIf(String::isNotEmpty)
         ?.let(::add)

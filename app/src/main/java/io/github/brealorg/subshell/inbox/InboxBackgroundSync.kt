@@ -474,8 +474,7 @@ internal class InboxBackgroundSyncWorker(
                             )
                             Log.d(
                                 INBOX_BACKGROUND_LOG_TAG,
-                                "inbox-applied account=$account unread=${currentKeys.size} " +
-                                    "new=${decision.newEventKeys.size} posted=$posted",
+                                "inbox-applied account=$account unread=${currentKeys.size} new=${decision.newEventKeys.size} posted=$posted",
                             )
                             recordCheck(
                                 inboxCheckSummary(
@@ -597,8 +596,7 @@ internal class InboxBackgroundSyncWorker(
                             )
                             Log.d(
                                 INBOX_BACKGROUND_LOG_TAG,
-                                "modmail-applied account=$account unread=${currentKeys.size} " +
-                                    "new=${decision.newEventKeys.size} posted=$posted",
+                                "modmail-applied account=$account unread=${currentKeys.size} new=${decision.newEventKeys.size} posted=$posted",
                             )
                         }
                     }

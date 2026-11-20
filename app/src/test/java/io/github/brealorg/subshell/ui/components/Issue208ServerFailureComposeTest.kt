@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.s
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -35,7 +36,7 @@ class Issue208ServerFailureComposeTest {
                 )
             }
         }
-        composeRule.onNodeWithText(REDDIT_READ_SERVER_PROBLEM_REASON, substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText(REDDIT_READ_SERVER_PROBLEM_REASON.s, substring = true).assertIsDisplayed()
     }
 
     @Test
@@ -50,6 +51,6 @@ class Issue208ServerFailureComposeTest {
                 )
             }
         }
-        composeRule.onNodeWithText(REDDIT_READ_SERVER_PROBLEM_REASON, substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText(REDDIT_READ_SERVER_PROBLEM_REASON.s, substring = true).assertIsDisplayed()
     }
 }

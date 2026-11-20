@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertEquals
@@ -50,10 +51,10 @@ class Issue2CrosspostRedditLinkRoutingPolicyTest {
     fun crosspostMarkdownUsesExplicitSubshellRoutingWithExternalFallback() {
         val markdown = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/MarkdownText.kt",
-        ).readText()
+        ).readSourceText()
         val media = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/MediaComponents.kt",
-        ).readText()
+        ).readSourceText()
 
         assertTrue(markdown.contains("onLinkClick: ((String) -> Unit)? = null"))
         assertTrue(markdown.contains("LinkInteractionListener"))

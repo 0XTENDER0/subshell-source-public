@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.label
 import io.github.brealorg.subshell.ui.theme.AppTextScale
 import io.github.brealorg.subshell.backup.BackupRetention
 import io.github.brealorg.subshell.backup.BackupRetentionPolicy
@@ -40,6 +44,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// TRANSLATE08: reads string resources (enum labels), so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class SettingsBackupContractTest {
     private val customizedSettings = SubshellSettings(
         themeMode = ThemeMode.LIGHT,
@@ -162,17 +169,17 @@ class SettingsBackupContractTest {
         val restored = SubshellSettings.fromStorageMap(olderBackup)
 
         assertEquals(VideoQuality.HIGH, restored.wifiVideoQuality)
-        assertEquals(VideoQuality.MEDIUM, restored.mobileVideoQuality)
+        assertEquals(VideoQuality.HIGH, restored.mobileVideoQuality)
         assertEquals(VideoTimelineSize.STANDARD, restored.videoTimelineSize)
         assertEquals(PlaybackOptionsPlacement.POST_AND_FULLSCREEN, restored.playbackOptionsPlacement)
         assertEquals(VideoSubtitleDefault.WHEN_MARKED, restored.videoSubtitleDefault)
         assertEquals(VideoAudioDefault.VIDEO_DEFAULT, restored.videoAudioDefault)
         assertEquals(false, restored.videoSpeedControls)
-        assertEquals(false, restored.videoDoubleTapSeek)
-        assertEquals(false, restored.videoHoldForDoubleSpeed)
-        assertEquals(false, restored.videoPinchToZoom)
+        assertEquals(true, restored.videoDoubleTapSeek)
+        assertEquals(true, restored.videoHoldForDoubleSpeed)
+        assertEquals(true, restored.videoPinchToZoom)
         assertEquals(false, restored.videoPictureInPicture)
-        assertEquals(false, restored.videoRotateFullscreen)
+        assertEquals(true, restored.videoRotateFullscreen)
         assertEquals(false, restored.videoTechnicalDetails)
         assertEquals(false, restored.loopVideos)
         assertEquals(true, restored.landscapeVideoGesturesEnabled)
@@ -182,21 +189,21 @@ class SettingsBackupContractTest {
         assertEquals(VoteColorPalette.NEUTRAL, restored.voteColorPalette)
         assertEquals(VoteControlMode.COMFORTABLE, restored.voteControlMode)
         assertEquals(InteractionSide.RIGHT, restored.interactionSide)
-        assertEquals(DrawerSidePreference.FOLLOW, restored.drawerSidePreference)
+        assertEquals(DrawerSidePreference.RIGHT, restored.drawerSidePreference)
         assertEquals(CommentActionPreference.FOLLOW, restored.commentActionPreference)
-        assertEquals(CommentTimeFormat.RELATIVE, restored.commentTimeFormat)
+        assertEquals(CommentTimeFormat.LOCAL_24_HOUR, restored.commentTimeFormat)
         assertEquals(true, restored.highlightNewComments)
         assertEquals(true, restored.useSuggestedCommentSort)
         assertEquals(true, restored.showUnreadMarker) // settings audit 2026-10-13
-        assertEquals(false, restored.showNsfwPosts)
+        assertEquals(true, restored.showNsfwPosts)
         assertEquals(SensitiveMediaPreviewMode.BLUR_AND_PRELOAD, restored.sensitiveMediaPreviewMode)
-        assertEquals(false, restored.showNsfwMedia)
+        assertEquals(true, restored.showNsfwMedia)
         assertEquals(ContentFilters(), restored.contentFilters)
         assertEquals(emptyMap<String, CommunitySort>(), restored.communitySortPreferences)
         assertEquals(RedditListingTimePeriod.ALL, restored.listingTimePeriod)
         assertEquals(DrawerCommunitiesMode.COLLAPSIBLE, restored.drawerCommunitiesMode)
         assertEquals(false, restored.drawerRecentCommunities)
-        assertEquals(false, restored.backTwiceToExit)
+        assertEquals(true, restored.backTwiceToExit)
         assertEquals(false, restored.pureBlackDarkTheme)
         assertEquals(AppTextScale.DEFAULT, restored.appTextScale)
         assertEquals(false, restored.topLevelCommentJumpButton)

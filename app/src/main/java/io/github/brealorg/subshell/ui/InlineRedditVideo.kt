@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import io.github.brealorg.subshell.model.Post
 import io.github.brealorg.subshell.model.PostKind
 
@@ -54,7 +56,7 @@ internal fun redditImageLinkPost(target: RedditTarget.Image): Post = Post(
     community = "reddit",
     author = "[linked media]",
     age = "",
-    title = if (target.animated) "Linked GIF" else "Linked image",
+    title = if (target.animated) REDDIT_LINKED_GIF_TITLE else REDDIT_LINKED_IMAGE_TITLE,
     score = 0,
     comments = 0,
     kind = if (target.animated) PostKind.GIF else PostKind.IMAGE,
@@ -65,3 +67,5 @@ internal fun redditImageLinkPost(target: RedditTarget.Image): Post = Post(
 )
 
 internal const val REDDIT_IMAGE_LINK_POST_ID_PREFIX = "linked-image-"
+internal const val REDDIT_LINKED_GIF_TITLE = "Linked GIF"
+internal const val REDDIT_LINKED_IMAGE_TITLE = "Linked image"

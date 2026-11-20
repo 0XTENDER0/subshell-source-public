@@ -1,24 +1,26 @@
 package io.github.brealorg.subshell.ui
 
-enum class InteractionSide(val label: String) {
-    LEFT("Left"),
-    RIGHT("Right"),
+import io.github.brealorg.subshell.R
+
+enum class InteractionSide(@androidx.annotation.StringRes val labelRes: Int) {
+    LEFT( io.github.brealorg.subshell.R.string.interaction_side_left),
+    RIGHT( io.github.brealorg.subshell.R.string.interaction_side_right),
 }
 
-enum class DrawerSidePreference(val label: String) {
-    FOLLOW("Follow"),
-    LEFT("Left"),
-    RIGHT("Right"),
+enum class DrawerSidePreference(@androidx.annotation.StringRes val labelRes: Int) {
+    FOLLOW( io.github.brealorg.subshell.R.string.drawer_side_preference_follow),
+    LEFT( io.github.brealorg.subshell.R.string.drawer_side_preference_left),
+    RIGHT( io.github.brealorg.subshell.R.string.drawer_side_preference_right),
 }
 
-enum class CommentActionPreference(val label: String) {
-    FOLLOW("Follow"),
-    LEFT("Left"),
-    BALANCED("Balanced"),
-    RIGHT("Right"),
+enum class CommentActionPreference(@androidx.annotation.StringRes val labelRes: Int) {
+    FOLLOW( io.github.brealorg.subshell.R.string.comment_action_preference_follow),
+    LEFT( io.github.brealorg.subshell.R.string.comment_action_preference_left),
+    BALANCED( io.github.brealorg.subshell.R.string.comment_action_preference_balanced),
+    RIGHT( io.github.brealorg.subshell.R.string.comment_action_preference_right),
 }
 
-fun InteractionSide.followLabel(): String = "Follow · $label"
+fun InteractionSide.followLabel(): UiText = UiText.Resource(R.string.follow_label, UiText.Resource(labelRes))
 
 fun InteractionSide.floatingActionAtStart(): Boolean = this == InteractionSide.LEFT
 

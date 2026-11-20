@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.data.auth.reddit
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.data.auth.AuthCapabilityAuthorizationOwner
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
@@ -21,13 +22,13 @@ class Moderation02A5A5AuthorizationPolicyTest {
         // ISSUE237: sign-in asks for it too; the capability owner stays the fallback.
         assertTrue(RedditOAuth.dailyDriverScopes.contains("modothers"))
 
-        val oauth = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/data/auth/reddit/RedditOAuth.kt").readText()
-        val owner = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/data/auth/AuthCapabilityAuthorizer.kt").readText()
+        val oauth = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/data/auth/reddit/RedditOAuth.kt").readSourceText()
+        val owner = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/data/auth/AuthCapabilityAuthorizer.kt").readSourceText()
         // The moderation parts are built in ModerationRuntimeParts since R7.
-        val runtime = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/auth/AuthApplicationRuntime.kt").readText() +
-            File("src/main/java/${SUBSHELL_PACKAGE_DIR}/auth/ModerationRuntimeParts.kt").readText()
-        val vm = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/auth/AuthConnectViewModel.kt").readText()
-        val writer = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/data/auth/reddit/RedditModeratorInvitationWriter.kt").readText()
+        val runtime = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/auth/AuthApplicationRuntime.kt").readSourceText() +
+            File("src/main/java/${SUBSHELL_PACKAGE_DIR}/auth/ModerationRuntimeParts.kt").readSourceText()
+        val vm = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/auth/AuthConnectViewModel.kt").readSourceText()
+        val writer = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/data/auth/reddit/RedditModeratorInvitationWriter.kt").readSourceText()
 
         assertTrue(oauth.contains("liveModeratorTeamScopes = coreReadScopes + \"modothers\""))
         assertTrue(oauth.contains("MODERATION_TEAM -> liveModeratorTeamScopes"))

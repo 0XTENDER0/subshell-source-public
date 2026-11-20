@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.util.Log
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
@@ -248,16 +250,14 @@ internal fun RuntimeStateBridge(
         if (!state.activeAccountIsAuthenticated) {
             uiDebugLog(
                 "SubshellCommentNav",
-                "phase=adb_launch_failed post=${target.postId} target=${target.commentId} " +
-                    "reason=active_account_not_authenticated",
+                "phase=adb_launch_failed post=${target.postId} target=${target.commentId} reason=active_account_not_authenticated",
             )
             onDebugFocusedCommentConsumed()
             return@LaunchedEffect
         }
         uiDebugLog(
             "SubshellCommentNav",
-            "phase=adb_launch_resolve post=${target.postId} target=${target.commentId} " +
-                "username=${target.username} account=${state.activeAccountId}",
+            "phase=adb_launch_resolve post=${target.postId} target=${target.commentId} username=${target.username} account=${state.activeAccountId}",
         )
         onRefreshRedditAccountHistory(
             state.activeAccountId,
@@ -278,8 +278,7 @@ internal fun RuntimeStateBridge(
         if (post == null) {
             uiDebugLog(
                 "SubshellCommentNav",
-                "phase=adb_launch_failed post=${target.postId} target=${target.commentId} " +
-                    "reason=post_resolution_failed",
+                "phase=adb_launch_failed post=${target.postId} target=${target.commentId} reason=post_resolution_failed",
             )
             onDebugFocusedCommentConsumed()
             return@LaunchedEffect
@@ -399,8 +398,7 @@ internal fun RuntimeStateBridge(
         if (BuildConfig.DEBUG) {
             Log.d(
                 "SubshellDeepLink",
-                "phase=${if (opened) "route_open" else "route_failed"} " +
-                    "request=${launch.requestId} target=${target::class.simpleName} source=remote",
+                "phase=${if (opened) "route_open" else "route_failed"} request=${launch.requestId} target=${target::class.simpleName} source=remote",
             )
         }
         if (!opened) {
@@ -611,8 +609,7 @@ internal fun RuntimeStateBridge(
             val after = state.postPagingSnapshot(updatedQueryKey).items.size
             uiDebugLog(
                 "SubshellPagingSync",
-                "remote_feed_sync key=$updatedQueryKey before=$before after=$after " +
-                    "revision=${redditFeedState.contentRevision}",
+                "remote_feed_sync key=$updatedQueryKey before=$before after=$after revision=${redditFeedState.contentRevision}",
             )
         }
     }
@@ -632,8 +629,7 @@ internal fun RuntimeStateBridge(
             val after = state.postPagingSnapshot(updatedQueryKey).items.size
             uiDebugLog(
                 "SubshellPagingSync",
-                "remote_history_sync key=$updatedQueryKey before=$before after=$after " +
-                    "revision=${redditAccountHistoryState.contentRevision}",
+                "remote_history_sync key=$updatedQueryKey before=$before after=$after revision=${redditAccountHistoryState.contentRevision}",
             )
         }
     }

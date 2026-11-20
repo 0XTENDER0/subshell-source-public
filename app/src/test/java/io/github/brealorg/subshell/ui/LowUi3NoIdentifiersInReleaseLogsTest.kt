@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertEquals
@@ -37,6 +38,6 @@ class LowUi3NoIdentifiersInReleaseLogsTest {
             .toList()
 
         assertEquals(emptyList<String>(), unguarded)
-        assertTrue(File(directory, "UiDebugLog.kt").readText().contains("if (BuildConfig.DEBUG) Log.d(tag, message)"))
+        assertTrue(File(directory, "UiDebugLog.kt").readSourceText().contains("if (BuildConfig.DEBUG) Log.d(tag, message)"))
     }
 }

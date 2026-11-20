@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -72,6 +74,7 @@ internal fun ConversationRouteHost(
     expandedWindowLayout: Boolean,
     inboxPrimaryTabState: MutableState<InboxPrimaryTab>,
     inboxModSectionState: MutableState<InboxModSection>,
+    onWebSignInAgain: (String) -> Unit = {},
 ) {
     var inboxPrimaryTab by inboxPrimaryTabState
     var inboxModSection by inboxModSectionState
@@ -94,12 +97,6 @@ internal fun ConversationRouteHost(
     val onAppendRedditModQueue = redditModeration.onAppendRedditModQueue
     val onResolveRedditModerationTarget = redditModeration.onResolveRedditModerationTarget
     val moderationActionState = redditModeration.moderationActionState
-    val onModerateRedditQueueItem = redditModeration.onModerateRedditQueueItem
-    val onRetryRedditModerationAction = redditModeration.onRetryRedditModerationAction
-    val onAuthorizeRedditModerationAction = redditModeration.onAuthorizeRedditModerationAction
-    val removalReasonState = redditModeration.removalReasonState
-    val onLoadRedditRemovalReasons = redditModeration.onLoadRedditRemovalReasons
-    val onAuthorizeRedditRemovalReasons = redditModeration.onAuthorizeRedditRemovalReasons
     val redditInboxState = redditInbox.redditInboxState
     val onLoadRedditInbox = redditInbox.onLoadRedditInbox
     val onAppendRedditInbox = redditInbox.onAppendRedditInbox
@@ -371,6 +368,9 @@ internal fun ConversationRouteHost(
                 onReconnectInbox = {
                     onAuthorizeRedditInbox(state.activeAccountId)
                 },
+                onSignInAgain = {
+                    onWebSignInAgain(state.activeAccountId)
+                },
                 onAuthorizeMediaReply = onAuthorizeCommentWrite,
                 interactionActionsAtStart =
                     state.interactionSide.composerActionsAtStart(),
@@ -392,8 +392,8 @@ internal fun ConversationRouteHost(
         // A11Y01A4_INBOX_CONVERSATION_TWO_PANE_V1
         ExpandedListDetailSurface(
             scaffoldPadding = padding,
-            listTitle = "Inbox",
-            listSubtitle = "Activity, messages & moderation",
+            listTitle = stringResource(R.string.all_inbox),
+            listSubtitle = stringResource(R.string.all_activity_messages_moderation),
             listContent = { listModifier ->
                 InboxScreen(
                     modmailThreadFillsTheScreen = false,
@@ -416,12 +416,6 @@ internal fun ConversationRouteHost(
                     onResolveRedditModerationTarget =
                         onResolveRedditModerationTarget,
                     moderationActionState = moderationActionState,
-                    onModerateRedditQueueItem = onModerateRedditQueueItem,
-                    onRetryRedditModerationAction = onRetryRedditModerationAction,
-                    onAuthorizeRedditModerationAction = onAuthorizeRedditModerationAction,
-                    removalReasonState = removalReasonState,
-                    onLoadRedditRemovalReasons = onLoadRedditRemovalReasons,
-                    onAuthorizeRedditRemovalReasons = onAuthorizeRedditRemovalReasons,
                     redditModmailState = redditModmailState,
                     onLoadRedditModmail = onLoadRedditModmail,
                     onAppendRedditModmail = onAppendRedditModmail,
@@ -479,11 +473,12 @@ internal fun ConversationRouteHost(
 // ISSUE48_CONVERSATION_WAITS_FOR_THE_LIVE_INBOX_V1
 @Composable
 private fun ConversationRouteWaiting(padding: PaddingValues) {
+    val loadingDescription = stringResource(R.string.scr_loading_conversation)
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .semantics { contentDescription = "Loading conversation" },
+            .semantics { contentDescription = loadingDescription },
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator()

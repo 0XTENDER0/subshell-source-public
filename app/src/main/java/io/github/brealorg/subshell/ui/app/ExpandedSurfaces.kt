@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -207,14 +209,15 @@ internal fun ExpandedMainNavigationRail(
         colors = WideNavigationRailDefaults.colors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Spacer(Modifier.height(8.dp))
+        val switchAccountLabel = stringResource(R.string.shell_switch_account)
         navItems.forEach { item ->
             val isYou = item.destination == MainDestination.YOU
-            val accessibilityLabel = item.destination.label
-            val visualLabel = navigationRailVisualLabel(item.destination)
+            val accessibilityLabel = stringResource(item.destination.labelRes)
+            val visualLabel = stringResource(navigationRailVisualLabel(item.destination))
             WideNavigationRailItem(
                 modifier = if (isYou) {
                     Modifier.semantics {
-                        onLongClick(label = "Switch account") {
+                        onLongClick(label = switchAccountLabel) {
                             onOpenAccountSwitcher()
                             true
                         }

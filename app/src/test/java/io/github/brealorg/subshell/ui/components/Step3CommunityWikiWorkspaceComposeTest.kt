@@ -1,6 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
 import android.app.Application
+import androidx.activity.ComponentDialog
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -29,6 +30,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowDialog
 
 /**
  * STEP3 (wiki01a2, wiki01a2r1, wiki01a2r2): the community sheet has three tabs
@@ -55,7 +57,7 @@ class Step3CommunityWikiWorkspaceComposeTest {
         listOf(CommunityWikiPageRef("faq"), CommunityWikiPageRef("config/sidebar")),
     )
 
-    private fun show() {
+    private fun show(onDismiss: () -> Unit = {}) {
         ensureWorkManagerInitialized(ApplicationProvider.getApplicationContext<Application>())
         composeRule.setContent {
             SubshellTheme {
@@ -77,7 +79,7 @@ class Step3CommunityWikiWorkspaceComposeTest {
                     onAuthorizeWiki = { _, community -> authorizations += community },
                     moderatorIdentity = { username -> UserFixture(username = username, description = "", karma = "") },
                     onEnsureModeratorIdentity = {},
-                    onDismiss = {},
+                    onDismiss = onDismiss,
                     onRetry = {},
                     onOpenModerator = {},
                 )
@@ -129,6 +131,43 @@ class Step3CommunityWikiWorkspaceComposeTest {
         click(hasContentDescription("Back to Wiki"))
         click(hasContentDescription("Back to Community info"))
         assertTrue(composeRule.onAllNodesWithText("Community documentation").fetchSemanticsNodes().isNotEmpty())
+    }
+
+    // WIKI02_BACK_STEPS_THROUGH_THE_SHEET_V1: Android's Back goes to the sheet's
+    // own dialog window; with the wiki open it steps page -> wiki -> community
+    // info, and only then closes the sheet.
+    @Test
+    fun backStepsThroughTheWikiBeforeTheSheetCloses() {
+        var dismissed = 0
+        show(onDismiss = { dismissed++ })
+        openWiki()
+        composeRule.runOnIdle { wiki = RedditCommunityWikiUiState(accountStableId = account, communityName = "kotlin", index = loadedIndex) }
+        composeRule.waitForIdle()
+        click(hasText("faq", substring = true) and hasClickAction())
+        composeRule.runOnIdle {
+            wiki = wiki.copy(page = CommunityWikiPage("kotlin", "faq", "# Questions\n\nRead the docs."))
+        }
+        composeRule.waitForIdle()
+        assertTrue(count("Read the docs.") >= 1)
+
+        pressBackInTheSheet()
+        assertEquals(0, count("Read the docs."))
+        assertTrue(composeRule.onAllNodes(hasContentDescription("Back to Community info")).fetchSemanticsNodes().isNotEmpty())
+        assertEquals(0, dismissed)
+
+        pressBackInTheSheet()
+        assertTrue(composeRule.onAllNodesWithText("Community documentation").fetchSemanticsNodes().isNotEmpty())
+        assertEquals(0, composeRule.onAllNodes(hasContentDescription("Back to Community info")).fetchSemanticsNodes().size)
+        assertEquals(0, dismissed)
+
+        pressBackInTheSheet()
+        assertEquals(1, dismissed)
+    }
+
+    private fun pressBackInTheSheet() {
+        val sheetWindow = ShadowDialog.getLatestDialog() as ComponentDialog
+        composeRule.runOnIdle { sheetWindow.onBackPressedDispatcher.onBackPressed() }
+        composeRule.waitForIdle()
     }
 
     @Test

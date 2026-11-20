@@ -35,7 +35,7 @@ class Issue222FeedbackTest {
         assertEquals(TrayTone.INFO, host.currentRequest?.tone)
         host.noticeFailure("Couldn't share this post", "No app on this device can share it")
         assertEquals(TrayTone.ERROR, host.currentRequest?.tone)
-        assertEquals("Couldn't share this post", host.currentRequest?.presentation?.title)
+        assertEquals("Couldn't share this post", host.currentRequest?.presentation?.title?.s)
     }
 
     @Test
@@ -44,7 +44,7 @@ class Issue222FeedbackTest {
         host.noticeInfo("Muted r/android", "Its posts are hidden from your feeds")
         host.dismissCurrent()
         host.noticeInfo("Muted r/android", "Its posts are hidden from your feeds")
-        assertEquals("Muted r/android", host.currentRequest?.presentation?.title)
+        assertEquals("Muted r/android", host.currentRequest?.presentation?.title?.s)
     }
 
     @Test
@@ -53,7 +53,7 @@ class Issue222FeedbackTest {
         host.noticeCopied("Link", sdkInt = Build.VERSION_CODES.TIRAMISU)
         assertNull(host.currentRequest)
         host.noticeCopied("Link", sdkInt = Build.VERSION_CODES.S_V2)
-        assertEquals("Link copied", host.currentRequest?.presentation?.title)
+        assertEquals("Link copied", host.currentRequest?.presentation?.title?.s)
         assertEquals(TrayTone.INFO, host.currentRequest?.tone)
     }
 

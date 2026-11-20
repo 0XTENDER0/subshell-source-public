@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.media
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.data.error.FailureDetails
 import io.github.brealorg.subshell.data.error.LocalFailureKind
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
@@ -203,5 +204,5 @@ class Issue5FeedPosterContinuityTest {
     }
 
     private fun source(path: String): String =
-        File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$path").readText()
+        File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$path").readSourceText()
 }

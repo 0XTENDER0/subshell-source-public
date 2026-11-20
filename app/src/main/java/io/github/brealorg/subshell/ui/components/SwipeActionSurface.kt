@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -64,7 +67,7 @@ internal fun startToEndUsesRightAction(layoutDirection: LayoutDirection): Boolea
     layoutDirection == LayoutDirection.Ltr
 
 internal data class SwipeActionVisual(
-    val label: String,
+    val label: UiText,
     val icon: ImageVector,
     val containerColor: Color,
     val contentColor: Color,
@@ -76,22 +79,26 @@ internal fun postSwipeActionLabel(
     vote: Int,
     saved: Boolean,
     hidden: Boolean,
-): String = when (action) {
-    PostSwipeAction.NONE -> "None"
-    PostSwipeAction.UPVOTE -> if (vote == 1) "Remove upvote" else "Upvote"
-    PostSwipeAction.DOWNVOTE -> if (vote == -1) "Remove downvote" else "Downvote"
-    PostSwipeAction.SAVE -> if (saved) "Unsave" else "Save"
-    PostSwipeAction.HIDE -> if (hidden) "Unhide" else "Hide"
-}
+): UiText = UiText.Resource(
+    when (action) {
+        PostSwipeAction.NONE -> R.string.post_swipe_action_none
+        PostSwipeAction.UPVOTE -> if (vote == 1) R.string.feed_action_remove_upvote else R.string.post_swipe_action_upvote
+        PostSwipeAction.DOWNVOTE -> if (vote == -1) R.string.feed_action_remove_downvote else R.string.post_swipe_action_downvote
+        PostSwipeAction.SAVE -> if (saved) R.string.feed_action_unsave else R.string.sw_save
+        PostSwipeAction.HIDE -> if (hidden) R.string.swipe_unhide else R.string.post_swipe_action_hide
+    },
+)
 
 internal fun commentSwipeActionLabel(
     action: CommentSwipeAction,
     vote: Int,
-): String = when (action) {
-    CommentSwipeAction.NONE -> "None"
-    CommentSwipeAction.UPVOTE -> if (vote == 1) "Remove upvote" else "Upvote"
-    CommentSwipeAction.DOWNVOTE -> if (vote == -1) "Remove downvote" else "Downvote"
-}
+): UiText = UiText.Resource(
+    when (action) {
+        CommentSwipeAction.NONE -> R.string.post_swipe_action_none
+        CommentSwipeAction.UPVOTE -> if (vote == 1) R.string.feed_action_remove_upvote else R.string.comment_swipe_action_upvote
+        CommentSwipeAction.DOWNVOTE -> if (vote == -1) R.string.feed_action_remove_downvote else R.string.comment_swipe_action_downvote
+    },
+)
 
 // ISSUE39_SWIPE_VOTE_FOLLOWS_VOTE_SETTINGS_V1
 // Vote swipes take colour and icon from the same helpers as the vote bar, so
@@ -106,7 +113,7 @@ internal fun voteSwipeContentColor(darkTheme: Boolean): Color =
 
 internal fun voteSwipeActionVisual(
     direction: Int,
-    label: String,
+    label: UiText,
     palette: VoteColorPalette,
     mode: VoteControlMode,
     enabled: Boolean,
@@ -363,7 +370,7 @@ internal fun SwipeActionSurface(
                             modifier = Modifier.size(22.dp),
                         )
                         Text(
-                            text = visual.label,
+                            text = visual.label.asString(),
                             style = MaterialTheme.typography.labelLarge,
                             color = visual.contentColor,
                             maxLines = 1,

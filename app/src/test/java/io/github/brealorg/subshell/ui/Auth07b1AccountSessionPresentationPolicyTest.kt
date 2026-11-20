@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import io.github.brealorg.subshell.data.account.AccountSessionSource
 import io.github.brealorg.subshell.data.account.AccountSessionState
 import io.github.brealorg.subshell.data.account.AccountSessionSummary
@@ -7,6 +10,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
 
+// TRANSLATE14: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Auth07b1AccountSessionPresentationPolicyTest {
     @Test
     fun connectedAccountCopyHidesOAuthTransport() {
@@ -18,12 +24,12 @@ class Auth07b1AccountSessionPresentationPolicyTest {
             accountSwitcherSessionLabel(
                 account = connected,
                 selected = true,
-            )
+            ).s
         val inactive =
             accountSwitcherSessionLabel(
                 account = connected,
                 selected = false,
-            )
+            ).s
 
         assertEquals(
             "Current account",
@@ -64,7 +70,7 @@ class Auth07b1AccountSessionPresentationPolicyTest {
             accountSwitcherSessionLabel(
                 account = account,
                 selected = true,
-            ),
+            ).s,
         )
 
         assertEquals(
@@ -72,7 +78,7 @@ class Auth07b1AccountSessionPresentationPolicyTest {
             accountSwitcherSessionLabel(
                 account = account,
                 selected = false,
-            ),
+            ).s,
         )
     }
 

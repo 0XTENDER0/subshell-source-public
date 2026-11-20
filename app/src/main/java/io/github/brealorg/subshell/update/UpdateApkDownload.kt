@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import java.io.File
 import java.io.IOException
 import java.security.MessageDigest
@@ -48,12 +50,12 @@ internal sealed interface UpdateApkDownload {
     data class Failed(val failure: UpdateApkFailure) : UpdateApkDownload
 }
 
-internal enum class UpdateApkFailure(val message: String) {
-    NETWORK("Couldn't download the update. Check your connection and try again."),
-    NOT_FOUND("GitHub doesn't have this release's APK."),
-    UNEXPECTED_ADDRESS("The download went somewhere other than GitHub, so it was stopped."),
-    TOO_LARGE("The download is larger than an update can be, so it was stopped."),
-    HASH_MISMATCH("The downloaded file isn't the published update, so it was deleted."),
+internal enum class UpdateApkFailure(@androidx.annotation.StringRes val messageRes: Int) {
+    NETWORK(io.github.brealorg.subshell.R.string.update_failed_network),
+    NOT_FOUND(io.github.brealorg.subshell.R.string.update_failed_not_found),
+    UNEXPECTED_ADDRESS(io.github.brealorg.subshell.R.string.update_failed_unexpected_address),
+    TOO_LARGE(io.github.brealorg.subshell.R.string.update_failed_too_large),
+    HASH_MISMATCH(io.github.brealorg.subshell.R.string.update_failed_hash_mismatch),
 }
 
 internal class UpdateApkDownloader(

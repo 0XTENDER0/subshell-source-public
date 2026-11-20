@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.data.SampleData
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import io.github.brealorg.subshell.media.FeedScrollDirection
@@ -209,10 +210,10 @@ class Issue5GoogleFeedVisibilityTest {
     @Test
     fun productionWiringUsesNativeDwellAndAStableExplicitViewport() {
         val root = File("src/main/java/${SUBSHELL_PACKAGE_DIR}")
-        val google = File(root, "ui/GoogleFeedVideoVisibility.kt").readText()
-        val media = File(root, "ui/components/MediaComponents.kt").readText()
-        val state = File(root, "ui/SubshellState.kt").readText()
-        val player = File(root, "media/VideoPlayback.kt").readText()
+        val google = File(root, "ui/GoogleFeedVideoVisibility.kt").readSourceText()
+        val media = File(root, "ui/components/MediaComponents.kt").readSourceText()
+        val state = File(root, "ui/SubshellState.kt").readSourceText()
+        val player = File(root, "media/VideoPlayback.kt").readSourceText()
         val googleDecision = state.substringAfter("private fun reconcileGoogleFeedVideoPlayback()")
             .substringBefore("fun updateVideoVisibility(")
         assertTrue(google.contains("import androidx.compose.ui.layout.onVisibilityChanged"))
@@ -238,7 +239,7 @@ class Issue5GoogleFeedVisibilityTest {
         assertFalse(googleDecision.contains("feedViewportState.motion"))
         assertFalse(googleDecision.contains("OWNER_RETAIN"))
         for (screen in listOf("HomeScreen", "CommunityScreen")) {
-            assertTrue(File(root, "ui/screens/$screen.kt").readText()
+            assertTrue(File(root, "ui/screens/$screen.kt").readSourceText()
                 .contains("GoogleFeedVideoViewport("))
         }
     }

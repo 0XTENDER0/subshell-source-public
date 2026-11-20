@@ -166,6 +166,8 @@ class Step3DirectChatOptimisticMediaComposeTest {
                 sentText = "and some words",
                 sentDraftText = "and some words",
                 sentHadMedia = true,
+                // The image was confirmed: it has an event id (as the coordinator sets it).
+                sentMatrixEventId = "\$image",
                 completedAtEpochSeconds = 1_800_000_000L,
                 completionRevision = 1L,
             )

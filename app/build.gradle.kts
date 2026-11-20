@@ -190,6 +190,9 @@ private val AUTH05C_TEST_APPLICATION_ID =
     AUTH05C_DEBUG_APPLICATION_ID + ".test"
 private val AUTH05C_COMPONENT_NAMESPACE = "io.github.brealorg.subshell"
 
+// TRANSLATE10_RELEASE_SHIPS_ONLY_FINISHED_LANGUAGES_V1: the languages a release ships.
+private val SUBSHELL_RELEASE_LOCALE_FILTER = listOf("-c", "en")
+
 // Optional parallel debug installations. Canonical debug remains the default.
 private val subshellDebugSlots = setOf("dev1", "dev2")
 private val subshellDebugSlot = providers
@@ -957,6 +960,10 @@ android {
         unitTests {
             // Robolectric needs the merged resources and manifest on the JVM.
             isIncludeAndroidResources = true
+            // ROBOLECTRIC417_JDK_INTERNAL_ACCESS_V1: Robolectric 4.17's file descriptor
+            // interceptor reaches jdk.internal.access.SharedSecrets by reflection, which
+            // JDK 21 refuses unless java.base exports it to the test JVM.
+            all { test -> test.jvmArgs("--add-exports=java.base/jdk.internal.access=ALL-UNNAMED") }
         }
     }
 
@@ -1016,6 +1023,20 @@ androidComponents {
             extension.defaultConfig.versionName =
                 requireNotNull(subshellReleaseVersionNameOverride)
         }
+    }
+    // TRANSLATE10_RELEASE_SHIPS_ONLY_FINISHED_LANGUAGES_V1 (owner 2026-11-15): the
+    // Norwegian translation (#299) is not finished, and Android would show it
+    // to every phone set to Norwegian, so the release (and the benchmark build,
+    // which measures the release) keeps English resources only: aapt2's config
+    // filter, the mechanism AGP's own locale filter uses (AGP has no locale
+    // filter per build type). Debug and lane builds and unit tests keep every
+    // language. src/release and src/benchmark give Android's per-app language
+    // list English only. To ship a language, add it here and to those files.
+    onVariants(selector().withBuildType("release")) { variant ->
+        variant.androidResources.aaptAdditionalParameters.addAll(SUBSHELL_RELEASE_LOCALE_FILTER)
+    }
+    onVariants(selector().withBuildType("benchmark")) { variant ->
+        variant.androidResources.aaptAdditionalParameters.addAll(SUBSHELL_RELEASE_LOCALE_FILTER)
     }
 }
 

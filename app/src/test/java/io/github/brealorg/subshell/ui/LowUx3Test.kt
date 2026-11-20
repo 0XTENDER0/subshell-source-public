@@ -33,6 +33,8 @@ import org.junit.Test
  * LOWUX3_SETTINGS_SEARCH_SKIPS_ROWS_THE_STATE_HIDES_V1 (OCB-267/278),
  * LOWUX3_POST_FLAIR_CAN_BE_REMOVED_V1 (OCB-233).
  */
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class LowUx3Test {
     private fun epoch(year: Int, month: Int, day: Int, hour: Int = 14, minute: Int = 5): Long =
         LocalDateTime.of(year, month, day, hour, minute).atZone(ZoneId.systemDefault()).toEpochSecond()
@@ -46,15 +48,15 @@ class LowUx3Test {
             state = AccountSessionState.CONNECTED,
             providerLabel = "Reddit",
         )
-        assertEquals("u/alice", restorePreviewAccountLabel("reddit:native_production:1x2y3z", listOf(alice)))
-        assertEquals("u/alice", restorePreviewAccountLabel("Alice", listOf(alice)))
-        assertEquals("another account", restorePreviewAccountLabel("reddit:native_production:gone", listOf(alice)))
+        assertEquals("u/alice", restorePreviewAccountLabel("reddit:native_production:1x2y3z", listOf(alice), "another account"))
+        assertEquals("u/alice", restorePreviewAccountLabel("Alice", listOf(alice), "another account"))
+        assertEquals("another account", restorePreviewAccountLabel("reddit:native_production:gone", listOf(alice), "another account"))
     }
 
     @Test
     fun thePreviewBadgeNamesPureBlack() {
-        assertEquals("Pure black", appearanceThemeLabel(ThemeMode.DARK, pureBlack = true))
-        assertEquals("Dark", appearanceThemeLabel(ThemeMode.DARK))
+        assertEquals("Pure black", appearanceThemeLabel(ThemeMode.DARK, pureBlack = true).s)
+        assertEquals("Dark", appearanceThemeLabel(ThemeMode.DARK).s)
     }
 
     @Test
@@ -63,8 +65,8 @@ class LowUx3Test {
         val lastYear = MessageBubble(id = "m1", sender = "a", age = "", body = "", createdEpochSeconds = epoch(2025, 3, 5))
         val thisYear = MessageBubble(id = "m2", sender = "a", age = "", body = "", createdEpochSeconds = epoch(2026, 3, 5))
 
-        assertTrue(conversationDayLabel(lastYear, now).contains("2025"))
-        assertFalse(conversationDayLabel(thisYear, now).contains("2026"))
+        assertTrue(conversationDayLabel(lastYear, "Today", "Yesterday", now).contains("2025"))
+        assertFalse(conversationDayLabel(thisYear, "Today", "Yesterday", now).contains("2026"))
         assertEquals("14:05", conversationTimeLabel(thisYear, use24Hour = true))
         assertTrue(conversationTimeLabel(thisYear, use24Hour = false).startsWith("2:05"))
     }

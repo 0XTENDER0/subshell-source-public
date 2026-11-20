@@ -5,6 +5,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class Next01A4BBlockedWorkspacePolicyTest {
     @Test
     fun blockedWorkspaceRequiresExpandedSplitSupportedOriginAndTabSix() {
@@ -86,7 +88,7 @@ class Next01A4BBlockedWorkspacePolicyTest {
     fun blockedWorkspacePlaceholderIsStable() {
         assertEquals(
             "Select an account",
-            YOU_BLOCKED_WORKSPACE_PLACEHOLDER,
+            YOU_BLOCKED_WORKSPACE_PLACEHOLDER.s,
         )
     }
 }

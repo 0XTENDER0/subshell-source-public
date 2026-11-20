@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import io.github.brealorg.subshell.model.Community
 import io.github.brealorg.subshell.model.CommunityDiscoveryItem
@@ -26,7 +27,7 @@ class Subs05A1ContextualDiscoveryRowsPolicyTest {
     private fun source(path: String): String {
         val file = File(repositoryRoot, path)
         assertTrue("Expected source file: ${file.path}", file.isFile)
-        return file.readText()
+        return file.readSourceText()
     }
 
     @Test

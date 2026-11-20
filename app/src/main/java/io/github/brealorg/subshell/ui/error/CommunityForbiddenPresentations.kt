@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.error
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
 import io.github.brealorg.subshell.data.error.FailureDetails
 
 // ISSUE211_FORBIDDEN_COMMUNITY_SAYS_WHY_V1 (#211): a community feed that
@@ -33,25 +35,24 @@ internal fun communityForbiddenPresentation(
 ): ErrorPresentation = ErrorPresentation(
     kind = if (showingCachedContent) ErrorPresentationKind.DEGRADED else ErrorPresentationKind.BLOCKING,
     title = when (reason) {
-        CommunityForbiddenReason.PRIVATE -> "$communityLabel is private"
-        CommunityForbiddenReason.QUARANTINED -> "$communityLabel is quarantined"
-        CommunityForbiddenReason.PREMIUM_ONLY -> "$communityLabel is for Reddit Premium members"
-        CommunityForbiddenReason.BANNED -> "$communityLabel is banned"
+        CommunityForbiddenReason.PRIVATE -> UiText.Resource(R.string.error_forbidden_is_private, communityLabel)
+        CommunityForbiddenReason.QUARANTINED -> UiText.Resource(R.string.error_forbidden_is_quarantined, communityLabel)
+        CommunityForbiddenReason.PREMIUM_ONLY -> UiText.Resource(R.string.error_forbidden_is_for_reddit_premium_members, communityLabel)
+        CommunityForbiddenReason.BANNED -> UiText.Resource(R.string.error_forbidden_is_banned, communityLabel)
     },
     message = when (reason) {
         CommunityForbiddenReason.PRIVATE ->
-            "Only members the moderators have approved can see its posts."
+            UiText.Resource(R.string.error_forbidden_only_members_the_moderators_have_approved_can)
         CommunityForbiddenReason.QUARANTINED ->
-            "Reddit has quarantined this community for content many find offensive or upsetting. " +
-                "Its posts show only after you choose to view it."
+            UiText.Resource(R.string.error_forbidden_reddit_has_quarantined_this_community_for_content)
         CommunityForbiddenReason.PREMIUM_ONLY ->
-            "Only Reddit Premium members can see its posts."
+            UiText.Resource(R.string.error_forbidden_only_reddit_premium_members_can_see_its)
         CommunityForbiddenReason.BANNED ->
-            "Reddit has banned this community, so its posts can't be shown."
+            UiText.Resource(R.string.error_forbidden_reddit_has_banned_this_community_so_its)
     },
     primaryAction = if (reason == CommunityForbiddenReason.QUARANTINED) {
         // The tray's and the notice's one action button; it runs the opt-in.
-        ErrorAction(ErrorActionKind.RETRY, "View anyway")
+        ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.error_forbidden_view_anyway))
     } else {
         null
     },
@@ -71,18 +72,17 @@ internal fun quarantineOptInPresentation(
     -> null
     io.github.brealorg.subshell.data.account.QuarantineOptInResult.MissingPermission -> ErrorPresentation(
         kind = ErrorPresentationKind.DEGRADED,
-        title = "Couldn't open $communityLabel",
-        message = "Reddit asks for permission to manage your communities before showing a " +
-            "quarantined one, and this account's sign-in doesn't include it.",
+        title = UiText.Resource(R.string.error_forbidden_couldn_t_open, communityLabel),
+        message = UiText.Resource(R.string.error_forbidden_reddit_asks_for_permission_to_manage_your),
     )
     is io.github.brealorg.subshell.data.account.QuarantineOptInResult.Refused -> ErrorPresentation(
         kind = ErrorPresentationKind.DEGRADED,
-        title = "Couldn't open $communityLabel",
+        title = UiText.Resource(R.string.error_forbidden_couldn_t_open, communityLabel),
         // Reddit's source refuses an account without a verified email with 403.
         message = if (result.httpStatusCode == 403) {
-            "Reddit shows quarantined communities only to accounts with a verified email address."
+            UiText.Resource(R.string.error_forbidden_reddit_shows_quarantined_communities_only_to_accounts)
         } else {
-            "Reddit didn't accept the request to view this quarantined community."
+            UiText.Resource(R.string.error_forbidden_reddit_didn_t_accept_the_request_to)
         },
     )
 }

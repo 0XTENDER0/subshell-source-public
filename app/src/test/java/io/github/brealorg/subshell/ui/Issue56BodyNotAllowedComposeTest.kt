@@ -66,7 +66,7 @@ class Issue56BodyNotAllowedComposeTest {
         composeRule.waitForIdle()
 
         assertEquals(1, count("Shared text"))
-        assertEquals(1, count(COMPOSER_BODY_NOT_ALLOWED_MESSAGE))
+        assertEquals(1, count(COMPOSER_BODY_NOT_ALLOWED_MESSAGE.s))
 
         composeRule.onNodeWithText("Remove body text").performClick()
         composeRule.waitForIdle()

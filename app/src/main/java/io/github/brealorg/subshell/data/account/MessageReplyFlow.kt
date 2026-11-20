@@ -15,6 +15,8 @@ enum class MessageReplyPhase {
 enum class MessageReplyFailureKind {
     VALIDATION,
     CHAT_SESSION_REQUIRED,
+    // ISSUE303B: Reddit's web sign-in has expired; only signing in again helps.
+    CHAT_WEB_SIGN_IN_EXPIRED,
     CHAT_ROOM_UNAVAILABLE,
     MEDIA_CAPTION_UNSUPPORTED,
     MEDIA_UNSUPPORTED,
@@ -174,6 +176,8 @@ internal fun messageReplyFailureMessage(kind: MessageReplyFailureKind): String =
     MessageReplyFailureKind.VALIDATION -> "Enter a message or choose an image/GIF before sending."
     MessageReplyFailureKind.CHAT_SESSION_REQUIRED ->
         "subshell couldn't open Reddit's chat session for images; text messages still work."
+    MessageReplyFailureKind.CHAT_WEB_SIGN_IN_EXPIRED ->
+        "Reddit's sign-in for chat images has expired. Sign in again; text messages still work."
     MessageReplyFailureKind.CHAT_ROOM_UNAVAILABLE ->
         "subshell could not match this Direct Chat to its Reddit Chat room."
     MessageReplyFailureKind.MEDIA_CAPTION_UNSUPPORTED ->

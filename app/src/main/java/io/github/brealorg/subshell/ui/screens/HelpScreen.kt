@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -107,9 +109,9 @@ fun HelpScreen(
     val routeTopBarScroll = rememberRouteTopBarScrollBehavior()
     Column(modifier.fillMaxSize().nestedScroll(routeTopBarScroll.nestedScrollConnection)) {
         RouteTopBar(
-            title = { Text("Help & about") },
+            title = { Text(stringResource(R.string.scr_help_about)) },
             navigationIcon = {
-                IconButton(onClick = onBack) { Icon(Symbols.ArrowBack, contentDescription = "Back") }
+                IconButton(onClick = onBack) { Icon(Symbols.ArrowBack, contentDescription = stringResource(R.string.scr_back)) }
             },
             scrollBehavior = routeTopBarScroll,
         )
@@ -148,9 +150,7 @@ fun HelpScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Text(
-                            "Independent Reddit client for Android. Use Settings to configure " +
-                                "appearance, navigation, media, Reddit connection, notifications " +
-                                "and backups.",
+                            stringResource(R.string.all2_independent_reddit_client_for_android_use_settings),
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     }
@@ -161,11 +161,11 @@ fun HelpScreen(
                 item("reddit-api-2027") {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
-                            "Reddit's API change",
+                            stringResource(R.string.all_reddit_s_api_change),
                             style = MaterialTheme.typography.titleSmall,
                         )
                         Text(
-                            REDDIT_API_2027_NOTE,
+                            stringResource(R.string.help_reddit_api_2027_note),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -175,7 +175,7 @@ fun HelpScreen(
                 // ISSUE39_LICENCES_AND_SOURCE_IN_THE_APP_V1 (#39)
                 item("licence") {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Licence", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.scr_licence), style = MaterialTheme.typography.titleSmall)
                         Text(
                             SUBSHELL_LICENCE_NOTICE,
                             style = MaterialTheme.typography.bodyMedium,
@@ -190,8 +190,8 @@ fun HelpScreen(
                                         // Nothing can open a web page; the licence screen still works.
                                     }
                                 },
-                            ) { Text("Source code") }
-                            TextButton(onClick = { licencesVisible = true }) { Text("Open-source licences") }
+                            ) { Text(stringResource(R.string.scr_source_code)) }
+                            TextButton(onClick = { licencesVisible = true }) { Text(stringResource(R.string.scr_open_source_licences)) }
                         }
                     }
                 }
@@ -215,7 +215,7 @@ fun HelpScreen(
 
                 item("changelog-heading") {
                     Text(
-                        "Changelog",
+                        stringResource(R.string.all_changelog),
                         style = MaterialTheme.typography.titleLarge,
                     )
                 }
@@ -223,7 +223,7 @@ fun HelpScreen(
                 if (changelog.releases.isEmpty()) {
                     item("changelog-empty") {
                         Text(
-                            "No bundled changelog is available in this build.",
+                            stringResource(R.string.all_no_bundled_changelog_is_available_in_this),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -343,25 +343,21 @@ private fun Modifier.easterEggOverscrollHold(
     }
 }
 
-internal const val REDDIT_API_2027_NOTE =
-    "Reddit plans to end API access for unregistered apps on 12 January 2027. " +
-        "subshell may stop loading new content then; what is stored stays readable."
 
 @Composable
 private fun UpdateCheckFailingNotice(onOpenReleases: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
-            "Update check isn't working",
+            stringResource(R.string.all_update_check_isn_t_working),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.error,
         )
         Text(
-            "subshell hasn't been able to read its update information for a few days. " +
-                "New releases are published on GitHub.",
+            stringResource(R.string.scr_subshell_hasn_t_been_able_to),
             style = MaterialTheme.typography.bodyMedium,
         )
         TextButton(onClick = onOpenReleases) {
-            Text("Open GitHub releases")
+            Text(stringResource(R.string.scr_open_github_releases))
         }
     }
 }

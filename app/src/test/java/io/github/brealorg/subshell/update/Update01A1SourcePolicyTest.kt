@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.update
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertFalse
@@ -57,7 +58,7 @@ class Update01A1SourcePolicyTest {
             "app/src/main/java/${SUBSHELL_PACKAGE_DIR}/update",
         ).walkTopDown()
             .filter(File::isFile)
-            .joinToString("\n") { it.readText() }
+            .joinToString("\n") { it.readSourceText() }
         val gradle = source("app/build.gradle.kts")
 
         assertFalse(updateDirectory.contains("AppUpdateManager"))
@@ -77,5 +78,5 @@ class Update01A1SourcePolicyTest {
     private fun source(relative: String): String =
         File(root, relative).also { file ->
             check(file.exists()) { "Missing fixture: ${file.path}" }
-        }.readText()
+        }.readSourceText()
 }

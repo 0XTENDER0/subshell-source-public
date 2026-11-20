@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -31,11 +34,10 @@ internal const val REDDIT_PREFERENCES_URL = "https://www.reddit.com/settings/pre
 
 internal fun nsfwAccountPreferencePresentation(): ErrorPresentation = ErrorPresentation(
     kind = ErrorPresentationKind.DEGRADED,
-    title = "Your Reddit account hides NSFW content",
-    message = "Reddit leaves NSFW posts and communities out for this account until " +
-        "\"Show mature content\" is on in your Reddit settings.",
-    primaryAction = ErrorAction(ErrorActionKind.RETRY, "Open Reddit settings"),
-    secondaryAction = ErrorAction(ErrorActionKind.DISMISS, "Dismiss"),
+    title = UiText.Resource(R.string.notice_nsfwaccountp_your_reddit_account_hides_nsfw_content),
+    message = UiText.Resource(R.string.notice_nsfwaccountp_reddit_leaves_nsfw_posts_and_communities_out),
+    primaryAction = ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.notice_nsfwaccountp_open_reddit_settings)),
+    secondaryAction = ErrorAction(ErrorActionKind.DISMISS, UiText.Resource(R.string.notice_nsfwaccountp_dismiss)),
 )
 
 /** True when the account's answer means the notice should show. */
@@ -58,12 +60,10 @@ internal fun nsfwSearchPreferenceNeedsNotice(result: NsfwPreferencesResult): Boo
 
 internal fun nsfwSearchPreferencePresentation(): ErrorPresentation = ErrorPresentation(
     kind = ErrorPresentationKind.DEGRADED,
-    title = "Your Reddit account leaves NSFW out of search",
-    message = "NSFW communities won't show in search, and Random NSFW community finds none, until " +
-        "\"Include mature content in search results\" is on. Reddit's newer settings page may show " +
-        "it on when it isn't; old.reddit.com/prefs shows the real value.",
-    primaryAction = ErrorAction(ErrorActionKind.RETRY, "Open Reddit preferences"),
-    secondaryAction = ErrorAction(ErrorActionKind.DISMISS, "Dismiss"),
+    title = UiText.Resource(R.string.notice_nsfwaccountp_your_reddit_account_leaves_nsfw_out_of),
+    message = UiText.Resource(R.string.notice_nsfwaccountp_nsfw_communities_won_t_show_in_search),
+    primaryAction = ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.notice_nsfwaccountp_open_reddit_preferences)),
+    secondaryAction = ErrorAction(ErrorActionKind.DISMISS, UiText.Resource(R.string.notice_nsfwaccountp_dismiss)),
 )
 
 @Composable
@@ -95,7 +95,7 @@ internal fun NsfwAccountPreferenceNotice(
                 scopeKey = NSFW_ACCOUNT_PREFERENCE_SCOPE,
                 presentation = nsfwAccountPreferencePresentation(),
                 failureDetails = null,
-                onRetry = { openInBrowser(context, REDDIT_PREFERENCES_URL) },
+                onRetry = { io.github.brealorg.subshell.ui.components.openRedditPageInBrowser(context, REDDIT_PREFERENCES_URL) },
                 tone = TrayTone.INFO, // ISSUE222: information, not an error
             )
         } else if (nsfwSearchPreferenceNeedsNotice(result)) {
@@ -103,30 +103,9 @@ internal fun NsfwAccountPreferenceNotice(
                 scopeKey = NSFW_ACCOUNT_PREFERENCE_SCOPE,
                 presentation = nsfwSearchPreferencePresentation(),
                 failureDetails = null,
-                onRetry = { openInBrowser(context, REDDIT_OLD_PREFERENCES_URL) },
+                onRetry = { io.github.brealorg.subshell.ui.components.openRedditPageInBrowser(context, REDDIT_OLD_PREFERENCES_URL) },
                 tone = TrayTone.INFO,
             )
         }
     }
-}
-
-/**
- * Reddit's own site in the browser: Subshell handles reddit.com links itself,
- * so the default browser is named explicitly (as for polls).
- */
-private fun openInBrowser(context: Context, url: String) {
-    val uri = Uri.parse(url)
-    val browser = context.packageManager
-        .resolveActivity(
-            Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com")).addCategory(Intent.CATEGORY_BROWSABLE),
-            android.content.pm.PackageManager.MATCH_DEFAULT_ONLY,
-        )
-        ?.activityInfo
-        ?.packageName
-        ?.takeUnless { packageName -> packageName == "android" }
-    val intent = Intent(Intent.ACTION_VIEW, uri)
-        .addCategory(Intent.CATEGORY_BROWSABLE)
-        .apply { if (browser != null) setPackage(browser) }
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    runCatching { context.startActivity(intent) }
 }

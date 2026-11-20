@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,11 +54,11 @@ fun MutedCommunitiesSheet(
                 .padding(horizontal = 16.dp),
         ) {
             Text(
-                text = "Muted communities",
+                text = stringResource(R.string.comp_muted_communities),
                 style = MaterialTheme.typography.headlineSmall,
             )
             Text(
-                text = "Posts stay hidden from Home, Popular and All. Direct visits still work.",
+                text = stringResource(R.string.comp_posts_stay_hidden_from_home_popular_and),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 6.dp, bottom = 10.dp),
@@ -77,7 +79,7 @@ fun MutedCommunitiesSheet(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
-                        text = "No muted communities",
+                        text = stringResource(R.string.comp_no_muted_communities),
                         modifier = Modifier.padding(start = 10.dp),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -134,7 +136,7 @@ fun MutedCommunitiesSheet(
                                             modifier = Modifier.size(17.dp),
                                         )
                                         Text(
-                                            text = "Change",
+                                            text = stringResource(R.string.comp_change),
                                             modifier = Modifier.padding(start = 4.dp),
                                         )
                                     }
@@ -144,7 +146,7 @@ fun MutedCommunitiesSheet(
                                         Icon(
                                             imageVector = Symbols.VolumeUp,
                                             contentDescription =
-                                                "Unmute ${communityLabel(mute.communityName)}",
+                                                stringResource(R.string.comm_unmute_name, communityLabel(mute.communityName)),
                                         )
                                     }
                                 }
@@ -161,7 +163,7 @@ fun MutedCommunitiesSheet(
                 horizontalArrangement = Arrangement.End,
             ) {
                 TextButton(onClick = onDismiss) {
-                    Text("Close")
+                    Text(stringResource(R.string.comp_close))
                 }
             }
         }

@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import androidx.compose.ui.res.stringResource
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.ui.semantics.Role
@@ -22,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
@@ -72,6 +76,11 @@ import io.github.brealorg.subshell.data.account.RedditModmailListMode
 import io.github.brealorg.subshell.data.account.RedditModmailMessage
 import io.github.brealorg.subshell.data.account.RedditModmailParticipantMuteStatus
 import io.github.brealorg.subshell.data.account.RedditModmailTriageAction
+import io.github.brealorg.subshell.data.account.RedditModmailDraft
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.rememberUpdatedState
+import io.github.brealorg.subshell.data.account.RedditModmailFailedAction
 import io.github.brealorg.subshell.data.account.RedditModmailUiFailureKind
 import io.github.brealorg.subshell.ui.symbols.Symbols
 import java.time.Duration
@@ -162,7 +171,7 @@ fun InboxModmailConversationRow(
                         modifier = Modifier.weight(1f),
                     )
                     if (conversation.unread) {
-                        Badge { Text("New") }
+                        Badge { Text(stringResource(R.string.comp_new)) }
                     }
                 }
             },
@@ -241,7 +250,7 @@ fun InboxModmailThreadHeader(
                 IconButton(onClick = onBack) {
                     Icon(
                         Symbols.ArrowBack,
-                        contentDescription = "Back to Modmail conversations",
+                        contentDescription = stringResource(R.string.comp_back_to_modmail_conversations),
                     )
                 }
             }
@@ -286,12 +295,12 @@ fun InboxModmailThreadHeader(
                 }
                 readStateOutcomeUnknown -> {
                     TextButton(onClick = onVerifyReadState) {
-                        Text("Refresh to verify")
+                        Text(stringResource(R.string.comp_refresh_to_verify))
                     }
                 }
                 archiveOutcomeUnknown -> {
                     TextButton(onClick = onVerifyArchived) {
-                        Text("Refresh to verify")
+                        Text(stringResource(R.string.comp_refresh_to_verify))
                     }
                 }
                 else -> {
@@ -301,7 +310,7 @@ fun InboxModmailThreadHeader(
                                 onSetArchived(!conversation.archived)
                             },
                         ) {
-                            Text(if (conversation.archived) "Unarchive" else "Archive")
+                            Text(if (conversation.archived) stringResource(R.string.all_unarchive) else stringResource(R.string.all_archive))
                         }
                     }
                     Box {
@@ -310,7 +319,7 @@ fun InboxModmailThreadHeader(
                         ) {
                             Icon(
                                 Symbols.MoreVert,
-                                contentDescription = "Modmail triage actions",
+                                contentDescription = stringResource(R.string.comp_modmail_triage_actions),
                             )
                         }
                         DropdownMenu(
@@ -319,7 +328,7 @@ fun InboxModmailThreadHeader(
                         ) {
                             DropdownMenuItem(
                                 text = {
-                                    Text(if (conversation.unread) "Mark read" else "Mark unread")
+                                    Text(if (conversation.unread) stringResource(R.string.all_mark_read) else stringResource(R.string.all_mark_unread))
                                 },
                                 onClick = {
                                     triageMenuExpanded = false
@@ -330,9 +339,9 @@ fun InboxModmailThreadHeader(
                                 text = {
                                     Text(
                                         if (conversation.highlighted) {
-                                            "Remove highlight"
+                                            stringResource(R.string.all_remove_highlight)
                                         } else {
-                                            "Highlight"
+                                            stringResource(R.string.all_highlight)
                                         },
                                     )
                                 },
@@ -353,7 +362,7 @@ fun InboxModmailThreadHeader(
                             ) {
                                 if (participantMuteStatus?.muted == true) {
                                     DropdownMenuItem(
-                                        text = { Text("Unmute user") },
+                                        text = { Text(stringResource(R.string.comp_unmute_user)) },
                                         onClick = {
                                             triageMenuExpanded = false
                                             onTriageAction(RedditModmailTriageAction.UNMUTE)
@@ -361,21 +370,21 @@ fun InboxModmailThreadHeader(
                                     )
                                 } else {
                                     DropdownMenuItem(
-                                        text = { Text("Mute user · 3 days") },
+                                        text = { Text(stringResource(R.string.comp_mute_user_3_days)) },
                                         onClick = {
                                             triageMenuExpanded = false
                                             onTriageAction(RedditModmailTriageAction.MUTE_3_DAYS)
                                         },
                                     )
                                     DropdownMenuItem(
-                                        text = { Text("Mute user · 7 days") },
+                                        text = { Text(stringResource(R.string.comp_mute_user_7_days)) },
                                         onClick = {
                                             triageMenuExpanded = false
                                             onTriageAction(RedditModmailTriageAction.MUTE_7_DAYS)
                                         },
                                     )
                                     DropdownMenuItem(
-                                        text = { Text("Mute user · 28 days") },
+                                        text = { Text(stringResource(R.string.comp_mute_user_28_days)) },
                                         onClick = {
                                             triageMenuExpanded = false
                                             onTriageAction(RedditModmailTriageAction.MUTE_28_DAYS)
@@ -438,7 +447,7 @@ fun InboxModmailQueueFilters(
                 verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 Text(
-                    text = "Queue",
+                    text = stringResource(R.string.comp_queue),
                     style = MaterialTheme.typography.labelMedium,
                     color = LocalContentColor.current.copy(alpha = if (enabled) 0.78f else 1f),
                 )
@@ -450,7 +459,7 @@ fun InboxModmailQueueFilters(
             }
             Icon(
                 imageVector = Symbols.ArrowDropDown,
-                contentDescription = "Choose Modmail queue",
+                contentDescription = stringResource(R.string.comp_choose_modmail_queue),
             )
         }
     }
@@ -474,13 +483,13 @@ fun InboxModmailQueueFilters(
                         .padding(horizontal = 24.dp),
                 ) {
                     Text(
-                        text = "Modmail queue",
+                        text = stringResource(R.string.comp_modmail_queue),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.SemiBold,
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "Choose which Reddit queue to view",
+                        text = stringResource(R.string.comp_choose_which_reddit_queue_to_view),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -585,7 +594,7 @@ fun InboxModmailQueueFilters(
                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                             ) {
                                 Text(
-                                    text = "More queues below",
+                                    text = stringResource(R.string.comp_more_queues_below),
                                     style = MaterialTheme.typography.labelLarge,
                                 )
                                 Icon(
@@ -603,43 +612,46 @@ fun InboxModmailQueueFilters(
 }
 
 
+@androidx.compose.runtime.Composable
 internal fun RedditModmailListMode.modmailQueueLabel(): String = when (this) {
-    RedditModmailListMode.ACTIVE -> "Active"
-    RedditModmailListMode.NEW -> "New"
-    RedditModmailListMode.IN_PROGRESS -> "In progress"
-    RedditModmailListMode.FILTERED -> "Filtered"
-    RedditModmailListMode.HIGHLIGHTED -> "Highlighted"
-    RedditModmailListMode.ARCHIVED -> "Archived"
-    RedditModmailListMode.APPEALS -> "Appeals"
-    RedditModmailListMode.JOIN_REQUESTS -> "Join requests"
-    RedditModmailListMode.MOD_DISCUSSIONS -> "Mod discussions"
-    RedditModmailListMode.NOTIFICATIONS -> "Notifications"
+    RedditModmailListMode.ACTIVE -> stringResource(R.string.comp_modmail_mode_1)
+    RedditModmailListMode.NEW -> stringResource(R.string.comp_modmail_mode_2)
+    RedditModmailListMode.IN_PROGRESS -> stringResource(R.string.comp_modmail_mode_3)
+    RedditModmailListMode.FILTERED -> stringResource(R.string.comp_modmail_mode_4)
+    RedditModmailListMode.HIGHLIGHTED -> stringResource(R.string.comp_modmail_mode_5)
+    RedditModmailListMode.ARCHIVED -> stringResource(R.string.comp_modmail_mode_6)
+    RedditModmailListMode.APPEALS -> stringResource(R.string.comp_modmail_mode_7)
+    RedditModmailListMode.JOIN_REQUESTS -> stringResource(R.string.comp_modmail_mode_8)
+    RedditModmailListMode.MOD_DISCUSSIONS -> stringResource(R.string.comp_modmail_mode_9)
+    RedditModmailListMode.NOTIFICATIONS -> stringResource(R.string.comp_modmail_mode_10)
 }
 
+@androidx.compose.runtime.Composable
 internal fun RedditModmailListMode.modmailEmptyTitle(): String = when (this) {
-    RedditModmailListMode.ACTIVE -> "Modmail is clear"
-    RedditModmailListMode.NEW -> "No new Modmail"
-    RedditModmailListMode.IN_PROGRESS -> "No Modmail in progress"
-    RedditModmailListMode.FILTERED -> "No filtered Modmail"
-    RedditModmailListMode.HIGHLIGHTED -> "No highlighted Modmail"
-    RedditModmailListMode.ARCHIVED -> "No archived Modmail"
-    RedditModmailListMode.APPEALS -> "No Modmail appeals"
-    RedditModmailListMode.JOIN_REQUESTS -> "No join requests"
-    RedditModmailListMode.MOD_DISCUSSIONS -> "No mod discussions"
-    RedditModmailListMode.NOTIFICATIONS -> "No Modmail notifications"
+    RedditModmailListMode.ACTIVE -> stringResource(R.string.comp_modmail_empty_title_1)
+    RedditModmailListMode.NEW -> stringResource(R.string.comp_modmail_empty_title_2)
+    RedditModmailListMode.IN_PROGRESS -> stringResource(R.string.comp_modmail_empty_title_3)
+    RedditModmailListMode.FILTERED -> stringResource(R.string.comp_modmail_empty_title_4)
+    RedditModmailListMode.HIGHLIGHTED -> stringResource(R.string.comp_modmail_empty_title_5)
+    RedditModmailListMode.ARCHIVED -> stringResource(R.string.comp_modmail_empty_title_6)
+    RedditModmailListMode.APPEALS -> stringResource(R.string.comp_modmail_empty_title_7)
+    RedditModmailListMode.JOIN_REQUESTS -> stringResource(R.string.comp_modmail_empty_title_8)
+    RedditModmailListMode.MOD_DISCUSSIONS -> stringResource(R.string.comp_modmail_empty_title_9)
+    RedditModmailListMode.NOTIFICATIONS -> stringResource(R.string.comp_modmail_empty_title_10)
 }
 
+@androidx.compose.runtime.Composable
 internal fun RedditModmailListMode.modmailEmptySupportingText(): String = when (this) {
-    RedditModmailListMode.ACTIVE -> "No active Modmail conversations are available."
-    RedditModmailListMode.NEW -> "New conversations will appear here."
-    RedditModmailListMode.IN_PROGRESS -> "Conversations being handled will appear here."
-    RedditModmailListMode.FILTERED -> "Reddit-filtered conversations will appear here."
-    RedditModmailListMode.HIGHLIGHTED -> "Highlighted conversations will appear here."
-    RedditModmailListMode.ARCHIVED -> "Archived conversations will appear here."
-    RedditModmailListMode.APPEALS -> "Appeal conversations will appear here."
-    RedditModmailListMode.JOIN_REQUESTS -> "Join-request conversations will appear here."
-    RedditModmailListMode.MOD_DISCUSSIONS -> "Internal moderator discussions will appear here."
-    RedditModmailListMode.NOTIFICATIONS -> "Moderator notifications will appear here."
+    RedditModmailListMode.ACTIVE -> stringResource(R.string.comp_modmail_empty_text_1)
+    RedditModmailListMode.NEW -> stringResource(R.string.comp_modmail_empty_text_2)
+    RedditModmailListMode.IN_PROGRESS -> stringResource(R.string.comp_modmail_empty_text_3)
+    RedditModmailListMode.FILTERED -> stringResource(R.string.comp_modmail_empty_text_4)
+    RedditModmailListMode.HIGHLIGHTED -> stringResource(R.string.comp_modmail_empty_text_5)
+    RedditModmailListMode.ARCHIVED -> stringResource(R.string.comp_modmail_empty_text_6)
+    RedditModmailListMode.APPEALS -> stringResource(R.string.comp_modmail_empty_text_7)
+    RedditModmailListMode.JOIN_REQUESTS -> stringResource(R.string.comp_modmail_empty_text_8)
+    RedditModmailListMode.MOD_DISCUSSIONS -> stringResource(R.string.comp_modmail_empty_text_9)
+    RedditModmailListMode.NOTIFICATIONS -> stringResource(R.string.comp_modmail_empty_text_10)
 }
 
 @Composable
@@ -653,7 +665,7 @@ fun InboxModmailMessageRow(
     val authorLabel = modmailMessageAuthorLabel(message, communityName)
     // ISSUE34_USER_TAGS_V1: only next to a person, never the community label.
     val shownAuthorTag = authorTag?.takeIf { authorLabel.startsWith("u/") }
-    val semanticRole = modmailMessageSemanticRole(message)
+    val semanticRole = modmailMessageSemanticRole(message)?.asString()
     val roleBorder = when {
         message.isInternal -> BorderStroke(
             width = 1.dp,
@@ -747,20 +759,20 @@ internal fun modmailMessageAuthorLabel(
     }
 }
 
-internal fun modmailMessageSemanticRole(message: RedditModmailMessage): String? {
+internal fun modmailMessageSemanticRole(message: RedditModmailMessage): UiText? {
     val role = message.participatingAs.orEmpty().lowercase()
     return when {
-        message.isInternal -> "Internal note · moderators only"
+        message.isInternal -> UiText.Resource(R.string.comp_modmail_role_1)
         message.authorHidden -> {
             val moderator = message.authorName.removePrefix("u/")
             if (moderator.isBlank() || moderator == "[deleted]") {
-                "Hidden moderator reply"
+                UiText.Resource(R.string.comp_modmail_role_3)
             } else {
-                "Sent by u/$moderator · hidden from participant"
+                UiText.Resource(R.string.comp_modmail_role_4, moderator)
             }
         }
         role.contains("subreddit") || role.contains("moderator") || role == "mod" ->
-            "Moderator reply"
+            UiText.Resource(R.string.comp_modmail_role_8)
         role.contains("participant") || role.contains("user") -> null
         role.isBlank() -> null
         else -> null
@@ -775,28 +787,88 @@ fun InboxModmailFailure(
     onRetry: () -> Unit,
 ) {
     val message = when (failureKind) {
-        RedditModmailUiFailureKind.CONFIGURATION -> "Modmail is unavailable for this Reddit configuration."
-        RedditModmailUiFailureKind.ACCOUNT_CHANGED -> "The active Reddit account changed."
-        RedditModmailUiFailureKind.AUTHORIZATION -> "Reddit Modmail permission is required."
-        RedditModmailUiFailureKind.SESSION -> "The Reddit session for this account needs attention."
+        RedditModmailUiFailureKind.CONFIGURATION -> UiText.Resource(R.string.modmail_error_configuration)
+        RedditModmailUiFailureKind.ACCOUNT_CHANGED -> UiText.Resource(R.string.modmail_error_account_changed)
+        RedditModmailUiFailureKind.AUTHORIZATION -> UiText.Resource(R.string.modmail_error_authorization)
+        RedditModmailUiFailureKind.SESSION -> UiText.Resource(R.string.modmail_error_session)
         // ISSUE208_SERVER_FAILURES_ARE_NOT_REJECTIONS_V1
         RedditModmailUiFailureKind.HTTP ->
             if (httpStatusCode != null && !redditReadHttpStatusHasOwnReason(httpStatusCode)) {
-                "Reddit returned HTTP $httpStatusCode while loading Modmail."
+                UiText.Resource(R.string.modmail_error_http_status, httpStatusCode)
             } else {
-                redditReadHttpReason(httpStatusCode, "Reddit rejected the Modmail request.")
+                redditReadHttpReason(httpStatusCode, UiText.Resource(R.string.modmail_error_rejected))
             }
-        RedditModmailUiFailureKind.TRANSPORT -> "Couldn’t reach Reddit Modmail."
-        RedditModmailUiFailureKind.PROTOCOL -> "Reddit returned an unexpected Modmail response."
+        RedditModmailUiFailureKind.TRANSPORT -> UiText.Resource(R.string.modmail_error_transport)
+        RedditModmailUiFailureKind.PROTOCOL -> UiText.Resource(R.string.modmail_error_protocol)
     }
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 16.dp),
     ) {
-        Text(message, style = MaterialTheme.typography.bodyMedium)
+        Text(message.asString(), style = MaterialTheme.typography.bodyMedium)
         if (retryable) {
-            TextButton(onClick = onRetry) { Text("Retry") }
+            TextButton(onClick = onRetry) { Text(stringResource(R.string.comp_retry)) }
+        }
+    }
+}
+
+/**
+ * ISSUE304_A_FAILED_ACTION_SAYS_WHICH_V1 (#304): a reply, archive, triage or
+ * read change that Reddit refused showed nothing in the full-screen thread
+ * (Sending reply… just stopped). The open thread says which action failed and
+ * why; reloading the conversation is offered when that is what failed.
+ */
+@Composable
+fun InboxModmailActionFailure(
+    failedAction: RedditModmailFailedAction,
+    failureKind: RedditModmailUiFailureKind,
+    httpStatusCode: Int?,
+    onReload: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val title = when (failedAction) {
+        RedditModmailFailedAction.THREAD -> UiText.Resource(R.string.modmail_failed_thread)
+        RedditModmailFailedAction.SEND -> UiText.Resource(R.string.modmail_failed_send)
+        RedditModmailFailedAction.ARCHIVE -> UiText.Resource(R.string.modmail_failed_archive)
+        RedditModmailFailedAction.TRIAGE -> UiText.Resource(R.string.modmail_failed_triage)
+        RedditModmailFailedAction.READ_STATE -> UiText.Resource(R.string.modmail_failed_read_state)
+    }
+    val reason = when (failureKind) {
+        RedditModmailUiFailureKind.HTTP ->
+            if (httpStatusCode != null && !redditReadHttpStatusHasOwnReason(httpStatusCode)) {
+                UiText.Resource(R.string.modmail_error_http_status_plain, httpStatusCode)
+            } else {
+                redditReadHttpReason(httpStatusCode, UiText.Resource(R.string.modmail_error_rejected))
+            }
+        RedditModmailUiFailureKind.CONFIGURATION -> UiText.Resource(R.string.modmail_error_configuration)
+        RedditModmailUiFailureKind.ACCOUNT_CHANGED -> UiText.Resource(R.string.modmail_error_account_changed)
+        RedditModmailUiFailureKind.AUTHORIZATION -> UiText.Resource(R.string.modmail_error_authorization)
+        RedditModmailUiFailureKind.SESSION -> UiText.Resource(R.string.modmail_error_session)
+        RedditModmailUiFailureKind.TRANSPORT -> UiText.Resource(R.string.modmail_error_transport)
+        RedditModmailUiFailureKind.PROTOCOL -> UiText.Resource(R.string.modmail_error_protocol)
+    }
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.errorContainer,
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+            Text(
+                text = title.asString(),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onErrorContainer,
+            )
+            Text(
+                text = reason.asString(),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onErrorContainer,
+            )
+            if (failedAction == RedditModmailFailedAction.THREAD) {
+                TextButton(onClick = onReload) { Text(stringResource(R.string.comp_retry)) }
+            }
         }
     }
 }
@@ -814,7 +886,7 @@ private fun ModmailUserAvatar(
         ?: "?"
     RemoteIdentityImage(
         uri = avatarUri,
-        contentDescription = "Avatar for u/${username.removePrefix("u/")}",
+        contentDescription = stringResource(R.string.comp_avatar_for_u, username.removePrefix("u/")),
         modifier = modifier.clip(CircleShape),
     ) {
         Surface(
@@ -856,7 +928,7 @@ private fun ModmailReplyIdentitySelector(
     ) {
         OutlinedTextField(
             value = if (replyAsSubreddit) {
-                "r/$communityName mod team"
+                stringResource(R.string.comp_r_mod_team_2, communityName)
             } else {
                 "u/${moderatorUsername.removePrefix("u/")}"
             },
@@ -864,7 +936,7 @@ private fun ModmailReplyIdentitySelector(
             readOnly = true,
             enabled = enabled,
             singleLine = true,
-            label = { Text("Replying as") },
+            label = { Text(stringResource(R.string.comp_replying_as)) },
             leadingIcon = {
                 if (replyAsSubreddit) {
                     CommunityAvatar(
@@ -902,7 +974,7 @@ private fun ModmailReplyIdentitySelector(
                     Column {
                         Text("u/${moderatorUsername.removePrefix("u/")}")
                         Text(
-                            "Reply as myself",
+                            stringResource(R.string.all_reply_as_myself),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -926,9 +998,9 @@ private fun ModmailReplyIdentitySelector(
                 },
                 text = {
                     Column {
-                        Text("r/$communityName mod team")
+                        Text(stringResource(R.string.comp_r_mod_team, communityName))
                         Text(
-                            "Hide your username from the participant",
+                            stringResource(R.string.all_hide_your_username_from_the_participant),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -969,21 +1041,50 @@ fun InboxModmailComposer(
     onSend: (body: String, internal: Boolean, authorHidden: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     sendBlocked: Boolean = false,
+    // ISSUE304_MODMAIL_DRAFT_SURVIVES_CLOSING_V1: where the draft lives while the
+    // conversation is closed; the field starts from it and reports each change.
+    initialDraft: RedditModmailDraft? = null,
+    onDraftChange: (RedditModmailDraft) -> Unit = {},
 ) {
     // ISSUE77_MODMAIL_DRAFT_SURVIVES_RECREATION_V1: the draft, like the mode
     // and identity below, belongs to its conversation and survives activity
     // recreation; an effect that ran on every entry used to wipe all three.
     val body = rememberSaveable(conversation.id, saver = TextFieldState.Saver) {
-        TextFieldState()
+        TextFieldState(initialText = initialDraft?.text.orEmpty())
     }
     var handledSendRevision by rememberSaveable(conversation.id) {
         mutableLongStateOf(sendRevision)
     }
     var modeName by rememberSaveable(conversation.id) {
-        mutableStateOf(InboxModmailComposeMode.REPLY.name)
+        mutableStateOf(
+            if (initialDraft?.internalNote == true) InboxModmailComposeMode.INTERNAL_NOTE.name else InboxModmailComposeMode.REPLY.name,
+        )
     }
     var replyAsSubreddit by rememberSaveable(conversation.id) {
-        mutableStateOf(true)
+        mutableStateOf(initialDraft?.replyAsSubreddit ?: true)
+    }
+    val latestOnDraftChange by rememberUpdatedState(onDraftChange)
+    LaunchedEffect(conversation.id) {
+        snapshotFlow {
+            RedditModmailDraft(
+                text = body.text.toString(),
+                internalNote = modeName == InboxModmailComposeMode.INTERNAL_NOTE.name,
+                replyAsSubreddit = replyAsSubreddit,
+            )
+        }.collect { draft -> latestOnDraftChange(draft) }
+    }
+    // Closing right after the last keystroke must not lose it: the draft is
+    // also stored as the field leaves.
+    DisposableEffect(conversation.id) {
+        onDispose {
+            latestOnDraftChange(
+                RedditModmailDraft(
+                    text = body.text.toString(),
+                    internalNote = modeName == InboxModmailComposeMode.INTERNAL_NOTE.name,
+                    replyAsSubreddit = replyAsSubreddit,
+                ),
+            )
+        }
     }
     val mode = runCatching { InboxModmailComposeMode.valueOf(modeName) }
         .getOrDefault(InboxModmailComposeMode.REPLY)
@@ -1024,9 +1125,9 @@ fun InboxModmailComposer(
                         label = {
                             Text(
                                 if (candidate == InboxModmailComposeMode.REPLY) {
-                                    "Reply"
+                                    stringResource(R.string.all_reply)
                                 } else {
-                                    "Internal note"
+                                    stringResource(R.string.all_internal_note)
                                 },
                             )
                         },
@@ -1048,7 +1149,7 @@ fun InboxModmailComposer(
                     ),
                 ) {
                     Text(
-                        text = "Visible to moderators only",
+                        text = stringResource(R.string.comp_visible_to_moderators_only),
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.tertiary,
@@ -1070,7 +1171,7 @@ fun InboxModmailComposer(
 
             if (sendOutcomeUnknown) {
                 Text(
-                    text = "Send outcome is unclear. Refresh this thread before sending again.",
+                    text = stringResource(R.string.comp_send_outcome_is_unclear_refresh_this_thread),
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
@@ -1085,9 +1186,9 @@ fun InboxModmailComposer(
                 // by the success clear.
                 inputLocked = sendInProgress,
                 placeholder = if (mode == InboxModmailComposeMode.INTERNAL_NOTE) {
-                    "Internal note"
+                    stringResource(R.string.all_internal_note)
                 } else {
-                    "Reply"
+                    stringResource(R.string.all_reply)
                 },
                 sendEnabled = body.text.isNotBlank() &&
                     !sendInProgress &&
@@ -1108,27 +1209,27 @@ fun InboxModmailComposer(
                 mediaEnabled = false,
                 showMediaActions = false,
                 longReplyTitle = if (mode == InboxModmailComposeMode.INTERNAL_NOTE) {
-                    "Internal note"
+                    stringResource(R.string.all_internal_note)
                 } else {
-                    "Reply in r/${conversation.communityName}"
+                    stringResource(R.string.comp_modmail_reply_in, conversation.communityName)
                 },
                 interactionActionsAtStart = true,
                 maxCharacters = 10_000,
                 sendContentDescription = when {
                     sendInProgress && mode == InboxModmailComposeMode.INTERNAL_NOTE ->
-                        "Adding internal note"
-                    sendInProgress -> "Sending Modmail reply"
-                    mode == InboxModmailComposeMode.INTERNAL_NOTE -> "Add internal note"
-                    else -> "Send Modmail reply"
+                        stringResource(R.string.all_adding_internal_note)
+                    sendInProgress -> stringResource(R.string.all_sending_modmail_reply)
+                    mode == InboxModmailComposeMode.INTERNAL_NOTE -> stringResource(R.string.comp_add_internal_note)
+                    else -> stringResource(R.string.all_send_modmail_reply)
                 },
             )
 
             if (sendInProgress) {
                 Text(
                     text = if (mode == InboxModmailComposeMode.INTERNAL_NOTE) {
-                        "Adding internal note…"
+                        stringResource(R.string.all_adding_internal_note_2)
                     } else {
-                        "Sending reply…"
+                        stringResource(R.string.all_sending_reply)
                     },
                     modifier = Modifier
                         .fillMaxWidth()

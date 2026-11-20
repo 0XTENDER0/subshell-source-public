@@ -6,6 +6,7 @@ internal enum class AuthenticatedMainFeedLandingDecision {
     WAIT,
     HOME,
     POPULAR,
+    ALL,
     ABORT,
 }
 
@@ -23,11 +24,20 @@ internal fun authenticatedMainFeedLandingRouteEligible(
 // Reddit refreshes (the wait for Reddit's answer cost ~0.9 s on every start).
 // Only a missing or empty cache still waits: the cache never decides that an
 // account has zero communities. A sign-in or account switch waits as before.
+// ISSUE302_START_FEED_V1: a reader who chose Popular or All lands there at
+// once; the subscription list only decides between Home and Popular.
 internal fun resolveAuthenticatedLandingFeed(
     accountStableId: String,
     subscriptions: RedditSubscriptionsUiState,
     coldStart: Boolean = false,
+    startFeed: StartFeed = StartFeed.HOME,
 ): AuthenticatedMainFeedLandingDecision = when {
+    startFeed == StartFeed.POPULAR ->
+        AuthenticatedMainFeedLandingDecision.POPULAR
+
+    startFeed == StartFeed.ALL ->
+        AuthenticatedMainFeedLandingDecision.ALL
+
     !subscriptions.matches(accountStableId) ->
         AuthenticatedMainFeedLandingDecision.WAIT
 

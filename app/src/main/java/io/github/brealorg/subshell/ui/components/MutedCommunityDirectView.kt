@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -38,11 +40,11 @@ fun MutedCommunityDirectViewSetting(
 ) {
     // M3225_SHORT_SINGLE_CHOICE_IS_A_SEGMENTED_ROW_V1
     SettingsSegmentedChoice(
-        title = "When opening a muted community",
-        description = "Choose whether direct visits can show posts while the community is muted.",
+        title = stringResource(R.string.comp_when_opening_a_muted_community),
+        description = stringResource(R.string.comp_choose_whether_direct_visits_can_show_posts),
         options = MutedCommunityDirectViewMode.entries,
         selected = mode,
-        label = { it.label },
+        label = { stringResource(it.labelRes) },
         onSelect = onModeChange,
         modifier = modifier,
     )
@@ -55,9 +57,10 @@ fun MutedCommunityDirectViewLivePreview(
 ) {
     // LOWUI7_PREVIEWS_ARE_ONE_DESCRIBED_IMAGE_V1 (OCB-156): the mock screen
     // is read as one description, not as fake content.
+    val previewDescription = stringResource(R.string.comp_preview_of, stringResource(mode.descriptionRes))
     Surface(
         modifier = modifier.clearAndSetSemantics {
-            contentDescription = "Preview: ${mode.description}"
+            contentDescription = previewDescription
         },
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainer,
@@ -155,7 +158,7 @@ fun MutedCommunityDirectViewLivePreview(
                         modifier = Modifier.size(16.dp),
                     )
                     Text(
-                        "Muted",
+                        stringResource(R.string.all_muted),
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.SemiBold,
                         ),
@@ -176,7 +179,7 @@ fun MutedCommunityDirectViewLivePreview(
                         ) {
                             MutedCommunityPreviewPost(
                                 age = "2h",
-                                title = "Community post",
+                                title = stringResource(R.string.comp_community_post),
                             )
                         }
                     }
@@ -199,7 +202,7 @@ fun MutedCommunityDirectViewLivePreview(
                                     Arrangement.spacedBy(2.dp),
                             ) {
                                 Text(
-                                    "Posts hidden while muted",
+                                    stringResource(R.string.all_posts_hidden_while_muted),
                                     style =
                                         MaterialTheme.typography.labelLarge
                                             .copy(
@@ -208,7 +211,7 @@ fun MutedCommunityDirectViewLivePreview(
                                             ),
                                 )
                                 Text(
-                                    "Community information remains available.",
+                                    stringResource(R.string.all_community_information_remains_available),
                                     style =
                                         MaterialTheme.typography.bodySmall,
                                 )
@@ -276,11 +279,11 @@ fun MutedCommunityPostsHiddenCard(
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        text = "Posts hidden while muted",
+                        text = stringResource(R.string.comp_posts_hidden_while_muted),
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        text = "$communityLabel is available for community information and mute controls.",
+                        text = stringResource(R.string.comp_is_available_for_community_information_and_mute, communityLabel),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -290,7 +293,7 @@ fun MutedCommunityPostsHiddenCard(
                 onClick = onManageMute,
                 modifier = Modifier.align(Alignment.End),
             ) {
-                Text("Manage mute")
+                Text(stringResource(R.string.comp_manage_mute))
             }
         }
     }

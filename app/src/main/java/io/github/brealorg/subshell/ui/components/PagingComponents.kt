@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,9 +56,9 @@ internal fun RepositoryPagingFooter(
                     InlineProgressIndicator()
                     Text(
                         when {
-                            appending -> "Loading more…"
-                            refreshing && snapshot.items.isNotEmpty() -> "Refreshing…"
-                            else -> "Loading…"
+                            appending -> stringResource(R.string.all_loading_more)
+                            refreshing && snapshot.items.isNotEmpty() -> stringResource(R.string.all_refreshing)
+                            else -> stringResource(R.string.all_loading)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                     )
@@ -64,12 +66,12 @@ internal fun RepositoryPagingFooter(
 
                 is RepositoryLoadState.Offline -> {
                     Column(Modifier.weight(1f)) {
-                        Text("Offline", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.comp_offline), style = MaterialTheme.typography.titleSmall)
                         Text(
                             if (snapshot.items.isEmpty()) {
-                                "No cached items are available."
+                                stringResource(R.string.all_no_cached_items_are_available)
                             } else {
-                                "Showing stale cached items."
+                                stringResource(R.string.all_showing_stale_cached_items)
                             },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -82,16 +84,16 @@ internal fun RepositoryPagingFooter(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    Button(onClick = onRetry) { Text("Retry") }
+                    Button(onClick = onRetry) { Text(stringResource(R.string.comp_retry)) }
                 }
 
                 is RepositoryLoadState.Error -> {
                     Column(Modifier.weight(1f)) {
                         Text(
                             when {
-                                appending -> "Could not load more"
-                                refreshing && snapshot.items.isNotEmpty() -> "Could not refresh"
-                                else -> "Could not load"
+                                appending -> stringResource(R.string.all_could_not_load_more)
+                                refreshing && snapshot.items.isNotEmpty() -> stringResource(R.string.all_could_not_refresh)
+                                else -> stringResource(R.string.all_could_not_load)
                             },
                             style = MaterialTheme.typography.titleSmall,
                         )
@@ -108,7 +110,7 @@ internal fun RepositoryPagingFooter(
                             )
                         }
                     }
-                    Button(onClick = onRetry) { Text("Retry") }
+                    Button(onClick = onRetry) { Text(stringResource(R.string.comp_retry)) }
                 }
 
                 RepositoryLoadState.Idle -> Unit

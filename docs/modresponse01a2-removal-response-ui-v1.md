@@ -8,9 +8,15 @@ Inbox mod queue) share `RemovalResponseSection` and `RemovalResponseDraft`
 
 1. Remove content (existing).
 2. Select a removal reason or none (existing).
-3. "Send a removal message" — off by default; selecting a reason never sends.
-   When on, the body is pre-filled from the selected reason's message until
-   the moderator edits it; an edited body survives reason changes.
+3. "Send a removal message" — off until a reason is picked. Picking a reason
+   that has a message switches it on; picking "No removal reason" (or one
+   without a message) switches it off again (MODRESPONSE02, 2026-11-13, a
+   moderator's request: removals went out without the message because the
+   switch was missed). Once the moderator flips the switch or writes/picks
+   their own text, the reason no longer moves it. The body is pre-filled
+   from the selected reason's message until the moderator edits it; an
+   edited body survives reason changes. Until 2026-11-13 the switch was off
+   by default and a reason never turned it on.
 4. Presentation: public comment as you / as the subreddit (Reddit posts a
    distinguished, stickied comment on a post, a distinguished reply on a
    comment), private modmail with the moderator hidden / shown. Default

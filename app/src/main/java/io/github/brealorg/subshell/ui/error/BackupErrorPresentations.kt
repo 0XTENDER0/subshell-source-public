@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.error
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
 import io.github.brealorg.subshell.backup.BackupFailureOperation
 import io.github.brealorg.subshell.data.error.FailureDetails
 import io.github.brealorg.subshell.data.error.LocalFailureKind
@@ -10,26 +12,26 @@ internal fun backupErrorPresentation(
     details: FailureDetails,
 ): ErrorPresentation {
     val title = when (operation) {
-        BackupFailureOperation.CONNECT_FOLDER -> "Couldn't connect backup folder"
-        BackupFailureOperation.SYNC -> "Couldn't sync backup"
-        BackupFailureOperation.IMPORT -> "Couldn't import backup"
-        BackupFailureOperation.EXPORT -> "Couldn't export backup"
-        BackupFailureOperation.SAVE -> "Couldn't save backup"
-        BackupFailureOperation.RESTORE -> "Couldn't restore settings"
-        BackupFailureOperation.RENAME -> "Couldn't rename saved setup"
-        BackupFailureOperation.DELETE -> "Couldn't delete saved setup"
+        BackupFailureOperation.CONNECT_FOLDER -> UiText.Resource(R.string.error_backup_couldn_t_connect_backup_folder)
+        BackupFailureOperation.SYNC -> UiText.Resource(R.string.error_backup_couldn_t_sync_backup)
+        BackupFailureOperation.IMPORT -> UiText.Resource(R.string.error_backup_couldn_t_import_backup)
+        BackupFailureOperation.EXPORT -> UiText.Resource(R.string.error_backup_couldn_t_export_backup)
+        BackupFailureOperation.SAVE -> UiText.Resource(R.string.error_backup_couldn_t_save_backup)
+        BackupFailureOperation.RESTORE -> UiText.Resource(R.string.error_backup_couldn_t_restore_settings)
+        BackupFailureOperation.RENAME -> UiText.Resource(R.string.error_backup_couldn_t_rename_saved_setup)
+        BackupFailureOperation.DELETE -> UiText.Resource(R.string.error_backup_couldn_t_delete_saved_setup)
     }
     val message = when (details.localKind) {
-        LocalFailureKind.PERMISSION -> "Android didn't grant subshell access to the selected backup location."
-        LocalFailureKind.VALIDATION -> "The selected backup data isn't valid for this operation."
-        LocalFailureKind.IO -> "subshell couldn't read or write the backup data."
-        LocalFailureKind.STORAGE -> "The local backup store couldn't complete the operation."
-        LocalFailureKind.SECURITY -> "The backup operation was blocked by a security check."
-        LocalFailureKind.CONFIGURATION -> "The backup configuration isn't valid."
-        LocalFailureKind.DECODING -> "The backup data couldn't be decoded."
+        LocalFailureKind.PERMISSION -> UiText.Resource(R.string.error_backup_android_didn_t_grant_subshell_access_to)
+        LocalFailureKind.VALIDATION -> UiText.Resource(R.string.error_backup_the_selected_backup_data_isn_t_valid)
+        LocalFailureKind.IO -> UiText.Resource(R.string.error_backup_subshell_couldn_t_read_or_write_the_backup)
+        LocalFailureKind.STORAGE -> UiText.Resource(R.string.error_backup_the_local_backup_store_couldn_t_complete)
+        LocalFailureKind.SECURITY -> UiText.Resource(R.string.error_backup_the_backup_operation_was_blocked_by_a)
+        LocalFailureKind.CONFIGURATION -> UiText.Resource(R.string.error_backup_the_backup_configuration_isn_t_valid)
+        LocalFailureKind.DECODING -> UiText.Resource(R.string.error_backup_the_backup_data_couldn_t_be_decoded)
         LocalFailureKind.UNKNOWN,
         null,
-        -> "The backup operation failed before it could finish."
+        -> UiText.Resource(R.string.error_backup_the_backup_operation_failed_before_it_could)
     }
     return ErrorPresentation(
         kind = ErrorPresentationKind.DEGRADED,

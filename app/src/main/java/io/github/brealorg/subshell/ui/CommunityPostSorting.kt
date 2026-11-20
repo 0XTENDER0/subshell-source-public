@@ -32,14 +32,17 @@ fun sortCommunityPosts(posts: List<Post>, sort: CommunitySort): List<Post> = whe
     )
 }
 
+// ISSUE300_DEFAULT_COMMUNITY_SORT_V1: a community without a remembered sort
+// opens on the reader's default (Hot unless changed).
 internal fun preferredCommunitySort(
     preferences: Map<String, CommunitySort>,
     communityName: String,
+    defaultSort: CommunitySort = CommunitySort.HOT,
 ): CommunitySort {
     val normalizedName = runCatching {
         normalizeRedditCommunityName(communityName)
-    }.getOrNull() ?: return CommunitySort.HOT
-    return preferences[normalizedName] ?: CommunitySort.HOT
+    }.getOrNull() ?: return defaultSort
+    return preferences[normalizedName] ?: defaultSort
 }
 
 internal fun encodeCommunitySortPreferences(

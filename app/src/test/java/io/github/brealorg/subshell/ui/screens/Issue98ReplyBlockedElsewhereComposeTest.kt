@@ -9,6 +9,7 @@ import io.github.brealorg.subshell.data.account.MessageReplyPhase
 import io.github.brealorg.subshell.data.account.MessageReplyUiState
 import io.github.brealorg.subshell.model.ActivityKind
 import io.github.brealorg.subshell.model.InboxItem
+import io.github.brealorg.subshell.ui.s
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
@@ -84,7 +85,7 @@ class Issue98ReplyBlockedElsewhereComposeTest {
             messageReplyBlockedElsewhereMessage(
                 unknownInX.copy(phase = MessageReplyPhase.SENDING),
                 scoped = MessageReplyUiState(),
-            ),
+            )?.s,
         )
     }
 }

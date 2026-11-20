@@ -30,6 +30,10 @@ internal val settingsSearchEntries: List<SettingsSearchEntry> = listOf(
     setting("online-visibility", "Account privacy", "online status visibility show presence Reddit account privacy"),
 
     // ISSUE234_FEED_POST_LAYOUTS_V1: the Thumbnail row shows only with List, so its words lead here.
+    // ISSUE302_START_FEED_V1 / ISSUE300_DEFAULT_FEED_SORT_V1
+    setting("start-feed", "Feed", "start feed default feed open on launch home popular all r/all startup first screen"),
+    setting("default-feed-sort", "Feed", "feed sort default sorting home popular all best hot new rising top controversial"),
+    setting("default-community-sort", "Feed", "community sort default sorting subreddit hot new rising top controversial remember"),
     setting("post-layout", "Feed", "post layout large compact list grid density cards size small dense columns view thumbnail left right"),
     // POSTSTYLE_EDGE_TO_EDGE_V1
     setting("remember-feed-sort", "Feed", "remember feed sort best hot new top keep restart reopen default"),
@@ -82,10 +86,12 @@ internal val settingsSearchEntries: List<SettingsSearchEntry> = listOf(
     setting("app-lock-notifications", "Privacy", "hide notification content preview app lock private messages modmail"),
 
     setting("search-keyboard", "Search", "open keyboard entering search focus suggestions scope"),
+    setting("shown-languages", "Search", "languages language filter foreign other languages hide communities search results random english norwegian"),
     setting("saved-searches", "Search", "saved searches save bookmark run again query"),
 
     setting("sensitive-media-previews", "Media & links", "sensitive media previews NSFW spoiler blur preload load on tap hide preview"),
     setting("show-nsfw-media", "Media & links", "show NSFW media without blur unblur uncovered images videos GIFs autoplay"),
+    setting("clean-links", "Media & links", "clean links tracking parameters utm fbclid remove tracking short long url privacy"),
     setting("reddit-link-handling", "Media & links", "Open Reddit links reddit links open links browser default Android app links supported domains"),
     setting("media-autoplay", "Media & links", "autoplay videos GIFs one visible media item"),
     setting("media-muted", "Media & links", "start videos muted volume audio sound"),
@@ -132,13 +138,15 @@ internal val settingsSearchEntries: List<SettingsSearchEntry> = listOf(
     setting("compact-comment-vote-buttons", "Comments", "compact comments vote buttons upvote downvote arrows always visible without tap"),
     setting("comment-hierarchy-style", "Comments", "comment hierarchy guide lines parent connectors replies thread"),
     setting("comment-thread-colours", "Comments", "thread colours colors colour color lines guide depth warm cold accent card top level parent comments"),
+    setting("comment-rail-from-parent", "Comments", "reply line starts parent middle guide lines rail thread connector"),
+    setting("comment-indent-size", "Comments", "reply indent indentation size depth nested replies space left none small normal large"),
     setting("highlight-new-comments", "Comments", "highlight new comments replies"),
     setting("show-comment-avatars", "Comments", "avatars snoovatar profile picture comment author image"),
     setting("top-level-comment-jump", "Comments", "jump next previous top-level parent comment navigate button thread"),
     setting("use-suggested-comment-sort", "Comments", "suggested comment sort Reddit default sorting"),
     setting("comment-actions", "Comments", "comment actions placement follow balanced left right interaction side"),
     setting("comment-time-format", "Comments", "comment time relative local timestamp 24-hour 12-hour am pm"),
-    setting("comment-collapse-mode", "Comments", "collapse comments tap header comment hide replies thread fold"),
+    setting("comment-collapse-mode", "Comments", "collapse comments tap header comment both hide replies thread fold"),
     // ISSUE284_POST_TEXT_COLLAPSES_LIKE_A_COMMENT_V1
     setting("collapsible-post-text", "Comments", "collapse post text self text body title hide fold long"),
 

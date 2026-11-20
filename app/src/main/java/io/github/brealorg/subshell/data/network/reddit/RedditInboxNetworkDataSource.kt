@@ -373,6 +373,7 @@ internal fun RedditInboxListingDto.toNetworkPage(
         )
     }
     val merged = projected
+        .inTheirRootThreads()
         .groupBy { projection -> projection.item.id }
         .values
         .map { group ->
@@ -390,6 +391,41 @@ internal fun RedditInboxListingDto.toNetworkPage(
         items = merged.map(InboxProjection::item),
         nextCursor = data.after?.trim()?.takeIf(String::isNotEmpty),
     )
+}
+
+/**
+ * ISSUE303_A_CHAT_THREAD_IS_ONE_ROW_V1 (Pixel 11, 2026-11-14): Reddit filed a
+ * Direct Chat text sent right after an image under the image message
+ * (`first_message_name` = the image's id) while the image itself sits in the
+ * chat's thread, so the Inbox showed the chat twice and the text sorted above
+ * the image it followed. A thread named after a message of another thread on
+ * the page joins that thread (followed to its root, at most 8 steps).
+ */
+private fun List<InboxProjection>.inTheirRootThreads(): List<InboxProjection> {
+    val threadOfMessage = HashMap<String, String>()
+    forEach { projection ->
+        if (projection.item.kind != ActivityKind.MESSAGE) return@forEach
+        projection.messageTimeline.forEach { message ->
+            if (message.bubble.id != projection.item.id) {
+                threadOfMessage.putIfAbsent(message.bubble.id, projection.item.id)
+            }
+        }
+    }
+    if (threadOfMessage.isEmpty()) return this
+    fun root(threadId: String): String {
+        var current = threadId
+        repeat(8) {
+            val next = threadOfMessage[current] ?: return current
+            if (next == current) return current
+            current = next
+        }
+        return current
+    }
+    return map { projection ->
+        if (projection.item.kind != ActivityKind.MESSAGE) return@map projection
+        val root = root(projection.item.id)
+        if (root == projection.item.id) projection else projection.copy(item = projection.item.copy(id = root))
+    }
 }
 
 private fun RedditInboxThingDto.toInboxProjection(
@@ -793,7 +829,14 @@ private fun String?.normalizedInboxLabel(): String = orEmpty()
 private fun RedditInboxDataDto.annotatedInboxBody(): String =
     body.orEmpty().withRedditMediaAnnotations(mediaMetadata, appendUnplaced = true)
 
-private fun String.toInboxPreview(): String = redditReadableText()
+// ISSUE303_A_CHAT_IMAGE_PREVIEW_READS_AS_TEXT_V1 (Pixel 11, 2026-11-14): Reddit
+// sends a Direct Chat image as "sent an [image](https://matrix…)", and the
+// Inbox row and notification showed that markdown as it is; a link reads as
+// its label.
+private val INBOX_PREVIEW_MARKDOWN_LINK = Regex("\\[([^\\]\\n]*)\\]\\((?:[^()\\s]|\\([^()\\s]*\\))+\\)")
+
+internal fun String.toInboxPreview(): String = redditReadableText()
+    .replace(INBOX_PREVIEW_MARKDOWN_LINK, "$1")
     .replace(Regex("\\s+"), " ")
     .trim()
     .take(REDDIT_INBOX_MAX_PREVIEW_LENGTH)

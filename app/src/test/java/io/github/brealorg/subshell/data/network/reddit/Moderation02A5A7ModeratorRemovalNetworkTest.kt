@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.data.network.reddit
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.data.account.RedditModeratorRemovalRequest
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
@@ -51,7 +52,7 @@ class Moderation02A5A7ModeratorRemovalNetworkTest {
         val source = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/data/network/reddit/" +
                 "RedditModeratorRemovalNetworkDataSource.kt",
-        ).readText()
+        ).readSourceText()
 
         assertTrue(source.contains("postFormStatus("))
         assertTrue(source.contains("ModeratorRemovalFailureKind.OUTCOME_UNKNOWN"))

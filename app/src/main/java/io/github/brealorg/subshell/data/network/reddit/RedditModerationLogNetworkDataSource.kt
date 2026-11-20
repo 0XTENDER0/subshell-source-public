@@ -27,6 +27,8 @@ internal class RedditModerationLogNetworkDataSource(
 internal fun redditModerationLogRequest(
     rawCommunityName: String,
     after: String? = null,
+    // ISSUE301C_A_FILTER_REASON_COMES_FROM_THE_MOD_LOG_V1: one moderator's entries only.
+    moderator: String? = null,
 ): JsonGetRequest {
     val communityName = normalizeRedditCommunityName(rawCommunityName)
     return JsonGetRequest(
@@ -34,6 +36,10 @@ internal fun redditModerationLogRequest(
         queryParameters = buildList {
             add("limit" to MODERATION_LOG_PAGE_LIMIT.toString())
             add("raw_json" to "1")
+            moderator
+                ?.trim()
+                ?.takeIf(String::isNotEmpty)
+                ?.let { name -> add("mod" to name) }
             after
                 ?.trim()
                 ?.takeIf(String::isNotEmpty)

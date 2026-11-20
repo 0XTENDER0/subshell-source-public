@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -36,10 +38,10 @@ internal const val UPDATE_NOTICE_HIDDEN_FOR_MILLIS = 24L * 60L * 60L * 1000L
 internal fun updateAvailableNoticePresentation(release: UpdateManifestRelease): ErrorPresentation =
     ErrorPresentation(
         kind = ErrorPresentationKind.DEGRADED,
-        title = "subshell ${release.versionName} is ready",
-        message = "You're on ${BuildConfig.VERSION_NAME}. Update in Settings › Updates.",
-        primaryAction = ErrorAction(ErrorActionKind.RETRY, "Update"),
-        secondaryAction = ErrorAction(ErrorActionKind.DISMISS, "Dismiss"),
+        title = UiText.Resource(R.string.notice_updateavaila_subshell_is_ready, release.versionName),
+        message = UiText.Resource(R.string.notice_update_you_are_on_update_in_settings, BuildConfig.VERSION_NAME),
+        primaryAction = ErrorAction(ErrorActionKind.RETRY, UiText.Resource(R.string.notice_updateavaila_update)),
+        secondaryAction = ErrorAction(ErrorActionKind.DISMISS, UiText.Resource(R.string.notice_updateavaila_dismiss)),
     )
 
 /** True when the tray should offer [release]; a pure decision so it can be tested. */

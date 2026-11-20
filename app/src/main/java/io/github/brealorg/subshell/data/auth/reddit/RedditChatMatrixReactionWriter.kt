@@ -126,7 +126,7 @@ internal class RedditChatMatrixReactionWriter(
         val webToken = when (val result = tokenProvider.token()) {
             is RedditChatWebTokenResult.Success -> result.token
             RedditChatWebTokenResult.NoRedditWebSession,
-            RedditChatWebTokenResult.Failed,
+            is RedditChatWebTokenResult.Failed,
             -> return failed(DirectChatReactionFailureKind.SESSION)
         }
 

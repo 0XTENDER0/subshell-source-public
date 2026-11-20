@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.graphics.Bitmap
 import android.view.View
@@ -179,12 +182,12 @@ private fun MissingVideoSourcePlaceholder(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = "Video unavailable",
+                text = stringResource(R.string.comp_video_unavailable),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                text = "Reddit did not provide a playable video source.",
+                text = stringResource(R.string.comp_reddit_did_not_provide_a_playable_video),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -217,7 +220,7 @@ private fun FullscreenControlButton(
     atStart: Boolean,
     onClick: () -> Unit,
 ) {
-    val contentDescription = if (fullscreen) "Exit full screen" else "Enter full screen"
+    val contentDescription = if (fullscreen) stringResource(R.string.all_exit_full_screen) else stringResource(R.string.all_enter_full_screen)
     val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = Modifier
@@ -278,7 +281,7 @@ private fun FullscreenQuickControls(
             IconButton(onClick = onSpeed) {
                 Icon(
                     Symbols.Speed,
-                    contentDescription = "Playback speed, $speedLabel",
+                    contentDescription = stringResource(R.string.comp_playback_speed, speedLabel),
                     tint = Color.White,
                 )
             }
@@ -287,7 +290,7 @@ private fun FullscreenQuickControls(
             IconButton(onClick = onToggleMute) {
                 Icon(
                     if (muted) Symbols.VolumeOff else Symbols.VolumeUp,
-                    contentDescription = if (muted) "Turn sound on" else "Mute video",
+                    contentDescription = if (muted) stringResource(R.string.all_turn_sound_on) else stringResource(R.string.all_mute_video),
                     tint = Color.White,
                 )
             }
@@ -385,7 +388,7 @@ private fun VideoTopActionCluster(
         if (showPlaybackOptions) {
             VideoChromeIconButton(
                 icon = Symbols.Settings,
-                contentDescription = "Playback options",
+                contentDescription = stringResource(R.string.comp_playback_options),
                 onClick = onPlaybackOptions,
             )
         }
@@ -394,7 +397,7 @@ private fun VideoTopActionCluster(
         if (showMute) {
             VideoChromeIconButton(
                 icon = if (muted) Symbols.VolumeOff else Symbols.VolumeUp,
-                contentDescription = if (muted) "Turn sound on" else "Mute video",
+                contentDescription = if (muted) stringResource(R.string.all_turn_sound_on) else stringResource(R.string.all_mute_video),
                 onClick = onToggleMute,
             )
         }
@@ -444,7 +447,7 @@ private fun VideoPosterFrame(
             localUri != null -> LocalUriMedia(
                 uri = localUri,
                 mimeType = post.localMediaMimeType,
-                contentDescription = post.mediaLabel,
+                contentDescription = mediaLabelShown(post.mediaLabel),
                 modifier = Modifier.fillMaxSize(),
             )
 
@@ -458,7 +461,7 @@ private fun VideoPosterFrame(
                     )
                     is RemoteMediaLoadResult.Ready -> Image(
                         bitmap = result.value.asImageBitmap(),
-                        contentDescription = post.mediaLabel,
+                        contentDescription = mediaLabelShown(post.mediaLabel),
                         contentScale = ContentScale.Fit,
                         modifier = Modifier.fillMaxSize(),
                     )
@@ -475,7 +478,7 @@ private fun VideoPosterFrame(
 
             remoteUri != null -> RemoteImage(
                 uri = remoteUri,
-                label = post.mediaLabel,
+                label = mediaLabelShown(post.mediaLabel),
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Fit,
                 aspectRatio = null,
@@ -485,7 +488,7 @@ private fun VideoPosterFrame(
             else -> presentationMediaResource(post.mediaAsset)?.let { posterResource ->
                 Image(
                     painter = painterResource(posterResource),
-                    contentDescription = post.mediaLabel,
+                    contentDescription = mediaLabelShown(post.mediaLabel),
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -626,13 +629,10 @@ fun LocalVideoPlayer(
             mediaActionScope.launch {
                 val destination = actions.download()
                 if (destination != null) {
-                    mediaDownload = "Saved to ${mediaDownloadFolder(destination)}"
+                    mediaDownload = context.getString(R.string.comp_saved_to_folder, mediaDownloadFolder(destination))
                     delay(MEDIA_DOWNLOAD_SAVED_VISIBLE_MS)
                 } else {
-                    errorHost?.reportMediaActionFailure(
-                        title = "Could not download",
-                        message = "This media could not be saved",
-                    )
+                    errorHost?.reportMediaDownloadFailure()
                 }
                 mediaDownload = null
             }
@@ -761,10 +761,11 @@ fun LocalVideoPlayer(
         // covered); otherwise the poster alone, and a tap anywhere still plays it.
         val startsByItself = !fullscreen && !paneLeaving &&
             state.videoAutoplayAllowed && state.sensitiveMediaAutoplayAllowed(post)
+        val playVideoDescription = stringResource(R.string.comp_play_video)
         val frameModifier = if (startsByItself) {
             staticFrameModifier
-                .clickable(onClickLabel = "Play video") { state.playVideo(post.id) }
-                .semantics { contentDescription = "Play video" }
+                .clickable(onClickLabel = stringResource(R.string.comp_play_video)) { state.playVideo(post.id) }
+                .semantics { contentDescription = playVideoDescription }
         } else {
             staticFrameModifier
         }
@@ -783,7 +784,7 @@ fun LocalVideoPlayer(
                 ) {
                     Icon(
                         Symbols.PlayArrowFilled,
-                        contentDescription = "Play video",
+                        contentDescription = stringResource(R.string.comp_play_video),
                         modifier = Modifier.padding(12.dp),
                         tint = Color.White,
                     )
@@ -885,8 +886,7 @@ fun LocalVideoPlayer(
                 event = "feed_surface_retention",
                 mediaId = post.id,
                 transitionId = transitionId,
-                details = "retained=$retainedFeedSurface playing=$playing " +
-                    "same_owner=${coordinator.ownsPresentation(playbackOwner, post.id)}",
+                details = "retained=$retainedFeedSurface playing=$playing same_owner=${coordinator.ownsPresentation(playbackOwner, post.id)}",
             )
         }
     }
@@ -1111,6 +1111,12 @@ fun LocalVideoPlayer(
         onClose = onExitFullscreen ?: state::closeMedia,
     )
 
+    // TRANSLATE14: read here; the semantics block below is not composable.
+    val hideControlsLabel = stringResource(R.string.comp_hide_video_controls)
+    val showControlsLabel = stringResource(R.string.comp_show_video_controls)
+    val mediaActionsLabel = stringResource(R.string.comp_media_actions)
+    val showControlsShortLabel = stringResource(R.string.comp_show_controls)
+    val resetZoomLabel = stringResource(R.string.comp_reset_zoom)
     Box(
         playerFrameModifier
             .onSizeChanged { frameHeightPx = it.height }
@@ -1120,12 +1126,12 @@ fun LocalVideoPlayer(
             // clickable frame merged the title and times into its own node; the
             // frame now offers its actions without merging what it contains.
             .semantics {
-                onClick(label = if (showControls) "Hide video controls" else "Show video controls") {
+                onClick(label = if (showControls) hideControlsLabel else showControlsLabel) {
                     toggleControls()
                     true
                 }
                 if (longPress != null) {
-                    onLongClick(label = if (onLongPress != null) "Media actions" else "Show controls") {
+                    onLongClick(label = if (onLongPress != null) mediaActionsLabel else showControlsShortLabel) {
                         longPress()
                         true
                     }
@@ -1133,7 +1139,7 @@ fun LocalVideoPlayer(
                 // ISSUE231_PINCH_TO_ZOOM_VIDEOS_V1: zoom is touch-only; TalkBack can reset it.
                 if (videoZoomed) {
                     customActions = listOf(
-                        CustomAccessibilityAction(FULLSCREEN_VIDEO_RESET_ZOOM_LABEL) {
+                        CustomAccessibilityAction(resetZoomLabel) {
                             videoZoom = FullscreenVideoZoom()
                             true
                         },
@@ -1424,7 +1430,7 @@ fun LocalVideoPlayer(
                 color = Color.Black.copy(alpha = 0.62f),
             ) {
                 Text(
-                    text = "2× speed",
+                    text = stringResource(R.string.comp_2_speed),
                     color = Color.White,
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -1520,7 +1526,7 @@ fun LocalVideoPlayer(
                     IconButton(onClick = onExitFullscreen ?: state::closeMedia) {
                         Icon(
                             Symbols.ArrowBack,
-                            contentDescription = "Exit full screen",
+                            contentDescription = stringResource(R.string.comp_exit_full_screen),
                             tint = Color.White,
                         )
                     }
@@ -1531,14 +1537,14 @@ fun LocalVideoPlayer(
                 if (fullscreen) {
                     Column(Modifier.weight(1f)) {
                         Text(
-                            text = post.title,
+                            text = mediaPostTitleShown(post),
                             color = Color.White,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
-                            text = post.mediaLabel,
+                            text = mediaLabelShown(post.mediaLabel),
                             color = Color.White.copy(alpha = 0.78f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -1573,7 +1579,7 @@ fun LocalVideoPlayer(
                         // Owner: the gear, not three dots.
                         Icon(
                             Symbols.Settings,
-                            contentDescription = "Playback options",
+                            contentDescription = stringResource(R.string.comp_playback_options),
                             tint = Color.White,
                         )
                     }
@@ -1785,7 +1791,7 @@ fun LocalVideoPlayer(
                 color = Color.Black.copy(alpha = VIDEO_CENTER_BUTTON_SCRIM_ALPHA),
             ) {
                 Text(
-                    text = "${formatVideoPlaybackTime(scrubPositionMs)} / ${formatVideoPlaybackTime(durationMs)}",
+                    text = stringResource(R.string.comp_text_3, formatVideoPlaybackTime(scrubPositionMs), formatVideoPlaybackTime(durationMs)),
                     color = Color.White,
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -1831,7 +1837,7 @@ fun LocalVideoPlayer(
                 ) {
                     Icon(
                         Symbols.Refresh,
-                        contentDescription = "Replay video",
+                        contentDescription = stringResource(R.string.comp_replay_video),
                         modifier = Modifier.padding(12.dp),
                         tint = Color.White,
                     )
@@ -1849,7 +1855,7 @@ fun LocalVideoPlayer(
                     ) {
                         Icon(
                             if (playing) Symbols.PauseFilled else Symbols.PlayArrowFilled,
-                            contentDescription = if (playing) "Pause video" else "Resume video",
+                            contentDescription = if (playing) stringResource(R.string.all_pause_video) else stringResource(R.string.all_resume_video),
                             modifier = Modifier.padding(12.dp),
                             tint = Color.White,
                         )
@@ -1872,7 +1878,7 @@ fun LocalVideoPlayer(
                 when (playbackModal) {
                     PlaybackModal.OPTIONS -> PlaybackOptionsPanel(
                         options = coordinator.trackOptions,
-                        automaticVideoQuality = automaticVideoQuality.label,
+                        automaticVideoQuality = stringResource(automaticVideoQuality.labelRes),
                         onQuality = { playbackModal = PlaybackModal.QUALITY },
                         onAudio = { playbackModal = PlaybackModal.AUDIO },
                         onSubtitles = { playbackModal = PlaybackModal.SUBTITLES },
@@ -1883,8 +1889,8 @@ fun LocalVideoPlayer(
                         mediaActionRows = if (resolvedMediaActions != null) {
                             {
                                 PlaybackActionRow(
-                                    title = "Share",
-                                    summary = if (mediaSharing) "Preparing…" else "Send the video to another app",
+                                    title = stringResource(R.string.comp_share),
+                                    summary = if (mediaSharing) stringResource(R.string.all_preparing) else stringResource(R.string.all_send_the_video_to_another_app),
                                     busy = mediaSharing,
                                     enabled = !mediaSharing && mediaDownload == null,
                                     onClick = {
@@ -1893,17 +1899,18 @@ fun LocalVideoPlayer(
                                             val shared = resolvedMediaActions.share()
                                             mediaSharing = false
                                             if (!shared) {
-                                                errorHost?.reportMediaActionFailure(
-                                                    title = "Could not share",
-                                                    message = "This media could not be prepared for sharing",
-                                                )
+                                                errorHost?.reportMediaShareFailure()
                                             }
                                         }
                                     },
                                 )
                                 PlaybackActionRow(
-                                    title = "Download",
-                                    summary = mediaDownload ?: "Save to Downloads",
+                                    title = stringResource(R.string.comp_download),
+                                    summary = if (mediaDownload == VIDEO_DOWNLOAD_SAVING) {
+                                        stringResource(R.string.comp_saving_ellipsis)
+                                    } else {
+                                        mediaDownload ?: stringResource(R.string.all_save_to_downloads)
+                                    },
                                     busy = mediaDownload == VIDEO_DOWNLOAD_SAVING,
                                     enabled = !mediaSharing && mediaDownload == null,
                                     onClick = {
@@ -1911,13 +1918,10 @@ fun LocalVideoPlayer(
                                         mediaActionScope.launch {
                                             val destination = resolvedMediaActions.download()
                                             if (destination != null) {
-                                                mediaDownload = "Saved to ${mediaDownloadFolder(destination)}"
+                                                mediaDownload = context.getString(R.string.comp_saved_to_folder, mediaDownloadFolder(destination))
                                                 delay(MEDIA_DOWNLOAD_SAVED_VISIBLE_MS)
                                             } else {
-                                                errorHost?.reportMediaActionFailure(
-                                                    title = "Could not download",
-                                                    message = "This media could not be saved",
-                                                )
+                                                errorHost?.reportMediaDownloadFailure()
                                             }
                                             mediaDownload = null
                                         }
@@ -1943,7 +1947,7 @@ fun LocalVideoPlayer(
 
                     PlaybackModal.QUALITY -> PlaybackQualityPanel(
                         options = coordinator.trackOptions,
-                        automaticVideoQuality = automaticVideoQuality.label,
+                        automaticVideoQuality = stringResource(automaticVideoQuality.labelRes),
                         onAutomaticVideo = coordinator::selectAutomaticVideoTrack,
                         onVideoTrack = { key -> coordinator.selectVideoTrack(key) },
                         onBack = { playbackModal = PlaybackModal.OPTIONS },
@@ -1988,7 +1992,8 @@ fun LocalVideoPlayer(
 }
 
 private const val DOUBLE_TAP_SEEK_HINT_MS = 700L
-private const val VIDEO_DOWNLOAD_SAVING = "Saving…"
+/** A marker, not text: the row shows comp_saving_ellipsis for it. */
+private const val VIDEO_DOWNLOAD_SAVING = "\u0000saving"
 private val VIDEO_CENTER_BUTTON_SIZE = 58.dp
 private const val VIDEO_CENTER_BUTTON_SCRIM_ALPHA = 0.72f
 private const val VIDEO_CHROME_BUTTON_ALPHA = 0.92f
@@ -2036,6 +2041,7 @@ internal fun tabletopControlsAlignment(foldTopPx: Float, heightPx: Float): BiasA
 
 internal const val INLINE_VIDEO_SURFACE_TEST_TAG = "inline-video-surface"
 internal const val FULLSCREEN_VIDEO_FRAME_TEST_TAG = "fullscreen-video-frame"
+/** The English text of `comp_reset_zoom`, for tests. */
 internal const val FULLSCREEN_VIDEO_RESET_ZOOM_LABEL = "Reset zoom"
 
 internal fun boundedInlineVideoAspectRatio(aspectRatio: Float): Float =

@@ -126,7 +126,10 @@ class Step3PostActionsComposeTest {
         composeRule.waitForIdle()
         assertEquals(0, shown("Share"))
         assertEquals(0, shown("Download"))
-        composeRule.onNode(hasClickAction() and hasText("Copy link")).performSemanticsAction(SemanticsActions.OnClick)
+        // ISSUE300_ONE_COPY_ENTRY_OPENS_A_SHEET_V1: the post's link is in the Copy… sheet.
+        composeRule.onNode(hasClickAction() and hasText("Copy…")).performSemanticsAction(SemanticsActions.OnClick)
+        composeRule.waitForIdle()
+        composeRule.onNode(hasClickAction() and hasText("Copy link to post")).performSemanticsAction(SemanticsActions.OnClick)
         composeRule.waitForIdle()
         val clip = context.getSystemService(ClipboardManager::class.java).primaryClip!!
         assertTrue(clip.getItemAt(0).text.toString().contains("reddit.com/r/kotlin/comments/abc123"))

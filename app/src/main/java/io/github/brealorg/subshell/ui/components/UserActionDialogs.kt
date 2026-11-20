@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -44,11 +46,10 @@ internal fun UserBlockConfirmationDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Block u/$username?") },
+        title = { Text(stringResource(R.string.comp_block_u, username)) },
         text = {
             Text(
-                "Reddit will add this account to your blocked users. " +
-                    "You can unblock it again from this profile.",
+                stringResource(R.string.all2_reddit_will_add_this_account_to_your),
             )
         },
         confirmButton = {
@@ -58,12 +59,12 @@ internal fun UserBlockConfirmationDialog(
                     contentColor = MaterialTheme.colorScheme.error,
                 ),
             ) {
-                Text("Block")
+                Text(stringResource(R.string.comp_block))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.comp_cancel))
             }
         },
     )
@@ -85,7 +86,7 @@ internal fun UserTagEditorDialog(
     val color = UserTagColor.valueOf(colorName)
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Private note on u/$username") },
+        title = { Text(stringResource(R.string.comp_private_note_on_u, username)) },
         text = {
             UserTagEditorFields(
                 label = label,
@@ -113,7 +114,7 @@ internal fun UserTagEditorDialog(
                     )
                 },
             ) {
-                Text("Save")
+                Text(stringResource(R.string.comp_save))
             }
         },
         dismissButton = {
@@ -125,11 +126,11 @@ internal fun UserTagEditorDialog(
                             contentColor = MaterialTheme.colorScheme.error,
                         ),
                     ) {
-                        Text("Remove")
+                        Text(stringResource(R.string.comp_remove))
                     }
                 }
                 TextButton(onClick = onDismiss) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.comp_cancel))
                 }
             }
         },
@@ -152,7 +153,7 @@ internal fun UserTagEditorFields(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            "Only you see this. It is kept for this account and never sent to Reddit.",
+            stringResource(R.string.all_only_you_see_this_it_is_kept),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -161,9 +162,9 @@ internal fun UserTagEditorFields(
             onValueChange = { value ->
                 onLabelChange(value.replace('\n', ' ').take(USER_TAG_LABEL_MAX_LENGTH))
             },
-            label = { Text("Tag") },
+            label = { Text(stringResource(R.string.comp_tag)) },
             singleLine = true,
-            supportingText = { Text("${label.length}/$USER_TAG_LABEL_MAX_LENGTH") },
+            supportingText = { Text(stringResource(R.string.comp_text_2, label.length, USER_TAG_LABEL_MAX_LENGTH)) },
             modifier = Modifier.fillMaxWidth(),
         )
         Column(
@@ -174,6 +175,7 @@ internal fun UserTagEditorFields(
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     row.forEach { option ->
                         val colors = userTagChipColors(option)
+                        val colorName = stringResource(userTagColorName(option))
                         val selected = option == color
                         // LOWUI7_TOUCH_TARGETS_ARE_48DP_V1 (OCB-165)
                         Box(
@@ -196,7 +198,7 @@ internal fun UserTagEditorFields(
                                     onClick = { onColorChange(option) },
                                 )
                                 .semantics {
-                                    contentDescription = userTagColorName(option)
+                                    contentDescription = colorName
                                 },
                         )
                     }
@@ -206,22 +208,23 @@ internal fun UserTagEditorFields(
         OutlinedTextField(
             value = note,
             onValueChange = { value -> onNoteChange(value.take(USER_TAG_NOTE_MAX_LENGTH)) },
-            label = { Text("Note") },
+            label = { Text(stringResource(R.string.comp_note)) },
             minLines = 3,
             maxLines = 6,
-            supportingText = { Text("${note.length}/$USER_TAG_NOTE_MAX_LENGTH") },
+            supportingText = { Text(stringResource(R.string.comp_text_2, note.length, USER_TAG_NOTE_MAX_LENGTH)) },
             modifier = Modifier.fillMaxWidth(),
         )
     }
 }
 
-internal fun userTagColorName(color: UserTagColor): String = when (color) {
-    UserTagColor.GREY -> "Grey"
-    UserTagColor.RED -> "Red"
-    UserTagColor.ORANGE -> "Orange"
-    UserTagColor.YELLOW -> "Yellow"
-    UserTagColor.GREEN -> "Green"
-    UserTagColor.TEAL -> "Teal"
-    UserTagColor.BLUE -> "Blue"
-    UserTagColor.PURPLE -> "Purple"
+@androidx.annotation.StringRes
+internal fun userTagColorName(color: UserTagColor): Int = when (color) {
+    UserTagColor.GREY -> R.string.comp_tag_color_grey
+    UserTagColor.RED -> R.string.comp_tag_color_red
+    UserTagColor.ORANGE -> R.string.comp_tag_color_orange
+    UserTagColor.YELLOW -> R.string.comp_tag_color_yellow
+    UserTagColor.GREEN -> R.string.comp_tag_color_green
+    UserTagColor.TEAL -> R.string.comp_tag_color_teal
+    UserTagColor.BLUE -> R.string.comp_tag_color_blue
+    UserTagColor.PURPLE -> R.string.comp_tag_color_purple
 }

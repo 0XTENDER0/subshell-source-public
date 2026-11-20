@@ -1,83 +1,87 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import androidx.annotation.StringRes
+import io.github.brealorg.subshell.R
+
 // SUBSHELL_SETTINGS03A_TASK_BASED_MATERIAL_SETTINGS_V1
 internal enum class SettingsDestination(
-    val title: String,
-    val description: String,
+    @StringRes val titleRes: Int,
+    @StringRes val descriptionRes: Int?,
     internal val legacySections: Set<String> = emptySet(),
 ) {
     ROOT(
-        title = "Settings",
-        description = "",
+        titleRes = R.string.settings_destination_settings_title,
+        descriptionRes = null,
     ),
     ACCOUNTS(
-        title = "Accounts",
-        description = "Reddit accounts, privacy and connection",
+        titleRes = R.string.settings_destination_accounts_title,
+        descriptionRes = R.string.settings_destination_reddit_accounts_privacy_and_connection_description,
         legacySections = setOf("Accounts", "Account privacy", "Reddit connection"),
     ),
     APPEARANCE(
-        title = "Appearance",
-        description = "Theme, colours, voting, fonts and motion",
+        titleRes = R.string.settings_destination_appearance_title,
+        descriptionRes = R.string.settings_destination_theme_colours_voting_fonts_and_motion_description,
         legacySections = setOf("Appearance", "Accessibility"),
     ),
     NAVIGATION(
-        title = "Navigation & gestures",
-        description = "Controls, side menu, navigation bars and search",
+        titleRes = R.string.settings_destination_navigation_gestures_title,
+        descriptionRes = R.string.settings_destination_controls_side_menu_navigation_bars_and_description,
         legacySections = setOf("Home & feeds", "Navigation", "Search"),
     ),
     FEEDS(
-        title = "Feeds & content",
-        description = "Unread state, sensitive content and filters",
+        titleRes = R.string.settings_destination_feeds_content_title,
+        descriptionRes = R.string.settings_destination_start_feed_sorting_unread_state_sensitive_description,
         legacySections = setOf("Feed", "Privacy"),
     ),
     MEDIA(
-        title = "Media & links",
-        description = "Playback, quality, storage and captions",
+        titleRes = R.string.settings_destination_media_links_title,
+        descriptionRes = R.string.settings_destination_playback_quality_storage_and_captions_description,
         legacySections = setOf("Media & links"),
     ),
     COMMENTS(
-        title = "Comments & notifications",
-        description = "Comment behaviour, actions and inbox alerts",
+        titleRes = R.string.settings_destination_comments_notifications_title,
+        descriptionRes = R.string.settings_destination_comment_behaviour_actions_and_inbox_alerts_description,
         legacySections = setOf("Comments", "Notifications"),
     ),
     BACKUP(
-        title = "Backup & restore",
-        description = "What's backed up, your backups and the backup folder",
+        titleRes = R.string.settings_destination_backup_restore_title,
+        descriptionRes = R.string.settings_destination_what_s_backed_up_your_backups_description,
     ),
     ADVANCED(
-        title = "Advanced",
-        description = "Developer tools and diagnostics",
+        titleRes = R.string.settings_destination_advanced_title,
+        descriptionRes = R.string.settings_destination_developer_tools_and_diagnostics_description,
         legacySections = setOf("Diagnostics", "Developer states"),
     ),
     // ISSUE286_SETTINGS_UPDATES_V1
     UPDATES(
-        title = "Updates",
-        description = "Your version, the latest one and updating",
+        titleRes = R.string.settings_destination_updates_title,
+        descriptionRes = R.string.settings_destination_your_version_the_latest_one_and_description,
     ),
     ABOUT(
-        title = "Help & about",
-        description = "Version, help and application information",
+        titleRes = R.string.settings_destination_help_about_title,
+        descriptionRes = R.string.settings_destination_version_help_and_application_information_description,
     ),
     NOTIFICATION_TYPES(
-        title = "Notification types",
-        description = "Choose which Reddit activity can notify you",
+        titleRes = R.string.settings_destination_notification_types_title,
+        descriptionRes = R.string.settings_destination_choose_which_reddit_activity_can_notify_description,
     ),
     // ISSUE239_WATCHED_COMMUNITIES_IN_SETTINGS_V1
     NEW_POST_NOTIFICATIONS(
-        title = "New posts",
-        description = "Communities that notify you about new posts and comments",
+        titleRes = R.string.settings_destination_new_posts_title,
+        descriptionRes = R.string.settings_destination_communities_that_notify_you_about_new_description,
     ),
     CONTENT_FILTERS(
-        title = "Content filters",
-        description = "",
+        titleRes = R.string.settings_destination_content_filters_title,
+        descriptionRes = null,
     ),
     SENSITIVE_MEDIA_LAB(
-        title = "Sensitive media Reddit lab",
-        description = "",
+        titleRes = R.string.settings_destination_sensitive_media_reddit_lab_title,
+        descriptionRes = null,
     ),
     DIAGNOSTICS(
-        title = "Diagnostics",
-        description = "Local structured event history and shareable reports",
+        titleRes = R.string.settings_destination_diagnostics_title,
+        descriptionRes = R.string.settings_destination_local_structured_event_history_and_shareable_description,
     );
 
     companion object {
@@ -116,26 +120,30 @@ internal fun settingsSectionVisible(
     }
 }
 
+// TRANSLATE14_SETTINGS_SECTION_TITLES_ARE_RESOURCE_IDS_V1: the mapping
+// compared shown (translated) titles with English words, so it missed in
+// every other language; it maps resource ids now.
+@androidx.annotation.StringRes
 internal fun settingsSectionTitle(
     destination: SettingsDestination,
-    legacySection: String,
-): String = when (destination) {
+    @androidx.annotation.StringRes legacySection: Int,
+): Int = when (destination) {
     SettingsDestination.APPEARANCE -> when (legacySection) {
-        "Appearance" -> "Theme & style"
-        "Accessibility" -> "Motion"
+        R.string.all_appearance -> R.string.set_section_theme_style
+        R.string.all_accessibility -> R.string.set_section_motion
         else -> legacySection
     }
     SettingsDestination.NAVIGATION -> when (legacySection) {
-        "Home & feeds" -> "Navigation bars"
-        "Navigation" -> "Controls & side menu"
+        R.string.all_home_feeds -> R.string.set_section_navigation_bars
+        R.string.all_navigation -> R.string.set_section_controls_side_menu
         else -> legacySection
     }
     SettingsDestination.FEEDS ->
-        if (legacySection == "Privacy") "Hidden communities" else "Feed & content"
+        if (legacySection == R.string.all_privacy) R.string.set_section_hidden_communities else R.string.set_section_feed_content
     SettingsDestination.ACCOUNTS ->
-        if (legacySection == "Reddit connection") "Connection" else legacySection
+        if (legacySection == R.string.all_reddit_connection) R.string.set_section_connection else legacySection
     SettingsDestination.ADVANCED ->
-        if (legacySection == "Developer states") "Developer" else legacySection
+        if (legacySection == R.string.all_developer_states) R.string.set_section_developer else legacySection
     else -> legacySection
 }
 

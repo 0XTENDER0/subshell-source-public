@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -122,7 +123,7 @@ class Issue90SendableImageTest {
         assertEquals(0, submitted)
         assertEquals(
             1,
-            composeRule.onAllNodesWithText(COMMENT_REQUEST_UNBUILDABLE_MESSAGE).fetchSemanticsNodes().size,
+            composeRule.onAllNodesWithText(androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>().getString(COMMENT_REQUEST_UNBUILDABLE_MESSAGE)).fetchSemanticsNodes().size,
         )
     }
 }

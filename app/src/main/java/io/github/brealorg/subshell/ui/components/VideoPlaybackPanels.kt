@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
@@ -75,8 +77,8 @@ internal fun PlaybackOptionsPanel(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             PlaybackPanelHeader(
-                title = "Playback options",
-                subtitle = "Choices apply to this video session",
+                title = stringResource(R.string.comp_playback_options),
+                subtitle = stringResource(R.string.comp_choices_apply_to_this_video_session),
                 onDismiss = onDismiss,
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -85,29 +87,29 @@ internal fun PlaybackOptionsPanel(
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             }
             PlaybackOptionNavigationRow(
-                title = "Quality",
-                summary = options.videoSelectionSummary(automaticVideoQuality),
+                title = stringResource(R.string.comp_quality),
+                summary = trackSummaryShown(options.videoSelectionSummary(automaticVideoQuality)),
                 onClick = onQuality,
             )
             // VIDEO04_EMPTY_CHOICES_ARE_HIDDEN_V1: Reddit videos rarely carry a
             // second audio track or subtitles; a row with nothing to choose is noise.
             if (playbackAudioChoiceOffered(options)) {
                 PlaybackOptionNavigationRow(
-                    title = "Audio",
-                    summary = options.audioSelectionSummary(),
+                    title = stringResource(R.string.comp_audio),
+                    summary = trackSummaryShown(options.audioSelectionSummary()),
                     onClick = onAudio,
                 )
             }
             if (playbackSubtitleChoiceOffered(options)) {
                 PlaybackOptionNavigationRow(
-                    title = "Subtitles",
-                    summary = options.textSelectionSummary(),
+                    title = stringResource(R.string.comp_subtitles),
+                    summary = trackSummaryShown(options.textSelectionSummary()),
                     onClick = onSubtitles,
                 )
             }
             if (speedSummary != null) {
                 PlaybackOptionNavigationRow(
-                    title = "Speed",
+                    title = stringResource(R.string.comp_speed),
                     summary = speedSummary,
                     onClick = onSpeed,
                 )
@@ -115,8 +117,8 @@ internal fun PlaybackOptionsPanel(
             // VIDEO11_TECHNICAL_DETAILS_BEHIND_A_SETTING_V1 (owner): developer data.
             if (showTechnicalDetails) {
                 PlaybackOptionNavigationRow(
-                    title = "Technical details",
-                    summary = "Tracks, codecs, decoders and dropped frames",
+                    title = stringResource(R.string.comp_technical_details),
+                    summary = stringResource(R.string.comp_tracks_codecs_decoders_and_dropped_frames),
                     onClick = onTechnicalDetails,
                 )
             }
@@ -135,22 +137,22 @@ internal fun PlaybackQualityPanel(
     modifier: Modifier = Modifier,
 ) {
     PlaybackSelectionPanel(
-        title = "Quality",
-        subtitle = options.videoSelectionSummary(automaticVideoQuality),
+        title = stringResource(R.string.comp_quality),
+        subtitle = trackSummaryShown(options.videoSelectionSummary(automaticVideoQuality)),
         onBack = onBack,
         onDismiss = onDismiss,
         modifier = modifier,
     ) {
         PlaybackOptionRow(
-            title = "Auto",
-            summary = "Adaptive · $automaticVideoQuality ceiling",
+            title = stringResource(R.string.comp_auto),
+            summary = stringResource(R.string.comp_adaptive_ceiling, automaticVideoQuality),
             selected = options.selection.videoMode == PlaybackTrackSelectionMode.AUTO,
             onClick = onAutomaticVideo,
         )
         options.video.forEach { choice ->
             PlaybackTrackChoiceRow(choice, onClick = { onVideoTrack(choice.key) })
         }
-        PlaybackTrackAvailability(options.known, options.video, "video tracks")
+        PlaybackTrackAvailability(options.known, options.video, R.string.comp_no_video_tracks)
     }
 }
 
@@ -164,22 +166,22 @@ internal fun PlaybackAudioPanel(
     modifier: Modifier = Modifier,
 ) {
     PlaybackSelectionPanel(
-        title = "Audio",
-        subtitle = options.audioSelectionSummary(),
+        title = stringResource(R.string.comp_audio),
+        subtitle = trackSummaryShown(options.audioSelectionSummary()),
         onBack = onBack,
         onDismiss = onDismiss,
         modifier = modifier,
     ) {
         PlaybackOptionRow(
-            title = "Auto",
-            summary = "Use the source default",
+            title = stringResource(R.string.comp_auto),
+            summary = stringResource(R.string.comp_use_the_source_default),
             selected = options.selection.audioMode == PlaybackTrackSelectionMode.AUTO,
             onClick = onAutomaticAudio,
         )
         options.audio.forEach { choice ->
             PlaybackTrackChoiceRow(choice, onClick = { onAudioTrack(choice.key) })
         }
-        PlaybackTrackAvailability(options.known, options.audio, "audio tracks")
+        PlaybackTrackAvailability(options.known, options.audio, R.string.comp_no_audio_tracks)
     }
 }
 
@@ -194,28 +196,28 @@ internal fun PlaybackSubtitlesPanel(
     modifier: Modifier = Modifier,
 ) {
     PlaybackSelectionPanel(
-        title = "Subtitles",
-        subtitle = options.textSelectionSummary(),
+        title = stringResource(R.string.comp_subtitles),
+        subtitle = trackSummaryShown(options.textSelectionSummary()),
         onBack = onBack,
         onDismiss = onDismiss,
         modifier = modifier,
     ) {
         PlaybackOptionRow(
-            title = "Off",
-            summary = "Disable text tracks",
+            title = stringResource(R.string.comp_off),
+            summary = stringResource(R.string.comp_disable_text_tracks),
             selected = options.selection.textMode == PlaybackTrackSelectionMode.OFF,
             onClick = onTextOff,
         )
         PlaybackOptionRow(
-            title = "Auto",
-            summary = "Use forced or source-default subtitles",
+            title = stringResource(R.string.comp_auto),
+            summary = stringResource(R.string.comp_use_forced_or_source_default_subtitles),
             selected = options.selection.textMode == PlaybackTrackSelectionMode.AUTO,
             onClick = onAutomaticText,
         )
         options.text.forEach { choice ->
             PlaybackTrackChoiceRow(choice, onClick = { onTextTrack(choice.key) })
         }
-        PlaybackTrackAvailability(options.known, options.text, "subtitle tracks")
+        PlaybackTrackAvailability(options.known, options.text, R.string.comp_no_subtitle_tracks)
     }
 }
 
@@ -272,8 +274,8 @@ internal fun PlaybackSpeedPanel(
     modifier: Modifier = Modifier,
 ) {
     PlaybackSelectionPanel(
-        title = "Speed",
-        subtitle = "For this video",
+        title = stringResource(R.string.comp_speed),
+        subtitle = stringResource(R.string.comp_for_this_video),
         onBack = onBack,
         onDismiss = onDismiss,
         modifier = modifier,
@@ -387,7 +389,7 @@ private fun PlaybackPanelHeader(
             IconButton(onClick = onBack) {
                 Icon(
                     Symbols.ArrowBack,
-                    contentDescription = "Back to playback options",
+                    contentDescription = stringResource(R.string.comp_back_to_playback_options),
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
@@ -407,7 +409,7 @@ private fun PlaybackPanelHeader(
         IconButton(onClick = onDismiss) {
             Icon(
                 Symbols.Close,
-                contentDescription = "Close playback options",
+                contentDescription = stringResource(R.string.comp_close_playback_options),
                 tint = MaterialTheme.colorScheme.onSurface,
             )
         }
@@ -420,8 +422,8 @@ private fun PlaybackTrackChoiceRow(
     onClick: () -> Unit,
 ) {
     PlaybackOptionRow(
-        title = choice.title,
-        summary = choice.summary,
+        title = trackSummaryShown(choice.title),
+        summary = trackSummaryShown(choice.summary),
         selected = choice.selected,
         onClick = onClick,
     )
@@ -481,11 +483,11 @@ private fun PlaybackOptionRow(
 private fun PlaybackTrackAvailability(
     known: Boolean,
     choices: List<PlaybackTrackChoice>,
-    name: String,
+    @androidx.annotation.StringRes text: Int,
 ) {
     if (!known || choices.isNotEmpty()) return
     Text(
-        text = "No $name available",
+        text = stringResource(text),
         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         style = MaterialTheme.typography.labelMedium,
@@ -511,8 +513,8 @@ internal fun PlaybackDiagnosticsPanel(
                 .padding(16.dp),
         ) {
             PlaybackPanelHeader(
-                title = "Technical details",
-                subtitle = "Read-only runtime diagnostics",
+                title = stringResource(R.string.comp_technical_details),
+                subtitle = stringResource(R.string.comp_read_only_runtime_diagnostics),
                 onBack = onBack,
                 onDismiss = onDismiss,
             )
@@ -524,23 +526,23 @@ internal fun PlaybackDiagnosticsPanel(
                     .padding(top = 10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                PlaybackDiagnosticRow("Source", diagnostics.sourceSummary())
-                PlaybackDiagnosticRow("Video tracks", diagnostics.tracks.videoSummary())
-                PlaybackDiagnosticRow("Audio tracks", diagnostics.tracks.audioSummary())
-                PlaybackDiagnosticRow("Text tracks", diagnostics.tracks.textSummary())
+                PlaybackDiagnosticRow(stringResource(R.string.all_source), diagnostics.sourceSummary())
+                PlaybackDiagnosticRow(stringResource(R.string.all_video_tracks), diagnostics.tracks.videoSummary())
+                PlaybackDiagnosticRow(stringResource(R.string.all_audio_tracks), diagnostics.tracks.audioSummary())
+                PlaybackDiagnosticRow(stringResource(R.string.all_text_tracks), diagnostics.tracks.textSummary())
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                PlaybackDiagnosticRow("Active video", diagnostics.activeVideoFormat.videoSummary())
-                PlaybackDiagnosticRow("Video decoder", decoderSummary(
+                PlaybackDiagnosticRow(stringResource(R.string.all_active_video), diagnostics.activeVideoFormat.videoSummary())
+                PlaybackDiagnosticRow(stringResource(R.string.all_video_decoder), decoderSummary(
                     diagnostics.videoDecoderName,
                     diagnostics.videoDecoderInitializationMs,
                 ))
-                PlaybackDiagnosticRow("Active audio", diagnostics.activeAudioFormat.audioSummary())
-                PlaybackDiagnosticRow("Audio decoder", decoderSummary(
+                PlaybackDiagnosticRow(stringResource(R.string.all_active_audio), diagnostics.activeAudioFormat.audioSummary())
+                PlaybackDiagnosticRow(stringResource(R.string.all_audio_decoder), decoderSummary(
                     diagnostics.audioDecoderName,
                     diagnostics.audioDecoderInitializationMs,
                 ))
-                PlaybackDiagnosticRow("Dropped frames", diagnostics.droppedVideoFrames.toString())
-                diagnostics.lastCodecEvent?.let { PlaybackDiagnosticRow("Codec event", it) }
+                PlaybackDiagnosticRow(stringResource(R.string.all_dropped_frames), diagnostics.droppedVideoFrames.toString())
+                diagnostics.lastCodecEvent?.let { PlaybackDiagnosticRow(stringResource(R.string.all_codec_event), it) }
             }
         }
     }
@@ -565,5 +567,28 @@ private fun PlaybackDiagnosticRow(label: String, value: String) {
             color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.bodyMedium,
         )
+    }
+}
+
+// TRANSLATE14_TRACK_SUMMARIES_ARE_SHOWN_TRANSLATED_V1: media/VideoTrackSelection
+// builds English summaries (tests read them); the panel shows them translated.
+// Track names that come from the stream (a language, a label) are shown as they are.
+private val TRACK_AUTO_CEILING = Regex("""^Auto · (.+) ceiling$""")
+private val TRACK_VIDEO_NUMBER = Regex("""^Video (\d+)$""")
+private val TRACK_PIXEL_VIDEO = Regex("""^(\d+)px video$""")
+
+@Composable
+internal fun trackSummaryShown(summary: String): String {
+    TRACK_AUTO_CEILING.matchEntire(summary)?.let { return stringResource(R.string.comp_track_auto_ceiling, it.groupValues[1]) }
+    TRACK_VIDEO_NUMBER.matchEntire(summary)?.let { return stringResource(R.string.comp_track_video_number, it.groupValues[1].toInt()) }
+    TRACK_PIXEL_VIDEO.matchEntire(summary)?.let { return stringResource(R.string.comp_track_pixel_video, it.groupValues[1].toInt()) }
+    return when (summary) {
+        "Off" -> stringResource(R.string.comp_track_off)
+        "Auto · source default" -> stringResource(R.string.comp_track_auto_source_default)
+        "Auto · forced or source default" -> stringResource(R.string.comp_track_auto_forced_or_source_default)
+        "Loading tracks…" -> stringResource(R.string.comp_track_loading)
+        "Selected track unavailable" -> stringResource(R.string.comp_track_selected_unavailable)
+        "Text track" -> stringResource(R.string.comp_track_text)
+        else -> summary
     }
 }

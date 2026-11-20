@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.ui.screens
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.label
 import io.github.brealorg.subshell.model.Comment
 import io.github.brealorg.subshell.ui.CommentHierarchyStyle
 import io.github.brealorg.subshell.ui.SubshellSettings
@@ -10,11 +14,15 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// TRANSLATE08: reads string resources (enum labels), so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue10CommentHierarchyStylePolicyTest {
     @Test
-    fun guideLinesRemainTheBackwardCompatibleDefault() {
+    fun parentConnectorsAreTheDefault() {
         assertEquals(
-            CommentHierarchyStyle.GUIDE_LINES,
+            // DEFAULTS102_OWNER_SETTINGS_BECOME_DEFAULTS_V1 (owner 2026-11-11)
+            CommentHierarchyStyle.PARENT_CONNECTORS,
             SubshellSettings().commentHierarchyStyle,
         )
 
@@ -42,7 +50,7 @@ class Issue10CommentHierarchyStylePolicyTest {
                 SubshellSettings.COMMENT_HIERARCHY_STYLE
 
         assertEquals(
-            CommentHierarchyStyle.GUIDE_LINES,
+            CommentHierarchyStyle.PARENT_CONNECTORS,
             SubshellSettings.fromStorageMap(
                 legacy,
             ).commentHierarchyStyle,

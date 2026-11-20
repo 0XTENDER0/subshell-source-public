@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import android.os.Build
 import io.github.brealorg.subshell.data.account.CommentDeleteFailureKind
 import io.github.brealorg.subshell.data.account.CommentDeletePhase
@@ -29,6 +32,9 @@ import org.junit.Test
  * (OCB-170/172), warm surface containers (292), media type from its bytes
  * (295), downloads before Android 10 (084), crosspost flair match (293).
  */
+// TRANSLATE03: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class LowUiLogic3Test {
     private fun safetyMessage(
         operation: ContentSafetyOperation,
@@ -45,7 +51,7 @@ class LowUiLogic3Test {
             hidden = hidden,
             failureKind = kind,
         ),
-    ).message
+    ).message.s
 
     @Test
     fun aBlockOrHideFailureIsNotCalledAReport() {
@@ -73,8 +79,8 @@ class LowUiLogic3Test {
                 failureKind = CommentDeleteFailureKind.OUTCOME_NOT_CONFIRMED,
             ),
         )
-        assertFalse(presentation.message.contains("accepted"))
-        assertTrue(presentation.message.contains("may have received"))
+        assertFalse(presentation.message.s.contains("accepted"))
+        assertTrue(presentation.message.s.contains("may have received"))
     }
 
     @Test

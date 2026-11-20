@@ -12,6 +12,8 @@ import org.junit.Test
  * when the request rejected the draft after the composer's validation passed.
  * A preview image the request rejects is dropped; anything else is reported.
  */
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class Issue100PostRequestFailureTest {
     private val linkDraft = PostComposerDraft(
         community = "subshell",
@@ -58,7 +60,8 @@ class Issue100PostRequestFailureTest {
         assertNull(duplicateGallery.toV4RemoteRequest("reddit:alice", null))
         assertEquals(
             "This post can't be sent as it is. Check its link and attachments.",
-            io.github.brealorg.subshell.ui.screens.COMPOSER_REQUEST_UNBUILDABLE_MESSAGE,
+            androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>()
+                .getString(io.github.brealorg.subshell.ui.screens.COMPOSER_REQUEST_UNBUILDABLE_MESSAGE),
         )
     }
 }

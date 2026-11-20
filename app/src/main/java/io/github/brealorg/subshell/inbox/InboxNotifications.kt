@@ -99,6 +99,10 @@ internal fun inboxNotificationTarget(
 
 internal fun takeInboxNotificationTarget(context: Context, intent: Intent?): InboxNotificationTarget? {
     val candidate = intent ?: return null
+    // MODMAIL07_ONLY_THE_OWNING_ACTION_TAKES_THE_LAUNCH_KEY_V1: a modmail tap
+    // reaches this function first (MainActivity asks inbox, then modmail) and
+    // used to lose its key here, so the modmail tap was dropped as foreign.
+    if (candidate.action != INBOX_NOTIFICATION_ACTION_OPEN) return null
     if (!takeNotificationLaunchKey(context, candidate)) return null
     val target = inboxNotificationTarget(
         action = candidate.action,
@@ -136,6 +140,7 @@ internal fun modmailNotificationTarget(
 
 internal fun takeModmailNotificationTarget(context: Context, intent: Intent?): ModmailNotificationTarget? {
     val candidate = intent ?: return null
+    if (candidate.action != MODMAIL_NOTIFICATION_ACTION_OPEN) return null
     if (!takeNotificationLaunchKey(context, candidate)) return null
     val target = modmailNotificationTarget(
         action = candidate.action,
@@ -218,10 +223,10 @@ internal object InboxNotificationCenter {
         manager.createNotificationChannel(
             NotificationChannel(
                 INBOX_NOTIFICATION_CHANNEL_ID,
-                "Inbox",
+                context.getString(R.string.notif_channel_inbox),
                 NotificationManager.IMPORTANCE_DEFAULT,
             ).apply {
-                description = "New Reddit activity, private messages, and Modmail found by background Inbox sync"
+                description = context.getString(R.string.notif_channel_inbox_description)
             },
         )
     }
@@ -288,8 +293,8 @@ internal object InboxNotificationCenter {
                 INBOX_NOTIFICATION_CHANNEL_ID,
             )
                 .setSmallIcon(R.drawable.ic_notification_subshell)
-                .setContentTitle("subshell")
-                .setContentText("New Reddit Inbox activity")
+                .setContentTitle(appContext.getString(R.string.app_name))
+                .setContentText(appContext.getString(R.string.notif_new_inbox_activity))
                 .build()
 
             val builder = NotificationCompat.Builder(
@@ -297,19 +302,19 @@ internal object InboxNotificationCenter {
                 INBOX_NOTIFICATION_CHANNEL_ID,
             )
                 .setSmallIcon(R.drawable.ic_notification_subshell)
-                .setContentTitle(event.notificationTitle())
+                .setContentTitle(event.notificationTitle(appContext))
                 .setContentText(
                     event.preview.ifBlank {
                         if (event.kind == ActivityKind.MESSAGE) {
-                            "Open the conversation"
+                            appContext.getString(R.string.notif_open_conversation)
                         } else {
-                            "Open Reddit activity"
+                            appContext.getString(R.string.notif_open_reddit_activity)
                         }
                     },
                 )
                 .setStyle(
                     NotificationCompat.BigTextStyle().bigText(
-                        event.preview.ifBlank { event.notificationTitle() },
+                        event.preview.ifBlank { event.notificationTitle(appContext) },
                     ),
                 )
                 .setContentIntent(pendingIntent)
@@ -329,12 +334,16 @@ internal object InboxNotificationCenter {
             // the notification says no more than its lock-screen version.
             if (hideContent) {
                 builder
-                    .setContentTitle("subshell")
-                    .setContentText("New Reddit Inbox activity")
+                    .setContentTitle(appContext.getString(R.string.app_name))
+                    .setContentText(appContext.getString(R.string.notif_new_inbox_activity))
                     .setStyle(null)
             } else if (event.kind == ActivityKind.MESSAGE) {
                 // ISSUE253_MESSAGES_ARE_CONVERSATION_NOTIFICATIONS_V1
-                val content = conversationNotificationContent(event, System.currentTimeMillis())
+                val content = conversationNotificationContent(
+                    event,
+                    System.currentTimeMillis(),
+                    newMessageText = appContext.getString(R.string.notif_new_message),
+                )
                 builder.setStyle(conversationMessagingStyle(content))
                 if (pushConversationShortcut(appContext, account, content.sender)) {
                     builder.setShortcutId(conversationShortcutId(account, content.sender))
@@ -438,11 +447,11 @@ internal object InboxNotificationCenter {
             )
                 .setSmallIcon(R.drawable.ic_notification_subshell)
                 .setContentTitle("subshell")
-                .setContentText("New Reddit Modmail")
+                .setContentText(appContext.getString(R.string.notif_new_modmail))
                 .build()
-            val title = "Modmail · r/${event.communityName}"
+            val title = appContext.getString(R.string.notif_modmail_in, event.communityName)
             val content = event.preview.ifBlank {
-                event.subject.ifBlank { "Open the Modmail conversation" }
+                event.subject.ifBlank { appContext.getString(R.string.notif_open_modmail_conversation) }
             }
             val builder = NotificationCompat.Builder(
                 appContext,
@@ -464,7 +473,7 @@ internal object InboxNotificationCenter {
             if (hideContent) {
                 builder
                     .setContentTitle("subshell")
-                    .setContentText("New Reddit Modmail")
+                    .setContentText(appContext.getString(R.string.notif_new_modmail))
                     .setStyle(null)
             }
 
@@ -680,7 +689,7 @@ internal object InboxNotificationCenter {
                     intent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                 )
-                val text = if (modmail) "New Reddit Modmail" else "New Reddit Inbox activity"
+                val text = appContext.getString(if (modmail) R.string.notif_new_modmail else R.string.notif_new_inbox_activity)
                 val publicVersion = NotificationCompat.Builder(appContext, INBOX_NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_notification_subshell)
                     .setContentTitle("subshell")
@@ -951,11 +960,11 @@ internal object InboxNotificationCenter {
 
 internal const val MODMAIL_BACKGROUND_UNREAD_PAGE_LIMIT = MODMAIL_CONVERSATION_MAX_LIMIT
 
-private fun InboxNotificationEvent.notificationTitle(): String = when (kind) {
+private fun InboxNotificationEvent.notificationTitle(context: Context): String = when (kind) {
     ActivityKind.MESSAGE -> sender.takeIf(String::isNotBlank)
-        ?.let { "Message from $it" }
-        ?: "New message"
-    else -> title.ifBlank { "New Reddit activity" }
+        ?.let { context.getString(R.string.notif_message_from, it) }
+        ?: context.getString(R.string.notif_new_message)
+    else -> title.ifBlank { context.getString(R.string.notif_new_reddit_activity) }
 }
 
 private fun stableNotificationId(eventKey: String): Int =

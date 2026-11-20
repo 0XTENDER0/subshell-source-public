@@ -1,6 +1,9 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import android.content.SharedPreferences
+import io.github.brealorg.subshell.data.privateprefs.SealedKeysPreferences
 import io.github.brealorg.subshell.ui.theme.AppTextScale
 import io.github.brealorg.subshell.ui.theme.AppUiScale
 import io.github.brealorg.subshell.ui.state.BackgroundPostPagingExecutor
@@ -82,13 +85,18 @@ fun rememberSubshellState(
     var restoredMediaWasManual by rememberSaveable { mutableStateOf(false) }
 
     fun createState(processSnapshotToken: String?): SubshellState {
+        val applicationContext = context.applicationContext
         // STRICTMODE02_PREFERENCES_LOAD_BEFORE_THE_FIRST_FRAME_V1 (#243): the
         // application's files, read into memory by StartupPreferences; an
         // activity context would look up the folder on disk again per activity.
-        val preferences = context.applicationContext.getSharedPreferences("subshell_preferences", 0)
-        val devicePreferences = context.applicationContext.getSharedPreferences(
+        // PRIVATEPREFS01_PRIVATE_SETTINGS_ARE_SEALED_V1: the same file, with the keys about the
+        // reader (hidden and muted communities, notes, saved searches, drafts, saved responses)
+        // stored sealed.
+        val preferences = SealedKeysPreferences.of(context)
+        // PRIVATEPREFS02: the search history and the search index in this file are sealed.
+        val devicePreferences = SealedKeysPreferences.named(
+            context,
             RedditLinkHandlingPromptStore.DEVICE_PREFERENCES_NAME,
-            0,
         )
         val composerDraftStore = ComposerDraftStore(preferences)
         val moderatorSavedResponseStore = ModeratorSavedResponseStore(preferences)
@@ -626,6 +634,22 @@ fun rememberSubshellState(
                 CommentThreadColours.entries,
                 DefaultSubshellSettings.commentThreadColours,
             ),
+            initialCommentIndentSize = enumValue(
+                SubshellSettings.COMMENT_INDENT_SIZE,
+                CommentIndentSize.entries,
+                DefaultSubshellSettings.commentIndentSize,
+            ),
+            initialCommentRailFromParent = preferences.getBoolean(
+                SubshellSettings.COMMENT_RAIL_FROM_PARENT,
+                DefaultSubshellSettings.commentRailFromParent,
+            ),
+            initialCleanLinks = preferences.getBoolean(
+                SubshellSettings.CLEAN_LINKS,
+                DefaultSubshellSettings.cleanLinks,
+            ),
+            initialShownLanguages = decodeShownLanguages(
+                preferences.getString(SubshellSettings.SHOWN_LANGUAGES, null),
+            ),
             initialHighlightNewComments = preferences.getBoolean(
                 SubshellSettings.HIGHLIGHT_NEW_COMMENTS,
                 DefaultSubshellSettings.highlightNewComments,
@@ -762,9 +786,27 @@ fun rememberSubshellState(
                 FeedPositionStart.entries,
                 DefaultSubshellSettings.resumeFeedPositionStart,
             ),
+            // ISSUE302_START_FEED_V1 / ISSUE300_DEFAULT_FEED_SORT_V1
+            initialStartFeed = enumValue(
+                SubshellSettings.START_FEED,
+                StartFeed.entries,
+                DefaultSubshellSettings.startFeed,
+            ),
+            initialDefaultFeedSort = enumValue(
+                SubshellSettings.DEFAULT_FEED_SORT,
+                FeedSort.entries,
+                DefaultSubshellSettings.defaultFeedSort,
+            ),
+            initialDefaultCommunitySort = enumValue(
+                SubshellSettings.DEFAULT_COMMUNITY_SORT,
+                CommunitySort.entries,
+                DefaultSubshellSettings.defaultCommunitySort,
+            ),
+            // LEAK01_STATE_HOLDS_NO_ACTIVITY_V1: the state outlives the activity
+            // (#245); the lazy lambda holds the application, never `context`.
             feedPositionFile = FeedPositionFile {
                 java.io.File(
-                    java.io.File(context.applicationContext.noBackupFilesDir, "feed-positions"),
+                    java.io.File(applicationContext.noBackupFilesDir, "feed-positions"),
                     FEED_POSITION_FILE_NAME,
                 )
             },

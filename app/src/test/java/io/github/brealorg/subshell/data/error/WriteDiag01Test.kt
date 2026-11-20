@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.data.error
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.data.network.NetworkRateLimit
 import io.github.brealorg.subshell.data.network.NetworkResponseMetadata
 import java.io.File
@@ -37,7 +38,7 @@ class WriteDiag01Test {
         val root = requireNotNull(File(requireNotNull(System.getProperty("user.dir"))).parentFile)
         val offenders = File(root, "app/src/main/java").walkTopDown()
             .filter { it.extension == "kt" && it.name != "RedditWriteFailureDetails.kt" }
-            .filter { it.readText().contains(Regex("""rateLimit\??\.resetAfterMs""")) }
+            .filter { it.readSourceText().contains(Regex("""rateLimit\??\.resetAfterMs""")) }
             .map { it.name }
             .toList()
         assertEquals(emptyList<String>(), offenders)

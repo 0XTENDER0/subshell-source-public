@@ -25,6 +25,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import io.github.brealorg.subshell.data.cache.CachePayloadSeal
+import io.github.brealorg.subshell.data.cache.CipherCachePayloadSeal
+import io.github.brealorg.subshell.data.cache.SoftwareAesCipher
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -71,23 +74,42 @@ class Issue253ConversationNotificationsTest {
         unread = true,
     )
 
+    // The Android Keystore is not there under Robolectric: a software key stands in for it.
+    private val productionSealBefore = CachePayloadSeal.production
+
+    private fun useSoftwareSeal() {
+        CachePayloadSeal.production = { CipherCachePayloadSeal(SoftwareAesCipher(keyByte = 1)) }
+    }
+
+    private fun restoreSeal() {
+        CachePayloadSeal.production = productionSealBefore
+    }
+
     @Before
     fun allowNotifications() {
+        useSoftwareSeal()
         shadowOf(context).grantPermissions(Manifest.permission.POST_NOTIFICATIONS)
         context.getSharedPreferences("subshell_preferences", Context.MODE_PRIVATE)
             .edit()
             .putBoolean(SubshellSettings.INBOX_NOTIFICATIONS_ENABLED, true)
             .commit()
-        InboxReplyWork.enqueue = { _, input -> enqueued += input.getString(INBOX_REPLY_TEXT_KEY).orEmpty() }
+        // ISSUE305_A_NOTIFICATION_REPLY_IS_SEALED_V1: the worker's input names the
+        // request; the text waits in sealed storage (what the worker reads).
+        InboxReplyWork.enqueue = { _, input ->
+            enqueuedInputs += input
+            enqueued += ConversationReplyTargets.takeText(context, input.getString(INBOX_REPLY_REQUEST_INPUT)!!).orEmpty()
+        }
     }
 
     @After
     fun restoreWork() {
+        restoreSeal()
         InboxReplyWork.enqueue = defaultEnqueue
     }
 
     private val defaultEnqueue = InboxReplyWork.enqueue
     private val enqueued = mutableListOf<String>()
+    private val enqueuedInputs = mutableListOf<androidx.work.Data>()
 
     private fun post(item: InboxItem) {
         InboxNotificationCenter.postNewEvents(
@@ -193,6 +215,46 @@ class Issue253ConversationNotificationsTest {
         InboxReplyReceiver().onReceive(context, replyIntent("unknown-event", NotificationLaunchKey.value(context), "x"))
 
         assertEquals(before, NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(shown())!!.messages.size)
+        assertTrue(enqueued.isEmpty())
+    }
+
+    // ISSUE305_A_NOTIFICATION_REPLY_IS_SEALED_V1 (#305): WorkManager keeps input
+    // data in plain text in its own database.
+    @Test
+    fun theTypedReplyNeverGoesIntoWorkManagersData() {
+        post(message)
+        InboxReplyReceiver().onReceive(
+            context,
+            replyIntent(message.inboxBackgroundEventKey(), NotificationLaunchKey.value(context), "Secret plans"),
+        )
+
+        val input = enqueuedInputs.single()
+        assertTrue(input.keyValueMap.values.none { value -> value.toString().contains("Secret plans") })
+        val stored = context.getSharedPreferences("subshell_conversation_replies", Context.MODE_PRIVATE).all
+        assertTrue(stored.values.none { value -> value.toString().contains("Secret plans") })
+        assertEquals(listOf("Secret plans"), enqueued)
+    }
+
+    // ISSUE305_A_LOST_REPLY_TARGET_SAYS_SO_V1 (#305): a reply whose stored target
+    // is gone was dropped without a word.
+    @Test
+    fun aReplyWhoseTargetIsGoneSaysItWasNotSent() {
+        post(message)
+        val action = requireNotNull(replyAction(shown()))
+        val sent = Intent()
+        action.actionIntent!!.let { pending ->
+            shadowOf(pending).savedIntent.let { saved -> sent.replaceExtras(saved) }
+        }
+        context.getSharedPreferences("subshell_conversation_replies", Context.MODE_PRIVATE).edit().clear().commit()
+
+        val intent = replyIntent("event-whose-target-is-gone", NotificationLaunchKey.value(context), "Hello?")
+            .putExtra(INBOX_REPLY_NOTIFICATION_TAG_EXTRA, sent.getStringExtra(INBOX_REPLY_NOTIFICATION_TAG_EXTRA))
+            .putExtra(INBOX_REPLY_NOTIFICATION_ID_EXTRA, sent.getIntExtra(INBOX_REPLY_NOTIFICATION_ID_EXTRA, 0))
+        InboxReplyReceiver().onReceive(context, intent)
+
+        val messages = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(shown())!!.messages
+        assertTrue(messages.any { it.text.toString() == "Hello?" })
+        assertTrue(messages.any { it.text.toString() == context.getString(io.github.brealorg.subshell.R.string.notif_reply_not_sent) })
         assertTrue(enqueued.isEmpty())
     }
 

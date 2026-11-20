@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertTrue
@@ -21,7 +22,7 @@ class CommentSave01A3SaveIconConsistencyPolicyTest {
     private fun source(path: String): String {
         val file = File(repositoryRoot, path)
         assertTrue("Expected source file: ${file.path}", file.isFile)
-        return file.readText()
+        return file.readSourceText()
     }
 
     @Test

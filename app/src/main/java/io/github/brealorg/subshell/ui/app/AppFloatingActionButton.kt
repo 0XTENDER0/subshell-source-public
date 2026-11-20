@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -58,7 +60,7 @@ internal fun AppFloatingActionButton(
             icon = {
                 Icon(Symbols.Add, contentDescription = null)
             },
-            text = { Text("Create feed") },
+            text = { Text(stringResource(R.string.shell_create_feed)) },
         )
     } else if (!customFeedFabVisible) {
         AnimatedVisibility(visible = createButtonVisible && !chromeFullyHidden && !videoControlsInUse) {
@@ -82,7 +84,7 @@ internal fun AppFloatingActionButton(
                     contentDescription = null,
                 )
             },
-            text = { Text(if (createPostButtonVisible) "Create" else "Message") },
+            text = { Text(stringResource(if (createPostButtonVisible) R.string.fab_create else R.string.fab_message)) },
         )
     }
     }

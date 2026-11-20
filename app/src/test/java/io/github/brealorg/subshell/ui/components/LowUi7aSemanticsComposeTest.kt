@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.s
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -103,11 +104,11 @@ class LowUi7aSemanticsComposeTest {
         val third = redditDirectChatReactionCatalog[2].key
         assertEquals(
             "Reddit reaction 3, 2 reactions, including yours",
-            directChatReactionChipLabel(DirectChatReactionSummary(key = third, count = 2, self = true)),
+            directChatReactionChipLabel(DirectChatReactionSummary(key = third, count = 2, self = true)).s,
         )
         assertEquals(
             "Reddit reaction 3, 1 reaction",
-            directChatReactionChipLabel(DirectChatReactionSummary(key = third, count = 1, self = false)),
+            directChatReactionChipLabel(DirectChatReactionSummary(key = third, count = 1, self = false)).s,
         )
     }
 }

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -160,7 +161,7 @@ fun SensitiveMediaLabScreen(
                                 FilterChip(
                                     selected = state.sensitiveMediaPreviewMode == mode,
                                     onClick = { state.updateSensitiveMediaPreviewMode(mode) },
-                                    label = { Text(mode.label) },
+                                    label = { Text(stringResource(mode.labelRes)) },
                                 )
                             }
                         }

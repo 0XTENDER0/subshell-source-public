@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Badge
@@ -82,9 +84,10 @@ internal fun AppBottomBar(
                     translationY = size.height * bottomBarHiddenFraction
                 },
         ) {
+            val switchAccountLabel = stringResource(R.string.shell_switch_account)
             navItems.forEach { item ->
                 val isYou = item.destination == MainDestination.YOU
-                val navigationAccessibilityLabel = item.destination.label
+                val navigationAccessibilityLabel = stringResource(item.destination.labelRes)
                 val navigationVisualLabel =
                     navigationVisualLabel(
                         destination = item.destination,
@@ -100,7 +103,7 @@ internal fun AppBottomBar(
                 ShortNavigationBarItem(
                     modifier = if (isYou) {
                         Modifier.semantics {
-                            onLongClick(label = "Switch account") {
+                            onLongClick(label = switchAccountLabel) {
                                 accountSwitcherVisible = true
                                 true
                             }
@@ -147,7 +150,7 @@ internal fun AppBottomBar(
                     } else {
                         {
                             Text(
-                                text = navigationVisualLabel,
+                                text = stringResource(navigationVisualLabel),
                                 modifier = Modifier.clearAndSetSemantics {
                                     contentDescription =
                                         navigationAccessibilityLabel

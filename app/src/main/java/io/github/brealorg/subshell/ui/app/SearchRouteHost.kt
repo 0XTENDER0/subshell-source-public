@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -52,7 +54,7 @@ internal fun SearchRouteHost(
             // NEXT01A2R1_SEARCH_WORKSPACE_TWO_PANE_V1
             ExpandedListDetailSurface(
                 scaffoldPadding = padding,
-                listTitle = "Search",
+                listTitle = stringResource(R.string.all_search),
                 listSubtitle = null,
                 listContent = { listModifier ->
                     SearchScreen(
@@ -80,10 +82,10 @@ internal fun SearchRouteHost(
                             // LOWUX3_SEARCH_DETAIL_PLACEHOLDER_FOLLOWS_THE_SCOPE_V1
                             // (OCB-121): Communities and People results are not posts.
                             text = when {
-                                state.searchSubmittedQuery.isBlank() -> "Search for a post"
+                                state.searchSubmittedQuery.isBlank() -> stringResource(R.string.all_search_for_a_post)
                                 state.searchScope == SearchScope.COMMUNITIES -> "Select a community"
                                 state.searchScope == SearchScope.USERS -> "Select a person"
-                                else -> "Select a post"
+                                else -> stringResource(R.string.all_select_a_post)
                             },
                             style = MaterialTheme.typography.titleMedium,
                             color =

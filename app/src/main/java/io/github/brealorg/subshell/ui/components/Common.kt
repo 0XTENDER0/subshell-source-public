@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.compositeOver
 import io.github.brealorg.subshell.ui.error.LocalViewportErrorHostState
 import io.github.brealorg.subshell.ui.noticeInfo
@@ -93,11 +95,12 @@ import io.github.brealorg.subshell.ui.ProfileActivityEvidence
 import io.github.brealorg.subshell.ui.PostLayout
 import io.github.brealorg.subshell.ui.feedEdgeToEdge
 import io.github.brealorg.subshell.ui.SubshellState
+import io.github.brealorg.subshell.ui.flairSearchTarget
 import io.github.brealorg.subshell.ui.MainDestination
 import io.github.brealorg.subshell.ui.SecondaryDestination
 import io.github.brealorg.subshell.ui.VoteColorPalette
 import io.github.brealorg.subshell.ui.VoteControlMode
-import io.github.brealorg.subshell.ui.copyPostLink
+import io.github.brealorg.subshell.ui.canonicalRedditPostUrl
 import io.github.brealorg.subshell.ui.sharePostLink
 import io.github.brealorg.subshell.ui.supportsTimePeriod
 import io.github.brealorg.subshell.ui.symbols.Symbols
@@ -245,7 +248,7 @@ private fun RefreshableContent(
                 delay(650)
                 previewRefreshing = false
                 // ISSUE222_NO_TOASTS_V1
-                notices.noticeInfo("Offline preview — no new data fetched", "This preview has no live data to refresh")
+                notices.noticeInfo(UiText.Resource(R.string.nt_offline_preview_no_new_data_fetched), UiText.Resource(R.string.nt_this_preview_has_no_live_data_to))
             }
         }
     }
@@ -451,9 +454,7 @@ fun RefreshableLazyColumn(
                 if (shouldRequest) {
                     uiDebugLog(
                         LIVE_FEED_PAGING_LOG_TAG,
-                        "governor viewport first=${viewport.firstVisibleIndex} " +
-                            "last=${viewport.lastVisibleIndex} total=${viewport.totalItems} " +
-                            "token=${viewport.token}",
+                        "governor viewport first=${viewport.firstVisibleIndex} last=${viewport.lastVisibleIndex} total=${viewport.totalItems} token=${viewport.token}",
                     )
                     currentOnLoadNext()
                 }
@@ -622,7 +623,7 @@ fun MainScreenHeader(
     onSaveForOffline: (() -> Unit)? = null,
     onExploreClick: (() -> Unit)? = null,
     onSearchClick: (() -> Unit)? = null,
-    searchContentDescription: String = "Search",
+    searchContentDescription: String = stringResource(R.string.all_search),
     // ISSUE234_LAYOUT_CHOICE_BESIDE_THE_FEED_V1
     postLayoutButton: Boolean = false,
     // SEARCHBAR_HEADER_V1 (fork): [menu][sort][wide search bar]; the layout choice and the
@@ -694,9 +695,9 @@ fun MainScreenHeader(
                                     state.activeAccountIsAuthenticated &&
                                     feedSort.supportsTimePeriod
                                 ) {
-                                    "${feedSort.label} · ${listingTimePeriod.label}"
+                                    "${stringResource(feedSort.labelRes)} · ${stringResource(listingTimePeriod.labelRes)}"
                                 } else {
-                                    feedSort.label
+                                    stringResource(feedSort.labelRes)
                                 },
                                 style = MaterialTheme.typography.labelLarge.copy(
                                     lineHeight = CompactHomeSortLineHeight,
@@ -711,7 +712,7 @@ fun MainScreenHeader(
                             Spacer(Modifier.width(2.dp))
                             Icon(
                                 Symbols.KeyboardArrowDown,
-                                contentDescription = "Choose feed sorting",
+                                contentDescription = stringResource(R.string.feed_choose_feed_sorting),
                                 modifier = Modifier.size(16.dp),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -724,7 +725,7 @@ fun MainScreenHeader(
                 ) {
                     feedSortOptions.forEach { sort ->
                         DropdownMenuItem(
-                            text = { Text(sort.label) },
+                            text = { Text(stringResource(sort.labelRes)) },
                             trailingIcon = if (sort == feedSort) {
                                 { Icon(Symbols.Check, contentDescription = null) }
                             } else {
@@ -742,7 +743,7 @@ fun MainScreenHeader(
                     ) {
                         HorizontalDivider()
                         DropdownMenuItem(
-                            text = { Text("Time period · ${listingTimePeriod.label}") },
+                            text = { Text(stringResource(R.string.feed_time_period, stringResource(listingTimePeriod.labelRes))) },
                             trailingIcon = {
                                 Icon(
                                     Symbols.KeyboardArrowDown,
@@ -762,10 +763,10 @@ fun MainScreenHeader(
                                 // ISSUE283_HIDE_READ_POSTS_SAYS_WHY_IT_IS_OFF_V1 (#283): a reader
                                 // saw it greyed out with nothing saying why.
                                 Column {
-                                    Text(if (hideReadPosts) "Show read posts" else "Hide read posts")
+                                    Text(if (hideReadPosts) stringResource(R.string.all_show_read_posts) else stringResource(R.string.all_hide_read_posts))
                                     if (!hasReadPosts) {
                                         Text(
-                                            "Posts you open count as read",
+                                            stringResource(R.string.all_posts_you_open_count_as_read),
                                             style = MaterialTheme.typography.bodySmall,
                                         )
                                     }
@@ -786,7 +787,7 @@ fun MainScreenHeader(
                         // refresh icon a reader took it for "Refresh feed"; it only forgets
                         // which posts were opened, so it has no icon, like the items above.
                         DropdownMenuItem(
-                            text = { Text("Reset read markers") },
+                            text = { Text(stringResource(R.string.feed_reset_read_markers)) },
                             enabled = hasReadPosts,
                             onClick = {
                                 onResetReadPosts()
@@ -797,7 +798,7 @@ fun MainScreenHeader(
                     if (onSaveForOffline != null) {
                         HorizontalDivider()
                         DropdownMenuItem(
-                            text = { Text("Save for offline") },
+                            text = { Text(stringResource(R.string.feed_save_for_offline)) },
                             leadingIcon = {
                                 Icon(Symbols.Download, contentDescription = null)
                             },
@@ -814,7 +815,7 @@ fun MainScreenHeader(
                 ) {
                     RedditListingTimePeriod.entries.forEach { timePeriod ->
                         DropdownMenuItem(
-                            text = { Text(timePeriod.label) },
+                            text = { Text(stringResource(timePeriod.labelRes)) },
                             trailingIcon = if (timePeriod == listingTimePeriod) {
                                 { Icon(Symbols.Check, contentDescription = null) }
                             } else {
@@ -843,7 +844,7 @@ fun MainScreenHeader(
             IconButton(onClick = onExploreClick) {
                 Icon(
                     Symbols.Explore,
-                    contentDescription = "Explore communities",
+                    contentDescription = stringResource(R.string.feed_explore_communities),
                 )
             }
         }
@@ -906,7 +907,7 @@ private fun HeaderDrawerButton(state: SubshellState) {
             SubshellMark(Modifier.size(SubshellLogoSize))
             Icon(
                 Symbols.KeyboardArrowDown,
-                contentDescription = "Open navigation",
+                contentDescription = stringResource(R.string.feed_open_navigation),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .size(12.dp),
@@ -919,7 +920,7 @@ private fun HeaderDrawerButton(state: SubshellState) {
 @Composable
 private fun HeaderSearchButton(
     onSearchClick: (() -> Unit)?,
-    searchContentDescription: String = "Search",
+    searchContentDescription: String = stringResource(R.string.all_search),
 ) {
     if (onSearchClick != null) {
         IconButton(onClick = onSearchClick) {
@@ -934,12 +935,13 @@ private fun HeaderAccountMenu(
     onExpandedChange: (Boolean) -> Unit,
     state: SubshellState,
 ) {
+    val accountMenuDescription = stringResource(R.string.comp_account_menu)
     Box {
         IconButton(onClick = { onExpandedChange(true) }) {
             SnooAvatar(
                 Modifier
                     .size(34.dp)
-                    .semantics { contentDescription = "Account menu" },
+                    .semantics { contentDescription = accountMenuDescription },
             )
         }
         DropdownMenu(
@@ -947,7 +949,7 @@ private fun HeaderAccountMenu(
             onDismissRequest = { onExpandedChange(false) },
         ) {
             DropdownMenuItem(
-                text = { Text("Switch account") },
+                text = { Text(stringResource(R.string.feed_switch_account)) },
                 leadingIcon = { Icon(Symbols.SwapHoriz, contentDescription = null) },
                 onClick = {
                     onExpandedChange(false)
@@ -955,7 +957,7 @@ private fun HeaderAccountMenu(
                 },
             )
             DropdownMenuItem(
-                text = { Text("View profile") },
+                text = { Text(stringResource(R.string.feed_view_profile)) },
                 leadingIcon = { Icon(Symbols.Person, contentDescription = null) },
                 onClick = {
                     onExpandedChange(false)
@@ -963,7 +965,7 @@ private fun HeaderAccountMenu(
                 },
             )
             DropdownMenuItem(
-                text = { Text("Settings") },
+                text = { Text(stringResource(R.string.feed_settings)) },
                 leadingIcon = { Icon(Symbols.Settings, contentDescription = null) },
                 onClick = {
                     onExpandedChange(false)
@@ -971,7 +973,7 @@ private fun HeaderAccountMenu(
                 },
             )
             DropdownMenuItem(
-                text = { Text("Help & about") },
+                text = { Text(stringResource(R.string.feed_help_about)) },
                 leadingIcon = {
                     Icon(Symbols.Help, contentDescription = null)
                 },
@@ -997,7 +999,7 @@ fun CommunityAvatar(
     val avatarBackground = accent.copy(alpha = 0.18f).compositeOver(MaterialTheme.colorScheme.surface)
     RemoteIdentityImage(
         uri = iconImageUri,
-        contentDescription = "Icon for r/$name",
+        contentDescription = stringResource(R.string.feed_icon_for_r, name),
         modifier = modifier
             .clip(CircleShape)
             .background(avatarBackground),
@@ -1027,7 +1029,7 @@ fun CommentAuthorAvatar(
     val avatarBackground = accent.copy(alpha = 0.18f).compositeOver(MaterialTheme.colorScheme.surface)
     RemoteIdentityImage(
         uri = avatarUri,
-        contentDescription = "Avatar for u/$author",
+        contentDescription = stringResource(R.string.feed_avatar_for_u, author),
         modifier = modifier
             .clip(CircleShape)
             .background(avatarBackground),
@@ -1105,6 +1107,9 @@ fun PostCard(
     bodyMaxLines: Int = 4,
     onEditPost: (() -> Unit)? = null,
     onManagePost: (() -> Unit)? = null,
+    // ISSUE295_MODERATOR_SETS_POST_FLAIR_V1: the post view opens its manage page
+    // as a moderator's; elsewhere the card asks the post view to.
+    onModeratePost: (() -> Unit)? = null,
     onDeletePost: (() -> Unit)? = null,
     onRefreshComments: (() -> Unit)? = null,
     knownHidden: Boolean = false,
@@ -1145,6 +1150,7 @@ fun PostCard(
     val context = LocalContext.current
     val notices = LocalViewportErrorHostState.current
     var overflowExpanded by remember(post.id) { mutableStateOf(false) }
+    var ownPostSheetVisible by remember(post.id) { mutableStateOf(false) }
     // ISSUE284_POST_TEXT_COLLAPSES_LIKE_A_COMMENT_V1 (#284, owner: optional,
     // off by default): on the post screen a tap on the title hides the post's
     // text, as a tap collapses a comment. The community and author above it
@@ -1157,9 +1163,53 @@ fun PostCard(
     var postTextCollapsed by remember(post.id) { mutableStateOf(false) }
     var reportDialogVisible by remember(post.id) { mutableStateOf(false) }
     var muteSheetVisible by remember(post.id) { mutableStateOf(false) }
+    var copySheetVisible by remember(post.id) { mutableStateOf(false) }
     // ISSUE34_USER_TAGS_V1
     val authorTag = state.userTagFor(post.author)
     var userTagEditorVisible by remember(post.id) { mutableStateOf(false) }
+    // ISSUE295_YOUR_POST_ACTIONS_IN_ONE_SHEET_V1
+    if (ownPostSheetVisible) {
+        ItemActionsSheet(
+            title = stringResource(R.string.feed_your_post),
+            groups = listOf(
+                listOfNotNull(
+                    SheetAction(
+                        if (bodyEditEntryMode == PostBodyEditEntryMode.PROBE) stringResource(R.string.comp_edit_body_test) else stringResource(R.string.scr_edit_post),
+                        Symbols.Edit,
+                    ) {
+                        if (onEditPost != null) {
+                            onEditPost()
+                        } else {
+                            state.requestPostEdit(post.id)
+                            beforeNavigation()
+                            onOpen()
+                        }
+                    }.takeIf { state.activeAccountIsAuthenticated && bodyEditEntryMode != null },
+                    SheetAction(stringResource(R.string.all_manage_post), Symbols.Tune) {
+                        if (onManagePost != null) {
+                            onManagePost()
+                        } else {
+                            state.requestPostManage(post.id)
+                            beforeNavigation()
+                            onOpen()
+                        }
+                    }.takeIf { state.activeAccountIsAuthenticated && ownPostActions.canDelete },
+                ),
+                listOfNotNull(
+                    SheetAction(stringResource(R.string.all_delete_post), Symbols.Delete, destructive = true) {
+                        if (onDeletePost != null) {
+                            onDeletePost()
+                        } else {
+                            state.requestPostDelete(post.id)
+                            beforeNavigation()
+                            onOpen()
+                        }
+                    }.takeIf { state.activeAccountIsAuthenticated && ownPostActions.canDelete },
+                ),
+            ),
+            onDismiss = { ownPostSheetVisible = false },
+        )
+    }
     if (userTagEditorVisible) {
         UserTagEditorDialog(
             username = post.author,
@@ -1180,7 +1230,7 @@ fun PostCard(
     val postOverflowMenu: @Composable () -> Unit = {
         Box {
             IconButton(onClick = { overflowExpanded = true }) {
-                Icon(Symbols.MoreVert, contentDescription = "Post actions")
+                Icon(Symbols.MoreVert, contentDescription = stringResource(R.string.feed_post_actions))
             }
             DropdownMenu(
                 expanded = overflowExpanded,
@@ -1189,7 +1239,7 @@ fun PostCard(
                 // CROSSPOST01A1E_SHARED_POST_ACTION_V1
                 if (state.canOpenCrosspostComposer(post)) {
                     DropdownMenuItem(
-                        text = { Text("Crosspost") },
+                        text = { Text(stringResource(R.string.feed_crosspost)) },
                         onClick = {
                             overflowExpanded = false
                             beforeNavigation()
@@ -1206,7 +1256,7 @@ fun PostCard(
                                     state.effectivePostFollowed(
                                         post,
                                     ),
-                                ),
+                                ).asString(),
                             )
                         },
                         enabled =
@@ -1220,119 +1270,84 @@ fun PostCard(
                     )
                 }
 
+                // ISSUE295_YOUR_POST_ACTIONS_IN_ONE_SHEET_V1 (owner: the ⋮ menu was
+                // too long): Edit, Manage and Delete are one entry opening a sheet.
                 if (
                     state.activeAccountIsAuthenticated &&
-                    bodyEditEntryMode != null
+                    (bodyEditEntryMode != null || ownPostActions.canDelete)
                 ) {
                     DropdownMenuItem(
-                        text = {
-                        if (bodyEditEntryMode == PostBodyEditEntryMode.PROBE) {
-                            Text("Edit body (test)")
-                        } else {
-                            Text("Edit post")
-                        }
-                    },
+                        text = { Text(stringResource(R.string.feed_your_post_2)) },
+                        leadingIcon = { Icon(Symbols.Edit, contentDescription = null) },
                         onClick = {
                             overflowExpanded = false
-                            if (onEditPost != null) {
-                                onEditPost()
-                            } else {
-                                state.requestPostEdit(post.id)
-                                beforeNavigation()
-                                onOpen()
-                            }
-                        },
-                    )
-                }
-                if (
-                    state.activeAccountIsAuthenticated &&
-                    ownPostActions.canDelete
-                ) {
-                    DropdownMenuItem(
-                        text = { Text("Manage post") },
-                        onClick = {
-                            overflowExpanded = false
-                            if (onManagePost != null) {
-                                onManagePost()
-                            } else {
-                                state.requestPostManage(post.id)
-                                beforeNavigation()
-                                onOpen()
-                            }
-                        },
-                    )
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                "Delete post",
-                                color = MaterialTheme.colorScheme.error,
-                            )
-                        },
-                        onClick = {
-                            overflowExpanded = false
-                            if (onDeletePost != null) {
-                                onDeletePost()
-                            } else {
-                                state.requestPostDelete(post.id)
-                                beforeNavigation()
-                                onOpen()
-                            }
+                            ownPostSheetVisible = true
                         },
                     )
                 }
                 if (onRefreshComments != null) {
                     DropdownMenuItem(
-                        text = { Text("Refresh comments") },
+                        text = { Text(stringResource(R.string.feed_refresh_comments)) },
                         onClick = {
                             overflowExpanded = false
                             onRefreshComments()
                         },
                     )
                 }
-                DropdownMenuItem(
-                    text = { Text("Go to ${state.subredditLabel(post.community)}") },
-                    onClick = {
-                        overflowExpanded = false
-                        beforeNavigation()
-                        state.openSubreddit(post.community)
-                    },
-                )
-                DropdownMenuItem(
-                    text = { Text("About u/${post.author}") },
-                    onClick = {
-                        overflowExpanded = false
-                        beforeNavigation()
-                        state.openUser(post.author, ProfileActivityEvidence.POST)
-                    },
-                )
+                // ISSUE295_MENU_OFFERS_ONLY_WHAT_THE_CARD_DOES_NOT_V1: the Large card
+                // (and the post view) opens the community and the author from its
+                // header, Compact the community; only where the card cannot does
+                // the menu offer the way.
+                if (!postLayoutOpensCommunity(layout)) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.feed_go_to, state.subredditLabel(post.community))) },
+                        onClick = {
+                            overflowExpanded = false
+                            beforeNavigation()
+                            state.openSubreddit(post.community)
+                        },
+                    )
+                }
+                if (!postLayoutOpensAuthor(layout)) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.feed_about_u, post.author)) },
+                        onClick = {
+                            overflowExpanded = false
+                            beforeNavigation()
+                            state.openUser(post.author, ProfileActivityEvidence.POST)
+                        },
+                    )
+                }
                 if (state.canTagUser(post.author)) {
                     DropdownMenuItem(
-                        text = { Text("Private note on u/${post.author}") },
+                        text = { Text(stringResource(R.string.feed_private_note_on_u, post.author)) },
                         onClick = {
                             overflowExpanded = false
                             userTagEditorVisible = true
                         },
                     )
                 }
-                // MODERATION02A2_POST_REPORT_REOPEN_OUTSIDE_QUEUE_V1
-                ModeratorReportMenuItem(
+                // ISSUE295_ONE_MODERATE_ENTRY_OPENS_A_SHEET_V1: reports, approve,
+                // remove, spam, lock and distinguish are in the sheet it opens.
+                ModeratorMenuItem(
                     target = io.github.brealorg.subshell.data.account.moderatorReportTargetOrNull(
                         if (post.id.startsWith("t3_")) post.id else "t3_${post.id}",
                         post.community,
                     ),
                     onDismissMenu = { overflowExpanded = false },
-                )
-                // MODERATION02A3_POST_CONTENT_CONTROLS_REOPEN_V1
-                ModeratorContentControlsMenuItem(
-                    target = io.github.brealorg.subshell.data.account.moderatorReportTargetOrNull(
-                        if (post.id.startsWith("t3_")) post.id else "t3_${post.id}",
-                        post.community,
-                    ),
-                    onDismissMenu = { overflowExpanded = false },
+                    onChangeFlair = {
+                        if (onModeratePost != null) {
+                            onModeratePost()
+                        } else {
+                            state.requestPostManage(post.id, asModerator = true)
+                            beforeNavigation()
+                            onOpen()
+                        }
+                    },
                 )
                 // SAFETY01A3_REAL_POST_HIDE_UNHIDE_REPORT_UI_V1
                 DropdownMenuItem(
-                    text = { Text(if (postHidden) "Unhide post" else "Hide post") },
+                    text = { Text(if (postHidden) stringResource(R.string.all_unhide_post) else stringResource(R.string.all_hide_post)) },
                     enabled = state.postVisibilityControlEnabled(post),
                     onClick = {
                         overflowExpanded = false
@@ -1341,7 +1356,7 @@ fun PostCard(
                 )
                 if (state.activeAccountIsAuthenticated) {
                     DropdownMenuItem(
-                        text = { Text("Report") },
+                        text = { Text(stringResource(R.string.feed_report)) },
                         enabled = state.contentReportControlEnabled(),
                         onClick = {
                             overflowExpanded = false
@@ -1353,9 +1368,9 @@ fun PostCard(
                     text = {
                         Text(
                             if (communityMuted) {
-                                "Unmute ${state.subredditLabel(post.community)}"
+                                stringResource(R.string.comm_unmute_name, state.subredditLabel(post.community))
                             } else {
-                                "Mute ${state.subredditLabel(post.community)}…"
+                                stringResource(R.string.comm_mute_name_more, state.subredditLabel(post.community))
                             },
                         )
                     },
@@ -1363,17 +1378,19 @@ fun PostCard(
                         overflowExpanded = false
                         if (communityMuted) {
                             state.unmuteCommunity(post.community)
-                            notices.noticeInfo("Unmuted ${state.subredditLabel(post.community)}", "Its posts show in your feeds again")
+                            notices.noticeInfo(UiText.Resource(R.string.nt_unmuted, state.subredditLabel(post.community)), UiText.Resource(R.string.nt_its_posts_show_in_your_feeds_again))
                         } else {
                             muteSheetVisible = true
                         }
                     },
                 )
+                // ISSUE300_ONE_COPY_ENTRY_OPENS_A_SHEET_V1: Copy text, Select text,
+                // the post's link and the links in it, in one sheet.
                 DropdownMenuItem(
-                    text = { Text("Copy link") },
+                    text = { Text(stringResource(COPY_MENU_ENTRY_LABEL)) },
                     onClick = {
                         overflowExpanded = false
-                        copyPostLink(context, post, notices)
+                        copySheetVisible = true
                     },
                 )
             }
@@ -1477,13 +1494,13 @@ fun PostCard(
                     ) {
                         RemoteIdentityImage(
                             uri = communityIdentity?.iconImageUri,
-                            contentDescription = "Icon for ${state.subredditLabel(post.community)}",
+                            contentDescription = stringResource(R.string.feed_icon_for, state.subredditLabel(post.community)),
                             modifier = Modifier
                                 .size(30.dp)
                                 .clip(CircleShape)
                                 // LOWUI7_LABELS_SAY_WHAT_A_CONTROL_DOES_V1 (OCB-126): sizes stay
                                 // (owner); each target says what it opens.
-                                .clickable(onClickLabel = "Open community", role = Role.Button) {
+                                .clickable(onClickLabel = stringResource(R.string.feed_open_community), role = Role.Button) {
                                     beforeNavigation()
                                     state.openSubreddit(post.community)
                                 },
@@ -1501,7 +1518,7 @@ fun PostCard(
                                 maxLines = 1,
                                 modifier = Modifier
                                     .clip(MaterialTheme.shapes.small)
-                                    .clickable(onClickLabel = "Open community", role = Role.Button) {
+                                    .clickable(onClickLabel = stringResource(R.string.feed_open_community), role = Role.Button) {
                                         beforeNavigation()
                                         state.openSubreddit(post.community)
                                     }
@@ -1510,7 +1527,7 @@ fun PostCard(
                             Row(
                                 modifier = Modifier
                                     .clip(MaterialTheme.shapes.small)
-                                    .clickable(onClickLabel = "Open profile", role = Role.Button) {
+                                    .clickable(onClickLabel = stringResource(R.string.feed_open_profile), role = Role.Button) {
                                         beforeNavigation()
                                         state.openUser(post.author, ProfileActivityEvidence.POST)
                                     }
@@ -1562,11 +1579,12 @@ fun PostCard(
                                 )
                                 if (shouldShowUnreadMarker(state.showUnreadMarker, read)) {
                                     Spacer(Modifier.width(6.dp))
+                                    val unreadDescription = stringResource(R.string.feed_unread_post)
                                     Box(
                                         Modifier
                                             .size(6.dp)
                                             .background(MaterialTheme.colorScheme.primary, CircleShape)
-                                            .semantics { contentDescription = "Unread post" },
+                                            .semantics { contentDescription = unreadDescription },
                                     )
                                 }
                             }
@@ -1574,23 +1592,42 @@ fun PostCard(
                     }
                     postOverflowMenu()
                 }
-                if (post.pinned || post.moderatorPost || post.flair != null || post.spoiler || post.nsfw) {
+                // ISSUE295_REMOVED_POST_IS_MARKED_V1: only a moderator of the
+                // community sees that a post was removed.
+                val showRemoved = postShowsRemoved(post, LocalModeratorQuickActions.current)
+                if (showRemoved || post.pinned || post.moderatorPost || post.flair != null || post.spoiler || post.nsfw) {
                     Row(
                         modifier = Modifier.padding(top = 6.dp),
                         horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp),
                     ) {
+                        if (showRemoved) MetadataChip("REMOVED", tone = MetadataChipTone.SENSITIVE)
                         if (post.pinned) MetadataChip("PINNED")
                         if (post.moderatorPost) MetadataChip("MOD")
-                        post.flair?.let { PostFlairChip(text = it, richText = post.flairRichText) }
+                        post.flair?.let { flair ->
+                            val flairSearch = flairSearchTarget(post)
+                            PostFlairChip(
+                                text = flair,
+                                richText = post.flairRichText,
+                                onClick = flairSearch?.let { target ->
+                                    {
+                                        beforeNavigation()
+                                        state.openRedditTarget(target)
+                                    }
+                                },
+                                onClickLabel = flairSearch?.let {
+                                    stringResource(R.string.comm_search_flair, state.subredditLabel(post.community))
+                                },
+                            )
+                        }
                         if (post.spoiler) {
                             MetadataChip(
-                                label = "SPOILER",
+                                label = stringResource(R.string.feed_spoiler),
                                 tone = MetadataChipTone.SPOILER,
                             )
                         }
                         if (post.nsfw) {
                             MetadataChip(
-                                label = "NSFW",
+                                label = stringResource(R.string.feed_nsfw),
                                 tone = MetadataChipTone.SENSITIVE,
                             )
                         }
@@ -1604,7 +1641,7 @@ fun PostCard(
                         .then(
                             if (postTextCollapsible) {
                                 Modifier.clickable(
-                                    onClickLabel = if (postTextCollapsed) "Show post text" else "Hide post text",
+                                    onClickLabel = if (postTextCollapsed) stringResource(R.string.all_show_post_text) else stringResource(R.string.all_hide_post_text),
                                     role = Role.Button,
                                 ) { postTextCollapsed = !postTextCollapsed }
                             } else {
@@ -1614,12 +1651,12 @@ fun PostCard(
                 )
                 if (postTextCollapsible && postTextCollapsed) {
                     Text(
-                        text = "Text hidden",
+                        text = stringResource(R.string.feed_text_hidden),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier
                             .clip(MaterialTheme.shapes.small)
-                            .clickable(onClickLabel = "Show post text", role = Role.Button) {
+                            .clickable(onClickLabel = stringResource(R.string.feed_show_post_text), role = Role.Button) {
                                 postTextCollapsed = false
                             }
                             .padding(vertical = 4.dp),
@@ -1675,7 +1712,6 @@ fun PostCard(
     }
     if (reportDialogVisible) {
         RedditContentReportDialog(
-            targetLabel = "post",
             communityName = post.community,
             targetKind = RedditReportTargetKind.POST,
             state = state,
@@ -1686,6 +1722,12 @@ fun PostCard(
             },
         )
     }
+    if (copySheetVisible) {
+        CopySheet(
+            content = postCopySheetContent(post, canonicalRedditPostUrl(post)),
+            onDismiss = { copySheetVisible = false },
+        )
+    }
     if (muteSheetVisible) {
         CommunityMuteSheet(
             communityLabel = state.subredditLabel(post.community),
@@ -1693,14 +1735,14 @@ fun PostCard(
             onDismiss = { muteSheetVisible = false },
             onMute = { expiresAtEpochMillis ->
                 if (state.muteCommunity(post.community, expiresAtEpochMillis)) {
-                    notices.noticeInfo("Muted ${state.subredditLabel(post.community)}", "Its posts are hidden from your feeds")
+                    notices.noticeInfo(UiText.Resource(R.string.nt_muted, state.subredditLabel(post.community)), UiText.Resource(R.string.nt_its_posts_are_hidden_from_your_feeds))
                 }
             },
             currentMute = currentCommunityMute,
             onUnmute = if (currentCommunityMute != null) {
                 {
                     if (state.unmuteCommunity(post.community)) {
-                        notices.noticeInfo("Unmuted ${state.subredditLabel(post.community)}", "Its posts show in your feeds again")
+                        notices.noticeInfo(UiText.Resource(R.string.nt_unmuted, state.subredditLabel(post.community)), UiText.Resource(R.string.nt_its_posts_show_in_your_feeds_again))
                     }
                 }
             } else {
@@ -1724,6 +1766,7 @@ internal fun resolvedPostBodyMaxLines(kind: PostKind, requestedMaxLines: Int): I
 @Composable
 private fun MetadataChip(
     label: String,
+    modifier: Modifier = Modifier,
     tone: MetadataChipTone = MetadataChipTone.DEFAULT,
 ) {
     val containerColor = when (tone) {
@@ -1739,6 +1782,7 @@ private fun MetadataChip(
     Surface(
         shape = CircleShape,
         color = containerColor,
+        modifier = modifier,
     ) {
         Text(
             label,
@@ -1756,14 +1800,27 @@ private fun MetadataChip(
 internal fun PostFlairChip(
     text: String,
     richText: List<FlairRichTextSegment>,
+    onClick: (() -> Unit)? = null,
+    onClickLabel: String? = null,
 ) {
+    // ISSUE294_FLAIR_OPENS_A_FLAIR_SEARCH_V1: the chip keeps its size; Compose
+    // widens a small clickable's touch area to the minimum touch target when
+    // no other target is nearer, so the row does not grow.
+    val clickModifier = if (onClick != null) {
+        Modifier
+            .clip(CircleShape)
+            .clickable(onClickLabel = onClickLabel, role = Role.Button, onClick = onClick)
+    } else {
+        Modifier
+    }
     if (richText.isEmpty()) {
-        MetadataChip(redditFlairFallbackText(text).ifBlank { text })
+        MetadataChip(redditFlairFallbackText(text).ifBlank { text }, modifier = clickModifier)
         return
     }
     Surface(
         shape = CircleShape,
         color = MaterialTheme.colorScheme.secondaryContainer,
+        modifier = clickModifier,
     ) {
         FlairRichTextLabel(
             text = text,
@@ -1838,12 +1895,12 @@ fun PostActionRow(
         IconButton(onClick = onSave, enabled = saveActionsEnabled) {
             Icon(
                 if (saved) Symbols.BookmarkFilled else Symbols.Bookmark,
-                contentDescription = if (saved) "Unsave" else "Save",
+                contentDescription = if (saved) stringResource(R.string.all_unsave) else stringResource(R.string.all_save),
                 tint = if (saved) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         IconButton(onClick = onShare) {
-            Icon(Symbols.Share, contentDescription = "Share")
+            Icon(Symbols.Share, contentDescription = stringResource(R.string.feed_share))
         }
     }
 }
@@ -1901,7 +1958,7 @@ internal fun VoteControl(
             ) {
                 Icon(
                     imageVector = voteStateIcon(1, mode, voted = vote == 1),
-                    contentDescription = if (vote == 1) "Remove upvote" else "Upvote",
+                    contentDescription = if (vote == 1) stringResource(R.string.feed_action_remove_upvote) else stringResource(R.string.feed_action_upvote),
                     modifier = Modifier.size(iconSize),
                     tint = upvoteTint,
                 )
@@ -1921,7 +1978,7 @@ internal fun VoteControl(
             ) {
                 Icon(
                     imageVector = voteStateIcon(-1, mode, voted = vote == -1),
-                    contentDescription = if (vote == -1) "Remove downvote" else "Downvote",
+                    contentDescription = if (vote == -1) stringResource(R.string.feed_action_remove_downvote) else stringResource(R.string.feed_action_downvote),
                     modifier = Modifier.size(iconSize),
                     tint = downvoteTint,
                 )
@@ -2021,7 +2078,7 @@ private fun CompactAction(
     ) {
         Icon(
             icon,
-            contentDescription = "Comments",
+            contentDescription = stringResource(R.string.feed_comments),
             modifier = Modifier.size(ButtonDefaults.IconSize),
         )
         Spacer(Modifier.width(ButtonDefaults.IconSpacing))
@@ -2043,10 +2100,12 @@ private fun LinkPanel(post: Post) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = post.mediaLabel,
+                text = io.github.brealorg.subshell.model.UrlCleaner.cardLabel(post.mediaLabel),
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
             Icon(Symbols.KeyboardArrowDown, contentDescription = null)
         }
@@ -2089,3 +2148,12 @@ fun accentFor(seed: String): Color {
 // ISSUE76_ACCENT_INDEX_NEVER_NEGATIVE_V1
 internal fun accentIndex(seed: String, size: Int): Int =
     (seed.hashCode().toLong().absoluteValue % size).toInt()
+
+// ISSUE295_MENU_OFFERS_ONLY_WHAT_THE_CARD_DOES_NOT_V1: the Large card (and the
+// post view) opens the community and the author from its header; Compact opens
+// the community; List and Grid open neither, so their menu keeps both.
+internal fun postLayoutOpensCommunity(layout: PostLayout): Boolean =
+    layout == PostLayout.LARGE || layout == PostLayout.COMPACT
+
+internal fun postLayoutOpensAuthor(layout: PostLayout): Boolean =
+    layout == PostLayout.LARGE

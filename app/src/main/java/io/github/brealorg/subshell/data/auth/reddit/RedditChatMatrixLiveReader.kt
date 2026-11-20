@@ -6,6 +6,7 @@ import android.util.Log
 import io.github.brealorg.subshell.BuildConfig
 import io.github.brealorg.subshell.chat.RedditChatWebTokenSource
 import io.github.brealorg.subshell.chat.RedditChatWebTokenResult
+import io.github.brealorg.subshell.chat.redditChatWebSignInExpired
 import io.github.brealorg.subshell.data.account.DirectChatLiveFailureKind
 import io.github.brealorg.subshell.data.auth.AuthInboxReadCapability
 import io.github.brealorg.subshell.data.auth.AuthSessionResult
@@ -172,7 +173,7 @@ internal class RedditChatMatrixLiveReader(
         val webTokenResult = when (val result = tokenProvider.token()) {
             is RedditChatWebTokenResult.Success -> result
             RedditChatWebTokenResult.NoRedditWebSession,
-            RedditChatWebTokenResult.Failed,
+            is RedditChatWebTokenResult.Failed,
             -> return@withContext failed(DirectChatLiveFailureKind.SESSION)
         }
         val token = webTokenResult.token
@@ -207,7 +208,13 @@ internal class RedditChatMatrixLiveReader(
             is MatrixHttpResult.HttpFailure -> {
                 if (whoami.statusCode == 401 || whoami.statusCode == 403) {
                     invalidateAuthorization(token)
-                    return@withContext failed(DirectChatLiveFailureKind.SESSION, whoami.statusCode)
+                    // ISSUE303B_A_MATRIX_401_ON_A_FRESH_TOKEN_IS_AN_EXPIRED_WEB_SIGN_IN_V1
+                    val kind = if (redditChatWebSignInExpired(webTokenResult, whoami.statusCode)) {
+                        DirectChatLiveFailureKind.WEB_SIGN_IN_EXPIRED
+                    } else {
+                        DirectChatLiveFailureKind.SESSION
+                    }
+                    return@withContext failed(kind, whoami.statusCode)
                 }
                 return@withContext failed(DirectChatLiveFailureKind.HTTP, whoami.statusCode)
             }

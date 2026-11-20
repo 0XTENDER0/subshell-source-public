@@ -3,10 +3,10 @@ package io.github.brealorg.subshell.ui
 import io.github.brealorg.subshell.model.Post
 import io.github.brealorg.subshell.model.PostKind
 
-enum class SensitiveMediaPreviewMode(val label: String) {
-    BLUR_AND_PRELOAD("Blurred"),
-    LOAD_ON_TAP("Load on tap"),
-    HIDE_PREVIEW("Hide preview"),
+enum class SensitiveMediaPreviewMode(@androidx.annotation.StringRes val labelRes: Int) {
+    BLUR_AND_PRELOAD( io.github.brealorg.subshell.R.string.sensitive_media_preview_mode_blur_and_preload),
+    LOAD_ON_TAP( io.github.brealorg.subshell.R.string.sensitive_media_preview_mode_load_on_tap),
+    HIDE_PREVIEW( io.github.brealorg.subshell.R.string.sensitive_media_preview_mode_hide_preview),
 }
 
 internal fun postVisibleWithNsfwPreference(post: Post, showNsfwPosts: Boolean): Boolean =

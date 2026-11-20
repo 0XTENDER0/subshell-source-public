@@ -1,10 +1,16 @@
 package io.github.brealorg.subshell.ui
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// TRANSLATE08: reads string resources (enum labels), so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class InteractionSidePolicyTest {
     @Test
     fun followPreferencesResolveFromTheInteractionSide() {
@@ -28,8 +34,8 @@ class InteractionSidePolicyTest {
 
     @Test
     fun followLabelsExposeTheResolvedInteractionSide() {
-        assertEquals("Follow · Left", InteractionSide.LEFT.followLabel())
-        assertEquals("Follow · Right", InteractionSide.RIGHT.followLabel())
+        assertEquals("Follow · Left", InteractionSide.LEFT.followLabel().s)
+        assertEquals("Follow · Right", InteractionSide.RIGHT.followLabel().s)
     }
 
     @Test

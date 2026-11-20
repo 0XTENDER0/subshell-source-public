@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.ui.components
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.account.ModeratorReportTarget
 import io.github.brealorg.subshell.data.account.ModeratorReportsUiState
 import io.github.brealorg.subshell.data.account.RedditModerationUiFailureKind
@@ -9,6 +13,9 @@ import io.github.brealorg.subshell.data.account.RedditModeratorQueueKind
 import org.junit.Assert.*
 import org.junit.Test
 
+// TRANSLATE15: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Moderation02A2ReportLookupPolicyTest {
     private val owner = "moderator-account"
     private fun row(id: String, community: String = "subshell") = RedditModeratorQueueItem(
@@ -66,7 +73,7 @@ class Moderation02A2ReportLookupPolicyTest {
         val result = moderatorReportLookupContent("other-account", queue(row("t3_private")), history)
         assertTrue(result.queueItems.isEmpty())
         assertTrue(result.recentTargets.isEmpty())
-        assertTrue(result.queueMessage.orEmpty().contains("this account"))
+        assertTrue(result.queueMessage?.s.orEmpty().contains("this account"))
     }
     @Test fun recentHistoryOwnerIsCheckedIndependentlyOfQueueOwner() {
         val foreign = reports(ModeratorReportTarget("t1_private", "subshell")).copy(accountStableId = "other")
@@ -93,21 +100,21 @@ class Moderation02A2ReportLookupPolicyTest {
         val state = queue(row("t3_old")).copy(queueLoaded = false)
         val result = moderatorReportLookupContent(owner, state, reports())
         assertTrue(result.queueItems.isEmpty())
-        assertTrue(result.queueMessage.orEmpty().contains("No queue has been loaded"))
-        assertFalse(result.queueMessage.orEmpty().contains("No reports"))
+        assertTrue(result.queueMessage?.s.orEmpty().contains("No queue has been loaded"))
+        assertFalse(result.queueMessage?.s.orEmpty().contains("No reports"))
     }
     @Test fun loadingAndFailedStatesAreNotPresentedAsAnEmptySuccessfulQueue() {
         val loading = moderatorReportLookupContent(owner, queue().copy(queueLoading = true), reports())
         val failed = moderatorReportLookupContent(
             owner, queue(row("t3_old")).copy(queueFailureKind = RedditModerationUiFailureKind.HTTP), reports(),
         )
-        assertTrue(loading.queueMessage.orEmpty().contains("Loading"))
-        assertTrue(failed.queueMessage.orEmpty().contains("last successful load"))
+        assertTrue(loading.queueMessage?.s.orEmpty().contains("Loading"))
+        assertTrue(failed.queueMessage?.s.orEmpty().contains("last successful load"))
         assertEquals(1, failed.queueItems.size)
     }
     @Test fun loadedPageWithCursorIsNotCalledTheCompleteQueue() {
         val result = moderatorReportLookupContent(owner, queue(row("t3_one")).copy(queueNextCursor = "t3_next"), reports())
-        assertTrue(result.queueMessage.orEmpty().contains("loaded items only"))
+        assertTrue(result.queueMessage?.s.orEmpty().contains("loaded items only"))
     }
     @Test fun duplicateOrMismatchedAndOversizedTargetRowsAreRejected() {
         val good = row("t3_good")
@@ -117,9 +124,9 @@ class Moderation02A2ReportLookupPolicyTest {
         assertEquals(listOf(good), result.queueItems)
     }
     @Test fun reportQuantityHasSingularAndPluralForms() {
-        assertEquals("0 reports", moderatorReportQuantity(0))
-        assertEquals("1 report", moderatorReportQuantity(1))
-        assertEquals("2 reports", moderatorReportQuantity(2))
-        assertEquals("100 reports", moderatorReportQuantity(100))
+        assertEquals("0 reports", moderatorReportQuantity(0).s)
+        assertEquals("1 report", moderatorReportQuantity(1).s)
+        assertEquals("2 reports", moderatorReportQuantity(2).s)
+        assertEquals("100 reports", moderatorReportQuantity(100).s)
     }
 }

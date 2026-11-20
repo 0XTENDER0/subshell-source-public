@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell.ui.screens
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.label
 import io.github.brealorg.subshell.ui.CommentActionPlacement
 import io.github.brealorg.subshell.ui.DrawerCommunitiesMode
 import io.github.brealorg.subshell.ui.MainDestination
@@ -11,6 +15,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
+// TRANSLATE08: reads string resources (enum labels), so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Subs04cCommunityNavigationDiscoveryPolicyTest {
     @Test
     fun communityNavigationModesHaveSingleOwnedSemantics() {

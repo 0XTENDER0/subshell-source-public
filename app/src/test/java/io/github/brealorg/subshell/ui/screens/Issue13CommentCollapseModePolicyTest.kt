@@ -1,5 +1,10 @@
 package io.github.brealorg.subshell.ui.screens
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.label
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import io.github.brealorg.subshell.ui.CommentCollapseMode
 import io.github.brealorg.subshell.ui.SubshellSettings
@@ -9,12 +14,15 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// TRANSLATE08: reads string resources (enum labels), so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class Issue13CommentCollapseModePolicyTest {
     @Test
-    fun headerIsBackwardCompatibleDefaultAndEveryModeRoundTrips() {
-        assertEquals(CommentCollapseMode.HEADER, SubshellSettings().commentCollapseMode)
+    fun commentIsTheDefaultAndEveryModeRoundTrips() {
+        assertEquals(CommentCollapseMode.COMMENT, SubshellSettings().commentCollapseMode)
         assertEquals(
-            listOf("Header", "Comment"),
+            listOf("Header", "Comment", "Header and comment"),
             CommentCollapseMode.entries.map(CommentCollapseMode::label),
         )
 
@@ -29,9 +37,19 @@ class Issue13CommentCollapseModePolicyTest {
         val legacyWithoutMode =
             SubshellSettings().toStorageMap() - SubshellSettings.COMMENT_COLLAPSE_MODE
         assertEquals(
-            CommentCollapseMode.HEADER,
+            CommentCollapseMode.COMMENT,
             SubshellSettings.fromStorageMap(legacyWithoutMode).commentCollapseMode,
         )
+    }
+
+    @Test
+    fun bothCollapsesFromTheHeaderAndFromTheComment() {
+        assertTrue(CommentCollapseMode.BOTH.collapsesFromHeader)
+        assertTrue(CommentCollapseMode.BOTH.collapsesFromComment)
+        assertTrue(CommentCollapseMode.HEADER.collapsesFromHeader)
+        assertTrue(!CommentCollapseMode.HEADER.collapsesFromComment)
+        assertTrue(!CommentCollapseMode.COMMENT.collapsesFromHeader)
+        assertTrue(CommentCollapseMode.COMMENT.collapsesFromComment)
     }
 
     @Test
@@ -54,10 +72,14 @@ class Issue13CommentCollapseModePolicyTest {
     fun postScreenKeepsHeaderAndBodyTargetsModeGated() {
         val source = source("ui/screens/PostScreen.kt")
 
-        assertTrue(source.contains("state.commentCollapseMode == CommentCollapseMode.HEADER"))
-        assertTrue(source.contains("state.commentCollapseMode == CommentCollapseMode.COMMENT"))
+        assertTrue(source.contains("state.commentCollapseMode.collapsesFromHeader"))
+        assertTrue(source.contains("state.commentCollapseMode.collapsesFromComment"))
         assertTrue(source.contains("Modifier.clickable { onToggleComment(comment.id) }"))
-        assertTrue(source.contains("onCollapse = { onToggleComment(comment.id) }"))
+        // ISSUE295_MENU_OFFERS_ONLY_WHAT_THE_CARD_DOES_NOT_V1: the comment menu's
+        // "Collapse thread" (onCollapse) is gone; the header's collapse button and
+        // the mode-gated tap targets above still toggle the comment.
+        assertTrue(!source.contains("onCollapse = { onToggleComment(comment.id) }"))
+        assertTrue(source.contains("contentDescription = if (collapsed) \"Expand thread\" else \"Collapse thread\""))
         assertTrue(source.contains("CommentContent("))
         assertTrue(source.contains("InlineCommentMedia("))
     }
@@ -75,8 +97,8 @@ class Issue13CommentCollapseModePolicyTest {
 
         assertTrue(preview.contains("collapseMode: CommentCollapseMode"))
         assertTrue(preview.contains("var replyCollapsed by rememberSaveable"))
-        assertTrue(preview.contains("collapseMode == CommentCollapseMode.HEADER"))
-        assertTrue(preview.contains("collapseMode == CommentCollapseMode.COMMENT"))
+        assertTrue(preview.contains("collapseMode.collapsesFromHeader"))
+        assertTrue(preview.contains("collapseMode.collapsesFromComment"))
         assertTrue(preview.contains("\"Comment collapsed\""))
         assertTrue(preview.contains("LaunchedEffect(collapseMode)"))
         assertTrue(preview.contains("collapseTargetDemoActive"))
@@ -88,6 +110,6 @@ class Issue13CommentCollapseModePolicyTest {
     private fun source(relative: String): String {
         val path = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative")
         check(path.isFile) { "Missing source fixture: ${path.path}" }
-        return path.readText()
+        return path.readSourceText()
     }
 }

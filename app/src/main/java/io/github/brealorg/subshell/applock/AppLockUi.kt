@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.applock
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -72,15 +75,15 @@ internal val LocalAppLocked = compositionLocalOf { false }
  */
 internal val LocalAppLockedNow = staticCompositionLocalOf<() -> Boolean> { { false } }
 
-internal fun appLockDelayLabel(minutes: Int): String {
+internal fun appLockDelayLabel(minutes: Int): UiText {
     val normalized = normalizeAppLockDelayMinutes(minutes)
     val hours = normalized / 60
     val rest = normalized % 60
     return when {
-        normalized == 0 -> "Immediately"
-        hours == 0 -> if (rest == 1) "1 minute" else "$rest minutes"
-        rest == 0 -> if (hours == 1) "1 hour" else "$hours hours"
-        else -> "$hours h $rest min"
+        normalized == 0 -> UiText.Resource(R.string.lock_immediately)
+        hours == 0 -> UiText.Plural(R.plurals.lock_minutes, rest, rest)
+        rest == 0 -> UiText.Plural(R.plurals.lock_hours, hours, hours)
+        else -> UiText.Resource(R.string.lock_hours_minutes, hours, rest)
     }
 }
 
@@ -142,13 +145,13 @@ internal fun AppLockScreen(onUnlock: () -> Unit) {
             )
             Spacer(Modifier.size(16.dp))
             Text(
-                "subshell is locked",
+                stringResource(R.string.lock_subshell_is_locked),
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.size(24.dp))
             Button(onClick = onUnlock) {
-                Text("Unlock")
+                Text(stringResource(R.string.sw_unlock))
             }
         }
     }
@@ -170,7 +173,7 @@ internal fun AppLockDelayDialog(
     )
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Lock after") },
+        title = { Text(stringResource(R.string.sw_lock_after)) },
         text = {
             // LOW_APPLOCK_DELAY_OPTIONS_ARE_RADIO_BUTTONS_V1 (OCB-395): TalkBack
             // announces one choice of a group and which one is selected.
@@ -180,13 +183,13 @@ internal fun AppLockDelayDialog(
             ) {
                 APP_LOCK_PRESET_DELAY_MINUTES.forEach { minutes ->
                     AppLockDelayOption(
-                        label = appLockDelayLabel(minutes),
+                        label = appLockDelayLabel(minutes).asString(),
                         selected = !custom && minutes == selectedMinutes,
                         onClick = { onSelect(minutes) },
                     )
                 }
                 AppLockDelayOption(
-                    label = "Custom",
+                    label = stringResource(R.string.sw_custom),
                     selected = custom,
                     onClick = { custom = true },
                 )
@@ -198,7 +201,7 @@ internal fun AppLockDelayDialog(
                         OutlinedTextField(
                             value = hoursText,
                             onValueChange = { value -> hoursText = value.filter(Char::isDigit).take(2) },
-                            label = { Text("Hours") },
+                            label = { Text(stringResource(R.string.sw_hours)) },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.weight(1f),
@@ -207,14 +210,14 @@ internal fun AppLockDelayDialog(
                         OutlinedTextField(
                             value = minutesText,
                             onValueChange = { value -> minutesText = value.filter(Char::isDigit).take(2) },
-                            label = { Text("Minutes") },
+                            label = { Text(stringResource(R.string.sw_minutes)) },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.weight(1f),
                         )
                     }
                     Text(
-                        appLockDelayLabel(customMinutes),
+                        appLockDelayLabel(customMinutes).asString(),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 4.dp),
@@ -225,13 +228,13 @@ internal fun AppLockDelayDialog(
         confirmButton = {
             if (custom) {
                 TextButton(onClick = { onSelect(customMinutes) }) {
-                    Text("Save")
+                    Text(stringResource(R.string.sw_save))
                 }
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.sw_cancel))
             }
         },
     )

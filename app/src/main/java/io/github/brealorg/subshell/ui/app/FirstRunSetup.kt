@@ -1,7 +1,7 @@
 package io.github.brealorg.subshell.ui.app
 
-import android.Manifest
-import android.content.pm.PackageManager
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -55,7 +55,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -63,7 +62,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import io.github.brealorg.subshell.backup.SettingsBackupRepository
 import io.github.brealorg.subshell.ui.InteractionSide
 import io.github.brealorg.subshell.ui.PostLayout
@@ -84,14 +82,16 @@ import kotlinx.coroutines.withContext
 /**
  * ISSUE271_ONE_SETUP_FLOW_AFTER_SIGN_IN_V1 (owner 2026-10-28): after the first
  * sign-in, one full-screen flow asks for the choices that matter — hand,
- * look, content and video, notifications, Reddit links, backups — instead of
- * the Android notification question, the link screen, the side dialog and the
- * backup dialog interrupting one after another. Every page can be skipped and
+ * look, content and video, Reddit links, backups — instead of the link
+ * screen, the side dialog and the backup dialog interrupting one after
+ * another. DEFAULTS102_NO_NOTIFICATION_PAGE_V1 (owner 2026-11-11): there is
+ * no notification page; inbox notifications are on by default and Android's
+ * own question comes once when the flow ends (InboxNotificationPermissionEffect). Every page can be skipped and
  * says where to change it later. It runs while the interaction side has never
  * been chosen (a fresh install); Skip or Done confirms the side, so it never
  * returns and existing installs never see it.
  */
-internal enum class FirstRunSetupPage { HAND, LOOK, CONTENT, NOTIFICATIONS, LINKS, BACKUPS, DONE }
+internal enum class FirstRunSetupPage { HAND, LOOK, CONTENT, LINKS, BACKUPS, DONE }
 
 /** The link page only where Android lets subshell open Reddit links and it does not yet. */
 internal fun firstRunSetupPages(linkHandlingState: RedditLinkHandlingState): List<FirstRunSetupPage> =
@@ -108,8 +108,6 @@ internal fun FirstRunSetupScreen(
     onOpenRedditLinkSettings: () -> Unit,
     onDismissRedditLinkPrompt: () -> Unit,
     modifier: Modifier = Modifier,
-    // Replaces Android's permission question in tests.
-    onRequestNotificationPermission: (((Boolean) -> Unit) -> Unit)? = null,
 ) {
     val pages = firstRunSetupPages(linkHandlingState)
     var pageName by rememberSaveable { mutableStateOf(FirstRunSetupPage.HAND.name) }
@@ -147,7 +145,7 @@ internal fun FirstRunSetupScreen(
             ) {
                 SubshellWordmark(Modifier.weight(1f))
                 if (page != FirstRunSetupPage.DONE) {
-                    TextButton(onClick = ::finish) { Text("Skip") }
+                    TextButton(onClick = ::finish) { Text(stringResource(R.string.setup_skip)) }
                 }
             }
             if (page != FirstRunSetupPage.DONE) {
@@ -168,11 +166,6 @@ internal fun FirstRunSetupScreen(
                     FirstRunSetupPage.HAND -> HandPage(state)
                     FirstRunSetupPage.LOOK -> LookPage(state)
                     FirstRunSetupPage.CONTENT -> ContentPage(state)
-                    FirstRunSetupPage.NOTIFICATIONS -> NotificationsPage(
-                        state = state,
-                        onRequestPermission = onRequestNotificationPermission,
-                        onDone = ::next,
-                    )
                     FirstRunSetupPage.LINKS -> LinksPage(
                         linkHandlingState = linkHandlingState,
                         onOpenSettings = onOpenRedditLinkSettings,
@@ -200,14 +193,14 @@ internal fun FirstRunSetupScreen(
                     TextButton(onClick = { scrollScope.launch { scroll.animateScrollTo(scroll.maxValue) } }) {
                         Icon(Symbols.ExpandMore, contentDescription = null)
                         Spacer(Modifier.width(4.dp))
-                        Text("More below")
+                        Text(stringResource(R.string.setup_more_below))
                     }
                 }
             }
             }
             if (page != FirstRunSetupPage.DONE) {
                 Text(
-                    "You can change this later in Settings.",
+                    stringResource(R.string.all_you_can_change_this_later_in_settings),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -221,14 +214,14 @@ internal fun FirstRunSetupScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (index > 0 && page != FirstRunSetupPage.DONE) {
-                    TextButton(onClick = ::back) { Text("Back") }
+                    TextButton(onClick = ::back) { Text(stringResource(R.string.setup_back)) }
                 }
                 Spacer(Modifier.weight(1f))
                 when (page) {
                     // These pages move on with their own answer.
-                    FirstRunSetupPage.NOTIFICATIONS, FirstRunSetupPage.LINKS -> Unit
-                    FirstRunSetupPage.DONE -> Button(onClick = ::finish) { Text("Start using subshell") }
-                    else -> Button(onClick = ::next) { Text("Next") }
+                    FirstRunSetupPage.LINKS -> Unit
+                    FirstRunSetupPage.DONE -> Button(onClick = ::finish) { Text(stringResource(R.string.setup_start)) }
+                    else -> Button(onClick = ::next) { Text(stringResource(R.string.setup_next)) }
                 }
             }
         }
@@ -237,10 +230,11 @@ internal fun FirstRunSetupScreen(
 
 @Composable
 private fun SetupProgress(step: Int, steps: Int) {
+    val stepDescription = stringResource(R.string.setup_step, step + 1, steps)
     Row(
         modifier = Modifier
             .padding(horizontal = 24.dp)
-            .semantics { contentDescription = "Step ${step + 1} of $steps" },
+            .semantics { contentDescription = stepDescription },
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         repeat(steps) { dot ->
@@ -278,13 +272,13 @@ private fun SectionLabel(text: String) {
 
 @Composable
 private fun HandPage(state: SubshellState) {
-    PageTitle("Which hand do you use?")
-    PageText("Vote and reply buttons, the side menu and the Create button go on that side, where your thumb is.")
+    PageTitle(stringResource(R.string.all_which_hand_do_you_use))
+    PageText(stringResource(R.string.set_vote_and_reply_buttons_the_side_menu))
     Row(
         modifier = Modifier.fillMaxWidth().selectableGroup().padding(top = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        listOf(InteractionSide.LEFT to "Left hand", InteractionSide.RIGHT to "Right hand").forEach { (side, label) ->
+        listOf(InteractionSide.LEFT to stringResource(R.string.all_left_hand), InteractionSide.RIGHT to stringResource(R.string.all_right_hand)).forEach { (side, label) ->
             val selected = state.interactionSide == side
             Surface(
                 modifier = Modifier
@@ -313,7 +307,7 @@ private fun HandPage(state: SubshellState) {
         }
     }
     Text(
-        "The orange edge is where the side menu slides in.",
+        stringResource(R.string.all_the_orange_edge_is_where_the_side),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -367,21 +361,22 @@ private fun HandPreview(side: InteractionSide) {
 
 @Composable
 private fun LookPage(state: SubshellState) {
-    PageTitle("How should it look?")
+    PageTitle(stringResource(R.string.setup_look_title))
     // How posts look with the layout and theme chosen below.
     PostLayoutPreview(state.postLayout)
+    val themeLabels = ThemeChoice.entries.associateWith { stringResource(it.shortLabelRes) }
     SegmentedChoiceRow(
         options = ThemeChoice.entries,
         selected = state.themeChoice,
-        label = ThemeChoice::shortLabel,
+        label = { choice -> themeLabels.getValue(choice) },
         onSelect = state::updateThemeChoice,
         showSelectedIcon = false,
     )
     val dynamicSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     if (dynamicSupported) {
         SetupSwitchRow(
-            title = "Dynamic colour",
-            description = "Wallpaper colours instead of subshell orange",
+            title = stringResource(R.string.set_dynamic_colour),
+            description = stringResource(R.string.set_wallpaper_colours_instead_of_subshell_orange),
             checked = state.dynamicColor,
             onCheckedChange = state::updateDynamicColor,
         )
@@ -410,7 +405,7 @@ private fun LookPage(state: SubshellState) {
                 ) {
                     Icon(postLayoutIcon(layout), contentDescription = null)
                     Text(
-                        layout.label,
+                        stringResource(layout.labelRes),
                         // bodySmall, not labelMedium: the label styles use the code font.
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Medium,
@@ -420,20 +415,20 @@ private fun LookPage(state: SubshellState) {
             }
         }
     }
-    Text("Text size", style = MaterialTheme.typography.titleSmall)
+    Text(stringResource(R.string.set_text_size), style = MaterialTheme.typography.titleSmall)
     SegmentedChoiceRow(
         options = AppTextScale.entries,
         selected = state.appTextScale,
-        label = AppTextScale::label,
+        label = { it.label },
         onSelect = state::updateAppTextScale,
         showSelectedIcon = false,
     )
 }
 
 private val previewPosts = listOf(
-    Triple("r/battlestations", "Finally happy with my desk", R.drawable.media_linux_desk),
-    Triple("r/homelab", "The rack is done, for now", R.drawable.media_homelab),
-    Triple("r/androiddev", "Where the apps get made", R.drawable.media_android_desk),
+    Triple("r/battlestations", R.string.app_finally_happy_with_my_desk, R.drawable.media_linux_desk),
+    Triple("r/homelab", R.string.app_the_rack_is_done_for_now, R.drawable.media_homelab),
+    Triple("r/androiddev", R.string.app_where_the_apps_get_made, R.drawable.media_android_desk),
 )
 
 /**
@@ -444,12 +439,13 @@ private val previewPosts = listOf(
  */
 @Composable
 private fun PostLayoutPreview(layout: PostLayout) {
+    val previewDescription = stringResource(R.string.setup_preview_of_the_post_layout, stringResource(layout.labelRes))
     val colors = MaterialTheme.colorScheme
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .height(236.dp)
-            .semantics { contentDescription = "Preview of the ${layout.label} post layout" },
+            .semantics { contentDescription = previewDescription },
         shape = MaterialTheme.shapes.large,
         color = colors.background,
         border = BorderStroke(1.dp, colors.outlineVariant),
@@ -460,13 +456,13 @@ private fun PostLayoutPreview(layout: PostLayout) {
         ) {
             when (layout) {
                 PostLayout.LARGE -> previewPosts.first().let { (community, title, image) ->
-                    PreviewCard(community, title, image, mediaHeight = 124, stats = true)
+                    PreviewCard(community, stringResource(title), image, mediaHeight = 124, stats = true)
                 }
                 PostLayout.COMPACT -> previewPosts.take(2).forEach { (community, title, image) ->
-                    PreviewCard(community, title, image, mediaHeight = 38, stats = false)
+                    PreviewCard(community, stringResource(title), image, mediaHeight = 38, stats = false)
                 }
                 PostLayout.LIST -> previewPosts.forEach { (community, title, image) ->
-                    PreviewListRow(community, title, image)
+                    PreviewListRow(community, stringResource(title), image)
                 }
                 PostLayout.GRID -> repeat(2) { row ->
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -509,7 +505,7 @@ private fun PreviewCard(community: String, title: String, image: Int, mediaHeigh
         if (stats) {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Symbols.ThumbUp, contentDescription = null, modifier = Modifier.size(14.dp), tint = colors.onSurfaceVariant)
-                Text("1.2k", style = MaterialTheme.typography.labelSmall, color = colors.onSurfaceVariant)
+                Text(stringResource(R.string.set_1_2k), style = MaterialTheme.typography.labelSmall, color = colors.onSurfaceVariant)
                 Icon(Symbols.ThumbDown, contentDescription = null, modifier = Modifier.size(14.dp), tint = colors.onSurfaceVariant)
                 Spacer(Modifier.width(6.dp))
                 Icon(Symbols.Comment, contentDescription = null, modifier = Modifier.size(14.dp), tint = colors.onSurfaceVariant)
@@ -569,101 +565,39 @@ private fun SetupSwitchRow(
 
 @Composable
 private fun ContentPage(state: SubshellState) {
-    PageTitle("What do you want to see?")
+    PageTitle(stringResource(R.string.all_what_do_you_want_to_see))
     SectionLabel("NSFW")
     SetupSwitchRow(
-        title = "Show NSFW posts",
-        description = "Posts Reddit marks NSFW appear in feeds and search",
+        title = stringResource(R.string.set_show_nsfw_posts),
+        description = stringResource(R.string.set_posts_reddit_marks_nsfw_appear_in_feeds),
         checked = state.showNsfwPosts,
         onCheckedChange = state::updateShowNsfwPosts,
     )
     SetupSwitchRow(
-        title = "Show NSFW media without a tap",
+        title = stringResource(R.string.set_show_nsfw_media_without_a_tap),
         description = if (state.showNsfwPosts) {
-            "NSFW images, GIFs and videos show without a cover; spoilers stay covered"
+            stringResource(R.string.app_nsfw_images_gifs_and_videos_show)
         } else {
-            "Turn on NSFW posts first"
+            stringResource(R.string.all_turn_on_nsfw_posts_first)
         },
         checked = state.showNsfwPosts && state.showNsfwMedia,
         onCheckedChange = state::updateShowNsfwMedia,
         enabled = state.showNsfwPosts,
     )
-    SectionLabel("Video")
-    Text("Play videos and GIFs by themselves", style = MaterialTheme.typography.bodyLarge)
+    SectionLabel(stringResource(R.string.all_video))
+    Text(stringResource(R.string.set_play_videos_and_gifs_by_themselves), style = MaterialTheme.typography.bodyLarge)
     SegmentedChoiceRow(
         options = VideoAutoplay.entries,
         selected = state.videoAutoplay,
-        label = VideoAutoplay::label,
+        label = { stringResource(it.labelRes) },
         onSelect = state::updateVideoAutoplay,
         showSelectedIcon = false,
     )
     SetupSwitchRow(
-        title = "Start videos muted",
-        description = "Tap the sound button to hear them",
+        title = stringResource(R.string.set_start_videos_muted),
+        description = stringResource(R.string.set_tap_the_sound_button_to_hear_them),
         checked = state.startVideosMuted,
         onCheckedChange = state::updateStartVideosMuted,
-    )
-}
-
-@Composable
-private fun NotificationsPage(
-    state: SubshellState,
-    onRequestPermission: (((Boolean) -> Unit) -> Unit)?,
-    onDone: () -> Unit,
-) {
-    val context = LocalContext.current
-    // The answer turns them off on a refusal, as the Settings switch does.
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (!granted) state.updateInboxNotificationsEnabled(false)
-        onDone()
-    }
-    PageTitle("Get notified?")
-    PageText("subshell checks your Reddit inbox about every 15 minutes and tells you when there is something new.")
-    Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerLow) {
-        Column(Modifier.padding(vertical = 4.dp)) {
-            NotificationKind(Symbols.Reply, "Replies", "to your posts and comments")
-            NotificationKind(Symbols.Mail, "Messages and chats", "you can answer from the notification")
-            NotificationKind(Symbols.AlternateEmail, "Mentions", "when someone writes your u/name")
-        }
-    }
-    Text(
-        "After you tap Turn on, Android asks you to allow notifications. Each kind can be switched off later.",
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
-        TextButton(
-            onClick = {
-                state.updateInboxNotificationsEnabled(false)
-                onDone()
-            },
-        ) { Text("Not now") }
-        Button(
-            onClick = {
-                state.updateInboxNotificationsEnabled(true)
-                val needsPermission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
-                    PackageManager.PERMISSION_GRANTED
-                when {
-                    !needsPermission -> onDone()
-                    onRequestPermission != null -> onRequestPermission { granted ->
-                        if (!granted) state.updateInboxNotificationsEnabled(false)
-                        onDone()
-                    }
-                    else -> launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                }
-            },
-        ) { Text("Turn on") }
-    }
-}
-
-@Composable
-private fun NotificationKind(icon: ImageVector, title: String, description: String) {
-    ListItem(
-        content = { Text(title) },
-        supportingContent = { Text(description) },
-        leadingContent = { Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
     )
 }
 
@@ -674,42 +608,41 @@ private fun LinksPage(
     onDone: () -> Unit,
 ) {
     var opened by rememberSaveable { mutableStateOf(false) }
-    PageTitle("Open Reddit links here?")
+    PageTitle(stringResource(R.string.all_open_reddit_links_here))
     PageText(
-        "Links to reddit.com in other apps can open in subshell instead of the browser. " +
-            "Android lets only you turn this on.",
+        stringResource(R.string.app_links_to_reddit_com_in_other),
     )
     Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerLow) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            LinkStep(1, "Tap Set up. Android's page for subshell opens.")
-            LinkStep(2, "Turn on Open supported links and tick the Reddit addresses.")
-            LinkStep(3, "Come back. subshell checks what you turned on.")
+            LinkStep(1, stringResource(R.string.all_tap_set_up_android_s_page_for))
+            LinkStep(2, stringResource(R.string.all_turn_on_open_supported_links_and_tick))
+            LinkStep(3, stringResource(R.string.all_come_back_subshell_checks_what_you_turned))
         }
     }
     val status = when (linkHandlingState.status) {
-        RedditLinkHandlingStatus.ENABLED -> "Reddit links open in subshell."
-        RedditLinkHandlingStatus.PARTIAL -> "Some Reddit addresses open in subshell."
+        RedditLinkHandlingStatus.ENABLED -> stringResource(R.string.all_reddit_links_open_in_subshell)
+        RedditLinkHandlingStatus.PARTIAL -> stringResource(R.string.all_some_reddit_addresses_open_in_subshell)
         else -> null
     }
     if (opened && status != null) {
         Text(status, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary)
     }
     Text(
-        "If another Reddit app already opens these links, move them to subshell on the same page.",
+        stringResource(R.string.all_if_another_reddit_app_already_opens_these),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
         if (opened) {
-            Button(onClick = onDone) { Text("Next") }
+            Button(onClick = onDone) { Text(stringResource(R.string.set_next)) }
         } else {
-            TextButton(onClick = onDone) { Text("Not now") }
+            TextButton(onClick = onDone) { Text(stringResource(R.string.set_not_now)) }
             Button(
                 onClick = {
                     opened = true
                     onOpenSettings()
                 },
-            ) { Text("Set up") }
+            ) { Text(stringResource(R.string.set_set_up)) }
         }
     }
 }
@@ -758,18 +691,23 @@ private fun BackupsPage(repository: SettingsBackupRepository) {
             }
         }
     }
-    PageTitle("Keep your setup safe")
-    PageText("Your settings are backed up on this phone. Sign-ins never are.")
+    PageTitle(stringResource(R.string.all_keep_your_setup_safe))
+    PageText(stringResource(R.string.set_your_settings_are_backed_up_on_this))
     // One row: what a folder is for, or where the copies go.
     ListItem(
-        content = { Text("Backup folder") },
+        content = { Text(stringResource(R.string.set_backup_folder)) },
         supportingContent = {
             Text(
                 when {
-                    connected && found > 0 -> "Copied to ${folder ?: "your folder"} · $found backups found"
-                    connected -> "Copied to ${folder ?: "your folder"}"
-                    failed -> "Couldn't use that folder. Try another."
-                    else -> "Copies that survive removing subshell"
+                    connected && found > 0 -> pluralStringResource(
+                        R.plurals.set_copied_to_folder_found,
+                        found,
+                        folder ?: stringResource(R.string.set_your_folder),
+                        found,
+                    )
+                    connected -> stringResource(R.string.set_copied_to_folder, folder ?: stringResource(R.string.set_your_folder))
+                    failed -> stringResource(R.string.all_couldn_t_use_that_folder_try_another)
+                    else -> stringResource(R.string.all_copies_that_survive_removing_subshell)
                 },
                 color = if (failed && !connected) MaterialTheme.colorScheme.error else Color.Unspecified,
             )
@@ -777,22 +715,22 @@ private fun BackupsPage(repository: SettingsBackupRepository) {
         leadingContent = { Icon(Symbols.Folder, contentDescription = null) },
         trailingContent = {
             if (!connected) {
-                FilledTonalButton(onClick = { folderLauncher.launch(null) }) { Text("Choose") }
+                FilledTonalButton(onClick = { folderLauncher.launch(null) }) { Text(stringResource(R.string.set_choose)) }
             }
         },
         colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         modifier = Modifier.clip(MaterialTheme.shapes.large),
     )
-    SectionLabel("Privacy-sensitive backup data")
-    PrivacyBackupSwitch("Hidden communities", repository::hiddenCommunitiesBackupEnabled, repository::setHiddenCommunitiesBackupEnabled)
-    PrivacyBackupSwitch("Muted communities", repository::communityMutesBackupEnabled, repository::setCommunityMutesBackupEnabled)
-    PrivacyBackupSwitch("Post drafts", repository::postComposerDraftsBackupEnabled, repository::setPostComposerDraftsBackupEnabled)
+    SectionLabel(stringResource(R.string.scr_privacy_sensitive_backup_data))
+    PrivacyBackupSwitch(stringResource(R.string.all_hidden_communities), repository::hiddenCommunitiesBackupEnabled, repository::setHiddenCommunitiesBackupEnabled)
+    PrivacyBackupSwitch(stringResource(R.string.all_muted_communities), repository::communityMutesBackupEnabled, repository::setCommunityMutesBackupEnabled)
+    PrivacyBackupSwitch(stringResource(R.string.all_post_drafts), repository::postComposerDraftsBackupEnabled, repository::setPostComposerDraftsBackupEnabled)
     PrivacyBackupSwitch(
-        "Saved moderator responses",
+        stringResource(R.string.all_saved_moderator_responses),
         repository::moderatorSavedResponsesBackupEnabled,
         repository::setModeratorSavedResponsesBackupEnabled,
     )
-    PrivacyBackupSwitch("Private notes & tags", repository::userTagsBackupEnabled, repository::setUserTagsBackupEnabled)
+    PrivacyBackupSwitch(stringResource(R.string.all_private_notes_tags), repository::userTagsBackupEnabled, repository::setUserTagsBackupEnabled)
 }
 
 @Composable
@@ -821,25 +759,25 @@ private fun DonePage(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Icon(Symbols.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(56.dp))
-        Text("You're all set", style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.set_you_re_all_set), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
         Text(
-            "Everything here lives in Settings if you change your mind.",
+            stringResource(R.string.all_everything_here_lives_in_settings_if_you),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
     }
-    val theme = state.themeChoice.label
+    val theme = stringResource(state.themeChoice.shortLabelRes)
     val rows = buildList {
-        add("Hand" to if (state.interactionSide == InteractionSide.LEFT) "Left" else "Right")
-        add("Theme · Posts · Text" to "$theme · ${state.postLayout.label} · ${state.appTextScale.label}")
-        add("NSFW posts" to if (state.showNsfwPosts) "On" else "Off")
-        add("Videos" to state.videoAutoplay.label + if (state.startVideosMuted) ", muted" else "")
-        add("Notifications" to if (state.inboxNotificationsEnabled) "On" else "Off")
+        add(stringResource(R.string.app_summary_hand) to stringResource(if (state.interactionSide == InteractionSide.LEFT) R.string.interaction_side_left else R.string.interaction_side_right))
+        add(stringResource(R.string.all_theme_posts_text) to "$theme · ${stringResource(state.postLayout.labelRes)} · ${state.appTextScale.label}")
+        add(stringResource(R.string.app_nsfw_posts) to stringResource(if (state.showNsfwPosts) R.string.app_summary_on else R.string.app_summary_off))
+        add(stringResource(R.string.all_videos) to if (state.startVideosMuted) stringResource(R.string.app_summary_videos_muted, stringResource(state.videoAutoplay.labelRes)) else stringResource(state.videoAutoplay.labelRes))
+        add(stringResource(R.string.all_notifications) to stringResource(if (state.inboxNotificationsEnabled) R.string.app_summary_on else R.string.app_summary_off))
         if (linkHandlingState.supported) {
-            add("Reddit links" to if (linkHandlingState.status == RedditLinkHandlingStatus.ENABLED) "Open here" else "Not set up")
+            add(stringResource(R.string.app_reddit_links) to if (linkHandlingState.status == RedditLinkHandlingStatus.ENABLED) stringResource(R.string.app_open_here) else stringResource(R.string.app_not_set_up))
         }
-        add("Backup folder" to if (repository.folderConnected()) "Chosen" else "Not chosen")
+        add(stringResource(R.string.all_backup_folder) to if (repository.folderConnected()) stringResource(R.string.all_chosen) else stringResource(R.string.all_not_chosen))
     }
     Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerLow) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.export
 
+import io.github.brealorg.subshell.ui.s
 import android.app.Application
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.hasScrollAction
@@ -102,7 +103,7 @@ class RedditExport01SettingsRowComposeTest {
 
         val work = WorkManager.getInstance(context).getWorkInfosForUniqueWork(REDDIT_EXPORT_UNIQUE_WORK).get()
         assertEquals(1, work.size)
-        assertEquals("Exporting your Reddit data", notices.currentRequest?.presentation?.title)
+        assertEquals("Exporting your Reddit data", notices.currentRequest?.presentation?.title?.s)
     }
 
     @Test

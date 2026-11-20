@@ -1,5 +1,9 @@
 package io.github.brealorg.subshell
 
+import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
+import org.junit.runner.RunWith
+import io.github.brealorg.subshell.ui.s
 import io.github.brealorg.subshell.data.SampleData
 import io.github.brealorg.subshell.data.account.AccountSessionSource
 import io.github.brealorg.subshell.data.account.AccountSessionState
@@ -45,6 +49,9 @@ import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// TRANSLATE14: reads string resources through UiText.s, so it needs Robolectric.
+@RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "en")
 class PostComposerContractTest {
     private val communities = SampleData.communities.map { it.name }
 
@@ -156,11 +163,11 @@ class PostComposerContractTest {
         )
         assertEquals(
             "Use at least 4 characters in the title",
-            validatePostComposerDraft(PostComposerDraft(title = "Hey"), communities, policy),
+            validatePostComposerDraft(PostComposerDraft(title = "Hey"), communities, policy)?.s,
         )
         assertEquals(
             "Post flair is required",
-            validatePostComposerDraft(PostComposerDraft(title = "Hello"), communities, policy),
+            validatePostComposerDraft(PostComposerDraft(title = "Hello"), communities, policy)?.s,
         )
         val flairIssue = validatePostComposerDraftIssue(
             PostComposerDraft(title = "Hello"),
@@ -169,14 +176,14 @@ class PostComposerContractTest {
         )
         requireNotNull(flairIssue)
         assertEquals(ComposerValidationField.FLAIR, flairIssue.field)
-        assertEquals("Post flair is required", flairIssue.message)
+        assertEquals("Post flair is required", flairIssue.message.s)
         assertEquals(
             "Add post body text",
             validatePostComposerDraft(
                 PostComposerDraft(title = "Hello", flair = flair),
                 communities,
                 policy,
-            ),
+            )?.s,
         )
         assertEquals(
             "Use at least 7 characters in the post body",
@@ -184,7 +191,7 @@ class PostComposerContractTest {
                 PostComposerDraft(title = "Hello", body = "Short", flair = flair),
                 communities,
                 policy,
-            ),
+            )?.s,
         )
         assertNull(
             validatePostComposerDraft(
@@ -401,7 +408,7 @@ class PostComposerContractTest {
 
         assertEquals(
             "Use a complete web link for each gallery item",
-            validateRemoteTextPostComposerDraft(draft),
+            validateRemoteTextPostComposerDraft(draft)?.s,
         )
     }
 
@@ -480,7 +487,7 @@ class PostComposerContractTest {
                     allowImages = false,
                     allowGalleries = false,
                 ),
-            ),
+            )?.s,
         )
         assertNull(
             validateRemoteTextPostComposerDraft(
@@ -509,7 +516,7 @@ class PostComposerContractTest {
                         ),
                     ),
                 ),
-            ),
+            )?.s,
         )
         val videoDraft = PostComposerDraft(
             type = ComposerPostType.MEDIA,
@@ -532,7 +539,7 @@ class PostComposerContractTest {
                     community = "subshell",
                     allowVideo = false,
                 ),
-            ),
+            )?.s,
         )
         assertEquals(
             "Choose an MP4, MOV, or WebM video",
@@ -546,7 +553,7 @@ class PostComposerContractTest {
                         ),
                     ),
                 ),
-            ),
+            )?.s,
         )
     }
 
@@ -1085,7 +1092,7 @@ class PostComposerContractTest {
         assertNull(validateRemoteTextPostComposerDraft(videoDraft, videoOnly))
         assertEquals(
             "This community doesn't allow GIF-style video posts",
-            validateRemoteTextPostComposerDraft(videoGifDraft, videoOnly),
+            validateRemoteTextPostComposerDraft(videoGifDraft, videoOnly)?.s,
         )
 
         val videoGifOnly = ComposerCommunityPolicy(
@@ -1095,7 +1102,7 @@ class PostComposerContractTest {
         )
         assertEquals(
             "This community doesn't allow video posts",
-            validateRemoteTextPostComposerDraft(videoDraft, videoGifOnly),
+            validateRemoteTextPostComposerDraft(videoDraft, videoGifOnly)?.s,
         )
         assertNull(validateRemoteTextPostComposerDraft(videoGifDraft, videoGifOnly))
 
@@ -1106,11 +1113,11 @@ class PostComposerContractTest {
         )
         assertEquals(
             "This community doesn't allow video posts",
-            validateRemoteTextPostComposerDraft(videoDraft, neitherAllowed),
+            validateRemoteTextPostComposerDraft(videoDraft, neitherAllowed)?.s,
         )
         assertEquals(
             "This community doesn't allow GIF-style video posts",
-            validateRemoteTextPostComposerDraft(videoGifDraft, neitherAllowed),
+            validateRemoteTextPostComposerDraft(videoGifDraft, neitherAllowed)?.s,
         )
     }
 

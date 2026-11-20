@@ -1,5 +1,7 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Immutable
 import io.github.brealorg.subshell.model.Community
 import io.github.brealorg.subshell.model.GalleryItem
@@ -9,12 +11,18 @@ import io.github.brealorg.subshell.model.PostKind
 import java.net.URI
 import java.util.UUID
 
-enum class ComposerPostType(val label: String) {
-    TEXT("Text"),
-    LINK("Link"),
-    MEDIA("Media"),
+// TRANSLATE14_COMPOSER_KINDS_HAVE_RESOURCES_V1: `label` stays the English
+// code (stored drafts, mediaLabel); screens show `labelRes`.
+enum class ComposerPostType(
+    val label: String,
+    @androidx.annotation.StringRes val labelRes: Int,
+    @androidx.annotation.StringRes val untitledRes: Int,
+) {
+    TEXT("Text", io.github.brealorg.subshell.R.string.composer_type_text, io.github.brealorg.subshell.R.string.composer_untitled_text),
+    LINK("Link", io.github.brealorg.subshell.R.string.composer_type_link, io.github.brealorg.subshell.R.string.composer_untitled_link),
+    MEDIA("Media", io.github.brealorg.subshell.R.string.composer_type_media, io.github.brealorg.subshell.R.string.composer_untitled_media),
     // CROSSPOST01A1C_SOURCE_BOUND_DRAFT_TYPE_V1
-    CROSSPOST("Crosspost"),
+    CROSSPOST("Crosspost", io.github.brealorg.subshell.R.string.composer_type_crosspost, io.github.brealorg.subshell.R.string.composer_untitled_crosspost),
     ;
 
     companion object {
@@ -28,10 +36,10 @@ enum class ComposerInputMode(val label: String) {
     MARKDOWN("Markdown"),
 }
 
-enum class ComposerMediaKind(val label: String) {
-    IMAGE("Photo"),
-    GIF("GIF"),
-    VIDEO("Video"),
+enum class ComposerMediaKind(val label: String, @androidx.annotation.StringRes val labelRes: Int) {
+    IMAGE("Photo", io.github.brealorg.subshell.R.string.media_label_photo),
+    GIF("GIF", io.github.brealorg.subshell.R.string.media_label_gif),
+    VIDEO("Video", io.github.brealorg.subshell.R.string.media_label_video),
 }
 
 @Immutable
@@ -156,8 +164,8 @@ enum class ComposerPolicyStatus {
     UNAVAILABLE,
 }
 
-internal const val COMPOSER_BODY_NOT_ALLOWED_MESSAGE =
-    "This community doesn't allow body text for this post"
+internal val COMPOSER_BODY_NOT_ALLOWED_MESSAGE: UiText =
+    UiText.Resource(R.string.composer_this_community_doesn_t_allow_body_text)
 
 @Immutable
 data class ComposerPolicySnapshot(
@@ -198,7 +206,7 @@ enum class ComposerValidationField {
 @Immutable
 data class ComposerValidationIssue(
     val field: ComposerValidationField,
-    val message: String,
+    val message: UiText,
 )
 
 
@@ -384,7 +392,7 @@ fun validatePostComposerDraftIssue(
     policy: ComposerCommunityPolicy = ComposerCommunityPolicy.local(draft.community),
 ): ComposerValidationIssue? {
     if (communityNames.none { it.equals(draft.community, ignoreCase = true) }) {
-        return ComposerValidationIssue(ComposerValidationField.COMMUNITY, "Choose a community")
+        return ComposerValidationIssue(ComposerValidationField.COMMUNITY, UiText.Resource(R.string.composer_choose_a_community))
     }
     return validatePostComposerContentIssue(draft, policy, remote = false)
 }
@@ -393,7 +401,7 @@ fun validatePostComposerDraft(
     draft: PostComposerDraft,
     communityNames: Collection<String>,
     policy: ComposerCommunityPolicy = ComposerCommunityPolicy.local(draft.community),
-): String? = validatePostComposerDraftIssue(draft, communityNames, policy)?.message
+): UiText? = validatePostComposerDraftIssue(draft, communityNames, policy)?.message
 
 fun validateRemoteTextPostComposerDraftIssue(
     draft: PostComposerDraft,
@@ -404,7 +412,7 @@ fun validateRemoteTextPostComposerDraftIssue(
         community.length !in 1..100 ||
         community.any { !it.isLetterOrDigit() && it != '_' && it != '-' }
     ) {
-        return ComposerValidationIssue(ComposerValidationField.COMMUNITY, "Choose a community")
+        return ComposerValidationIssue(ComposerValidationField.COMMUNITY, UiText.Resource(R.string.composer_choose_a_community))
     }
     return validatePostComposerContentIssue(draft, policy, remote = true)
 }
@@ -412,82 +420,82 @@ fun validateRemoteTextPostComposerDraftIssue(
 fun validateRemoteTextPostComposerDraft(
     draft: PostComposerDraft,
     policy: ComposerCommunityPolicy = ComposerCommunityPolicy.local(draft.community),
-): String? = validateRemoteTextPostComposerDraftIssue(draft, policy)?.message
+): UiText? = validateRemoteTextPostComposerDraftIssue(draft, policy)?.message
 
 private fun validatePostComposerContentIssue(
     draft: PostComposerDraft,
     policy: ComposerCommunityPolicy,
     remote: Boolean,
 ): ComposerValidationIssue? {
-    fun issue(field: ComposerValidationField, message: String) =
+    fun issue(field: ComposerValidationField, message: UiText) =
         ComposerValidationIssue(field = field, message = message)
 
     // CROSSPOST01A1C_NO_GENERIC_PUBLISH_OR_LOCAL_DOWNGRADE_V1
     // A1D will call the source-bound crosspost gate from its explicit review flow.
     if (draft.type == ComposerPostType.CROSSPOST || draft.crosspostSource != null) {
-        return issue(ComposerValidationField.GENERAL, "Open this crosspost through its source review flow")
+        return issue(ComposerValidationField.GENERAL, UiText.Resource(R.string.composer_open_this_crosspost_through_its_source_review))
     }
     val title = draft.title.trim()
-    if (title.isEmpty()) return issue(ComposerValidationField.TITLE, "Add a title")
+    if (title.isEmpty()) return issue(ComposerValidationField.TITLE, UiText.Resource(R.string.composer_add_a_title))
     if ('\u0000' in title || '\n' in title || '\r' in title) {
-        return issue(ComposerValidationField.TITLE, "Keep the title on one line")
+        return issue(ComposerValidationField.TITLE, UiText.Resource(R.string.composer_keep_the_title_on_one_line))
     }
     if (title.length < policy.titleMinLength) {
         return issue(
             ComposerValidationField.TITLE,
-            "Use at least ${policy.titleMinLength} characters in the title",
+            UiText.Resource(R.string.composer_use_at_least_characters_in_the_title, policy.titleMinLength),
         )
     }
     if (title.length > policy.titleMaxLength) {
         return issue(
             ComposerValidationField.TITLE,
-            "Keep the title under ${policy.titleMaxLength} characters",
+            UiText.Resource(R.string.composer_keep_the_title_under_characters, policy.titleMaxLength),
         )
     }
     if (policy.titleRequiredStrings.any { it.isNotBlank() && !title.contains(it, true) }) {
         return issue(
             ComposerValidationField.TITLE,
-            "The title is missing text required by this community",
+            UiText.Resource(R.string.composer_the_title_is_missing_text_required_by),
         )
     }
     if (policy.titleBlockedStrings.any { it.isNotBlank() && title.contains(it, true) }) {
         return issue(
             ComposerValidationField.TITLE,
-            "The title contains text blocked by this community",
+            UiText.Resource(R.string.composer_the_title_contains_text_blocked_by_this),
         )
     }
     if (!policy.allows(draft.type)) {
         return issue(
             ComposerValidationField.GENERAL,
-            "This community doesn't allow ${draft.type.label.lowercase()} posts",
+            UiText.Resource(R.string.composer_this_community_doesn_t_allow_posts, draft.type.label.lowercase()),
         )
     }
     if (policy.flairRequired && draft.flair == null) {
-        return issue(ComposerValidationField.FLAIR, "Post flair is required")
+        return issue(ComposerValidationField.FLAIR, UiText.Resource(R.string.composer_post_flair_is_required))
     }
     val normalizedBody = draft.body.replace("\r\n", "\n").replace('\r', '\n').trim()
     if (!policy.bodyAllowed && normalizedBody.isNotEmpty()) {
         return issue(ComposerValidationField.BODY, COMPOSER_BODY_NOT_ALLOWED_MESSAGE)
     }
     if (policy.bodyRequired && normalizedBody.isEmpty()) {
-        return issue(ComposerValidationField.BODY, "Add post body text")
+        return issue(ComposerValidationField.BODY, UiText.Resource(R.string.composer_add_post_body_text))
     }
     if ('\u0000' in draft.body) {
         return issue(
             ComposerValidationField.BODY,
-            "Remove the unsupported character from the post body",
+            UiText.Resource(R.string.composer_remove_the_unsupported_character_from_the_post),
         )
     }
     if (normalizedBody.isNotEmpty() && normalizedBody.length < policy.bodyMinLength) {
         return issue(
             ComposerValidationField.BODY,
-            "Use at least ${policy.bodyMinLength} characters in the post body",
+            UiText.Resource(R.string.composer_use_at_least_characters_in_the_post, policy.bodyMinLength),
         )
     }
     if (normalizedBody.length > policy.bodyMaxLength) {
         return issue(
             ComposerValidationField.BODY,
-            "Keep the post body under ${policy.bodyMaxLength} characters",
+            UiText.Resource(R.string.composer_keep_the_post_body_under_characters, policy.bodyMaxLength),
         )
     }
     if (policy.bodyRequiredStrings.any {
@@ -496,23 +504,23 @@ private fun validatePostComposerContentIssue(
     ) {
         return issue(
             ComposerValidationField.BODY,
-            "The post body is missing text required by this community",
+            UiText.Resource(R.string.composer_the_post_body_is_missing_text_required),
         )
     }
     if (policy.bodyBlockedStrings.any { it.isNotBlank() && normalizedBody.contains(it, true) }) {
         return issue(
             ComposerValidationField.BODY,
-            "The post body contains text blocked by this community",
+            UiText.Resource(R.string.composer_the_post_body_contains_text_blocked_by),
         )
     }
 
     return when (draft.type) {
         ComposerPostType.CROSSPOST -> issue(
             ComposerValidationField.GENERAL,
-            "Crossposts require source review",
+            UiText.Resource(R.string.composer_crossposts_require_source_review),
         )
         ComposerPostType.TEXT -> if (draft.media.isNotEmpty()) {
-            issue(ComposerValidationField.MEDIA, "Remove media or switch the post type to Media")
+            issue(ComposerValidationField.MEDIA, UiText.Resource(R.string.composer_remove_media_or_switch_the_post_type))
         } else {
             null
         }
@@ -522,51 +530,51 @@ private fun validatePostComposerContentIssue(
             when {
                 host.isNullOrBlank() -> issue(
                     ComposerValidationField.LINK,
-                    "Add a complete web link including its scheme",
+                    UiText.Resource(R.string.composer_add_a_complete_web_link_including_its),
                 )
                 policy.domainWhitelist.isNotEmpty() &&
                     policy.domainWhitelist.none { host.matchesDomainRule(it) } -> issue(
                     ComposerValidationField.LINK,
-                    "This community doesn't allow links from that domain",
+                    UiText.Resource(R.string.composer_this_community_doesn_t_allow_links_from),
                 )
                 policy.domainBlacklist.any { host.matchesDomainRule(it) } -> issue(
                     ComposerValidationField.LINK,
-                    "This community blocks links from that domain",
+                    UiText.Resource(R.string.composer_this_community_blocks_links_from_that_domain),
                 )
                 else -> null
             }
         }
         ComposerPostType.MEDIA -> when {
-            draft.media.isEmpty() -> issue(ComposerValidationField.MEDIA, "Add a photo or video")
+            draft.media.isEmpty() -> issue(ComposerValidationField.MEDIA, UiText.Resource(R.string.composer_add_a_photo_or_video))
             draft.media.size == 1 &&
                 !draft.media.single().isComposerVideoSource() &&
                 !policy.allowImages -> issue(
                 ComposerValidationField.MEDIA,
-                "This community doesn't allow image posts",
+                UiText.Resource(R.string.composer_this_community_doesn_t_allow_image_posts),
             )
             draft.media.size == 1 &&
                 draft.media.single().isComposerVideoGif() &&
                 !policy.allowVideoGifs -> issue(
                 ComposerValidationField.MEDIA,
-                "This community doesn't allow GIF-style video posts",
+                UiText.Resource(R.string.composer_this_community_doesn_t_allow_gif_style),
             )
             draft.media.size == 1 &&
                 draft.media.single().isComposerVideoSource() &&
                 !draft.media.single().isComposerVideoGif() &&
                 !policy.allowVideo -> issue(
                 ComposerValidationField.MEDIA,
-                "This community doesn't allow video posts",
+                UiText.Resource(R.string.composer_this_community_doesn_t_allow_video_posts),
             )
             draft.media.size > COMPOSER_GALLERY_MAX_ITEMS -> issue(
                 ComposerValidationField.MEDIA,
-                "A gallery can contain up to $COMPOSER_GALLERY_MAX_ITEMS items",
+                UiText.Resource(R.string.composer_a_gallery_can_contain_up_to_items, COMPOSER_GALLERY_MAX_ITEMS),
             )
             draft.media.size > 1 && !policy.allowGalleries -> issue(
                 ComposerValidationField.MEDIA,
-                "This community doesn't allow gallery posts",
+                UiText.Resource(R.string.composer_this_community_doesn_t_allow_gallery_posts),
             )
             draft.media.size > 1 && draft.media.any { it.isComposerVideoSource() } ->
-                issue(ComposerValidationField.MEDIA, "A gallery can contain photos and GIFs, not video")
+                issue(ComposerValidationField.MEDIA, UiText.Resource(R.string.composer_a_gallery_can_contain_photos_and_gifs))
             draft.media.size > 1 && draft.media.any {
                 it.kind == ComposerMediaKind.IMAGE && !it.mimeType.isSupportedRedditStaticImageMimeType() ||
                     it.kind == ComposerMediaKind.GIF && !it.mimeType.equals(
@@ -575,18 +583,18 @@ private fun validatePostComposerContentIssue(
                     )
             } -> issue(
                 ComposerValidationField.MEDIA,
-                "Choose JPEG, PNG, WebP, or GIF files for this gallery",
+                UiText.Resource(R.string.composer_choose_jpeg_png_webp_or_gif_files),
             )
             draft.media.size > 1 && draft.media.any { it.caption.length > COMPOSER_GALLERY_CAPTION_MAX_LENGTH } ->
                 issue(
                     ComposerValidationField.MEDIA,
-                    "Keep each gallery caption under $COMPOSER_GALLERY_CAPTION_MAX_LENGTH characters",
+                    UiText.Resource(R.string.composer_keep_each_gallery_caption_under_characters, COMPOSER_GALLERY_CAPTION_MAX_LENGTH),
                 )
             draft.media.size > 1 && draft.media.any { item ->
                 item.outboundUrl.isNotBlank() && item.outboundUrl.asWebUri() == null
             } -> issue(
                 ComposerValidationField.MEDIA,
-                "Use a complete web link for each gallery item",
+                UiText.Resource(R.string.composer_use_a_complete_web_link_for_each),
             )
             remote && draft.media.size == 1 &&
                 draft.media.single().isComposerVideoSource() &&
@@ -596,7 +604,7 @@ private fun validatePostComposerContentIssue(
                     "video/webm",
                 ) -> issue(
                 ComposerValidationField.MEDIA,
-                "Choose an MP4, MOV, or WebM video",
+                UiText.Resource(R.string.composer_choose_an_mp4_mov_or_webm_video),
             )
             remote && draft.media.size == 1 &&
                 draft.media.single().kind == ComposerMediaKind.GIF &&
@@ -606,13 +614,13 @@ private fun validatePostComposerContentIssue(
                     ignoreCase = true,
                 ) -> issue(
                 ComposerValidationField.MEDIA,
-                "Choose a GIF image",
+                UiText.Resource(R.string.composer_choose_a_gif_image),
             )
             remote && draft.media.size == 1 &&
                 draft.media.single().kind == ComposerMediaKind.IMAGE &&
                 !draft.media.single().mimeType.isSupportedRedditStaticImageMimeType() -> issue(
                 ComposerValidationField.MEDIA,
-                "Choose a JPEG, PNG, or WebP image",
+                UiText.Resource(R.string.composer_choose_a_jpeg_png_or_webp_image),
             )
             else -> null
         }
@@ -719,7 +727,7 @@ private fun prefixMarkdownLines(
 private fun prefixNumberedMarkdownLines(text: String, start: Int, end: Int): MarkdownEdit {
     val selected = text.substring(start, end).ifEmpty { "list item" }
     val replacement = selected.lineSequence()
-        .mapIndexed { index, line -> "${index + 1}. $line" }
+        .mapIndexed { index, line -> "${index + 1}. ${line}" }
         .joinToString("\n")
     val updated = text.replaceRange(start, end, replacement)
     val cursor = start + replacement.length
@@ -730,7 +738,7 @@ private fun prefixNumberedMarkdownLines(text: String, start: Int, end: Int): Mar
 private fun linkMarkdown(text: String, start: Int, end: Int): MarkdownEdit {
     val selected = text.substring(start, end).ifEmpty { "link text" }
     val prefix = "[$selected]("
-    val url = "https:" + "//"
+    val url = "https://"
     val replacement = "$prefix$url)"
     val updated = text.replaceRange(start, end, replacement)
     val urlStart = start + prefix.length

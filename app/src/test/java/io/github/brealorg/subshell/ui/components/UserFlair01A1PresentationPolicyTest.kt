@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertFalse
@@ -11,7 +12,7 @@ class UserFlair01A1PresentationPolicyTest {
     fun communityOwnFlairUsesMaterial3ExpandedInsetAwareSheet() {
         val sheet = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/UserFlairSheet.kt",
-        ).readText()
+        ).readSourceText()
         assertTrue(sheet.contains("USERFLAIR01A1_MATERIAL3_OWN_COMMUNITY_FLAIR_SHEET_V1"))
         assertTrue(sheet.contains("ModalBottomSheet("))
         assertTrue(sheet.contains("rememberBottomSheetState(initialValue = SheetValue.Hidden, enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded))"))
@@ -25,10 +26,10 @@ class UserFlair01A1PresentationPolicyTest {
     fun communityOverflowOwnsEntryAndRemovalIsNotGuessed() {
         val community = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/CommunityScreen.kt",
-        ).readText()
+        ).readSourceText()
         val sheet = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/UserFlairSheet.kt",
-        ).readText()
+        ).readSourceText()
         assertTrue(community.contains("USERFLAIR01A1_COMMUNITY_OVERFLOW_ENTRY_V1"))
         assertTrue(community.contains("Text(\"User flair\")"))
         assertFalse(sheet.contains("Remove flair"))
@@ -40,10 +41,10 @@ class UserFlair01A1PresentationPolicyTest {
         // The user flair manager is built in AccountWriteRuntimeParts since R7d.
         val runtime = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/auth/AccountWriteRuntimeParts.kt",
-        ).readText()
+        ).readSourceText()
         val coordinator = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/auth/UserFlairCoordinator.kt",
-        ).readText()
+        ).readSourceText()
         assertTrue(runtime.contains("writeCallFactory = SubshellNetworkTransport.nonRetryingWriteCallFactory"))
         assertTrue(coordinator.contains("No pending mutation is stored"))
         assertTrue(coordinator.contains("refreshAfterAuthorization"))

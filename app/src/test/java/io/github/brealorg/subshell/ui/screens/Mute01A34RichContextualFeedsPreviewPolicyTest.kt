@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.screens
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import io.github.brealorg.subshell.ui.MutedCommunityDirectViewMode
 import java.io.File
@@ -31,7 +32,7 @@ class Mute01A34RichContextualFeedsPreviewPolicyTest {
         val feeds = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/screens/" +
                 "Settings03FeedsPreview.kt",
-        ).readText()
+        ).readSourceText()
 
         assertTrue(
             feeds.contains(
@@ -59,7 +60,7 @@ class Mute01A34RichContextualFeedsPreviewPolicyTest {
         val muteUi = File(
             "src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/" +
                 "MutedCommunityDirectView.kt",
-        ).readText()
+        ).readSourceText()
 
         assertTrue(muteUi.contains("\"‹   r/example\""))
         assertTrue(muteUi.contains("\"123k members\""))

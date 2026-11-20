@@ -1,5 +1,8 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.ui.UiText
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,22 +40,29 @@ internal sealed interface MediaDownloadUiState {
 /** How long the saved confirmation stays before the sheet closes. */
 internal const val MEDIA_DOWNLOAD_SAVED_VISIBLE_MS = 1_500L
 
-internal fun mediaDownloadTitle(state: MediaDownloadUiState): String = when (state) {
+internal fun mediaDownloadTitle(state: MediaDownloadUiState): UiText = when (state) {
     is MediaDownloadUiState.Saving ->
-        if (state.total > 1) "Saving ${state.done} of ${state.total}" else "Saving"
+        if (state.total > 1) {
+            UiText.Resource(R.string.comp_saving_n_of_total, state.done, state.total)
+        } else {
+            UiText.Resource(R.string.comp_saving)
+        }
     is MediaDownloadUiState.Saved -> when {
-        state.total <= 1 -> "Saved"
-        state.count == state.total -> "Saved ${state.count} items"
-        else -> "Saved ${state.count} of ${state.total}"
+        state.total <= 1 -> UiText.Resource(R.string.comp_saved)
+        state.count == state.total -> UiText.Plural(R.plurals.comp_saved_items, state.count, state.count)
+        else -> UiText.Resource(R.string.comp_saved_n_of_total, state.count, state.total)
     }
 }
 
-internal fun mediaDownloadDetail(state: MediaDownloadUiState): String = when (state) {
-    is MediaDownloadUiState.Saving -> "Keep this open until it is done"
-    is MediaDownloadUiState.Saved -> buildString {
-        append("In ${state.folder}")
+internal fun mediaDownloadDetail(state: MediaDownloadUiState): UiText = when (state) {
+    is MediaDownloadUiState.Saving -> UiText.Resource(R.string.comp_keep_open_until_done)
+    is MediaDownloadUiState.Saved -> {
         val failed = state.total - state.count
-        if (failed > 0) append(" · $failed could not be saved")
+        if (failed > 0) {
+            UiText.Plural(R.plurals.comp_saved_in_folder_with_failures, failed, state.folder, failed)
+        } else {
+            UiText.Resource(R.string.comp_saved_in_folder, state.folder)
+        }
     }
 }
 
@@ -82,7 +92,7 @@ internal fun MediaDownloadPanel(
             }
         }
         Text(
-            mediaDownloadTitle(state),
+            mediaDownloadTitle(state).asString(),
             // LOWUI7_NOTICES_ARE_ANNOUNCED_V1 (OCB-145)
             modifier = Modifier
                 .padding(top = 18.dp)
@@ -90,7 +100,7 @@ internal fun MediaDownloadPanel(
             style = MaterialTheme.typography.titleLarge,
         )
         Text(
-            mediaDownloadDetail(state),
+            mediaDownloadDetail(state).asString(),
             modifier = Modifier.padding(top = 6.dp),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -119,7 +129,14 @@ internal fun MediaDownloadPanel(
 internal const val MEDIA_ACTION_ERROR_SCOPE = "media-actions"
 
 /** Shows a media share/download failure in the viewport error tray. */
-internal fun ViewportErrorHostState.reportMediaActionFailure(title: String, message: String) {
+/** TRANSLATE14: the two media action failures every surface shows. */
+internal fun ViewportErrorHostState.reportMediaShareFailure() =
+    reportMediaActionFailure(UiText.Resource(R.string.media_could_not_share), UiText.Resource(R.string.media_share_failed_detail))
+
+internal fun ViewportErrorHostState.reportMediaDownloadFailure() =
+    reportMediaActionFailure(UiText.Resource(R.string.media_could_not_download), UiText.Resource(R.string.media_download_failed_detail))
+
+internal fun ViewportErrorHostState.reportMediaActionFailure(title: UiText, message: UiText) {
     clear(MEDIA_ACTION_ERROR_SCOPE)
     present(
         scopeKey = MEDIA_ACTION_ERROR_SCOPE,

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.backup
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertFalse
@@ -84,7 +85,7 @@ class Backup04A1HiddenCommunitiesOptInPolicyTest {
 
     @Test
     fun policyFreezesSchemaFiveAsHiddenOnly() {
-        val policy = repository("docs/backup/subshell-backup03-portability-policy-v1.md").readText()
+        val policy = repository("docs/backup/subshell-backup03-portability-policy-v1.md").readSourceText()
 
         assertTrue(policy.contains("BACKUP04A1_HIDDEN_COMMUNITIES_SCHEMA_V5_OPT_IN_V1"))
         assertTrue(policy.contains("SCHEMA_V5_STATUS=RESOLVED_BACKUP04A1"))
@@ -94,7 +95,7 @@ class Backup04A1HiddenCommunitiesOptInPolicyTest {
     }
 
     private fun source(relative: String): String =
-        repository("app/src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative").readText()
+        repository("app/src/main/java/${SUBSHELL_PACKAGE_DIR}/$relative").readSourceText()
 
     private fun repository(relative: String): File =
         File(repositoryRoot, relative).also { file ->

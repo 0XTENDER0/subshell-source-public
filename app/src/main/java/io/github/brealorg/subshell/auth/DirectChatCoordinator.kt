@@ -93,11 +93,22 @@ internal class DirectChatCoordinator(
 
     // SUBSHELL_MESSAGES02D5A_REAL_NEW_DIRECT_CHAT_V1
     fun startRedditDirectChat(request: DirectChatStartRequest) {
+        // ISSUE306_VALIDATION_NEVER_REPLACES_A_START_IN_FLIGHT_V1 (#306, as LOW10 did
+        // for replies): the account's send in flight or unknown outcome is
+        // checked first, so an invalid request no longer replaces it.
+        val requestAccount = request.accountStableId.trim()
+        val inFlight = _directChatStartUiState.value
+        if (inFlight.blocksSend && inFlight.accountStableId == requestAccount) return
+        if (requestAccount in parkedUnknownStarts) return
         val normalized = runCatching { request.normalizedDirectChatStartRequest() }
             .getOrNull()
         if (normalized == null) {
             _directChatStartUiState.value = DirectChatStartUiState(
                 phase = DirectChatStartPhase.FAILED,
+                accountStableId = requestAccount.takeIf(String::isNotEmpty),
+                participantUsername = runCatching {
+                    io.github.brealorg.subshell.data.account.normalizeDirectChatParticipantUsername(request.participantUsername)
+                }.getOrNull()?.takeIf(String::isNotBlank),
                 failureKind = DirectChatStartFailureKind.VALIDATION,
                 message = directChatStartFailureMessage(
                     DirectChatStartFailureKind.VALIDATION,
@@ -473,6 +484,7 @@ internal class DirectChatCoordinator(
                 is AuthenticatedRedditDirectChatLiveResult.Failed -> {
                     if (
                         result.kind == DirectChatLiveFailureKind.SESSION ||
+                        result.kind == DirectChatLiveFailureKind.WEB_SIGN_IN_EXPIRED ||
                         result.kind == DirectChatLiveFailureKind.ROOM ||
                         result.kind == DirectChatLiveFailureKind.PROTOCOL
                     ) {

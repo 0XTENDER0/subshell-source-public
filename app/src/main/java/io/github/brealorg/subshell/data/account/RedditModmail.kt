@@ -13,6 +13,31 @@ enum class RedditModmailUiFailureKind {
     PROTOCOL,
 }
 
+/**
+ * ISSUE304_MODMAIL_DRAFT_SURVIVES_CLOSING_V1 (Pixel 11, 2026-11-15): an unsent
+ * modmail reply, its Reply/Internal note mode and its identity, kept per
+ * account and conversation while the app runs. Closing the conversation lost
+ * all three (the composer's saved state left with it).
+ */
+data class RedditModmailDraft(
+    val text: String = "",
+    val internalNote: Boolean = false,
+    val replyAsSubreddit: Boolean = true,
+)
+
+/**
+ * ISSUE304_A_FAILED_ACTION_SAYS_WHICH_V1 (#304): one failure field served the
+ * list, the thread and every action, so a rejected reply showed nowhere in the
+ * full-screen thread and as a load failure in the two-pane list.
+ */
+enum class RedditModmailFailedAction {
+    THREAD,
+    SEND,
+    ARCHIVE,
+    TRIAGE,
+    READ_STATE,
+}
+
 // MODMAIL04A1_ACTIVE_ARCHIVED_LIST_MODE_V2
 // MODMAIL05_TRIAGE_QUEUE_FILTERS_V1
 enum class RedditModmailListMode {
@@ -183,6 +208,8 @@ data class RedditModmailUiState(
     val readStateMutationInProgress: Boolean = false,
     val readStateOutcomeUnknown: Boolean = false,
     val failureKind: RedditModmailUiFailureKind? = null,
+    // ISSUE304_A_FAILED_ACTION_SAYS_WHICH_V1: what failed; null is the list.
+    val failedAction: RedditModmailFailedAction? = null,
     val failureRetryable: Boolean = false,
     val failureHttpStatusCode: Int? = null,
     val failureDetails: FailureDetails? = null,

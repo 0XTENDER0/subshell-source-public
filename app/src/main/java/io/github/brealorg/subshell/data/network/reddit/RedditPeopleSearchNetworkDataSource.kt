@@ -26,15 +26,46 @@ internal class RedditPeopleSearchNetworkDataSource(
         searchQuery: String,
         cursor: String?,
         limit: Int,
-    ): NetworkResult<NetworkPage<RedditPeopleSearchItem>> = httpClient.getJson(
-        request = redditPeopleSearchJsonRequest(
-            searchQuery = searchQuery,
-            cursor = cursor,
-            limit = limit,
-        ),
-        deserializer = RedditPeopleSearchListingDto.serializer(),
-    ).map(RedditPeopleSearchListingDto::toNetworkPage)
+    ): NetworkResult<NetworkPage<RedditPeopleSearchItem>> {
+        val found = httpClient.getJson(
+            request = redditPeopleSearchJsonRequest(
+                searchQuery = searchQuery,
+                cursor = cursor,
+                limit = limit,
+            ),
+            deserializer = RedditPeopleSearchListingDto.serializer(),
+        ).map(RedditPeopleSearchListingDto::toNetworkPage)
+        if (found !is NetworkResult.Success || !cursor.isNullOrBlank()) return found
+        val exact = exactUsernameOrNull(searchQuery) ?: return found
+        if (found.value.items.any { item -> item.username.equals(exact, ignoreCase = true) }) return found
+        // PEOPLESEARCH_AN_EXACT_NAME_IS_ALWAYS_FOUND_V1 (Pixel 11, 2026-11-15): Reddit's
+        // profile autocomplete found u/subshell_dev for "subshell_" and nothing for
+        // "subshell_dev"; a query that is a whole username is also looked up by
+        // name, and the account goes first. A failed lookup leaves the result as it was.
+        val profile = httpClient.getJson(
+            request = JsonGetRequest(
+                pathSegments = listOf("user", exact, "about"),
+                queryParameters = listOf("raw_json" to "1"),
+            ),
+            deserializer = RedditPeopleSearchThingDto.serializer(),
+        )
+        val item = (profile as? NetworkResult.Success)?.value
+            ?.takeIf { thing -> thing.kind.equals(REDDIT_ACCOUNT_KIND, ignoreCase = true) }
+            ?.data
+            ?.toAccountPeopleSearchItem()
+            ?.takeIf { candidate -> candidate.username.equals(exact, ignoreCase = true) }
+            ?: return found
+        return NetworkResult.Success(
+            found.value.copy(items = (listOf(item) + found.value.items).take(limit)),
+            found.metadata,
+        )
+    }
 }
+
+private fun exactUsernameOrNull(searchQuery: String): String? =
+    runCatching { normalizeRedditUsername(searchQuery.trim().removePrefix("u/").removePrefix("/u/")) }
+        .getOrNull()
+        ?.takeIf { name -> name.length >= 3 }
 
 @Serializable
 internal data class RedditPeopleSearchListingDto(

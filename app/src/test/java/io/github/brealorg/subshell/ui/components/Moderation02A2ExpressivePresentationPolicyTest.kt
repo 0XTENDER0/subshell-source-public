@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui.components
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertEquals
@@ -9,21 +10,24 @@ import org.junit.Test
 
 /** Source-policy checks. These do not replace rendered Compose/UI tests. */
 class Moderation02A2ExpressivePresentationPolicyTest {
-    private fun source(name: String) = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/$name.kt").readText()
+    private fun source(name: String) = File("src/main/java/${SUBSHELL_PACKAGE_DIR}/ui/components/$name.kt").readSourceText()
 
     @Test fun bothQueuesUseOneHeaderAndWrapActionsWithoutChangingCallbacks() {
+        // ISSUE295_QUEUE_USES_THE_SHEET_V1: one summary and one action row for
+        // both queues; Spam is never sent from the row (the sheet asks first).
         listOf("InboxModeratorQueue", "ModeratorToolsSheet").forEach { name ->
             val s = source(name)
             assertTrue(s.contains("ModeratorQueueItemSummary("))
-            assertTrue(s.contains("FlowRow("))
-            assertTrue(s.contains("Symbols.Check"))
-            assertTrue(s.contains("Symbols.Block"))
-            assertTrue(s.contains("Text(\"Approve\")"))
-            assertTrue(s.contains("Text(\"Remove\")"))
-            assertTrue(s.contains("action = RedditModeratorAction.APPROVE"))
-            assertEquals(1, Regex("ModeratorSpamAction\\(").findAll(s).count())
+            assertTrue(s.contains("ModeratorQueueItemActions(item"))
             assertFalse(s.contains("action = RedditModeratorAction.SPAM"))
         }
+        val row = source("ModeratorQuickActions").substringAfter("internal fun ModeratorQueueItemActions(")
+        assertTrue(row.contains("Symbols.Check"))
+        assertTrue(row.contains("Symbols.Block"))
+        assertTrue(row.contains("Text(\"Approve\")"))
+        assertTrue(row.contains("Text(\"Remove\")"))
+        assertTrue(row.contains("RedditModeratorAction.APPROVE"))
+        assertFalse(row.contains("RedditModeratorAction.SPAM"))
         assertTrue(source("ModeratorReviewPresentation").contains("moderatorReportCountLabel(item)"))
     }
     @Test fun chooserPrioritizesLoadedQueueOverManualInput() {

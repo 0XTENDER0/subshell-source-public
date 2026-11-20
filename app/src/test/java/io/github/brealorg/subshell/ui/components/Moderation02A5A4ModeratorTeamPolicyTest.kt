@@ -9,7 +9,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import io.github.brealorg.subshell.ui.s
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class Moderation02A5A4ModeratorTeamPolicyTest {
     private val moderators = listOf(
         CommunityModerator("SecondInAlphabet", listOf("all")),
@@ -103,14 +106,14 @@ class Moderation02A5A4ModeratorTeamPolicyTest {
     fun emptyPermissionDetailsDoNotImplyAllOrNoPermissions() {
         assertTrue(moderatorTeamPermissionLabels(emptyList()).isEmpty())
         assertTrue(moderatorTeamPermissionLabels(listOf(" ")).isEmpty())
-        assertEquals(listOf("All permissions"), moderatorTeamPermissionLabels(listOf("all")))
+        assertEquals(listOf("All permissions"), moderatorTeamPermissionLabels(listOf("all")).map { it.s })
     }
 
     @Test
     fun unknownPermissionCodesRemainVisibleAndAreNotPromotedToAll() {
         assertEquals(
             listOf("Posts", "custom_future_permission", "Modmail"),
-            moderatorTeamPermissionLabels(listOf("posts", "custom_future_permission", "mail")),
+            moderatorTeamPermissionLabels(listOf("posts", "custom_future_permission", "mail")).map { it.s },
         )
     }
 

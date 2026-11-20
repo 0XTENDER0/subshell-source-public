@@ -5,6 +5,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(qualifiers = "en")
 class Next01A4AYouContentWorkspacePolicyTest {
     @Test
     fun sixContentDestinationsUseExpandedSplit() {
@@ -68,9 +70,9 @@ class Next01A4AYouContentWorkspacePolicyTest {
 
     @Test
     fun placeholdersReflectContentKind() {
-        assertEquals("Select a post", youContentWorkspacePlaceholder(0))
-        assertEquals("Select a comment", youContentWorkspacePlaceholder(1))
-        assertEquals("Select a saved item", youContentWorkspacePlaceholder(2))
-        assertEquals("Select a post", youContentWorkspacePlaceholder(5))
+        assertEquals("Select a post", youContentWorkspacePlaceholder(0).s)
+        assertEquals("Select a comment", youContentWorkspacePlaceholder(1).s)
+        assertEquals("Select a saved item", youContentWorkspacePlaceholder(2).s)
+        assertEquals("Select a post", youContentWorkspacePlaceholder(5).s)
     }
 }

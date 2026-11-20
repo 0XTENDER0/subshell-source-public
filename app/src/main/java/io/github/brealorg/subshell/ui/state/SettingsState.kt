@@ -11,7 +11,10 @@ import io.github.brealorg.subshell.ui.CommentActionPlacement
 import io.github.brealorg.subshell.ui.CommentActionPreference
 import io.github.brealorg.subshell.ui.CommentCollapseMode
 import io.github.brealorg.subshell.ui.CommentHierarchyStyle
+import io.github.brealorg.subshell.ui.CommentIndentSize
 import io.github.brealorg.subshell.ui.CommentThreadColours
+import io.github.brealorg.subshell.ui.decodeShownLanguages
+import io.github.brealorg.subshell.ui.encodeShownLanguages
 import io.github.brealorg.subshell.ui.CommentSwipeAction
 import io.github.brealorg.subshell.ui.CommentTimeFormat
 import io.github.brealorg.subshell.ui.CommunityDiscoveryLayout
@@ -76,6 +79,10 @@ internal class SettingsState(
     initialShowCreateButton: Boolean,
     initialCommentHierarchyStyle: CommentHierarchyStyle,
     initialCommentThreadColours: CommentThreadColours,
+    initialCommentIndentSize: CommentIndentSize,
+    initialCommentRailFromParent: Boolean,
+    initialCleanLinks: Boolean,
+    initialShownLanguages: Set<String>,
     initialSwipeActionsEnabled: Boolean,
     initialPostSwipeLeftAction: PostSwipeAction,
     initialPostSwipeRightAction: PostSwipeAction,
@@ -107,6 +114,9 @@ internal class SettingsState(
         io.github.brealorg.subshell.ui.FeedPositionAge.TWELVE_HOURS,
     initialResumeFeedPositionStart: io.github.brealorg.subshell.ui.FeedPositionStart =
         io.github.brealorg.subshell.ui.FeedPositionStart.SHOW_STORED,
+    initialStartFeed: io.github.brealorg.subshell.ui.StartFeed = io.github.brealorg.subshell.ui.StartFeed.HOME,
+    initialDefaultFeedSort: io.github.brealorg.subshell.ui.FeedSort = io.github.brealorg.subshell.ui.FeedSort.BEST,
+    initialDefaultCommunitySort: io.github.brealorg.subshell.ui.CommunitySort = io.github.brealorg.subshell.ui.CommunitySort.HOT,
     initialPostLayout: io.github.brealorg.subshell.ui.PostLayout = io.github.brealorg.subshell.ui.PostLayout.LARGE,
     initialListThumbnailSide: io.github.brealorg.subshell.ui.ListThumbnailSide =
         io.github.brealorg.subshell.ui.ListThumbnailSide.RIGHT,
@@ -179,6 +189,10 @@ internal class SettingsState(
     var searchBarHeader by mutableStateOf(initialSearchBarHeader)
     var showCreateButton by mutableStateOf(initialShowCreateButton)
     var commentThreadColours by mutableStateOf(initialCommentThreadColours)
+    var commentIndentSize by mutableStateOf(initialCommentIndentSize)
+    var commentRailFromParent by mutableStateOf(initialCommentRailFromParent)
+    var cleanLinks by mutableStateOf(initialCleanLinks)
+    var shownLanguages by mutableStateOf(initialShownLanguages)
         internal set
     var swipeActionsEnabled by mutableStateOf(initialSwipeActionsEnabled)
         internal set
@@ -231,6 +245,13 @@ internal class SettingsState(
     var resumeFeedPositionAge by mutableStateOf(initialResumeFeedPositionAge)
         internal set
     var resumeFeedPositionStart by mutableStateOf(initialResumeFeedPositionStart)
+        internal set
+    // ISSUE302_START_FEED_V1 / ISSUE300_DEFAULT_FEED_SORT_V1
+    var startFeed by mutableStateOf(initialStartFeed)
+        internal set
+    var defaultFeedSort by mutableStateOf(initialDefaultFeedSort)
+        internal set
+    var defaultCommunitySort by mutableStateOf(initialDefaultCommunitySort)
         internal set
     var postLayout by mutableStateOf(initialPostLayout)
         internal set
@@ -407,6 +428,26 @@ internal class SettingsState(
         persistPreference(SubshellSettings.COMMENT_THREAD_COLOURS, colours.name)
     }
 
+    fun updateCleanLinks(enabled: Boolean) {
+        cleanLinks = enabled
+        persistPreference(SubshellSettings.CLEAN_LINKS, enabled.toString())
+    }
+
+    fun updateCommentRailFromParent(enabled: Boolean) {
+        commentRailFromParent = enabled
+        persistPreference(SubshellSettings.COMMENT_RAIL_FROM_PARENT, enabled.toString())
+    }
+
+    fun updateCommentIndentSize(size: CommentIndentSize) {
+        commentIndentSize = size
+        persistPreference(SubshellSettings.COMMENT_INDENT_SIZE, size.name)
+    }
+
+    fun updateShownLanguages(languages: Set<String>) {
+        shownLanguages = decodeShownLanguages(encodeShownLanguages(languages))
+        persistPreference(SubshellSettings.SHOWN_LANGUAGES, encodeShownLanguages(shownLanguages))
+    }
+
     fun updateSwipeActionsEnabled(enabled: Boolean) {
         swipeActionsEnabled = enabled
         persistPreference(SubshellSettings.SWIPE_ACTIONS_ENABLED, enabled.toString())
@@ -576,6 +617,21 @@ internal class SettingsState(
     fun updateResumeFeedPositionStart(start: io.github.brealorg.subshell.ui.FeedPositionStart) {
         resumeFeedPositionStart = start
         persistPreference(SubshellSettings.RESUME_FEED_POSITION_START, start.name)
+    }
+
+    fun updateStartFeed(feed: io.github.brealorg.subshell.ui.StartFeed) {
+        startFeed = feed
+        persistPreference(SubshellSettings.START_FEED, feed.name)
+    }
+
+    fun updateDefaultFeedSort(sort: io.github.brealorg.subshell.ui.FeedSort) {
+        defaultFeedSort = sort
+        persistPreference(SubshellSettings.DEFAULT_FEED_SORT, sort.name)
+    }
+
+    fun updateDefaultCommunitySort(sort: io.github.brealorg.subshell.ui.CommunitySort) {
+        defaultCommunitySort = sort
+        persistPreference(SubshellSettings.DEFAULT_COMMUNITY_SORT, sort.name)
     }
 
     fun updatePostLayout(layout: io.github.brealorg.subshell.ui.PostLayout) {

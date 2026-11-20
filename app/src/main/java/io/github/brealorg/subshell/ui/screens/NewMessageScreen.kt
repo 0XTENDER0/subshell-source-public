@@ -2,6 +2,9 @@ package io.github.brealorg.subshell.ui.screens
 
 // SUBSHELL_MESSAGES02D5B2_FULLSCREEN_M3_EXPRESSIVE_NEW_MESSAGE_V1
 
+import io.github.brealorg.subshell.ui.components.pastedImageKeptInApp
+import io.github.brealorg.subshell.R
+import androidx.compose.ui.res.stringResource
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.layout.WindowInsetsRulers
@@ -206,7 +209,7 @@ fun NewMessageScreen(
     }
     if (discardConfirmationVisible) {
         ComposerDiscardChangesDialog(
-            subject = "message",
+            message = R.string.comp_edits_lost_message,
             onKeepEditing = { discardConfirmationVisible = false },
             onDiscard = {
                 discardConfirmationVisible = false
@@ -250,7 +253,7 @@ fun NewMessageScreen(
                 scrollBehavior = routeTopBarScroll,
                 title = {
                     Text(
-                        text = "New message",
+                        text = stringResource(R.string.scr_new_message),
                         style = MaterialTheme.typography.titleLarge,
                     )
                 },
@@ -261,7 +264,7 @@ fun NewMessageScreen(
                     ) {
                         Icon(
                             Symbols.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.scr_back),
                         )
                     }
                 },
@@ -340,17 +343,17 @@ fun NewMessageScreen(
                         }
                         Text(
                             text = if (handoffPending) {
-                                "Message sent"
+                                stringResource(R.string.all_message_sent)
                             } else {
-                                "Start a conversation"
+                                stringResource(R.string.all_start_a_conversation)
                             },
                             style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
                             text = if (handoffPending) {
-                                "Opening Direct Chat…"
+                                stringResource(R.string.all_opening_direct_chat)
                             } else {
-                                "Your first message starts the Direct Chat request."
+                                stringResource(R.string.all_your_first_message_starts_the_direct_chat)
                             },
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -368,10 +371,22 @@ fun NewMessageScreen(
                         )
                     }
 
+                // ISSUE306_A_NEW_CHAT_SAYS_WHY_SEND_IS_OFF_V1 (#306): Reddit starts a chat
+                // with either a message or an image; with both, Send was greyed out
+                // without a word.
+                if (editorText.isNotBlank() && media != null) {
+                    Text(
+                        text = stringResource(R.string.scr_new_chat_text_or_image),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                }
+                val pasteContext = androidx.compose.ui.platform.LocalContext.current
                 CompactReplyComposer(
                     state = editor,
                     media = media,
-                    placeholder = "Message",
+                    placeholder = stringResource(R.string.scr_message),
                     sendEnabled =
                         authenticated &&
                             (editorText.isNotBlank() != (media != null)) &&
@@ -394,13 +409,15 @@ fun NewMessageScreen(
                             ),
                         )
                     },
-                    onMediaReceived = { next ->
+                    // ISSUE306_A_PASTED_IMAGE_IS_KEPT_IN_THE_APP_V1
+                    onMediaReceived = { pasted ->
                         if (
                             !startInProgress &&
                             !outcomeUnknown &&
                             !handoffPending &&
                             editorText.isBlank()
                         ) {
+                            val next = pastedImageKeptInApp(pasteContext, pasted)
                             if (media == null) media = next else pendingMediaReplacement = next
                             onResetDirectChatStartState()
                         }
@@ -422,7 +439,7 @@ fun NewMessageScreen(
                     interactionActionsAtStart = interactionActionsAtStart,
                     focusRequester = composerFocusRequester,
                     maxCharacters = MESSAGE_REPLY_TEXT_MAX_LENGTH,
-                    sendContentDescription = if (startInProgress || handoffPending) "Sending message" else "Send message",
+                    sendContentDescription = if (startInProgress || handoffPending) stringResource(R.string.all_sending_message) else stringResource(R.string.all_send_message),
                 )
 
                 val replacement = pendingMediaReplacement
@@ -461,7 +478,7 @@ private fun RecipientSearchPhase(
         modifier = Modifier.fillMaxSize(),
     ) {
         Text(
-            text = "Who do you want to message?",
+            text = stringResource(R.string.scr_who_do_you_want_to_message),
             modifier = Modifier.padding(
                 start = 20.dp,
                 end = 20.dp,
@@ -473,7 +490,7 @@ private fun RecipientSearchPhase(
         SubshellSearchField(
             query = query,
             onQueryChange = onQueryChange,
-            placeholder = "Search Reddit users",
+            placeholder = stringResource(R.string.scr_search_reddit_users),
             modifier = Modifier.padding(horizontal = 16.dp),
             enabled = enabled,
             trailingIcon = if (query.isNotEmpty()) {
@@ -484,7 +501,7 @@ private fun RecipientSearchPhase(
                     ) {
                         Icon(
                             Symbols.Close,
-                            contentDescription = "Clear recipient search",
+                            contentDescription = stringResource(R.string.scr_clear_recipient_search),
                         )
                     }
                 }
@@ -494,14 +511,14 @@ private fun RecipientSearchPhase(
             supportingText = {
                 when {
                     !authenticated ->
-                        Text("Connect a Reddit account to use Direct Chat.")
+                        Text(stringResource(R.string.scr_connect_a_reddit_account_to_use_direct))
                     query.trim().length == 1 ->
-                        Text("Type at least 2 characters.")
+                        Text(stringResource(R.string.scr_type_at_least_2_characters))
                     loading && searchMatches ->
-                        Text("Searching Reddit users…")
+                        Text(stringResource(R.string.scr_searching_reddit_users))
                     loaded && searchMatches && query.trim().length >= 2 &&
                         people.isEmpty() ->
-                        Text("No Reddit users found.")
+                        Text(stringResource(R.string.scr_no_reddit_users_found))
                 }
             },
         )
@@ -520,7 +537,7 @@ private fun RecipientSearchPhase(
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = "Search by username to start a new Direct Chat.",
+                    text = stringResource(R.string.scr_search_by_username_to_start_a_new),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -559,7 +576,7 @@ private fun RecipientResult(
     onClick: () -> Unit,
 ) {
     ListCard(
-        headline = "u/${person.username}",
+        headline = stringResource(R.string.scr_u, person.username),
         supporting = person.description,
         supportingMaxLines = 2,
         onClick = onClick,
@@ -595,11 +612,11 @@ private fun SelectedRecipientSurface(
             RedditPersonAvatar(person = person, size = 42)
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "u/${person.username}",
+                    text = stringResource(R.string.scr_u, person.username),
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    text = "Direct Chat recipient",
+                    text = stringResource(R.string.scr_direct_chat_recipient),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -610,7 +627,7 @@ private fun SelectedRecipientSurface(
             ) {
                 Icon(
                     Symbols.Close,
-                    contentDescription = "Change recipient",
+                    contentDescription = stringResource(R.string.scr_change_recipient),
                 )
             }
         }
@@ -624,7 +641,7 @@ private fun RedditPersonAvatar(
 ) {
     RemoteIdentityImage(
         uri = person.avatarImageUri,
-        contentDescription = "Avatar for u/${person.username}",
+        contentDescription = stringResource(R.string.scr_avatar_for_u, person.username),
         modifier = Modifier
             .size(size.dp)
             .clip(CircleShape),
@@ -650,7 +667,7 @@ private fun DirectChatStartErrorNotice(
     InlineErrorNotice(
         message = message,
         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-        actionLabel = if (outcomeUnknown) "Refresh Inbox" else null,
+        actionLabel = if (outcomeUnknown) stringResource(R.string.all_refresh_inbox) else null,
         onAction = onRefreshInbox,
     )
 }

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.auth
 
+import io.github.brealorg.subshell.harness.readSourceText
 import io.github.brealorg.subshell.harness.SUBSHELL_PACKAGE_DIR
 import java.io.File
 import org.junit.Assert.assertEquals
@@ -30,6 +31,6 @@ class Low6NoIdentifiersInReleaseLogsTest {
             }
 
         assertEquals(emptyList<String>(), direct)
-        assertTrue(File(directory, "AuthDebugLog.kt").readText().contains("if (BuildConfig.DEBUG) Log.d(tag, message)"))
+        assertTrue(File(directory, "AuthDebugLog.kt").readSourceText().contains("if (BuildConfig.DEBUG) Log.d(tag, message)"))
     }
 }

@@ -78,6 +78,6 @@ class Issue263SearchPreferenceNoticeComposeTest {
         composeRule.waitForIdle()
         val request = host.currentRequest ?: return null
         assertEquals(NSFW_ACCOUNT_PREFERENCE_SCOPE, request.scopeKey)
-        return request.presentation.title
+        return request.presentation.title.s
     }
 }

@@ -1,5 +1,6 @@
 package io.github.brealorg.subshell.ui
 
+import io.github.brealorg.subshell.harness.readSourceText
 import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -26,7 +27,7 @@ class PredictiveBackOptInManifestTest {
 
     @Test
     fun applicationOptsInAndNoComponentOptsOut() {
-        val manifest = File(repositoryRoot, "app/src/main/AndroidManifest.xml").readText()
+        val manifest = File(repositoryRoot, "app/src/main/AndroidManifest.xml").readSourceText()
         val application = manifest.substringAfter("<application").substringBefore(">")
 
         assertEquals(
